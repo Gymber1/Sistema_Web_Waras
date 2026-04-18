@@ -1,0 +1,562 @@
+import React, { useState, useEffect } from 'react';
+import { Search, ChevronRight, ChevronDown, Camera, Image as ImageIcon, Heart, Filter, SlidersHorizontal, Eye, ArrowLeft, Download, Share2, MapPin, Maximize, Calendar, User, Aperture } from 'lucide-react';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('Inicio');
+  const [activeCategory, setActiveCategory] = useState('Plaza de Armas y Catedral');
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [expandedSections, setExpandedSections] = useState(['Distribución Geográfica', 'Especiales']);
+
+  // Detectar el scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Nuevo Menú de navegación
+  const navItems = [
+    'Inicio', 'Galería', 'Fotógrafos', 'Especiales', 'Aportantes'
+  ];
+
+  // Estructura de la Fototeca (Base de Datos / Filtros del Word)
+  const sidebarStructure = [
+    {
+      section: "Distribución Geográfica",
+      items: [
+        "Por Provincias", "Por Distritos", "Por Ciudades",
+        "Panorámica", "Plaza de Armas y Catedral",
+        "Barrios (Belén, La Soledad...)", "Puentes", "Calles", "Casas y Edificios"
+      ]
+    },
+    {
+      section: "Sociedad y Cultura",
+      items: [
+        "Instituciones Sociales", "Instituciones Culturales", "Instituciones Educativas",
+        "Deportes", "Familias"
+      ]
+    },
+    {
+      section: "Fotógrafos Consagrados",
+      items: [
+        "Siglo XIX", "Siglo XX", "Siglo XXI", "Colecciones Temáticas"
+      ]
+    },
+    {
+      section: "Especiales",
+      items: [
+        "Desastres en Ancash", "Tradiciones y Costumbres", "Patrimonio Arqueológico", "Parque Nacional Huascarán"
+      ]
+    }
+  ];
+
+  const toggleSection = (section) => {
+    setExpandedSections(prev => 
+      prev.includes(section) ? prev.filter(s => s !== section) : [...prev, section]
+    );
+  };
+
+  // Datos simulados (Adaptados a fotografías con URLs reales de Unsplash para demostración)
+  const mockItems = [
+    {
+      id: 1,
+      title: 'Nevado Huascarán desde el Valle',
+      photographer: 'Martín Chambi (Atribuido)',
+      year: '1932',
+      likes: 342,
+      type: 'Placa de Vidrio',
+      imageUrl: 'https://images.unsplash.com/photo-1542224566-6e85f2e6772f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      description: 'Impresionante captura del nevado Huascarán visto desde las afueras de Yungay antes del sismo de 1970. Esta fotografía en blanco y negro destaca por su alto contraste y detalle en las formaciones rocosas.',
+      resolution: '4500 x 3200 px',
+      location: 'Yungay, Ancash',
+      camera: 'Cámara de gran formato'
+    },
+    {
+      id: 2,
+      title: 'Campesina en el Mercado',
+      photographer: 'Archivo Histórico',
+      year: '1955',
+      likes: 128,
+      type: 'Negativo 35mm',
+      imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // Placeholder de retrato
+      description: 'Retrato costumbrista de una mujer andina vistiendo el traje tradicional durante el mercado dominical en la plaza principal de Huaraz.',
+      resolution: '3200 x 2400 px',
+      location: 'Huaraz, Ancash',
+      camera: 'Leica III (estimado)'
+    },
+    {
+      id: 3,
+      title: 'Callejón de Huaylas',
+      photographer: 'Carlos Zegarra',
+      year: '1980',
+      likes: 215,
+      type: 'Diapositiva Color',
+      imageUrl: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      description: 'Fotografía a color que muestra la inmensidad del Callejón de Huaylas al amanecer, con los primeros rayos de sol iluminando la Cordillera Blanca.',
+      resolution: '5120 x 3400 px',
+      location: 'Carhuaz, Ancash',
+      camera: 'Nikon F3, Lente 35mm'
+    },
+    {
+      id: 4,
+      title: 'Restos Arqueológicos de Chavín',
+      photographer: 'Desconocido',
+      year: '1919',
+      likes: 412,
+      type: 'Impresión en Papel',
+      imageUrl: 'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // Placeholder de ruinas
+      description: 'Una de las primeras documentaciones fotográficas de las cabezas clavas en su posición original en el templo de Chavín de Huántar.',
+      resolution: '2800 x 2800 px',
+      location: 'Chavín de Huántar',
+      camera: 'Desconocida'
+    }
+  ];
+
+  // Paleta de colores minimalista y elegante para Galería Fotográfica
+  const colors = {
+    primary: '#111111', // Negro casi puro (Ideal para enmarcar fotos)
+    primaryDark: '#000000', // Negro puro
+    accent: '#333333', // Gris oscuro elegante
+    accentHover: '#555555',
+    highlight: '#E53935', // Un toque de rojo (estilo Leica/cámara) para detalles muy sutiles
+    bgLight: '#FFFFFF', // Blanco puro para la pared de la galería
+    bgGray: '#F5F5F7', // Gris muy sutil para separar secciones
+  };
+
+  const Footer = () => (
+    <footer className="w-full text-white py-14 flex flex-col items-center justify-center mt-auto z-10 relative"
+            style={{ backgroundColor: colors.primaryDark }}>
+      <div className="flex items-center space-x-2 mb-4 opacity-50">
+        <Camera className="w-6 h-6" />
+      </div>
+      <p className="text-base md:text-lg font-medium tracking-wide text-center font-sans">
+        © 2024 FOTOTECA WARAS - Archivo Visual Ancashino
+      </p>
+      <p className="text-sm md:text-base text-gray-500 mt-2 text-center max-w-lg">
+        Preservando, digitalizando y compartiendo la memoria fotográfica e histórica de nuestra región.
+      </p>
+    </footer>
+  );
+
+  // VISTA DE DETALLE DE FOTOGRAFÍA
+  const ItemDetailSection = () => {
+    const relatedItems = mockItems.filter(item => item.id !== selectedItem.id);
+
+    return (
+      <div className="flex flex-col w-full min-h-screen pt-20" style={{ backgroundColor: colors.bgGray }}>
+        <div className="flex-1 max-w-[1400px] w-full mx-auto p-4 lg:p-8">
+          
+          {/* Botón Volver y Migas de pan */}
+          <div className="flex flex-wrap items-center gap-4 mb-6">
+            <button 
+              onClick={() => setSelectedItem(null)}
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-gray-200 hover:bg-black hover:text-white transition-colors shadow-sm text-gray-600 shrink-0"
+              title="Volver a la galería"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="flex flex-wrap items-center text-sm text-gray-500 font-medium">
+              <span className="hover:text-black cursor-pointer" onClick={() => { setActiveTab('Inicio'); setSelectedItem(null); }}>Inicio</span>
+              <ChevronRight className="w-4 h-4 mx-2 shrink-0" />
+              <span className="hover:text-black cursor-pointer" onClick={() => setSelectedItem(null)}>{activeCategory}</span>
+              <ChevronRight className="w-4 h-4 mx-2 shrink-0" />
+              <span className="text-black truncate max-w-[150px] sm:max-w-none">{selectedItem.title}</span>
+            </div>
+          </div>
+
+          {/* Área principal del visor de foto y datos */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-12 flex flex-col lg:flex-row">
+            
+            {/* Columna Izquierda: Visor de la Fotografía */}
+            <div className="w-full lg:w-2/3 bg-black flex items-center justify-center relative min-h-[400px] lg:min-h-[600px] p-4 lg:p-12">
+              <img 
+                src={selectedItem.imageUrl} 
+                alt={selectedItem.title} 
+                className="max-w-full max-h-[70vh] object-contain shadow-2xl"
+              />
+              <div className="absolute bottom-4 right-4 flex space-x-2">
+                <button className="bg-black/50 hover:bg-black/80 text-white p-2 rounded backdrop-blur-sm transition-colors">
+                  <Maximize className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Columna Derecha: Metadatos e Información */}
+            <div className="flex-1 p-6 lg:p-10 flex flex-col justify-between">
+              <div>
+                <div className="inline-block px-3 py-1 bg-gray-100 text-gray-800 text-xs font-bold uppercase tracking-widest rounded-sm mb-4">
+                  {selectedItem.type}
+                </div>
+                
+                <h1 className="text-3xl font-bold text-black mb-4 leading-tight tracking-tight">
+                  {selectedItem.title}
+                </h1>
+                
+                <p className="text-lg text-gray-600 font-medium mb-8 flex items-center border-b border-gray-100 pb-6">
+                  <User className="w-5 h-5 mr-2" /> {selectedItem.photographer}
+                </p>
+
+                {/* Grid de Metadatos Fotográficos */}
+                <div className="grid grid-cols-2 gap-y-6 gap-x-4 text-sm text-gray-700 mb-8">
+                  <div>
+                    <span className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Año / Fecha</span>
+                    <div className="flex items-center font-medium"><Calendar className="w-4 h-4 mr-1.5" /> {selectedItem.year}</div>
+                  </div>
+                  <div>
+                    <span className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Ubicación</span>
+                    <div className="flex items-center font-medium"><MapPin className="w-4 h-4 mr-1.5" /> {selectedItem.location}</div>
+                  </div>
+                  <div>
+                    <span className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Resolución Digital</span>
+                    <div className="flex items-center font-medium"><Maximize className="w-4 h-4 mr-1.5" /> {selectedItem.resolution}</div>
+                  </div>
+                  <div>
+                    <span className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Equipo / Formato</span>
+                    <div className="flex items-center font-medium"><Aperture className="w-4 h-4 mr-1.5" /> {selectedItem.camera}</div>
+                  </div>
+                </div>
+
+                <div className="mb-8">
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Descripción del Archivo</h3>
+                  <p className="text-gray-800 leading-relaxed text-sm md:text-base">
+                    {selectedItem.description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Acciones */}
+              <div className="flex flex-col sm:flex-row gap-3 mt-auto pt-6 border-t border-gray-100">
+                <button className="flex-1 flex items-center justify-center space-x-2 bg-black text-white px-6 py-3.5 rounded hover:bg-gray-800 transition-colors font-medium text-sm tracking-wide uppercase">
+                  <Download className="w-4 h-4" />
+                  <span>Descargar TIF</span>
+                </button>
+                <div className="flex gap-3 w-full sm:w-auto">
+                  <button className="flex-1 sm:flex-none flex items-center justify-center px-6 py-3.5 rounded border border-gray-200 text-gray-700 hover:border-black hover:text-black transition-colors group">
+                    <Heart className="w-5 h-5 group-hover:fill-black" />
+                  </button>
+                  <button className="flex-1 sm:flex-none flex items-center justify-center px-6 py-3.5 rounded border border-gray-200 text-gray-700 hover:border-black hover:text-black transition-colors">
+                    <Share2 className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Sección de Relacionados */}
+          <div className="mt-16 mb-8">
+            <h3 className="text-xl font-bold text-black mb-6 uppercase tracking-wider">
+              Fotografías Relacionadas
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {relatedItems.map((item) => (
+                <div 
+                  key={item.id} 
+                  onClick={() => {
+                    setSelectedItem(item);
+                    window.scrollTo(0, 0);
+                  }}
+                  className="bg-white rounded shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group cursor-pointer"
+                >
+                  <div className="h-56 w-full overflow-hidden bg-gray-100 relative">
+                    <img 
+                      src={item.imageUrl} 
+                      alt={item.title} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-sm font-bold text-black mb-1 truncate">{item.title}</h3>
+                    <div className="flex justify-between items-center mt-2">
+                      <p className="text-xs text-gray-500 font-medium">{item.photographer}</p>
+                      <p className="text-xs text-gray-400">{item.year}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+        </div>
+        <Footer />
+      </div>
+    );
+  };
+
+  // VISTA HERO (INICIO)
+  const HeroSection = () => (
+    <div className="flex flex-col w-full min-h-screen">
+      <div 
+        className="relative w-full flex-1 flex items-center justify-center min-h-screen bg-cover bg-center"
+        style={{ 
+          backgroundImage: 'url("https://images.unsplash.com/photo-1505322022379-7c3353ee6291?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80")' // Imagen de cámaras/lentes o paisaje B/N oscuro
+        }}
+      >
+        <div className="absolute inset-0 bg-black/60"></div>
+        
+        <div className="relative z-10 w-full max-w-4xl px-6 flex flex-col items-center text-center mt-16">
+          <div className="mb-6 inline-block p-3 border border-white/30 rounded-full backdrop-blur-sm">
+            <Camera className="w-8 h-8 text-white opacity-80" />
+          </div>
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tighter uppercase">
+            Fototeca <span className="font-light">Ancashina</span>
+          </h1>
+          <p className="text-lg md:text-xl text-gray-300 mb-12 tracking-wide font-light max-w-2xl">
+            Preservando y compartiendo la memoria visual, histórica y cultural de nuestra región.
+          </p>
+          
+          <div className="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded flex overflow-hidden p-1 md:w-11/12 mx-auto focus-within:bg-white transition-colors duration-300 group">
+            <div className="flex-1 flex items-center px-5">
+              <Search className="text-white group-focus-within:text-gray-400 w-6 h-6 mr-4 transition-colors" />
+              <input 
+                type="text" 
+                placeholder="Buscar fotografías, lugares, años o autores..." 
+                className="w-full py-4 text-white group-focus-within:text-black text-lg focus:outline-none bg-transparent placeholder-white/70 group-focus-within:placeholder-gray-400 transition-colors font-light tracking-wide"
+              />
+            </div>
+            <button className="bg-white text-black text-lg font-bold px-10 py-4 rounded-sm hover:bg-gray-200 transition-colors duration-200 uppercase tracking-widest text-sm">
+              Buscar
+            </button>
+          </div>
+        </div>
+      </div>
+      <Footer />
+    </div>
+  );
+
+  // VISTA CATÁLOGO (GALERÍA)
+  const ContentSection = () => (
+    <div className="flex flex-col w-full min-h-screen pt-20" style={{ backgroundColor: colors.bgGray }}>
+      <div className="flex flex-1 max-w-[1600px] w-full mx-auto">
+        
+        {/* Barra lateral de filtros */}
+        <aside className="w-72 bg-white border-r border-gray-200 hidden md:block shrink-0 overflow-y-auto z-10">
+          <div className="py-6 px-8 border-b border-gray-100 flex items-center space-x-3 bg-black">
+            <Filter className="w-4 h-4 text-white" />
+            <span className="text-white font-bold text-sm uppercase tracking-widest">Filtros de Galería</span>
+          </div>
+
+          <div className="py-2">
+            {sidebarStructure.map((group) => (
+              <div key={group.section} className="border-b border-gray-100 last:border-0">
+                <button
+                  onClick={() => toggleSection(group.section)}
+                  className="w-full flex items-center justify-between px-8 py-4 hover:bg-gray-50 transition-colors"
+                >
+                  <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider text-left">{group.section}</h3>
+                  {expandedSections.includes(group.section) ? (
+                    <ChevronDown className="w-4 h-4 text-gray-500 shrink-0 ml-2" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
+                  )}
+                </button>
+                
+                {expandedSections.includes(group.section) && (
+                  <ul className="py-2 bg-gray-50/50">
+                    {group.items.map((cat) => (
+                      <li key={cat}>
+                        <button
+                          onClick={() => { setActiveCategory(cat); setSelectedItem(null); }}
+                          className={`w-full flex items-center justify-between px-8 py-2.5 text-sm font-medium transition-all duration-200
+                            ${activeCategory === cat 
+                              ? 'text-black bg-gray-100 border-l-2 border-black' 
+                              : 'text-gray-500 hover:text-black hover:bg-gray-100 border-l-2 border-transparent'
+                            }`}
+                        >
+                          <span className="text-left leading-tight pr-4">{cat}</span>
+                          <ChevronRight className={`w-3 h-3 shrink-0 ${activeCategory === cat ? 'opacity-100 text-black' : 'opacity-0 -translate-x-2'} transition-all`} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Filtros Fotográficos */}
+          <div className="py-6 border-t border-gray-200 bg-white">
+            <div className="px-8 mb-6">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-3">Distribución Temporal</label>
+              <select className="w-full bg-white border border-gray-300 text-gray-700 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-black cursor-pointer">
+                <option>Todas las épocas</option>
+                <option>Antes del Terremoto</option>
+                <option>Terremoto (1970)</option>
+                <option>Después del Terremoto</option>
+                <option>Siglo XXI</option>
+              </select>
+            </div>
+
+            <div className="px-8">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-3">Color</label>
+              <div className="space-y-3">
+                <label className="flex items-center space-x-3 text-sm text-gray-600 cursor-pointer group">
+                  <div className="w-4 h-4 border border-gray-300 rounded-full flex items-center justify-center group-hover:border-black">
+                    <div className="w-2 h-2 bg-black rounded-full hidden"></div>
+                  </div>
+                  <span>Blanco y Negro</span>
+                </label>
+                <label className="flex items-center space-x-3 text-sm text-gray-600 cursor-pointer group">
+                  <div className="w-4 h-4 border border-gray-300 rounded-full flex items-center justify-center group-hover:border-black">
+                    <div className="w-2 h-2 bg-black rounded-full hidden"></div>
+                  </div>
+                  <span>A Color</span>
+                </label>
+                <label className="flex items-center space-x-3 text-sm text-gray-600 cursor-pointer group">
+                  <div className="w-4 h-4 border border-black rounded-full flex items-center justify-center">
+                    <div className="w-2 h-2 bg-black rounded-full"></div>
+                  </div>
+                  <span className="text-black font-medium">Todos</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* Área principal (Muro de Fotos) */}
+        <main className="flex-1 p-6 lg:p-10 overflow-y-auto bg-white">
+          
+          <div className="mb-8 pb-4 border-b border-gray-200">
+            <h2 className="text-3xl font-bold text-black tracking-tight mb-2">
+              {activeCategory}
+            </h2>
+            <p className="text-gray-500 text-sm">Explorando el archivo histórico y fotográfico.</p>
+          </div>
+
+          {/* Buscador y Toolbar */}
+          <div className="mb-8 w-full flex flex-col md:flex-row gap-4">
+            <div className="relative group shadow-sm flex-1">
+              <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2 group-focus-within:text-black transition-colors" />
+              <input 
+                type="text" 
+                placeholder={`Buscar en ${activeCategory}...`}
+                className="w-full pl-12 pr-4 py-3.5 border border-gray-200 rounded-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm bg-gray-50 focus:bg-white text-black"
+              />
+            </div>
+            
+            <div className="flex items-center justify-between md:justify-end space-x-4 bg-gray-50 px-4 py-2 border border-gray-200 rounded-sm">
+              <span className="text-sm text-gray-500 font-medium whitespace-nowrap">
+                <strong className="text-black">84</strong> fotos
+              </span>
+              <div className="h-6 w-px bg-gray-300"></div>
+              <div className="flex items-center space-x-2">
+                <SlidersHorizontal className="w-4 h-4 text-gray-400" />
+                <select className="bg-transparent text-sm font-medium text-black focus:outline-none cursor-pointer">
+                  <option>Más recientes</option>
+                  <option>Más antiguas</option>
+                  <option>Más populares</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Grid de Fotografías (Estilo Galería de Arte) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+            {mockItems.map((item) => (
+              <div 
+                key={item.id} 
+                onClick={() => setSelectedItem(item)}
+                className="group cursor-pointer flex flex-col"
+              >
+                {/* Contenedor de la Imagen */}
+                <div className="relative w-full aspect-[4/3] bg-gray-100 overflow-hidden mb-3">
+                  <img 
+                    src={item.imageUrl} 
+                    alt={item.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  
+                  {/* Overlay al pasar el mouse */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4">
+                    <button className="bg-white text-black px-6 py-2 rounded-sm font-bold text-xs uppercase tracking-widest transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 flex items-center space-x-2">
+                      <Eye className="w-4 h-4" />
+                      <span>Ver Fotografía</span>
+                    </button>
+                  </div>
+                  
+                  {/* Badge de formato */}
+                  <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-sm shadow-sm uppercase tracking-wider">
+                    {item.type}
+                  </div>
+                </div>
+                
+                {/* Información al pie de la foto */}
+                <div className="flex flex-col">
+                  <h3 className="text-base font-bold text-black leading-tight mb-1 group-hover:text-gray-600 transition-colors">
+                    {item.title}
+                  </h3>
+                  <div className="flex justify-between items-center text-sm text-gray-500">
+                    <span className="truncate pr-2">{item.photographer}</span>
+                    <span className="font-mono text-xs">{item.year}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </main>
+      </div>
+      <Footer />
+    </div>
+  );
+
+  const isHome = activeTab === 'Inicio';
+  const headerBackground = isHome 
+    ? (isScrolled ? 'bg-black shadow-lg py-3' : 'bg-transparent py-6') 
+    : 'bg-black shadow-md py-3';
+
+  return (
+    <div className="flex flex-col min-h-screen font-sans bg-white">
+      
+      {/* Navbar Superior */}
+      <header className={`fixed w-full top-0 z-50 transition-all duration-300 ${headerBackground} border-b border-white/10`}>
+        <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
+          <div className="flex items-center justify-between h-14">
+            
+            {/* Logo Fototeca */}
+            <div 
+              className="flex items-center cursor-pointer group"
+              onClick={() => { setActiveTab('Inicio'); setSelectedItem(null); }}
+            >
+              <div className="mr-3 border-2 border-white rounded-full p-1 group-hover:scale-110 transition-transform">
+                <Aperture className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold tracking-[0.2em] text-white uppercase">Fototeca</span>
+              <span className="text-xl font-light ml-2 text-gray-400">Ancashina</span>
+            </div>
+
+            {/* Navegación Desktop */}
+            <nav className="hidden lg:flex space-x-6">
+              {navItems.map((item) => (
+                <button
+                  key={item}
+                  onClick={() => { setActiveTab(item); setSelectedItem(null); }}
+                  className={`text-xs font-bold tracking-widest uppercase transition-all duration-200 pb-1 border-b-2
+                    ${activeTab === item && !selectedItem
+                      ? 'border-white text-white' 
+                      : 'border-transparent text-gray-400 hover:text-white'
+                    }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </nav>
+
+            <div className="lg:hidden flex items-center">
+               <button className="text-white hover:text-gray-300 transition-colors p-2">
+                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                 </svg>
+               </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Contenido principal condicional */}
+      {activeTab === 'Inicio' ? <HeroSection /> : (selectedItem ? <ItemDetailSection /> : <ContentSection />)}
+      
+    </div>
+  );
+}
