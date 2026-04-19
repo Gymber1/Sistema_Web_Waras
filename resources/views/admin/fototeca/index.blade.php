@@ -39,12 +39,13 @@
     </div>
 
     {{-- Métricas rápidas --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         @php
         $metrics = [
-            ['label' => 'Fotografías', 'value' => $stats['photos'], 'icon' => '🖼️'],
-            ['label' => 'Fotógrafos', 'value' => $stats['photographers'], 'icon' => '📸'],
-            ['label' => 'Categorías', 'value' => $stats['categories'], 'icon' => '🏷️'],
+            ['label' => 'Fotografías', 'value' => $stats['photos'],        'icon' => '🖼️'],
+            ['label' => 'Fotógrafos',  'value' => $stats['photographers'], 'icon' => '📸'],
+            ['label' => 'Categorías',  'value' => $stats['categories'],    'icon' => '🏷️'],
+            ['label' => 'Especiales',  'value' => $stats['specials'],      'icon' => '⭐'],
         ];
         @endphp
         @foreach($metrics as $m)
@@ -104,6 +105,21 @@
             <p class="text-sm text-slate-500 mb-4">Define la taxonomía del archivo fotográfico: crea categorías temáticas y subcategorías para una exploración ordenada.</p>
             <a href="{{ route('admin.fototeca.categories') }}" class="block w-full text-center py-2.5 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
                 Administrar Categorías
+            </a>
+        </div>
+
+        {{-- Especiales --}}
+        <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all">
+            <div class="flex items-center gap-3 mb-3">
+                <span class="text-2xl">⭐</span>
+                <div>
+                    <h3 class="font-black text-slate-800">Especiales</h3>
+                    <p class="text-xs text-slate-400">{{ $stats['specials'] }} fotos destacadas</p>
+                </div>
+            </div>
+            <p class="text-sm text-slate-500 mb-4">Marca fotografías para destacarlas como "especiales" en el portal público de la Fototeca.</p>
+            <a href="{{ route('admin.fototeca.specials') }}" class="block w-full text-center py-2.5 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
+                Administrar Especiales
             </a>
         </div>
 

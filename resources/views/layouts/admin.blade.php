@@ -89,6 +89,7 @@
                             <a href="{{ route('admin.fototeca.photos') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.fototeca.photos*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Fotografías</a>
                             <a href="{{ route('admin.fototeca.photographers') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.fototeca.photographers*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Fotógrafos</a>
                             <a href="{{ route('admin.fototeca.categories') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.fototeca.categories*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Categorías</a>
+                            <a href="{{ route('admin.fototeca.specials') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.fototeca.specials*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Especiales</a>
                         </div>
                     </details>
                     @endif

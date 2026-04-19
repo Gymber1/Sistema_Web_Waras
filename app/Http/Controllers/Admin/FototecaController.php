@@ -19,6 +19,7 @@ class FototecaController extends Controller
             'photos'        => Photo::count(),
             'photographers' => Photographer::count(),
             'categories'    => Category::where('type', 'fototeca')->count(),
+            'specials'      => Photo::where('is_special', true)->count(),
         ];
 
         return view('admin.fototeca.index', compact('stats'));
@@ -289,6 +290,20 @@ class FototecaController extends Controller
     {
         $category->delete();
         return redirect()->route('admin.fototeca.categories')->with('success', 'Categoría eliminada.');
+    }
+
+    // ============= ESPECIALES =============
+
+    public function indexSpecials()
+    {
+        $photos = Photo::with(['photographers', 'categories'])->orderBy('title')->get();
+        return view('admin.fototeca.specials.index', compact('photos'));
+    }
+
+    public function toggleSpecial(Request $request, Photo $photo)
+    {
+        $photo->update(['is_special' => !$photo->is_special]);
+        return response()->json(['is_special' => $photo->is_special]);
     }
 
     // ============= HELPERS =============

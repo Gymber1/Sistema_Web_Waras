@@ -46,7 +46,6 @@ Route::prefix('fototeca')->name('fototeca.')->group(function () {
     Route::get('/category/{category}', [FototecaController::class, 'getPhotosByCategory'])->name('category');
     Route::get('/fotografos/{photographer}', [FototecaController::class, 'showPhotographer'])->name('fotografos.show');
     Route::get('/galeria/{photo}', [FototecaController::class, 'showPhoto'])->name('galeria.show');
-    Route::get('/especiales/{special}', [FototecaController::class, 'showEspecial'])->name('especiales.show');
 });
 
 // ============= AUTENTICACIÓN =============
@@ -134,6 +133,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/categories/{category}/edit', [AdminFototecaController::class, 'editCategory'])->name('categories.edit');
             Route::put('/categories/{category}', [AdminFototecaController::class, 'updateCategory'])->name('categories.update');
             Route::delete('/categories/{category}', [AdminFototecaController::class, 'destroyCategory'])->name('categories.destroy');
+
+            // Especiales
+            Route::get('/specials', [AdminFototecaController::class, 'indexSpecials'])->name('specials');
+            Route::post('/specials/{photo}/toggle', [AdminFototecaController::class, 'toggleSpecial'])->name('specials.toggle');
         });
 
         // Configurar Web (solo admin global)

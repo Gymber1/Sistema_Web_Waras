@@ -26,6 +26,11 @@ class Photo extends Model
         'full_image_path',
         'source_type',
         'external_url',
+        'is_special',
+    ];
+
+    protected $casts = [
+        'is_special' => 'boolean',
     ];
 
     public function photographers(): BelongsToMany

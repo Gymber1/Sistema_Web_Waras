@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Photo;
 use App\Models\Photographer;
 use App\Models\Category;
-use App\Models\Special;
 use App\Models\SiteSetting;
 
 class FototecaController extends Controller
@@ -52,13 +51,23 @@ class FototecaController extends Controller
             'photo_path'   => $p->photo_path ? '/storage/' . $p->photo_path : null,
         ])->values()->toArray();
 
-        $especialesData = Special::withCount('photos')->get()->map(fn($s) => [
-            'id'          => $s->id,
-            'title'       => $s->title,
-            'description' => $s->description ?? '',
-            'cover'       => $s->cover_image_path ? '/storage/' . $s->cover_image_path : null,
-            'photos_count'=> $s->photos_count,
-        ])->values()->toArray();
+        $especialesData = Photo::where('is_special', true)
+            ->with(['photographers', 'categories'])
+            ->get()
+            ->map(fn($p) => [
+                'id'           => $p->id,
+                'title'        => $p->title,
+                'photographer' => $p->photographers->first()?->full_name ?? 'Desconocido',
+                'year'         => $p->year ?? 'S/F',
+                'source_type'  => $p->source_type ?? 'local',
+                'image_url'    => $p->thumbnail_path ? '/storage/' . $p->thumbnail_path : ($p->full_image_path ? '/storage/' . $p->full_image_path : null),
+                'description'  => $p->description ?? '',
+                'resolution'   => $p->resolution ?? 'N/A',
+                'location'     => $p->location ?? '',
+                'format'       => $p->format ?? '',
+                'external_url' => $p->external_url ?? '',
+                'detail_url'   => '/fototeca/galeria/' . $p->id,
+            ])->values()->toArray();
 
         $allCategories = Category::where('type', 'fototeca')
             ->whereNull('parent_id')

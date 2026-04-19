@@ -71,12 +71,12 @@
 </header>
 
 <div class="page-body">
-    <a href="{{ route('fototeca.dashboard') }}#Galería" class="back-btn" onclick="sessionStorage.setItem('fototeca_tab','Galería')">
+    <a id="backBtn" href="{{ route('fototeca.dashboard') }}" class="back-btn">
         <i class="fas fa-arrow-left"></i> Atrás
     </a>
     <div class="breadcrumbs">
         <a href="{{ route('fototeca.dashboard') }}" class="breadcrumb-link">Inicio</a><span>›</span>
-        <a href="{{ route('fototeca.dashboard') }}#Galería" class="breadcrumb-link" onclick="sessionStorage.setItem('fototeca_tab','Galería')">Galería</a><span>›</span>
+        <a id="breadcrumbSection" href="{{ route('fototeca.dashboard') }}" class="breadcrumb-link">Galería</a><span>›</span>
         <span class="breadcrumb-current">{{ Str::limit($photo->title, 50) }}</span>
     </div>
 
@@ -156,12 +156,14 @@
 </footer>
 
 <script>
-    document.querySelectorAll('a[href*="#"]').forEach(link => {
-        link.addEventListener('click', function() {
-            const tab = this.getAttribute('href').split('#')[1];
-            if (tab) sessionStorage.setItem('fototeca_tab', tab);
-        });
-    });
+    (function() {
+        const tab  = sessionStorage.getItem('fototeca_tab') || 'Galería';
+        const base = '{{ route('fototeca.dashboard') }}';
+        document.getElementById('backBtn').href = base + '#' + tab;
+        const bc = document.getElementById('breadcrumbSection');
+        bc.href = base + '#' + tab;
+        bc.textContent = tab;
+    })();
     document.getElementById('btnShare').addEventListener('click', () => {
         const url = window.location.href;
         const toast = document.getElementById('shareToast');

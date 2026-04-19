@@ -1,0 +1,33 @@
+"Necesito integrar la funcionalidad de Especiales en el módulo de Fototeca dentro del Panel Administrativo de mi proyecto Laravel. El objetivo es que funcione de la misma manera que en la Biblioteca, permitiendo destacar fotos específicas para que aparezcan en la sección correspondiente del sitio público.
+
+Requerimientos Técnicos y de UI:
+
+Actualización del Dashboard de Fototeca:
+
+Añade una nueva tarjeta de resumen (card) en el dashboard principal de Fototeca que muestre el conteo de 'Especiales' activos.
+
+Incluye un botón de 'Administrar Especiales' que redirija a la nueva ruta admin/fototeca/specials.
+
+Modificación del Sidebar:
+
+Agrega la opción 'Especiales' dentro del submenú de Fototeca en el menú lateral izquierdo.
+
+Debe seguir el mismo estilo y orden que en la sección de Biblioteca.
+
+Nueva Vista de Gestión de Especiales (Fototeca):
+
+Crea la vista admin/biblioteca/specials siguiendo exactamente la estructura de la imagen de referencia de la Biblioteca.
+
+Tabla de Datos: Debe listar todas las fotografías con columnas para: Miniatura (en aspecto horizontal/foto), Título, Fotógrafo, Categoría y el interruptor (toggle) de 'Especial'.
+
+Lógica de Tabs: Si en el futuro agregamos otros tipos de archivos a la Fototeca (como videos o álbumes), deja preparada la estructura de pestañas (tabs) que se ve en la Biblioteca. Por ahora, solo debe estar activa la pestaña de 'Fotografías'.
+
+Backend y Lógica de Datos:
+
+Asegúrate de que el interruptor (toggle) de 'Especial' funcione mediante una petición AJAX para que el administrador pueda marcar o desmarcar fotos rápidamente sin recargar la página.
+
+Modifica el controlador de Fototeca para manejar esta actualización en la base de datos (campo is_special o tabla pivote, según cómo esté estructurado).
+
+Vinculación con el Sitio Público:
+
+Asegúrate de que las fotos marcadas como 'Especial' en el panel se carguen dinámicamente en la vista pública de /fototeca/especiales, reemplazando los placeholders actuales.

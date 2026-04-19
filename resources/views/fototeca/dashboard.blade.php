@@ -567,20 +567,28 @@
             }
 
             if (state.activeTab === 'Especiales') {
-                grid.innerHTML = items.map(s => `
-                    <a href="/fototeca/especiales/${s.id}" style="text-decoration:none;">
-                        <div class="photo-card">
-                            <div class="photo-image-container" style="background:#111;">
-                                ${s.cover
-                                    ? `<img src="${s.cover}" alt="${s.title}" class="photo-image" onerror="this.style.display='none'">`
-                                    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-star" style="font-size:3rem;color:#555;"></i></div>`}
-                                <div class="photo-badge">${s.photos_count} fotos</div>
-                            </div>
-                            <div class="photo-title">${s.title}</div>
-                            <div class="photo-meta">${s.description ? s.description.slice(0, 80) + '…' : 'Colección especial'}</div>
+                if (items.length === 0) {
+                    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:4rem 0;color:#9ca3af;">No hay fotografías especiales.</div>`;
+                    return;
+                }
+                grid.innerHTML = items.map((photo, index) => `
+                    <div class="photo-card" data-index="${index}">
+                        <div class="photo-image-container">
+                            ${photo.image_url
+                                ? `<img src="${photo.image_url}" alt="${photo.title}" class="photo-image" onerror="this.style.display='none'">`
+                                : ''}
+                            <div class="photo-badge">${photo.format || photo.source_type || 'Archivo'}</div>
                         </div>
-                    </a>
-                `).join('') || `<div style="grid-column:1/-1;text-align:center;padding:4rem 0;color:#9ca3af;">No hay especiales registrados.</div>`;
+                        <div class="photo-title">${photo.title}</div>
+                        <div class="photo-meta">
+                            <span>${photo.photographer}</span>
+                            <span style="font-family:monospace;">${photo.year}</span>
+                        </div>
+                    </div>
+                `).join('');
+                document.querySelectorAll('#photosGrid .photo-card').forEach((card, index) => {
+                    card.addEventListener('click', () => showDetail(items[index]));
+                });
                 return;
             }
 
@@ -736,6 +744,7 @@
         // ========== MOSTRAR DETALLE ==========
         function showDetail(photo) {
             if (photo.detail_url) {
+                sessionStorage.setItem('fototeca_tab', state.activeTab);
                 window.location.href = photo.detail_url;
                 return;
             }
