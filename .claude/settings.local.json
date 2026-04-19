@@ -3,7 +3,11 @@
     "allow": [
       "Bash(php artisan *)",
       "Bash(grep -v \"^$\")",
-      "Bash(grep -rn 'parent->subcategories\\\\|foreach.*as $parent' c:/Users/NITRO/Documents/Proyectos/Waras/resources/views/admin/)"
+      "Bash(grep -rn 'parent->subcategories\\\\|foreach.*as $parent' c:/Users/NITRO/Documents/Proyectos/Waras/resources/views/admin/)",
+      "Bash(php -r \"require 'vendor/autoload.php';\")",
+      "Bash(php -r ' *)",
+      "Bash(xargs ls *)",
+      "Bash(xargs grep *)"
     ]
   }
 }

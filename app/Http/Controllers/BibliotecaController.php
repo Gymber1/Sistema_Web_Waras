@@ -7,6 +7,7 @@ use App\Models\Book;
 use App\Models\Author;
 use App\Models\Category;
 use App\Models\Publisher;
+use App\Models\SiteSetting;
 
 class BibliotecaController extends Controller
 {
@@ -16,95 +17,90 @@ class BibliotecaController extends Controller
      */
     public function index()
     {
-        // Verificar que el usuario tiene acceso (solo si está autenticado)
-        if (auth()->check() && !auth()->user()->canAccessModule('biblioteca')) {
-            abort(403, 'Acceso denegado a este módulo');
-        }
+        return view('biblioteca.dashboard', $this->dashboardData('Inicio'));
+    }
 
-        // Obtener estadísticas optimizadas
-        $totalBooks = Book::count();
-        $totalAuthors = Author::count();
+    private function dashboardData(string $activeSection): array
+    {
+        $totalBooks      = Book::count();
+        $totalAuthors    = Author::count();
         $totalPublishers = Publisher::count();
         $totalCategories = Category::count();
+        $allBooks        = Book::with(['authors', 'publisher', 'categories'])->get();
+        $booksByType     = $allBooks->groupBy('document_type');
 
-        // Obtener TODOS los libros con relaciones eager-loaded
-        $allBooks = Book::with(['authors', 'publisher', 'categories'])->get();
-
-        // Agrupar por tipo de documento
-        $booksByType = $allBooks->groupBy('document_type');
-        
-        // Preparar datos por sección (Libros, Revistas, etc.)
         $booksData = [
-            'Libros' => $booksByType->get('Libro', collect())->values()->toArray(),
-            'Revistas' => $booksByType->get('Revista', collect())->values()->toArray(),
-            'Editoriales' => [], // Placeholder para futura expansión
-            'Especiales' => [], // Placeholder para futura expansión
-            'Autores' => Author::all()->toArray(),
-            'Aportantes' => [], // Placeholder para futura expansión
+            'Libros'      => $booksByType->get('Libro', collect())->values()->toArray(),
+            'Revistas'    => $booksByType->get('Revista', collect())->values()->toArray(),
+            'Editoriales' => Publisher::with('books')->get()->toArray(),
+            'Especiales'  => Book::where('is_special', true)->with(['authors', 'publisher', 'categories'])->get()->toArray(),
+            'Autores'     => Author::all()->toArray(),
+            'Aportantes'  => [],
         ];
 
-        // Obtener categorías de biblioteca para filtros dinámicos
         $allCategories = Category::where('type', 'biblioteca')
             ->whereNull('parent_id')
             ->with('subcategories')
             ->get();
-        
-        // Convertir a array con estructura: [{ id, name, children: [...] }]
-        $categoriesForFilters = $allCategories->map(function($cat) {
-            return [
-                'id' => $cat->id,
-                'name' => $cat->name,
-                'slug' => $cat->slug,
-                'children' => $cat->subcategories->map(function($sub) {
-                    return [
-                        'id' => $sub->id,
-                        'name' => $sub->name,
-                        'slug' => $sub->slug,
-                    ];
-                })->toArray(),
-            ];
-        })->toArray();
 
-        // Agrupar libros por categoría para la vista
-        $booksByCategory = Category::with('books')->get();
+        $buildTree = function ($categories) use (&$buildTree) {
+            return $categories->map(fn($cat) => [
+                'id'       => $cat->id,
+                'name'     => $cat->name,
+                'slug'     => $cat->slug,
+                'children' => $buildTree($cat->subcategories),
+            ])->toArray();
+        };
 
-        return view('biblioteca.dashboard', [
-            'totalBooks' => $totalBooks,
-            'totalAuthors' => $totalAuthors,
-            'totalPublishers' => $totalPublishers,
-            'totalCategories' => $totalCategories,
-            'allBooks' => $allBooks,
-            'booksData' => $booksData,
-            'booksByCategory' => $booksByCategory,
-            'categoriesForFilters' => $categoriesForFilters,
-            'canEditPanel' => auth()->check() && (auth()->user()->is_admin_global || auth()->user()->canAccessModule('biblioteca')),
-        ]);
+        return [
+            'totalBooks'           => $totalBooks,
+            'totalAuthors'         => $totalAuthors,
+            'totalPublishers'      => $totalPublishers,
+            'totalCategories'      => $totalCategories,
+            'allBooks'             => $allBooks,
+            'booksData'            => $booksData,
+            'booksByCategory'      => Category::with('books')->get(),
+            'categoriesForFilters' => $buildTree($allCategories),
+            'activeSection'        => $activeSection,
+            'canEditPanel'         => auth()->check() && (auth()->user()->is_admin_global || auth()->user()->canAccessModule('biblioteca')),
+            'heroBg'               => ($p = SiteSetting::get('bg_biblioteca')) ? asset('storage/' . $p) : null,
+        ];
     }
 
-    /**
-     * Perfil público de un autor
-     */
+    public function indexLibros()     { return view('biblioteca.dashboard', $this->dashboardData('Libros')); }
+    public function indexRevistas()   { return view('biblioteca.dashboard', $this->dashboardData('Revistas')); }
+    public function indexEditoriales(){ return view('biblioteca.dashboard', $this->dashboardData('Editoriales')); }
+    public function indexAutores()    { return view('biblioteca.dashboard', $this->dashboardData('Autores')); }
+    public function indexEspeciales() { return view('biblioteca.dashboard', $this->dashboardData('Especiales')); }
+    public function indexAportantes() { return view('biblioteca.dashboard', $this->dashboardData('Aportantes')); }
+
     public function showAuthor(Author $author)
     {
-        if (auth()->check() && !auth()->user()->canAccessModule('biblioteca')) {
-            abort(403);
-        }
-
         $author->load(['books.publisher', 'books.categories']);
-
         return view('biblioteca.autor', compact('author'));
     }
 
-    /**
-     * API - Obtener libros por categoría
-     */
+    public function showBook(Book $book)
+    {
+        $book->load(['authors', 'publisher', 'categories']);
+        return view('biblioteca.libro', compact('book'));
+    }
+
+    public function showRevista(Book $book)
+    {
+        $book->load(['authors', 'publisher', 'categories']);
+        return view('biblioteca.revista', compact('book'));
+    }
+
+    public function showEditorial(Publisher $publisher)
+    {
+        $publisher->load(['books.authors', 'books.categories']);
+        return view('biblioteca.editorial', compact('publisher'));
+    }
+
+
     public function getBooksByCategory($categoryId)
     {
-        // Público, pero verificar si está autenticado
-        if (auth()->check() && !auth()->user()->canAccessModule('biblioteca')) {
-            abort(403);
-        }
-
         $books = Book::where('category_id', $categoryId)
             ->with(['authors', 'publisher'])
             ->paginate(20);
@@ -112,18 +108,10 @@ class BibliotecaController extends Controller
         return response()->json($books);
     }
 
-    /**
-     * API - Buscar libros
-     */
     public function search(Request $request)
     {
-        // Público, pero verificar si está autenticado
-        if (auth()->check() && !auth()->user()->canAccessModule('biblioteca')) {
-            abort(403);
-        }
-
         $query = $request->get('q');
-        
+
         $books = Book::where('title', 'like', "%{$query}%")
             ->orWhere('summary', 'like', "%{$query}%")
             ->with(['authors', 'publisher'])

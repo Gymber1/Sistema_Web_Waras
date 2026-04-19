@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Biblioteca Digital - WARAS</title>
+    <link rel="icon" type="image/png" href="/Logo-Biblioteca-Waras.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -139,8 +140,16 @@
             color: var(--accent);
         }
 
+        .header-actions { display: flex; align-items: center; gap: .625rem; margin-left: 1.5rem; }
+        .header-btn { display: inline-flex; align-items: center; gap: .4rem; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: .45rem 1rem; border-radius: .375rem; text-decoration: none; transition: all .2s; white-space: nowrap; }
+        .header-btn-outline { color: #e2e8f0; border: 1px solid rgba(255,255,255,.25); }
+        .header-btn-outline:hover { background: rgba(255,255,255,.1); color: var(--accent); border-color: var(--accent); }
+        .header-btn-solid { background: var(--accent); color: var(--primary); border: 1px solid var(--accent); }
+        .header-btn-solid:hover { background: #b08d4b; border-color: #b08d4b; }
+
         @media (max-width: 1024px) {
             .nav-menu { display: none; }
+            .header-actions { margin-left: 0; }
         }
 
         /* Hero */
@@ -153,8 +162,6 @@
             justify-content: center;
             padding-top: 80px;
             padding-bottom: 80px;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-                        url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
             background-attachment: fixed;
             overflow: visible;
         }
@@ -408,7 +415,7 @@
             width: 100%;
             background: var(--bg-light);
             margin-top: 70px;
-            min-height: auto;
+            min-height: calc(100vh - 70px);
         }
 
         .main-wrapper.hidden { 
@@ -1236,19 +1243,31 @@
             </a>
 
             <nav class="nav-menu" id="navMenu">
-                <button data-tab="Inicio" class="nav-item active">Inicio</button>
-                <button data-tab="Libros" class="nav-item">Libros</button>
-                <button data-tab="Revistas" class="nav-item">Revistas</button>
-                <button data-tab="Editoriales" class="nav-item">Editoriales</button>
-                <button data-tab="Especiales" class="nav-item">Especiales</button>
-                <button data-tab="Autores" class="nav-item">Autores</button>
-                <button data-tab="Aportantes" class="nav-item">Aportantes</button>
+                <a href="{{ route('biblioteca.inicio') }}" data-tab="Inicio" class="nav-item">Inicio</a>
+                <a href="{{ route('biblioteca.libros.index') }}" data-tab="Libros" class="nav-item">Libros</a>
+                <a href="{{ route('biblioteca.revistas.index') }}" data-tab="Revistas" class="nav-item">Revistas</a>
+                <a href="{{ route('biblioteca.editoriales.index') }}" data-tab="Editoriales" class="nav-item">Editoriales</a>
+                <a href="{{ route('biblioteca.especiales.index') }}" data-tab="Especiales" class="nav-item">Especiales</a>
+                <a href="{{ route('biblioteca.autores.index') }}" data-tab="Autores" class="nav-item">Autores</a>
+                <a href="{{ route('biblioteca.aportantes.index') }}" data-tab="Aportantes" class="nav-item">Aportantes</a>
             </nav>
+            <div class="header-actions">
+                <a href="{{ route('home') }}" class="header-btn header-btn-outline">
+                    <i class="fas fa-home"></i> Portal Principal
+                </a>
+                @auth
+                    @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('biblioteca'))
+                    <a href="{{ route('admin.dashboard') }}" class="header-btn header-btn-solid">
+                        <i class="fas fa-th-large"></i> Panel
+                    </a>
+                    @endif
+                @endauth
+            </div>
         </div>
     </header>
 
     <!-- Hero Section -->
-    <section class="hero" id="heroSection">
+    <section class="hero" id="heroSection" style="background: linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)), url('{{ $heroBg ?? 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' }}') center/cover no-repeat; background-attachment: fixed;">
         <div class="hero-content">
             <h1 class="hero-title">Biblioteca Digital Ancashina</h1>
             <p class="hero-subtitle">"Conocimiento e historia accesible para todos"</p>
@@ -1279,41 +1298,6 @@
                 <ul class="categories-list" id="categoriesList"></ul>
             </div>
 
-            <div class="filters-section">
-                <div class="categories-label">Filtros</div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Año de Publicación</label>
-                    <select class="filter-select">
-                        <option>Todos los años</option>
-                        <option>Últimos 5 años</option>
-                        <option>Últimos 10 años</option>
-                        <option>Anteriores a 2000</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label class="filter-label">Formato</label>
-                    <div class="filter-check">
-                        <label class="checkbox-item">
-                            <input type="checkbox" checked>
-                            <span>Libros Digitales</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" checked>
-                            <span>Revistas</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox">
-                            <span>Manuscritos</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox">
-                            <span>Mapas</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
         </aside>
 
         <!-- Content Area -->
@@ -1340,11 +1324,10 @@
                 <div class="sort-controls">
                     <i class="fas fa-sliders-h" style="color: #9ca3af;"></i>
                     <span>Ordenar por:</span>
-                    <select class="sort-select">
-                        <option>Relevancia</option>
-                        <option>Título (A-Z)</option>
-                        <option>Más recientes</option>
-                        <option>Más consultados</option>
+                    <select class="sort-select" id="sortSelect">
+                        <option value="az">Ordenar A-Z</option>
+                        <option value="recent">Más recientes</option>
+                        <option value="old">Más antiguos</option>
                     </select>
                 </div>
             </div>
@@ -1415,18 +1398,16 @@
                 </div>
 
                 <div class="detail-actions">
-                    <button class="detail-btn detail-btn-primary">
+                    <a id="btnLeerLinea" href="#" target="_blank" rel="noopener"
+                       class="detail-btn detail-btn-primary" style="text-decoration:none;">
                         <i class="fas fa-book-open"></i> Leer en línea
-                    </button>
-                    <button class="detail-btn detail-btn-secondary">
-                        <i class="fas fa-download"></i> Descargar PDF
-                    </button>
-                    <button class="detail-btn detail-btn-icon">
-                        <i class="fas fa-bookmark"></i>
-                    </button>
-                    <button class="detail-btn detail-btn-icon">
+                    </a>
+                    <button id="btnCompartir" class="detail-btn detail-btn-icon" title="Copiar enlace">
                         <i class="fas fa-share-alt"></i>
                     </button>
+                </div>
+                <div id="shareToast" style="display:none;margin-top:0.75rem;font-size:0.8rem;color:#6b7280;text-align:center;">
+                    ✓ Enlace copiado al portapapeles
                 </div>
             </div>
         </div>
@@ -1437,6 +1418,184 @@
             <div class="related-grid" id="relatedGrid"></div>
         </div>
         </div><!-- end max-width wrapper -->
+    </div>
+
+    <!-- ===== SECCIÓN NOSOTROS / APORTANTES ===== -->
+    <div id="aportantesSection" style="display:none;background:#f9f8f6;margin-top:72px;padding:0 0 4rem;">
+
+        <!-- Hero Banner -->
+        <div style="background:linear-gradient(135deg,var(--primary) 0%,#2d4a6e 100%);color:white;padding:5rem 2rem;text-align:center;position:relative;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1920&q=30') center/cover;opacity:.07;"></div>
+            <div style="position:relative;max-width:800px;margin:0 auto;">
+                <div style="display:flex;justify-content:center;margin-bottom:1.5rem;gap:.3rem;">
+                    <div style="width:10px;height:28px;background:#60a5fa;border-radius:2px;"></div>
+                    <div style="width:10px;height:22px;background:#f87171;border-radius:2px;margin-top:6px;"></div>
+                    <div style="width:10px;height:16px;background:var(--accent);border-radius:2px;margin-top:12px;"></div>
+                </div>
+                <h1 style="font-family:'Playfair Display',serif;font-size:2.75rem;font-weight:800;margin-bottom:1rem;letter-spacing:-.5px;">Asociación Waras</h1>
+                <p style="font-size:1rem;font-weight:300;color:rgba(255,255,255,.85);letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.5rem;">Ciencia y Cultura Ancashina</p>
+                <p style="font-size:1rem;color:rgba(255,255,255,.75);line-height:1.85;max-width:640px;margin:0 auto;">
+                    Un grupo de ciudadanos comprometidos con el desarrollo económico, social, científico y cultural del Departamento de Áncash.
+                </p>
+            </div>
+        </div>
+
+        <div style="max-width:1000px;margin:0 auto;padding:3rem 1.5rem;">
+
+            <!-- Quiénes somos -->
+            <div style="background:white;border-radius:.75rem;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:2.5rem;margin-bottom:2rem;">
+                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #e5e1d8;">
+                    <div style="width:38px;height:38px;background:var(--primary);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-landmark" style="color:var(--accent);font-size:.9rem;"></i>
+                    </div>
+                    <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--primary);">Quiénes Somos</h2>
+                </div>
+                <p style="font-size:.95rem;color:#4b5563;line-height:1.9;margin-bottom:1rem;">
+                    La <strong style="color:var(--primary);">Asociación Waras: Ciencia y Cultura</strong> nació ante el vacío estructural e histórico del Estado en la protección de la identidad cultural. Un grupo de ciudadanos conscientes de que la protección del Medio Ambiente, la Educación, la Cultura y la Investigación son el germen para un sólido Desarrollo Económico y Social decidió aportar para viabilizar el progreso sostenido de Áncash.
+                </p>
+                <p style="font-size:.95rem;color:#4b5563;line-height:1.9;">
+                    Áncash es una región privilegiada, con una profunda tradición cultural que subsiste a través del tiempo y una diversidad de recursos naturales únicos. Esta biblioteca digital es uno de los espacios que construimos para sistematizar, preservar y difundir el conocimiento y la cultura ancashina.
+                </p>
+            </div>
+
+            <!-- Finalidad + Objetivos -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;">
+                <div style="background:white;border-radius:.75rem;border:1px solid #e2e8f0;padding:2rem;">
+                    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;">
+                        <div style="width:34px;height:34px;background:var(--primary);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-bullseye" style="color:var(--accent);font-size:.8rem;"></i>
+                        </div>
+                        <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--primary);">Finalidad</h3>
+                    </div>
+                    <p style="font-size:.875rem;color:#4b5563;line-height:1.85;">
+                        Promover estudios, investigaciones, capacitaciones y espacios que aporten al desarrollo económico, social, ambiental, cultural y científico del Departamento de Áncash para la mejora de la calidad de vida de sus ciudadanos.
+                    </p>
+                </div>
+                <div style="background:var(--primary);border-radius:.75rem;padding:2rem;color:white;">
+                    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;">
+                        <div style="width:34px;height:34px;border:1px solid rgba(255,255,255,.25);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-flag" style="color:var(--accent);font-size:.8rem;"></i>
+                        </div>
+                        <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;">Objetivos Generales</h3>
+                    </div>
+                    <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.875rem;">
+                        <li style="display:flex;gap:.75rem;align-items:flex-start;font-size:.875rem;color:rgba(255,255,255,.85);line-height:1.65;">
+                            <i class="fas fa-chevron-right" style="color:var(--accent);margin-top:.2rem;flex-shrink:0;font-size:.65rem;"></i>
+                            Contribuir al Desarrollo Económico y Social del Departamento de Ancash.
+                        </li>
+                        <li style="display:flex;gap:.75rem;align-items:flex-start;font-size:.875rem;color:rgba(255,255,255,.85);line-height:1.65;">
+                            <i class="fas fa-chevron-right" style="color:var(--accent);margin-top:.2rem;flex-shrink:0;font-size:.65rem;"></i>
+                            Preservar y Difundir la Cultura Ancashina.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Objetivos Específicos -->
+            <div style="background:white;border-radius:.75rem;border:1px solid #e2e8f0;padding:2.5rem;margin-bottom:2rem;">
+                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #e5e1d8;">
+                    <div style="width:38px;height:38px;background:var(--primary);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-list-check" style="color:var(--accent);font-size:.9rem;"></i>
+                    </div>
+                    <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--primary);">Objetivos Específicos</h2>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.875rem;">
+                    @foreach([
+                        'Promover e impulsar las ciencias, arte, identidad y cultura en Áncash.',
+                        'Fomentar la investigación y capacitación educativa, artística y cultural.',
+                        'Ejecutar proyectos que desarrollen capacidades científicas y tecnológicas.',
+                        'Desarrollar alianzas con instituciones públicas y privadas a todo nivel.',
+                        'Promover la ciudadanía activa y la participación cívica.',
+                        'Impulsar iniciativas que contribuyan al desarrollo sostenible de Áncash.',
+                        'Promover la educación comunitaria en toda la región.',
+                        'Desarrollar un portal para la difusión de la ciencia y cultura ancashina.',
+                    ] as $obj)
+                    <div style="display:flex;gap:.75rem;align-items:flex-start;padding:.875rem;background:#f9f8f6;border-radius:.375rem;border:1px solid #e5e1d8;">
+                        <i class="fas fa-check-circle" style="color:var(--accent);margin-top:.15rem;flex-shrink:0;"></i>
+                        <span style="font-size:.875rem;color:#374151;line-height:1.6;">{{ $obj }}</span>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Valores -->
+            <div style="background:white;border-radius:.75rem;border:1px solid #e2e8f0;padding:2.5rem;margin-bottom:2rem;">
+                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.75rem;padding-bottom:1rem;border-bottom:2px solid #e5e1d8;">
+                    <div style="width:38px;height:38px;background:var(--primary);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-heart" style="color:var(--accent);font-size:.9rem;"></i>
+                    </div>
+                    <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--primary);">Nuestros Valores</h2>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;">
+                    @foreach([['fa-balance-scale','Equidad'],['fa-hands-helping','Fraternidad'],['fa-hand-holding-heart','Solidaridad'],['fa-leaf','Armonía'],['fa-dove','Libertad']] as [$icon,$valor])
+                    <div style="text-align:center;padding:1.5rem .75rem;border-radius:.5rem;border:1px solid #e5e1d8;transition:all .2s;cursor:default;"
+                         onmouseover="this.style.background='var(--primary)';this.style.color='white';this.style.borderColor='var(--primary)';this.querySelector('i').style.color='var(--accent)'"
+                         onmouseout="this.style.background='';this.style.color='';this.style.borderColor='#e5e1d8';this.querySelector('i').style.color='var(--primary)'">
+                        <i class="fas {{ $icon }}" style="font-size:1.75rem;color:var(--primary);margin-bottom:.75rem;display:block;transition:color .2s;"></i>
+                        <span style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:inherit;">{{ $valor }}</span>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Beneficiarios -->
+            <div style="background:white;border-radius:.75rem;border:1px solid #e2e8f0;padding:2.5rem;margin-bottom:2rem;">
+                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #e5e1d8;">
+                    <div style="width:38px;height:38px;background:var(--primary);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-users" style="color:var(--accent);font-size:.9rem;"></i>
+                    </div>
+                    <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--primary);">Beneficiarios</h2>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.75rem;">
+                    @foreach(['Estudiantes de primaria y secundaria de Áncash','Estudiantes de nivel superior de Áncash','Docentes de nivel básico y superior','Autoridades, partidos políticos y sociedad civil','Empresarios e inversores regionales y nacionales','Turistas nacionales e internacionales','Población con interés en la ciencia y cultura ancashina'] as $ben)
+                    <div style="display:flex;gap:.75rem;align-items:flex-start;padding:.875rem;background:#f9f8f6;border-radius:.375rem;border:1px solid #e5e1d8;">
+                        <i class="fas fa-check-circle" style="color:var(--accent);margin-top:.15rem;flex-shrink:0;"></i>
+                        <span style="font-size:.875rem;color:#374151;line-height:1.5;">{{ $ben }}</span>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Contacto -->
+            <div style="background:var(--primary);border-radius:.75rem;padding:2.5rem;color:white;">
+                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.75rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.15);">
+                    <div style="width:38px;height:38px;border:1px solid rgba(255,255,255,.25);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-envelope" style="color:var(--accent);font-size:.9rem;"></i>
+                    </div>
+                    <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;">Contáctanos</h2>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;">
+                    <div style="display:flex;gap:1rem;align-items:flex-start;">
+                        <div style="width:42px;height:42px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-map-marker-alt" style="color:var(--accent);"></i>
+                        </div>
+                        <div>
+                            <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:.25rem;">Ubicación</p>
+                            <p style="font-size:.9rem;color:rgba(255,255,255,.85);line-height:1.6;">Departamento de Áncash, Perú</p>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:1rem;align-items:flex-start;">
+                        <div style="width:42px;height:42px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-envelope" style="color:var(--accent);"></i>
+                        </div>
+                        <div>
+                            <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:.25rem;">Correo Electrónico</p>
+                            <p style="font-size:.9rem;color:rgba(255,255,255,.85);">asociacion@waras.pe</p>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:1rem;align-items:flex-start;">
+                        <div style="width:42px;height:42px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-quote-left" style="color:var(--accent);"></i>
+                        </div>
+                        <div>
+                            <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:.25rem;">Principios Incas</p>
+                            <p style="font-size:.875rem;color:rgba(255,255,255,.65);line-height:1.6;font-style:italic;">"Ama Llulla, Ama Quella, Ama Sua"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <!-- Footer -->
@@ -1497,6 +1656,14 @@
                 external_url: book.external_url || '',
                 pdf_path:     book.pdf_file_path || '',
                 categoryIds:  (book.categories || []).map(c => c.id),
+                detail_url:   book.document_type === 'Revista'
+                                ? '/biblioteca/revistas/' + book.id
+                                : '/biblioteca/libros/' + book.id,
+                read_url:     book.source_type === 'external' && book.external_url
+                                ? book.external_url
+                                : (book.source_type === 'pdf' && book.pdf_file_path
+                                    ? '/storage/' + book.pdf_file_path
+                                    : null),
             };
         }
 
@@ -1508,7 +1675,7 @@
                 'default': (booksDataFromServer['Revistas'] || []).map((book, idx) => mapBook(book, idx))
             },
             'Editoriales': { 'default': [] },
-            'Especiales':  { 'default': [] },
+            'Especiales':  { 'default': (booksDataFromServer['Especiales'] || []).map((book, idx) => mapBook(book, idx)) },
             'Autores': {
                 'default': (booksDataFromServer['Autores'] || []).map(author => ({
                     id:          author.id,
@@ -1521,11 +1688,14 @@
             'Aportantes': { 'default': [] }
         };
 
+        const serverActiveSection = @json($activeSection ?? 'Inicio');
+
         let state = {
             activeTab: 'Inicio',
             activeCategory: null, // {id, name} or null
             isScrolled: false,
-            openAccordion: null  // parent category id that is expanded in sidebar
+            openAccordions:   new Set(),  // ids abiertos manualmente
+            closedAccordions: new Set()   // ids cerrados manualmente (tienen prioridad sobre ancestro activo)
         };
 
         // ========== OBTENER DATOS según TAB y CATEGORÍA ==========
@@ -1559,6 +1729,50 @@
             }
         }, { passive: true });
 
+        // Recursivo: construye HTML de un nodo del árbol de categorías (Biblioteca)
+        function buildCatNodeHtml(node, depth) {
+            const hasChildren = node.children && node.children.length > 0;
+            const manuallyClosed = state.closedAccordions.has(node.id);
+            const isOpen = !manuallyClosed && (
+                state.openAccordions.has(node.id) ||
+                bibIsAncestorOfActive(node, state.activeCategory ? state.activeCategory.id : null)
+            );
+            const isActive = state.activeCategory && state.activeCategory.id === node.id;
+            const pl = `${1.5 + depth * 0.875}rem`;
+
+            if (hasChildren) {
+                const childrenHtml = node.children.map(c => buildCatNodeHtml(c, depth + 1)).join('');
+                return `<li>
+                    <button class="acc-parent-btn ${isOpen ? 'open' : ''}"
+                            data-parent-id="${node.id}" style="padding-left:${pl};">
+                        <span>${node.name}</span>
+                        <i class="fas fa-chevron-right acc-chevron"></i>
+                    </button>
+                    <div class="acc-children ${isOpen ? 'open' : ''}">
+                        <ul style="list-style:none;padding:0;margin:0;">${childrenHtml}</ul>
+                    </div>
+                </li>`;
+            } else {
+                return `<li>
+                    <button class="acc-child-btn ${isActive ? 'active' : ''}"
+                            data-category-id="${node.id}" data-category-name="${node.name}"
+                            style="padding-left:${pl};">
+                        <span>${node.name}</span>
+                        <i class="fas fa-chevron-right category-icon" style="font-size:0.65rem;"></i>
+                    </button>
+                </li>`;
+            }
+        }
+
+        function bibIsAncestorOfActive(node, activeId) {
+            if (!activeId || !node.children) return false;
+            for (const child of node.children) {
+                if (child.id === activeId) return true;
+                if (bibIsAncestorOfActive(child, activeId)) return true;
+            }
+            return false;
+        }
+
         function renderCategories() {
             const list = document.getElementById('categoriesList');
             const useAccordion = (state.activeTab === 'Libros' || state.activeTab === 'Revistas') && categoriesFromDatabase.length > 0;
@@ -1572,35 +1786,15 @@
                     </button>
                 </li>`;
 
-                // Build accordion: parent rows + collapsible children
-                list.innerHTML = todosItem + categoriesFromDatabase.map(parent => {
-                    const hasChildren = parent.children && parent.children.length > 0;
-                    const isOpen = state.openAccordion === parent.id;
-                    const childrenHtml = hasChildren ? parent.children.map(child => {
-                        const isActive = state.activeCategory && state.activeCategory.id === child.id;
-                        return `<button class="acc-child-btn ${isActive ? 'active' : ''}"
-                                    data-category-id="${child.id}"
-                                    data-category-name="${child.name}">
-                                    <span>${child.name}</span>
-                                    <i class="fas fa-chevron-right category-icon" style="font-size:0.65rem;"></i>
-                                </button>`;
-                    }).join('') : '';
-
-                    return `<li>
-                        <button class="acc-parent-btn ${isOpen ? 'open' : ''}" data-parent-id="${parent.id}">
-                            <span>${parent.name}</span>
-                            <i class="fas fa-chevron-right acc-chevron"></i>
-                        </button>
-                        ${hasChildren ? `<div class="acc-children ${isOpen ? 'open' : ''}" id="acc-children-${parent.id}">${childrenHtml}</div>` : ''}
-                    </li>`;
-                }).join('');
+                list.innerHTML = todosItem + categoriesFromDatabase.map(node => buildCatNodeHtml(node, 0)).join('');
 
                 // "Todos" button
                 const todosBtn = list.querySelector('.category-btn');
                 if (todosBtn) {
                     todosBtn.addEventListener('click', () => {
                         state.activeCategory = { id: null, name: 'Todos' };
-                        state.openAccordion = null;
+                        state.openAccordions.clear();
+                        state.closedAccordions.clear();
                         document.getElementById('sectionTitle').textContent = state.activeTab;
                         document.getElementById('breadcrumbCategory').textContent = state.activeTab;
                         document.getElementById('contentSearchInput').placeholder = `Buscar en ${state.activeTab}...`;
@@ -1609,36 +1803,32 @@
                     });
                 }
 
-                // Parent toggle
+                // Parent toggle (cualquier profundidad) — Set-based para multinivel
                 list.querySelectorAll('.acc-parent-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const pid = parseInt(btn.getAttribute('data-parent-id'));
-                        if (state.openAccordion === pid) {
-                            state.openAccordion = null;
+                        const isCurrentlyOpen = btn.classList.contains('open');
+                        if (isCurrentlyOpen) {
+                            state.openAccordions.delete(pid);
+                            state.closedAccordions.add(pid);
                         } else {
-                            state.openAccordion = pid;
+                            state.closedAccordions.delete(pid);
+                            state.openAccordions.add(pid);
                         }
                         renderCategories();
                     });
                 });
 
-                // Child select
+                // Leaf select (cualquier profundidad)
                 list.querySelectorAll('.acc-child-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
-                        const id = parseInt(btn.getAttribute('data-category-id'));
+                        const id   = parseInt(btn.getAttribute('data-category-id'));
                         const name = btn.getAttribute('data-category-name');
-                        // Find which parent owns this child
-                        const accChildren = btn.closest('.acc-children');
-                        if (accChildren) {
-                            const accParentBtn = accChildren.previousElementSibling;
-                            if (accParentBtn) state.openAccordion = parseInt(accParentBtn.getAttribute('data-parent-id'));
-                        }
                         state.activeCategory = { id, name };
                         document.getElementById('sectionTitle').textContent = name;
                         document.getElementById('breadcrumbCategory').textContent = name;
                         document.getElementById('contentSearchInput').placeholder = `Buscar libros, autores o temas en ${name}...`;
-                        list.querySelectorAll('.acc-child-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
+                        renderCategories();
                         renderBooks();
                     });
                 });
@@ -1672,13 +1862,26 @@
             }
         }
 
+        function getSortedItems(items) {
+            const sortVal = document.getElementById('sortSelect')?.value ?? 'az';
+            const arr = [...items];
+            if (sortVal === 'az') {
+                arr.sort((a, b) => (a.title || a.name || '').localeCompare(b.title || b.name || '', 'es'));
+            } else if (sortVal === 'recent') {
+                arr.sort((a, b) => (parseInt(b.year) || 0) - (parseInt(a.year) || 0));
+            } else if (sortVal === 'old') {
+                arr.sort((a, b) => (parseInt(a.year) || 9999) - (parseInt(b.year) || 9999));
+            }
+            return arr;
+        }
+
         function renderBooks() {
             const grid = document.getElementById('booksGrid');
-            const items = getDataForSection();
-            
+            const items = getSortedItems(getDataForSection());
+
             // Actualizar contador de recursos
             document.getElementById('resourceNumber').textContent = items.length;
-            
+
             // Detectar si estamos mostrando autores o libros
             const isAuthorsSection = state.activeTab === 'Autores';
             
@@ -1722,7 +1925,9 @@
                             <p class="book-year">Publicación: ${item.year}</p>
                             <div class="book-footer">
                                 <span style="font-size:0.75rem;color:#9ca3af;">${item.pages} págs.</span>
-                                <a href="#" class="book-read-link">Leer →</a>
+                                ${item.read_url
+                                    ? `<a href="${item.read_url}" target="_blank" rel="noopener" class="book-read-link">Leer →</a>`
+                                    : `<span class="book-read-link" style="opacity:0.35;cursor:default;">Sin acceso</span>`}
                             </div>
                         </div>
                     </div>
@@ -1739,29 +1944,37 @@
             });
         }
 
-        function showSection(tab) {
-            const hero = document.getElementById('heroSection');
-            const main = document.getElementById('mainWrapper');
-            const detail = document.getElementById('detailView');
+        function hideAllSections() {
+            document.getElementById('heroSection').classList.add('hidden');
+            document.getElementById('mainWrapper').classList.add('hidden');
+            document.getElementById('detailView').classList.add('hidden');
+            document.getElementById('aportantesSection').style.display = 'none';
+        }
 
+        function showSection(tab) {
             state.activeTab = tab;
-            state.openAccordion = null;
+            state.openAccordions.clear();
+            state.closedAccordions.clear();
+
+            hideAllSections();
+
+            if (tab === 'Aportantes') {
+                document.getElementById('aportantesSection').style.display = 'block';
+                updateNavigation();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                window.dispatchEvent(new Event('scroll'));
+                return;
+            }
 
             const useAccordion = (tab === 'Libros' || tab === 'Revistas') && categoriesFromDatabase.length > 0;
             if (useAccordion) {
-                // Start with no category filter (show all)
                 state.activeCategory = { id: null, name: 'Todos' };
             } else {
                 const firstCat = (categoriesBySection[tab] || categoriesBySection['Libros'])[0] || { id: null, name: tab };
                 state.activeCategory = firstCat;
             }
 
-            const displayName = state.activeCategory.name;
-
-            hero.classList.add('hidden');
-            detail.classList.add('hidden');
-            main.classList.remove('hidden');
-
+            document.getElementById('mainWrapper').classList.remove('hidden');
             document.getElementById('sectionTitle').textContent = tab;
             document.getElementById('breadcrumbCategory').textContent = tab;
             document.getElementById('contentSearchInput').placeholder = `Buscar en ${tab}...`;
@@ -1774,16 +1987,11 @@
         }
 
         function showHero() {
-            const hero = document.getElementById('heroSection');
-            const main = document.getElementById('mainWrapper');
-            const detail = document.getElementById('detailView');
-
             state.activeTab = 'Inicio';
             state.activeCategory = null;
 
-            detail.classList.add('hidden');
-            main.classList.add('hidden');
-            hero.classList.remove('hidden');
+            hideAllSections();
+            document.getElementById('heroSection').classList.remove('hidden');
 
             updateNavigation();
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1794,14 +2002,29 @@
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.toggle('active', item.getAttribute('data-tab') === state.activeTab);
             });
+            // Update browser URL without reload (history state)
+            const tabUrlMap = {
+                'Inicio': '{{ route('biblioteca.dashboard') }}',
+                'Libros': '{{ route('biblioteca.libros.index') }}',
+                'Revistas': '{{ route('biblioteca.revistas.index') }}',
+                'Editoriales': '{{ route('biblioteca.editoriales.index') }}',
+                'Especiales': '{{ route('biblioteca.especiales.index') }}',
+                'Autores': '{{ route('biblioteca.autores.index') }}',
+                'Aportantes': '{{ route('biblioteca.aportantes.index') }}',
+            };
+            if (tabUrlMap[state.activeTab]) {
+                history.replaceState(null, '', tabUrlMap[state.activeTab]);
+            }
         }
 
-        document.getElementById('logoBtn').addEventListener('click', showHero);
+        document.getElementById('logoBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = '{{ route('biblioteca.dashboard') }}';
+        });
         document.querySelectorAll('.nav-item').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tab = btn.getAttribute('data-tab');
-                if (tab === 'Inicio') showHero();
-                else showSection(tab);
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = btn.getAttribute('href');
             });
         });
 
@@ -1809,8 +2032,13 @@
         let currentMaterial = null;
 
         function showDetailView(item) {
+            if (item.detail_url) {
+                sessionStorage.setItem('biblioteca_tab', state.activeTab);
+                window.location.href = item.detail_url;
+                return;
+            }
             currentMaterial = item;
-            
+
             // Llenar información
             document.getElementById('detailTitle').textContent    = item.title;
             document.getElementById('detailAuthor').textContent   = item.author;
@@ -1832,6 +2060,45 @@
 
             // Materiales relacionados
             renderRelatedMaterials(item);
+
+            // Botón "Leer en línea"
+            const btnLeer = document.getElementById('btnLeerLinea');
+            if (item.source_type === 'external' && item.external_url) {
+                btnLeer.href = item.external_url;
+                btnLeer.style.display = '';
+                btnLeer.style.opacity = '1';
+                btnLeer.style.pointerEvents = '';
+            } else if (item.source_type === 'pdf' && item.pdf_path) {
+                btnLeer.href = '/storage/' + item.pdf_path;
+                btnLeer.style.display = '';
+                btnLeer.style.opacity = '1';
+                btnLeer.style.pointerEvents = '';
+            } else {
+                btnLeer.href = '#';
+                btnLeer.style.opacity = '0.4';
+                btnLeer.style.pointerEvents = 'none';
+            }
+
+            // Botón compartir — copia URL con hash para identificar el libro
+            const btnCompartir = document.getElementById('btnCompartir');
+            const shareToast   = document.getElementById('shareToast');
+            btnCompartir.onclick = () => {
+                const shareUrl = window.location.origin + window.location.pathname + '?libro=' + item.id;
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    shareToast.style.display = 'block';
+                    setTimeout(() => { shareToast.style.display = 'none'; }, 2500);
+                }).catch(() => {
+                    // Fallback para navegadores sin clipboard API
+                    const ta = document.createElement('textarea');
+                    ta.value = shareUrl;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    shareToast.style.display = 'block';
+                    setTimeout(() => { shareToast.style.display = 'none'; }, 2500);
+                });
+            };
 
             // Mostrar vista de detalle, ocultar otros
             document.getElementById('mainWrapper').classList.add('hidden');
@@ -1888,12 +2155,17 @@
         const initCatName = state.activeCategory ? state.activeCategory.name : '';
         document.getElementById('contentSearchInput').placeholder = `Buscar libros, autores o temas en ${initCatName}...`;
 
-        // Abrir sección correcta si se vuelve desde otra página (ej. autor detail)
+        // Activar sección según la ruta visitada (definida por el servidor)
+        const validTabs = ['Inicio','Libros','Revistas','Editoriales','Especiales','Autores','Aportantes'];
+
+        // Fallback sessionStorage para compatibilidad con páginas de detalle
         const pendingTab = sessionStorage.getItem('biblioteca_tab');
-        if (pendingTab) {
+        if (pendingTab && validTabs.includes(pendingTab)) {
             sessionStorage.removeItem('biblioteca_tab');
-            const validTabs = ['Libros','Revistas','Editoriales','Especiales','Autores','Aportantes'];
-            if (validTabs.includes(pendingTab)) showSection(pendingTab);
+            if (pendingTab === 'Inicio') showHero(); else showSection(pendingTab);
+        } else {
+            const sectionTab = validTabs.includes(serverActiveSection) ? serverActiveSection : 'Inicio';
+            if (sectionTab === 'Inicio') showHero(); else showSection(sectionTab);
         }
 
         // ========== BÚSQUEDA ==========
@@ -2046,6 +2318,10 @@
 
 
         // ---- BÚSQUEDA EN CATÁLOGO (filtra tarjetas visibles) ----
+        document.getElementById('sortSelect').addEventListener('change', function() {
+            renderBooks();
+        });
+
         document.getElementById('contentSearchInput').addEventListener('input', function() {
             const q = normalizeStr(this.value.trim());
             const isAuthors = state.activeTab === 'Autores';

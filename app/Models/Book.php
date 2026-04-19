@@ -30,10 +30,12 @@ class Book extends Model
         'external_url',
         'pdf_file_path',
         'publisher_id',
+        'is_special',
     ];
 
     protected $casts = [
         'publication_date' => 'date',
+        'is_special'       => 'boolean',
     ];
 
     /**

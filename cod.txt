@@ -1,23 +1,29 @@
-1. Navegación Global:
+"Necesito redefinir la lógica y el formulario de la sección Especiales en mi proyecto Laravel. El objetivo es que un 'Especial' sirva para destacar libros o revistas ya existentes, pero bajo una regla de exclusión mutua.
 
-En la barra de navegación superior (Navbar) de Biblioteca, añade un botón al extremo derecho que diga 'Portal Principal'. Este botón debe redirigir a la landing page unificada del sistema. Asegúrate de que el diseño sea consistente con los botones de 'Ir al sitio web' o 'Cerrar Sesión' ya existentes.
+1. Cambios en la Base de Datos (Estructura):
 
-2. Accesos Directos en Dashboard:
+Reestructura la tabla specials segun lo que necesitamos, pero añade una columna llamada type (enum: 'libro', 'revista') para identificar qué tipo de contenido contiene este especial.
 
-En las tarjetas del Panel Administrativo (Biblioteca, Fototeca), añade un botón secundario que diga 'Ver Sitio Público'.
+Asegúrate de que las relaciones (tablas pivote) funcionen correctamente: si el especial es de tipo 'libro', solo debe vincularse con la tabla books; si es 'revista', solo con magazines.
 
-Al hacer clic, debe abrir en una pestaña nueva la sección correspondiente del usuario final (ej. la biblioteca).
+2. Rediseño del Formulario (Agregar/Editar):
 
-3. Lógica de Gestión de Usuarios y Permisos:
+Campos requeridos: Título, Descripción y el Checkbox de 'Activo'.
 
-Botones de Acción: Los botones de la columna 'Acciones' (Editar, Bloquear, Eliminar) en la tabla de usuarios no tienen funcionalidad. Necesito que generes las rutas y los métodos en el controlador para que sean operativos.
+Lógica de Selección: En lugar de mostrar todos los documentos asociados a la vez, implementa lo siguiente:
 
-Protección del Admin Global: En mi base de datos, el usuario con ID 1 (Administrador Sistema) tiene el campo is_deletable en 0.
+Añade un selector (Radio buttons o Select) para elegir el 'Tipo de Especial' (Libro o Revista).
 
-Requerimiento: Modifica la vista Blade para que, mediante un @if, el botón de Eliminar se oculte o se deshabilite específicamente para este usuario, evitando que el administrador principal sea borrado por error.
+Si el usuario selecciona 'Libro', debe aparecer el buscador/selector de libros y desaparecer o bloquearse el de revistas.
 
-4. Sidebar Dinámico y Jerárquico (Biblioteca):
+Si selecciona 'Revista', debe aparecer el de revistas y bloquearse el de libros.
 
-El menú 'Explorar Catálogo' muestra todas las categorías y subcategorías de golpe. Según mi 'Gestión de Categorías', tengo una estructura de niveles (Categoría Padre -> Subcategoría).
+El usuario no debe poder guardar un especial que intente contener ambos tipos de documentos.
 
-Requerimiento: Implementa un sistema tipo Acordeón o Collapsible. El usuario solo debe ver las categorías principales (Ficción, No Ficción). Al hacer clic en una, se deben desplegar sus subcategorías (Cuento, Novela, Ciencia, etc.) mediante una transición suave. Esto debe ser responsivo y mantener el estado activo si el usuario está dentro de una de esas subcategorías.
+3. Interfaz del Portal Público:
+
+En la vista de /biblioteca/especiales, los resultados deben filtrarse correctamente. Si un especial es de libros, debe mostrar las portadas de los libros asociados con el diseño vertical que ya definimos.
+
+4. Limpieza de Código:
+
+Elimina cualquier campo innecesario del formulario que no sea Título, Descripción, Tipo, Selección de documentos y Estado Activo.

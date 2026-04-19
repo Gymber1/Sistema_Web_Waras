@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WARAS - Portal Unificado</title>
+    <link rel="icon" type="image/png" href="/Logo-Waras.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -163,7 +164,6 @@
         .hero-section {
             position: relative;
             height: 100vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/Fondo.png') center/cover no-repeat;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -495,9 +495,10 @@
                 <span class="logo-text">WARAS</span>
             </a>
             <nav>
+                <a href="{{ route('home') }}" class="nav-link">Inicio</a>
                 <a href="#servicios" class="nav-link">Servicios</a>
-                <a href="#acerca" class="nav-link">Acerca de</a>
-                <a href="#contacto" class="nav-link">Contacto</a>
+                <a href="{{ route('nosotros') }}" class="nav-link">Acerca de</a>
+                <a href="{{ route('contacto') }}" class="nav-link">Contacto</a>
                 <div class="nav-buttons">
                     <a href="tel:+51952845942" class="btn-phone">Llamar: +51 952-845-942</a>
                     @if (auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
@@ -515,7 +516,7 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="hero-section">
+    <section class="hero-section" style="background: linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)), url('{{ $heroBg }}') center/cover no-repeat;">
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <div class="hero-tag">🌍 Bienvenido a WARAS</div>
@@ -607,8 +608,8 @@
                     <h3>Enlaces Rápidos</h3>
                     <div class="footer-links">
                         <a href="#servicios" class="footer-link">Servicios</a>
-                        <a href="#acerca" class="footer-link">Acerca de</a>
-                        <a href="#contacto" class="footer-link">Contacto</a>
+                        <a href="{{ route('nosotros') }}" class="footer-link">Acerca de</a>
+                        <a href="{{ route('contacto') }}" class="footer-link">Contacto</a>
                         @if (auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
                             <a href="{{ route('admin.dashboard') }}" class="footer-link">Panel Admin</a>
                         @else

@@ -82,8 +82,8 @@ class User extends Authenticatable
 
         return $this->modules()
             ->where(function ($query) use ($moduleSlugOrId) {
-                $query->where('slug', $moduleSlugOrId)
-                    ->orWhere('id', $moduleSlugOrId);
+                $query->where('modules.slug', $moduleSlugOrId)
+                    ->orWhere('modules.id', $moduleSlugOrId);
             })
             ->exists();
     }

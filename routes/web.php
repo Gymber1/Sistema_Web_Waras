@@ -9,23 +9,44 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\BibliotecaController as AdminBibliotecaController;
 use App\Http\Controllers\Admin\FototecaController as AdminFototecaController;
 use App\Http\Controllers\Admin\UserAdminController;
+use App\Http\Controllers\Admin\WebConfigController;
 
 // ============= PÚBLICAS =============
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/nosotros', [HomeController::class, 'nosotros'])->name('nosotros');
+Route::get('/contacto', [HomeController::class, 'contacto'])->name('contacto');
 
 // Biblioteca (Pública)
 Route::prefix('biblioteca')->name('biblioteca.')->group(function () {
     Route::get('/', [BibliotecaController::class, 'index'])->name('dashboard');
+    Route::get('/inicio', [BibliotecaController::class, 'index'])->name('inicio');
+    Route::get('/libros', [BibliotecaController::class, 'indexLibros'])->name('libros.index');
+    Route::get('/revistas', [BibliotecaController::class, 'indexRevistas'])->name('revistas.index');
+    Route::get('/editoriales', [BibliotecaController::class, 'indexEditoriales'])->name('editoriales.index');
+    Route::get('/autores', [BibliotecaController::class, 'indexAutores'])->name('autores.index');
+    Route::get('/especiales', [BibliotecaController::class, 'indexEspeciales'])->name('especiales.index');
+    Route::get('/nosotros', [BibliotecaController::class, 'indexAportantes'])->name('aportantes.index');
     Route::get('/search', [BibliotecaController::class, 'search'])->name('search');
     Route::get('/category/{category}', [BibliotecaController::class, 'getBooksByCategory'])->name('category');
     Route::get('/autores/{author}', [BibliotecaController::class, 'showAuthor'])->name('autores.show');
+    Route::get('/libros/{book}', [BibliotecaController::class, 'showBook'])->name('libros.show');
+    Route::get('/revistas/{book}', [BibliotecaController::class, 'showRevista'])->name('revistas.show');
+    Route::get('/editoriales/{publisher}', [BibliotecaController::class, 'showEditorial'])->name('editoriales.show');
 });
 
 // Fototeca (Pública)
 Route::prefix('fototeca')->name('fototeca.')->group(function () {
     Route::get('/', [FototecaController::class, 'index'])->name('dashboard');
+    Route::get('/inicio', [FototecaController::class, 'index'])->name('inicio');
+    Route::get('/galeria', [FototecaController::class, 'indexGaleria'])->name('galeria.index');
+    Route::get('/fotografos', [FototecaController::class, 'indexFotografos'])->name('fotografos.index');
+    Route::get('/especiales', [FototecaController::class, 'indexEspeciales'])->name('especiales.index');
+    Route::get('/nosotros', [FototecaController::class, 'indexAportantes'])->name('aportantes.index');
     Route::get('/search', [FototecaController::class, 'search'])->name('search');
     Route::get('/category/{category}', [FototecaController::class, 'getPhotosByCategory'])->name('category');
+    Route::get('/fotografos/{photographer}', [FototecaController::class, 'showPhotographer'])->name('fotografos.show');
+    Route::get('/galeria/{photo}', [FototecaController::class, 'showPhoto'])->name('galeria.show');
+    Route::get('/especiales/{special}', [FototecaController::class, 'showEspecial'])->name('especiales.show');
 });
 
 // ============= AUTENTICACIÓN =============
@@ -40,7 +61,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/', DashboardController::class)->name('dashboard');
 
         // Biblioteca Admin
-        Route::prefix('biblioteca')->name('biblioteca.')->group(function () {
+        Route::prefix('biblioteca')->name('biblioteca.')->middleware('module.access:biblioteca')->group(function () {
+            Route::get('/', [AdminBibliotecaController::class, 'adminIndex'])->name('index');
             // Libros
             Route::get('/books', [AdminBibliotecaController::class, 'indexBooks'])->name('books');
             Route::get('/books/create', [AdminBibliotecaController::class, 'createBook'])->name('books.create');
@@ -83,13 +105,12 @@ Route::middleware('auth')->group(function () {
 
             // Especiales
             Route::get('/specials', [AdminBibliotecaController::class, 'indexSpecials'])->name('specials');
-            Route::post('/specials', [AdminBibliotecaController::class, 'storeSpecial'])->name('specials.store');
-            Route::put('/specials/{special}', [AdminBibliotecaController::class, 'updateSpecial'])->name('specials.update');
-            Route::delete('/specials/{special}', [AdminBibliotecaController::class, 'destroySpecial'])->name('specials.destroy');
+            Route::post('/specials/{book}/toggle', [AdminBibliotecaController::class, 'toggleSpecial'])->name('specials.toggle');
         });
 
         // Fototeca Admin
-        Route::prefix('fototeca')->name('fototeca.')->group(function () {
+        Route::prefix('fototeca')->name('fototeca.')->middleware('module.access:fototeca')->group(function () {
+            Route::get('/', [AdminFototecaController::class, 'adminIndex'])->name('index');
             // Fotografías
             Route::get('/photos', [AdminFototecaController::class, 'indexPhotos'])->name('photos');
             Route::get('/photos/create', [AdminFototecaController::class, 'createPhoto'])->name('photos.create');
@@ -115,8 +136,15 @@ Route::middleware('auth')->group(function () {
             Route::delete('/categories/{category}', [AdminFototecaController::class, 'destroyCategory'])->name('categories.destroy');
         });
 
-        // Usuarios Admin
-        Route::prefix('usuarios')->name('usuarios.')->group(function () {
+        // Configurar Web (solo admin global)
+        Route::middleware('can:admin-only')->prefix('web-config')->name('web-config.')->group(function () {
+            Route::get('/', [WebConfigController::class, 'index'])->name('index');
+            Route::post('/{key}', [WebConfigController::class, 'update'])->name('update');
+            Route::delete('/{key}', [WebConfigController::class, 'destroy'])->name('destroy');
+        });
+
+        // Usuarios Admin (solo admin global)
+        Route::middleware('can:admin-only')->prefix('usuarios')->name('usuarios.')->group(function () {
             Route::get('/', [UserAdminController::class, 'index'])->name('index');
             Route::post('/', [UserAdminController::class, 'store'])->name('store');
             Route::get('/{user}/edit', [UserAdminController::class, 'edit'])->name('edit');

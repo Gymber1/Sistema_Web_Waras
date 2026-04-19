@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Book;
 
 class Special extends Model
 {
@@ -17,9 +18,20 @@ class Special extends Model
         'slug',
         'description',
         'cover_image_path',
+        'type',
         'order',
         'is_active',
     ];
+
+    public function books(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Book::class,
+            'book_special',
+            'special_id',
+            'book_id'
+        )->withPivot('order')->orderByPivot('order');
+    }
 
     protected $casts = [
         'is_active' => 'boolean',

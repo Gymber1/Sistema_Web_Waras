@@ -7,12 +7,27 @@ use App\Models\Book;
 use App\Models\Author;
 use App\Models\Publisher;
 use App\Models\Category;
-use App\Models\Special;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class BibliotecaController extends Controller
 {
+    // ============= DASHBOARD DEL MÓDULO =============
+
+    public function adminIndex()
+    {
+        $stats = [
+            'books'      => Book::where('document_type', '!=', 'Revista')->count(),
+            'magazines'  => Book::where('document_type', 'Revista')->count(),
+            'authors'    => Author::count(),
+            'categories' => Category::where('type', 'biblioteca')->count(),
+            'publishers' => Publisher::count(),
+            'specials'   => Book::where('is_special', true)->count(),
+        ];
+
+        return view('admin.biblioteca.index', compact('stats'));
+    }
+
     // ============= LIBROS =============
 
     public function indexBooks()
@@ -511,67 +526,15 @@ class BibliotecaController extends Controller
 
     public function indexSpecials()
     {
-        $specials  = Special::with(['book', 'photo'])->orderBy('order')->get();
-        $books     = Book::where('document_type', '!=', 'Revista')->orderBy('title')->get(['id', 'title']);
-        $magazines = Book::where('document_type', 'Revista')->orderBy('title')->get(['id', 'title']);
-        return view('admin.biblioteca.specials.index', compact('specials', 'books', 'magazines'));
+        $books     = Book::where('document_type', '!=', 'Revista')->orderBy('title')->get(['id', 'title', 'document_type', 'is_special']);
+        $magazines = Book::where('document_type', 'Revista')->orderBy('title')->get(['id', 'title', 'document_type', 'is_special']);
+        return view('admin.biblioteca.specials.index', compact('books', 'magazines'));
     }
 
-    public function storeSpecial(Request $request)
+    public function toggleSpecial(Request $request, Book $book)
     {
-        $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'book_ids'    => 'nullable|array',
-            'book_ids.*'  => 'exists:books,id',
-            'order'       => 'nullable|integer|min:0',
-            'is_active'   => 'nullable|boolean',
-        ]);
-
-        $firstBookId = !empty($request->book_ids) ? $request->book_ids[0] : null;
-
-        Special::create([
-            'title'       => $request->title,
-            'slug'        => $this->uniqueSlug($request->title, Special::class),
-            'description' => $request->description,
-            'type'        => 'book',
-            'book_id'     => $firstBookId,
-            'order'       => $request->order ?? 0,
-            'is_active'   => $request->boolean('is_active', true),
-        ]);
-
-        return redirect()->route('admin.biblioteca.specials')->with('success', 'Especial agregado correctamente.');
-    }
-
-    public function updateSpecial(Request $request, Special $special)
-    {
-        $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'book_ids'    => 'nullable|array',
-            'book_ids.*'  => 'exists:books,id',
-            'order'       => 'nullable|integer|min:0',
-            'is_active'   => 'nullable|boolean',
-        ]);
-
-        $firstBookId = !empty($request->book_ids) ? $request->book_ids[0] : null;
-
-        $special->update([
-            'title'       => $request->title,
-            'description' => $request->description,
-            'type'        => 'book',
-            'book_id'     => $firstBookId,
-            'order'       => $request->order ?? 0,
-            'is_active'   => $request->boolean('is_active', true),
-        ]);
-
-        return redirect()->route('admin.biblioteca.specials')->with('success', 'Especial actualizado correctamente.');
-    }
-
-    public function destroySpecial(Special $special)
-    {
-        $special->delete();
-        return redirect()->route('admin.biblioteca.specials')->with('success', 'Especial eliminado.');
+        $book->update(['is_special' => !$book->is_special]);
+        return back()->with('success', $book->is_special ? 'Marcado como especial.' : 'Desmarcado como especial.');
     }
 
     // ============= HELPERS =============

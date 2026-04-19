@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /*
-     * Especiales: colecciones temáticas de la Fototeca.
-     * Ej: "Terremoto del 31 de mayo de 1970", "Parque Nacional Huascarán", etc.
-     * Cada especial agrupa fotos bajo un tema editorial.
-     */
     public function up(): void
     {
         Schema::create('specials', function (Blueprint $table) {
@@ -19,6 +14,7 @@ return new class extends Migration
             $table->string('slug', 255)->unique();
             $table->text('description')->nullable();
             $table->string('cover_image_path')->nullable();
+            $table->enum('type', ['libro', 'revista'])->default('libro');
             $table->integer('order')->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();

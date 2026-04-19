@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Panel Admin - WARAS')</title>
+    <link rel="icon" type="image/png" href="/Logo-Panel-Waras.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -54,23 +55,28 @@
                     <h3 class="px-4 text-[11px] font-black text-slate-500 uppercase tracking-widest mb-3">Módulos Operativos</h3>
                     
                     <!-- Biblioteca -->
+                    @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('biblioteca'))
                     <details class="group mb-1.5" {{ request()->routeIs('admin.biblioteca.*') ? 'open' : '' }}>
-                        <summary class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all hover:bg-slate-800/50 hover:text-slate-200 {{ request()->routeIs('admin.biblioteca.*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400' }}">
+                        <summary class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all hover:bg-slate-800/50 hover:text-slate-200 {{ request()->routeIs('admin.biblioteca.*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400' }}" onclick="event.preventDefault(); this.parentElement.toggleAttribute('open')">
                             <div class="flex items-center gap-3">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C6.5 6.253 2 9.75 2 14s4.5 7.747 10 7.747m0-13c5.5 0 10 3.503 10 7.747m-10-7.747V2m0 13c-5.5 0-10 3.503-10 7.747m10-7.747c5.5 0 10 3.503 10 7.747M9 19h6"></path></svg>
                                 <span class="text-sm font-medium">Biblioteca</span>
                             </div>
                         </summary>
                         <div class="ml-11 mt-2 flex flex-col gap-1 border-l-2 border-slate-700/50 pl-3">
+                            <a href="{{ route('admin.biblioteca.index') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.biblioteca.index') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Descripción General</a>
                             <a href="{{ route('admin.biblioteca.books') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.biblioteca.books*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Libros</a>
                             <a href="{{ route('admin.biblioteca.authors') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.biblioteca.authors*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Autores</a>
                             <a href="{{ route('admin.biblioteca.categories') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.biblioteca.categories*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Categorías</a>
                             <a href="{{ route('admin.biblioteca.publishers') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.biblioteca.publishers*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Editoriales</a>
                             <a href="{{ route('admin.biblioteca.magazines') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.biblioteca.magazines*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Revistas</a>
+                            <a href="{{ route('admin.biblioteca.specials') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.biblioteca.specials*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Especiales</a>
                         </div>
                     </details>
+                    @endif
 
                     <!-- Fototeca -->
+                    @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca'))
                     <details class="group mb-1.5" {{ request()->routeIs('admin.fototeca.*') ? 'open' : '' }}>
                         <summary class="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all hover:bg-slate-800/50 hover:text-slate-200 {{ request()->routeIs('admin.fototeca.*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400' }}">
                             <div class="flex items-center gap-3">
@@ -79,11 +85,13 @@
                             </div>
                         </summary>
                         <div class="ml-11 mt-2 flex flex-col gap-1 border-l-2 border-slate-700/50 pl-3">
+                            <a href="{{ route('admin.fototeca.index') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.fototeca.index') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Descripción General</a>
                             <a href="{{ route('admin.fototeca.photos') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.fototeca.photos*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Fotografías</a>
                             <a href="{{ route('admin.fototeca.photographers') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.fototeca.photographers*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Fotógrafos</a>
                             <a href="{{ route('admin.fototeca.categories') }}" class="text-left text-[13px] font-medium px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.fototeca.categories*') ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">Categorías</a>
                         </div>
                     </details>
+                    @endif
                 </div>
 
                 <!-- Próximamente -->
@@ -115,11 +123,20 @@
                 <!-- Gestión Sistema -->
                 <div class="mb-8">
                     <h3 class="px-4 text-[11px] font-black text-slate-500 uppercase tracking-widest mb-3">Gestión del Sistema</h3>
-                    <a href="{{ route('admin.usuarios.index') }}" 
+                    @if(auth()->user()->is_admin_global)
+                    <a href="{{ route('admin.usuarios.index') }}"
                        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('admin.usuarios.*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 8 4 4 0 010-8zM3 8a8 8 0 1116 0 8 8 0 01-16 0z"></path></svg>
                         <span class="text-sm font-medium">Usuarios y Roles</span>
                     </a>
+                    @endif
+                    @if(auth()->user()->is_admin_global)
+                    <a href="{{ route('admin.web-config.index') }}"
+                       class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all mt-1 {{ request()->routeIs('admin.web-config.*') ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span class="text-sm font-medium">Configurar Web</span>
+                    </a>
+                    @endif
                 </div>
             </div>
 
@@ -147,9 +164,6 @@
                 <div class="flex items-center gap-3">
                     <a href="{{ route('home') }}" target="_blank" class="text-sm font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-5 py-2.5 rounded-xl hover:bg-indigo-100 transition-colors shadow-sm">
                         Portal Principal
-                    </a>
-                    <a href="/" class="text-sm font-bold text-slate-600 border border-slate-200 px-5 py-2.5 rounded-xl hover:bg-slate-50 transition-colors shadow-sm">
-                        Ir al Sitio Web
                     </a>
                     <form method="POST" action="{{ route('logout') }}" style="display: inline;">
                         @csrf

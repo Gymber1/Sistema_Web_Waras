@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Fototeca Digital - WARAS</title>
+    <link rel="icon" type="image/png" href="/Logo-Fototeca-Waras.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -43,12 +44,18 @@
         .logo-sub { font-size: 1.25rem; font-weight: 300; color: #9ca3af; }
 
         .nav-menu { display: flex; gap: 2rem; list-style: none; }
-        .nav-item { background: none; border: none; color: #9ca3af; cursor: pointer; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s ease; padding: 0.5rem 0; border-bottom: 2px solid transparent; }
+        .nav-item { background: none; border: none; color: #9ca3af; cursor: pointer; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s ease; padding: 0.5rem 0; border-bottom: 2px solid transparent; text-decoration: none; }
         .nav-item:hover { color: white; }
         .nav-item.active { color: white; border-bottom-color: white; }
+        .header-actions { display: flex; align-items: center; gap: .625rem; margin-left: 1.5rem; }
+        .header-btn { display: inline-flex; align-items: center; gap: .4rem; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: .45rem 1rem; border-radius: .25rem; text-decoration: none; transition: all .2s; white-space: nowrap; }
+        .header-btn-outline { color: #9ca3af; border: 1px solid rgba(255,255,255,.2); }
+        .header-btn-outline:hover { background: rgba(255,255,255,.08); color: white; border-color: rgba(255,255,255,.4); }
+        .header-btn-solid { background: white; color: black; border: 1px solid white; }
+        .header-btn-solid:hover { background: #e5e7eb; border-color: #e5e7eb; }
 
         /* Hero Section */
-        .hero { width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1505322022379-7c3353ee6291?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat; }
+        .hero { width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
         .hero.hidden { display: none !important; }
         .hero-content { max-width: 56rem; width: 100%; padding: 2rem; text-align: center; color: white; }
         .hero-icon-wrapper { display: inline-block; padding: 1rem; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; margin-bottom: 1.5rem; backdrop-filter: blur(5px); }
@@ -71,16 +78,32 @@
         /* Main Wrapper & Sidebar */
         .main-wrapper { display: flex; width: 100%; background: var(--bg-gray); margin-top: 72px; flex: 1; }
         .main-wrapper.hidden { display: none !important; }
-        
-        .sidebar { width: 300px; background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; max-height: calc(100vh - 72px); }
+
+        .sidebar { width: 300px; background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; max-height: calc(100vh - 72px); position: sticky; top: 72px; align-self: flex-start; }
         .sidebar-header { display: flex; align-items: center; gap: 0.75rem; padding: 1.5rem 2rem; background: black; color: white; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-        
+
+        /* Accordion sidebar */
+        .acc-todos-btn { width: 100%; padding: 0.875rem 2rem; font-size: 0.85rem; font-weight: 600; color: #374151; background: transparent; border: none; border-left: 3px solid transparent; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
+        .acc-todos-btn:hover { background: #f9fafb; color: black; }
+        .acc-todos-btn.active { background: #f3f4f6; color: black; border-left-color: black; }
+
+        .acc-parent-btn { width: 100%; padding: 0.875rem 2rem; font-size: 0.8rem; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.06em; background: white; border: none; border-left: 3px solid transparent; border-bottom: 1px solid #f3f4f6; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
+        .acc-parent-btn:hover { background: #f9fafb; }
+        .acc-parent-btn.open { background: #f9fafb; color: black; border-left-color: black; }
+        .acc-parent-btn.active-parent { color: black; font-weight: 700; }
+        .acc-chevron { font-size: 0.65rem; color: #9ca3af; transition: transform 0.25s ease; }
+        .acc-parent-btn.open .acc-chevron { transform: rotate(90deg); color: black; }
+
+        .acc-children { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+        .acc-children.open { max-height: 600px; }
+
+        .acc-child-btn { width: 100%; padding: 0.65rem 2rem 0.65rem 3rem; font-size: 0.825rem; font-weight: 400; color: #6b7280; background: transparent; border: none; border-left: 3px solid transparent; border-bottom: 1px solid #f9fafb; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; text-align: left; }
+        .acc-child-btn:hover { background: #f9fafb; color: black; }
+        .acc-child-btn.active { background: #f3f4f6; color: black; font-weight: 600; border-left-color: black; }
+        .acc-child-icon { font-size: 0.6rem; opacity: 0.3; }
+        .acc-child-btn.active .acc-child-icon { opacity: 1; }
+
         .filter-section { border-bottom: 1px solid #f3f4f6; }
-        .filter-section-title { padding: 1.25rem 2rem; font-size: 0.75rem; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 1px; background: white; cursor: pointer; display: flex; align-items: center; justify-content: space-between; border: none; width: 100%; text-align: left; transition: background 0.2s; }
-        .filter-section-title:hover { background: #f9fafb; }
-        .filter-items { display: block; background: #f9fafb; padding: 0.5rem 0; }
-        .filter-items.collapsed { display: none; }
-        
         .filter-item { padding: 0.6rem 2rem; color: #6b7280; font-size: 0.85rem; font-weight: 500; background: transparent; border: none; width: 100%; text-align: left; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; display: flex; justify-content: space-between; align-items: center; }
         .filter-item:hover { color: black; background: #f3f4f6; }
         .filter-item.active { color: black; background: #f3f4f6; border-left-color: black; font-weight: 600; }
@@ -165,17 +188,29 @@
             </button>
             <nav>
                 <div class="nav-menu">
-                    <button data-tab="Inicio" class="nav-item active">Inicio</button>
-                    <button data-tab="Galería" class="nav-item">Galería</button>
-                    <button data-tab="Fotógrafos" class="nav-item">Fotógrafos</button>
-                    <button data-tab="Especiales" class="nav-item">Especiales</button>
-                    <button data-tab="Aportantes" class="nav-item">Aportantes</button>
+                    <a href="{{ route('fototeca.inicio') }}" data-tab="Inicio" class="nav-item">Inicio</a>
+                    <a href="{{ route('fototeca.galeria.index') }}" data-tab="Galería" class="nav-item">Galería</a>
+                    <a href="{{ route('fototeca.fotografos.index') }}" data-tab="Fotógrafos" class="nav-item">Fotógrafos</a>
+                    <a href="{{ route('fototeca.especiales.index') }}" data-tab="Especiales" class="nav-item">Especiales</a>
+                    <a href="{{ route('fototeca.aportantes.index') }}" data-tab="Aportantes" class="nav-item">Aportantes</a>
                 </div>
             </nav>
+            <div class="header-actions">
+                <a href="{{ route('home') }}" class="header-btn header-btn-outline">
+                    <i class="fas fa-home"></i> Portal Principal
+                </a>
+                @auth
+                    @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca'))
+                    <a href="{{ route('admin.dashboard') }}" class="header-btn header-btn-solid">
+                        <i class="fas fa-th-large"></i> Panel
+                    </a>
+                    @endif
+                @endauth
+            </div>
         </div>
     </header>
 
-    <section class="hero" id="heroSection">
+    <section class="hero" id="heroSection" style="background: linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)), url('{{ $heroBg ?? 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' }}') center/cover no-repeat;">
         <div class="hero-content">
             <div class="hero-icon-wrapper">
                 <i class="fas fa-camera" style="font-size: 2rem;"></i>
@@ -195,37 +230,9 @@
     <div class="main-wrapper hidden" id="mainWrapper">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <i class="fas fa-filter"></i> Filtros de Galería
+                <i class="fas fa-filter"></i> Explorar Catálogo
             </div>
-
-            <div id="sidebarCategories">
-                @forelse($categoriesForFilters as $parent)
-                <div class="filter-section">
-                    <button class="filter-section-title" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')">
-                        {{ strtoupper($parent['name']) }} <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="filter-items">
-                        <button class="filter-item" data-category="{{ $parent['name'] }}">
-                            {{ $parent['name'] }} — Todas <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i>
-                        </button>
-                        @foreach($parent['children'] as $child)
-                        <button class="filter-item" data-category="{{ $child['name'] }}">
-                            {{ $child['name'] }} <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i>
-                        </button>
-                        @endforeach
-                    </div>
-                </div>
-                @empty
-                <div class="filter-section">
-                    <button class="filter-section-title">
-                        TODAS LAS FOTOGRAFÍAS <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="filter-items">
-                        <button class="filter-item active" data-category="all">Todas <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i></button>
-                    </div>
-                </div>
-                @endforelse
-            </div>
+            <ul id="sidebarCategories" style="list-style:none; padding:0; margin:0;"></ul>
         </aside>
 
         <main class="content">
@@ -243,10 +250,10 @@
                     <span style="font-size:0.85rem; color:#6b7280"><strong style="color:black" id="photoCount">0</strong> fotos</span>
                     <div style="width:1px; height:20px; background:#e5e7eb; margin: 0 0.5rem;"></div>
                     <i class="fas fa-sliders-h" style="color:#9ca3af"></i>
-                    <select class="sort-select">
-                        <option>Más recientes</option>
-                        <option>Más antiguas</option>
-                        <option>Más populares</option>
+                    <select class="sort-select" id="sortSelect">
+                        <option value="az">Ordenar A-Z</option>
+                        <option value="recent">Más recientes</option>
+                        <option value="old">Más antiguos</option>
                     </select>
                 </div>
             </div>
@@ -308,6 +315,154 @@
         </div>
     </div>
 
+    <!-- ===== SECCIÓN NOSOTROS / APORTANTES ===== -->
+    <div id="aportantesSection" style="display:none; background:#f5f5f7; margin-top:56px; padding:0 0 4rem;">
+
+        <!-- Hero Banner -->
+        <div style="background:linear-gradient(135deg,#000 60%,#1a1a1a); color:white; padding:4rem 2rem; text-align:center; position:relative; overflow:hidden;">
+            <div style="position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1920&q=40') center/cover;opacity:.08;"></div>
+            <div style="position:relative;max-width:800px;margin:0 auto;">
+                <div style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border:2px solid rgba(255,255,255,.3);border-radius:50%;margin-bottom:1.5rem;">
+                    <i class="fas fa-camera" style="font-size:1.5rem;"></i>
+                </div>
+                <h1 style="font-size:2.5rem;font-weight:800;letter-spacing:-.5px;margin-bottom:1rem;text-transform:uppercase;letter-spacing:.1em;">Fototeca Ancashina</h1>
+                <p style="font-size:1.1rem;font-weight:300;color:#d1d5db;line-height:1.8;max-width:640px;margin:0 auto;">
+                    Archivo visual que preserva, digitaliza y difunde la memoria fotográfica e histórica del Departamento de Áncash.
+                </p>
+            </div>
+        </div>
+
+        <div style="max-width:1000px;margin:0 auto;padding:3rem 1.5rem;">
+
+            <!-- Quiénes somos -->
+            <div style="background:white;border:1px solid #e5e7eb;padding:2.5rem;margin-bottom:2rem;">
+                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #111;">
+                    <div style="width:36px;height:36px;background:black;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-landmark" style="color:white;font-size:.85rem;"></i>
+                    </div>
+                    <h2 style="font-size:1.25rem;font-weight:800;color:black;text-transform:uppercase;letter-spacing:.05em;">Quiénes Somos</h2>
+                </div>
+                <p style="font-size:.95rem;color:#4b5563;line-height:1.85;margin-bottom:1rem;">
+                    La <strong>Asociación Waras: Ciencia y Cultura</strong> nació de un grupo de ciudadanos comprometidos con el desarrollo económico, social, científico y cultural del Departamento de Áncash. Ante el vacío histórico del Estado en la protección de la identidad cultural, decidieron aportar para viabilizar el progreso sostenido de nuestra región.
+                </p>
+                <p style="font-size:.95rem;color:#4b5563;line-height:1.85;">
+                    Áncash es una región privilegiada, con una profunda tradición cultural que subsiste a través del tiempo y una diversidad de recursos naturales únicos. Esta fototeca es uno de los espacios que buscamos construir para sistematizar, preservar y difundir la ciencia y cultura ancashina.
+                </p>
+            </div>
+
+            <!-- Finalidad + Objetivos -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;">
+                <div style="background:white;border:1px solid #e5e7eb;padding:2rem;">
+                    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;">
+                        <div style="width:32px;height:32px;background:black;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-bullseye" style="color:white;font-size:.75rem;"></i>
+                        </div>
+                        <h3 style="font-size:1rem;font-weight:800;color:black;text-transform:uppercase;letter-spacing:.05em;">Finalidad</h3>
+                    </div>
+                    <p style="font-size:.875rem;color:#4b5563;line-height:1.8;">
+                        Promover estudios, investigaciones, capacitaciones y espacios que aporten al desarrollo económico, social, ambiental, cultural y científico del Departamento de Áncash para la mejora de la calidad de vida de sus ciudadanos.
+                    </p>
+                </div>
+                <div style="background:black;color:white;padding:2rem;">
+                    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;">
+                        <div style="width:32px;height:32px;border:1px solid rgba(255,255,255,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-flag" style="font-size:.75rem;"></i>
+                        </div>
+                        <h3 style="font-size:1rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;">Objetivos Generales</h3>
+                    </div>
+                    <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.75rem;">
+                        <li style="display:flex;gap:.75rem;align-items:flex-start;font-size:.875rem;color:#d1d5db;line-height:1.6;">
+                            <i class="fas fa-chevron-right" style="color:white;margin-top:.2rem;flex-shrink:0;font-size:.65rem;"></i>
+                            Contribuir al Desarrollo Económico y Social del Departamento de Ancash.
+                        </li>
+                        <li style="display:flex;gap:.75rem;align-items:flex-start;font-size:.875rem;color:#d1d5db;line-height:1.6;">
+                            <i class="fas fa-chevron-right" style="color:white;margin-top:.2rem;flex-shrink:0;font-size:.65rem;"></i>
+                            Preservar y Difundir la Cultura Ancashina.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Valores -->
+            <div style="background:white;border:1px solid #e5e7eb;padding:2.5rem;margin-bottom:2rem;">
+                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.75rem;padding-bottom:1rem;border-bottom:2px solid #111;">
+                    <div style="width:36px;height:36px;background:black;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-heart" style="color:white;font-size:.85rem;"></i>
+                    </div>
+                    <h2 style="font-size:1.25rem;font-weight:800;color:black;text-transform:uppercase;letter-spacing:.05em;">Nuestros Valores</h2>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;">
+                    @foreach([['fa-balance-scale','Equidad'],['fa-hands-helping','Fraternidad'],['fa-hand-holding-heart','Solidaridad'],['fa-leaf','Armonía'],['fa-dove','Libertad']] as [$icon,$valor])
+                    <div style="text-align:center;padding:1.25rem .75rem;border:1px solid #e5e7eb;transition:all .2s;"
+                         onmouseover="this.style.background='black';this.style.color='white';this.style.borderColor='black'"
+                         onmouseout="this.style.background='';this.style.color='';this.style.borderColor='#e5e7eb'">
+                        <i class="fas {{ $icon }}" style="font-size:1.5rem;margin-bottom:.5rem;display:block;"></i>
+                        <span style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">{{ $valor }}</span>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Beneficiarios -->
+            <div style="background:white;border:1px solid #e5e7eb;padding:2.5rem;margin-bottom:2rem;">
+                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #111;">
+                    <div style="width:36px;height:36px;background:black;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-users" style="color:white;font-size:.85rem;"></i>
+                    </div>
+                    <h2 style="font-size:1.25rem;font-weight:800;color:black;text-transform:uppercase;letter-spacing:.05em;">Beneficiarios</h2>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.75rem;">
+                    @foreach(['Estudiantes de primaria y secundaria de Áncash','Estudiantes de nivel superior de Áncash','Docentes de nivel básico y superior','Autoridades y sociedad civil','Empresarios e inversores regionales','Turistas nacionales e internacionales','Público interesado en la cultura ancashina'] as $ben)
+                    <div style="display:flex;gap:.75rem;align-items:flex-start;padding:.875rem;background:#f9fafb;border:1px solid #f3f4f6;">
+                        <i class="fas fa-check" style="color:black;margin-top:.2rem;flex-shrink:0;font-size:.75rem;"></i>
+                        <span style="font-size:.875rem;color:#374151;line-height:1.5;">{{ $ben }}</span>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Contacto -->
+            <div style="background:black;color:white;padding:2.5rem;">
+                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.75rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.15);">
+                    <div style="width:36px;height:36px;border:1px solid rgba(255,255,255,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-envelope" style="font-size:.85rem;"></i>
+                    </div>
+                    <h2 style="font-size:1.25rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;">Contáctanos</h2>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;">
+                    <div style="display:flex;gap:1rem;align-items:flex-start;">
+                        <div style="width:40px;height:40px;border:1px solid rgba(255,255,255,.2);border-radius:.25rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:.25rem;">Ubicación</p>
+                            <p style="font-size:.9rem;color:#e5e7eb;line-height:1.6;">Departamento de Áncash, Perú</p>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:1rem;align-items:flex-start;">
+                        <div style="width:40px;height:40px;border:1px solid rgba(255,255,255,.2);border-radius:.25rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:.25rem;">Correo Electrónico</p>
+                            <p style="font-size:.9rem;color:#e5e7eb;">asociacion@waras.pe</p>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:1rem;align-items:flex-start;">
+                        <div style="width:40px;height:40px;border:1px solid rgba(255,255,255,.2);border-radius:.25rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div>
+                            <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:.25rem;">Misión</p>
+                            <p style="font-size:.875rem;color:#9ca3af;line-height:1.6;font-style:italic;">"Ama Llulla, Ama Quella, Ama Sua"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <footer class="footer">
         <div class="footer-icon"><i class="fas fa-camera" style="font-size: 1.5rem;"></i></div>
         <p class="footer-text">© 2024 FOTOTECA WARAS - Archivo Visual Ancashino</p>
@@ -316,57 +471,116 @@
     <script>
         const PLACEHOLDER = 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
 
-        // Datos desde el servidor
-        const photosByCategory   = @json($photosByCategory ?? []);
-        const photographersData  = @json($photographersData ?? []);
-        const categoriesFromDB   = @json($categoriesForFilters ?? []);
+        // ========== DATOS DESDE LARAVEL ==========
+        const photosByCategory  = @json($photosByCategory ?? []);
+        const photographersData = @json($photographersData ?? []);
+        const categoriesFromDB  = @json($categoriesForFilters ?? []);
+        const especialesData    = @json($especialesData ?? []);
 
-        // Obtener la primera categoría disponible en la BD (o null)
-        const firstCategory = (() => {
-            for (const parent of categoriesFromDB) {
-                if (parent.children.length > 0) return parent.children[0].name;
-                return parent.name;
-            }
-            const keys = Object.keys(photosByCategory);
-            return keys.length > 0 ? keys[0] : 'all';
+        // Flat list of all photos (deduplicated by id)
+        const allPhotosFlat = (() => {
+            const seen = new Set();
+            const result = [];
+            Object.values(photosByCategory).flat().forEach(p => {
+                if (!seen.has(p.id)) { seen.add(p.id); result.push(p); }
+            });
+            return result;
         })();
 
+        const serverActiveSection = @json($activeSection ?? 'Inicio');
+
+        // ========== ESTADO ==========
         let state = {
-            activeTab:      'Galería',
-            activeCategory: firstCategory || 'all'
+            activeTab:      'Inicio',
+            activeCategory: { id: null, name: 'Todas' }, // {id, name} — null id = mostrar todas
+            openAccordions:   new Set(),  // ids abiertos manualmente
+            closedAccordions: new Set()   // ids cerrados manualmente (prioridad sobre ancestro activo)
         };
 
-        // Obtener fotos para la categoría/tab actual
+        // ========== FILTRADO ==========
         function getCurrentPhotos() {
             if (state.activeTab === 'Fotógrafos') return photographersData;
-            if (state.activeCategory === 'all') {
-                // Merge all photos
-                return Object.values(photosByCategory).flat();
+            if (state.activeTab === 'Especiales') return especialesData;
+
+            let base = allPhotosFlat;
+            if (state.activeCategory.id !== null) {
+                const catName = state.activeCategory.name;
+                base = photosByCategory[catName] || [];
             }
-            return photosByCategory[state.activeCategory] || [];
+
+            const q = document.getElementById('contentSearchInput')?.value?.toLowerCase().trim();
+            if (q) {
+                base = base.filter(p =>
+                    (p.title || '').toLowerCase().includes(q) ||
+                    (p.photographer || '').toLowerCase().includes(q) ||
+                    (p.description || '').toLowerCase().includes(q) ||
+                    (p.location || '').toLowerCase().includes(q)
+                );
+            }
+            return base;
         }
 
-        // Renderizar la grilla de fotos
+        // ========== RENDER FOTOS ==========
+        function getSortedPhotos(items) {
+            const sortVal = document.getElementById('sortSelect')?.value ?? 'az';
+            const arr = [...items];
+            if (sortVal === 'az') {
+                arr.sort((a, b) => (a.title || a.full_name || '').localeCompare(b.title || b.full_name || '', 'es'));
+            } else if (sortVal === 'recent') {
+                arr.sort((a, b) => (parseInt(b.year) || 0) - (parseInt(a.year) || 0));
+            } else if (sortVal === 'old') {
+                arr.sort((a, b) => (parseInt(a.year) || 9999) - (parseInt(b.year) || 9999));
+            }
+            return arr;
+        }
+
         function renderPhotos() {
             const grid = document.getElementById('photosGrid');
-            const items = getCurrentPhotos();
+            const items = getSortedPhotos(getCurrentPhotos());
             document.getElementById('photoCount').textContent = items.length;
 
             if (state.activeTab === 'Fotógrafos') {
-                grid.innerHTML = items.map((p, index) => `
-                    <div class="photo-card" data-index="${index}">
+                grid.innerHTML = items.map(p => `
+                    <div class="photo-card">
                         <div class="photo-image-container" style="background:#111;">
                             ${p.photo_path
-                                ? `<img src="${p.photo_path}" alt="${p.full_name}" class="photo-image">`
+                                ? `<img src="${p.photo_path}" alt="${p.full_name}" class="photo-image" onerror="this.style.display='none'">`
                                 : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-user" style="font-size:3rem;color:#555;"></i></div>`}
                             <div class="photo-badge">${p.photos_count} fotos</div>
+                            <div class="photo-overlay">
+                                <a href="/fototeca/fotografos/${p.id}" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')"
+                                   class="photo-overlay-btn"><i class="fas fa-user"></i> Ver Perfil</a>
+                            </div>
                         </div>
                         <div class="photo-title">${p.full_name}</div>
-                        <div class="photo-meta">
-                            <span>${p.biography ? p.biography.slice(0, 60) + '…' : 'Sin biografía'}</span>
+                        <div class="photo-meta"><span>${p.biography ? p.biography.slice(0, 80) + '…' : 'Sin biografía'}</span></div>
+                        <div style="padding:0.5rem 0 0.25rem;">
+                            <a href="/fototeca/fotografos/${p.id}" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')"
+                               style="font-size:0.8rem;font-weight:700;color:black;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid black;padding-bottom:1px;transition:opacity 0.2s;"
+                               onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">
+                                Más información →
+                            </a>
                         </div>
                     </div>
-                `).join('');
+                `).join('') || `<div style="grid-column:1/-1;text-align:center;padding:4rem 0;color:#9ca3af;">No hay fotógrafos registrados.</div>`;
+                return;
+            }
+
+            if (state.activeTab === 'Especiales') {
+                grid.innerHTML = items.map(s => `
+                    <a href="/fototeca/especiales/${s.id}" style="text-decoration:none;">
+                        <div class="photo-card">
+                            <div class="photo-image-container" style="background:#111;">
+                                ${s.cover
+                                    ? `<img src="${s.cover}" alt="${s.title}" class="photo-image" onerror="this.style.display='none'">`
+                                    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-star" style="font-size:3rem;color:#555;"></i></div>`}
+                                <div class="photo-badge">${s.photos_count} fotos</div>
+                            </div>
+                            <div class="photo-title">${s.title}</div>
+                            <div class="photo-meta">${s.description ? s.description.slice(0, 80) + '…' : 'Colección especial'}</div>
+                        </div>
+                    </a>
+                `).join('') || `<div style="grid-column:1/-1;text-align:center;padding:4rem 0;color:#9ca3af;">No hay especiales registrados.</div>`;
                 return;
             }
 
@@ -393,24 +607,150 @@
                 </div>
             `).join('');
 
-            document.querySelectorAll('.photo-card').forEach((card, index) => {
+            document.querySelectorAll('#photosGrid .photo-card').forEach((card, index) => {
                 card.addEventListener('click', () => showDetail(items[index]));
             });
         }
 
+        // ========== RENDER SIDEBAR ACORDEÓN (RECURSIVO) ==========
+
+        // Construir HTML recursivo para un nodo y sus hijos
+        function buildNodeHtml(node, depth) {
+            const hasChildren = node.children && node.children.length > 0;
+            const manuallyClosed = state.closedAccordions.has(node.id);
+            const isOpen = !manuallyClosed && (
+                state.openAccordions.has(node.id) ||
+                isAncestorOfActive(node, state.activeCategory.id)
+            );
+            const isActive = state.activeCategory.id === node.id;
+            const indent = 2 + depth * 1; // rem
+            const paddingLeft = `${indent}rem`;
+
+            if (hasChildren) {
+                // Nodo con hijos → botón acordeón + children colapsables
+                const childrenHtml = node.children.map(child => buildNodeHtml(child, depth + 1)).join('');
+                return `<li>
+                    <button class="acc-parent-btn ${isOpen ? 'open' : ''} ${isActive ? 'active-parent' : ''}"
+                            data-parent-id="${node.id}"
+                            style="padding-left:${paddingLeft};">
+                        <span>${node.name}</span>
+                        <i class="fas fa-chevron-right acc-chevron"></i>
+                    </button>
+                    <div class="acc-children ${isOpen ? 'open' : ''}">
+                        <ul style="list-style:none;padding:0;margin:0;">${childrenHtml}</ul>
+                    </div>
+                </li>`;
+            } else {
+                // Nodo hoja → botón seleccionable
+                return `<li>
+                    <button class="acc-child-btn ${isActive ? 'active' : ''}"
+                            data-cat-id="${node.id}" data-cat-name="${node.name}"
+                            style="padding-left:${paddingLeft};">
+                        <span>${node.name}</span>
+                        <i class="fas fa-chevron-right acc-child-icon"></i>
+                    </button>
+                </li>`;
+            }
+        }
+
+        // Comprobar si un nodo es ancestro de la categoría activa (para mantener abierto)
+        function isAncestorOfActive(node, activeId) {
+            if (!activeId || !node.children) return false;
+            for (const child of node.children) {
+                if (child.id === activeId) return true;
+                if (isAncestorOfActive(child, activeId)) return true;
+            }
+            return false;
+        }
+
+        function renderSidebar() {
+            const list = document.getElementById('sidebarCategories');
+
+            const todosActive = state.activeCategory.id === null;
+            let html = `<li><button class="acc-todos-btn ${todosActive ? 'active' : ''}" id="acc-todos">
+                            Todas las fotografías
+                            <i class="fas fa-chevron-right acc-child-icon"></i>
+                        </button></li>`;
+
+            if (categoriesFromDB.length > 0) {
+                html += categoriesFromDB.map(node => buildNodeHtml(node, 0)).join('');
+            } else {
+                Object.keys(photosByCategory).forEach(name => {
+                    const isActive = state.activeCategory.name === name;
+                    html += `<li><button class="acc-todos-btn ${isActive ? 'active' : ''}" data-cat-name="${name}">${name}</button></li>`;
+                });
+            }
+
+            list.innerHTML = html;
+
+            // "Todas" button
+            list.querySelector('#acc-todos')?.addEventListener('click', () => {
+                state.activeCategory = { id: null, name: 'Todas' };
+                state.openAccordions.clear();
+                state.closedAccordions.clear();
+                document.getElementById('sectionTitle').textContent = state.activeTab;
+                renderSidebar();
+                renderPhotos();
+            });
+
+            // Accordion parent toggle (cualquier profundidad) — Set-based para multinivel
+            list.querySelectorAll('.acc-parent-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const pid = parseInt(btn.getAttribute('data-parent-id'));
+                    const isCurrentlyOpen = btn.classList.contains('open');
+                    if (isCurrentlyOpen) {
+                        state.openAccordions.delete(pid);
+                        state.closedAccordions.add(pid);
+                    } else {
+                        state.closedAccordions.delete(pid);
+                        state.openAccordions.add(pid);
+                    }
+                    renderSidebar();
+                });
+            });
+
+            // Leaf category select (cualquier profundidad)
+            list.querySelectorAll('.acc-child-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id   = parseInt(btn.getAttribute('data-cat-id'));
+                    const name = btn.getAttribute('data-cat-name');
+                    state.activeCategory = { id, name };
+                    document.getElementById('sectionTitle').textContent = name;
+                    renderSidebar(); // re-render para mantener abierto el ancestro
+                    renderPhotos();
+                });
+            });
+
+            // Flat fallback buttons
+            list.querySelectorAll('.acc-todos-btn[data-cat-name]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const name = btn.getAttribute('data-cat-name');
+                    state.activeCategory = { id: null, name };
+                    document.getElementById('sectionTitle').textContent = name;
+                    renderSidebar();
+                    renderPhotos();
+                });
+            });
+        }
+
+        // ========== MOSTRAR DETALLE ==========
         function showDetail(photo) {
+            if (photo.detail_url) {
+                window.location.href = photo.detail_url;
+                return;
+            }
             const imgEl = document.getElementById('detailImage');
             imgEl.src = photo.image_url || PLACEHOLDER;
             imgEl.onerror = () => { imgEl.src = PLACEHOLDER; };
 
-            document.getElementById('detailTitle').textContent       = photo.title;
-            document.getElementById('detailPhotographer').textContent= photo.photographer;
-            document.getElementById('detailYear').textContent        = photo.year;
-            document.getElementById('detailLocation').textContent    = photo.location || '—';
-            document.getElementById('detailResolution').textContent  = photo.resolution || '—';
-            document.getElementById('detailCamera').textContent      = photo.format || '—';
-            document.getElementById('detailBadge').textContent       = photo.format || photo.source_type || 'Archivo';
-            document.getElementById('detailDescription').textContent = photo.description || '';
+            document.getElementById('detailTitle').textContent        = photo.title;
+            document.getElementById('detailPhotographer').textContent = photo.photographer;
+            document.getElementById('detailYear').textContent         = photo.year;
+            document.getElementById('detailLocation').textContent     = photo.location || '—';
+            document.getElementById('detailResolution').textContent   = photo.resolution || '—';
+            document.getElementById('detailCamera').textContent       = photo.format || '—';
+            document.getElementById('detailBadge').textContent        = photo.format || photo.source_type || 'Archivo';
+            document.getElementById('detailDescription').textContent  = photo.description || '';
 
             document.getElementById('mainWrapper').classList.add('hidden');
             document.getElementById('heroSection').classList.add('hidden');
@@ -418,12 +758,34 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function showGaleria() {
-            document.getElementById('mainWrapper').classList.remove('hidden');
+        function hideAllSections() {
             document.getElementById('heroSection').classList.add('hidden');
             document.getElementById('detailView').classList.add('hidden');
-            document.getElementById('sectionTitle').textContent = state.activeCategory === 'all' ? 'Todas las Fotografías' : state.activeCategory;
-            renderPhotos();
+            document.getElementById('mainWrapper').classList.add('hidden');
+            document.getElementById('aportantesSection').style.display = 'none';
+        }
+
+        // ========== MOSTRAR GALERÍA / SECCIONES ==========
+        function showSection(tab) {
+            state.activeTab = tab;
+            state.activeCategory = { id: null, name: 'Todas' };
+            state.openAccordions.clear();
+            state.closedAccordions.clear();
+
+            hideAllSections();
+
+            if (tab === 'Aportantes') {
+                document.getElementById('aportantesSection').style.display = 'block';
+            } else if (tab === 'Inicio') {
+                document.getElementById('heroSection').classList.remove('hidden');
+            } else {
+                document.getElementById('mainWrapper').classList.remove('hidden');
+                document.getElementById('sectionTitle').textContent = tab;
+                document.getElementById('contentSearchInput').value = '';
+                renderSidebar();
+                renderPhotos();
+            }
+
             updateNav();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -432,60 +794,89 @@
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-tab') === state.activeTab);
             });
+            const tabUrlMap = {
+                'Inicio':      '{{ route('fototeca.dashboard') }}',
+                'Galería':     '{{ route('fototeca.galeria.index') }}',
+                'Fotógrafos':  '{{ route('fototeca.fotografos.index') }}',
+                'Especiales':  '{{ route('fototeca.especiales.index') }}',
+                'Aportantes':  '{{ route('fototeca.aportantes.index') }}',
+            };
+            if (tabUrlMap[state.activeTab]) {
+                history.replaceState(null, '', tabUrlMap[state.activeTab]);
+            }
         }
 
-        // Header scroll
-        window.addEventListener('scroll', () => {
-            const header = document.getElementById('header');
-            header.style.background = window.scrollY > 50 ? 'black' : (state.activeTab === 'Inicio' ? 'rgba(0,0,0,0.4)' : 'black');
-        });
-
-        document.getElementById('logoBtn').addEventListener('click', () => {
-            state.activeTab = 'Inicio';
-            document.getElementById('heroSection').classList.remove('hidden');
-            document.getElementById('mainWrapper').classList.add('hidden');
-            document.getElementById('detailView').classList.add('hidden');
-            updateNav();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        document.querySelectorAll('.nav-item').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tab = btn.getAttribute('data-tab');
-                state.activeTab = tab;
-                if (tab === 'Inicio') {
-                    document.getElementById('heroSection').classList.remove('hidden');
-                    document.getElementById('mainWrapper').classList.add('hidden');
-                    document.getElementById('detailView').classList.add('hidden');
-                    updateNav();
-                } else {
-                    showGaleria();
-                }
-            });
-        });
-
-        // Sidebar filter clicks (delegated)
-        document.getElementById('sidebarCategories').addEventListener('click', e => {
-            const btn = e.target.closest('.filter-item');
-            if (!btn) return;
-            document.querySelectorAll('.filter-item').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            state.activeCategory = btn.getAttribute('data-category');
-            document.getElementById('sectionTitle').textContent = state.activeCategory === 'all' ? 'Todas las Fotografías' : state.activeCategory;
+        // ========== BÚSQUEDA EN CONTENIDO ==========
+        document.getElementById('contentSearchInput')?.addEventListener('input', () => {
             renderPhotos();
         });
 
+        document.getElementById('sortSelect').addEventListener('change', () => {
+            renderPhotos();
+        });
+
+        // ========== SCROLL HEADER ==========
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            header.style.background = window.scrollY > 50 || state.activeTab !== 'Inicio'
+                ? 'black'
+                : 'rgba(0,0,0,0.4)';
+        });
+
+        // ========== LOGO → INICIO ==========
+        document.getElementById('logoBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = '{{ route('fototeca.dashboard') }}';
+        });
+
+        // ========== NAVEGACIÓN ==========
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = btn.getAttribute('href');
+            });
+        });
+
+        // ========== BOTÓN VOLVER ==========
         document.getElementById('backBtn').addEventListener('click', () => {
             document.getElementById('detailView').classList.add('hidden');
             document.getElementById('mainWrapper').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // Marcar primera categoría del sidebar como activa
-        const firstFilterBtn = document.querySelector('.filter-item');
-        if (firstFilterBtn) firstFilterBtn.classList.add('active');
+        // ========== BÚSQUEDA HERO ==========
+        document.getElementById('heroSearchInput')?.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                const q = e.target.value.trim();
+                if (q) {
+                    showSection('Galería');
+                    document.getElementById('contentSearchInput').value = q;
+                    renderPhotos();
+                }
+            }
+        });
+        document.querySelector('.search-btn')?.addEventListener('click', () => {
+            const q = document.getElementById('heroSearchInput').value.trim();
+            showSection('Galería');
+            if (q) {
+                document.getElementById('contentSearchInput').value = q;
+                renderPhotos();
+            }
+        });
 
-        renderPhotos();
+        // ========== INICIO ==========
+        // Activar sección según la ruta visitada (definida por el servidor)
+        const validTabs = ['Inicio','Galería','Fotógrafos','Especiales','Aportantes'];
+
+        // Fallback sessionStorage para compatibilidad con páginas de detalle
+        const pendingTab = sessionStorage.getItem('fototeca_tab');
+        if (pendingTab && validTabs.includes(pendingTab)) {
+            sessionStorage.removeItem('fototeca_tab');
+            showSection(pendingTab);
+        } else {
+            const sectionTab = validTabs.includes(serverActiveSection) ? serverActiveSection : 'Inicio';
+            showSection(sectionTab);
+        }
     </script>
 </body>
 </html>

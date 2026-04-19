@@ -11,6 +11,19 @@ use Illuminate\Support\Str;
 
 class FototecaController extends Controller
 {
+    // ============= DASHBOARD DEL MÓDULO =============
+
+    public function adminIndex()
+    {
+        $stats = [
+            'photos'        => Photo::count(),
+            'photographers' => Photographer::count(),
+            'categories'    => Category::where('type', 'fototeca')->count(),
+        ];
+
+        return view('admin.fototeca.index', compact('stats'));
+    }
+
     // ============= FOTOGRAFÍAS =============
 
     public function indexPhotos()

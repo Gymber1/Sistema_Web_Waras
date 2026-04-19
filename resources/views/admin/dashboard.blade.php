@@ -11,6 +11,7 @@
     
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- BIBLIOTECA CARD -->
+        @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('biblioteca'))
         <div class="bg-white rounded-2xl border border-emerald-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden group">
             <div class="absolute inset-0 opacity-40 bg-gradient-to-br from-emerald-50 to-white -z-10 transition-opacity group-hover:opacity-100"></div>
             
@@ -55,7 +56,7 @@
             </div>
 
             <div class="flex gap-3">
-                <a href="{{ route('admin.biblioteca.books') }}" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white shadow-emerald-200 text-center">
+                <a href="{{ route('admin.biblioteca.index') }}" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white shadow-emerald-200 text-center">
                     Administrar Módulo →
                 </a>
                 <a href="{{ route('biblioteca.dashboard') }}" target="_blank" class="py-3 px-4 rounded-xl text-sm font-bold transition-all border border-emerald-300 text-emerald-700 hover:bg-emerald-50 bg-white shadow-sm whitespace-nowrap">
@@ -63,8 +64,10 @@
                 </a>
             </div>
         </div>
+        @endif
 
         <!-- FOTOTECA CARD -->
+        @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca'))
         <div class="bg-white rounded-2xl border border-blue-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden group">
             <div class="absolute inset-0 opacity-40 bg-gradient-to-br from-blue-50 to-white -z-10 transition-opacity group-hover:opacity-100"></div>
             
@@ -101,7 +104,7 @@
             </div>
 
             <div class="flex gap-3">
-                <a href="{{ route('admin.fototeca.photos') }}" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-blue-200 text-center">
+                <a href="{{ route('admin.fototeca.index') }}" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-blue-200 text-center">
                     Administrar Módulo →
                 </a>
                 <a href="{{ route('fototeca.dashboard') }}" target="_blank" class="py-3 px-4 rounded-xl text-sm font-bold transition-all border border-blue-300 text-blue-700 hover:bg-blue-50 bg-white shadow-sm whitespace-nowrap">
@@ -109,8 +112,10 @@
                 </a>
             </div>
         </div>
+        @endif
 
         <!-- USUARIOS CARD -->
+        @if(auth()->user()->is_admin_global)
         <div class="bg-white rounded-2xl border border-violet-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden group">
             <div class="absolute inset-0 opacity-40 bg-gradient-to-br from-violet-50 to-white -z-10 transition-opacity group-hover:opacity-100"></div>
             
@@ -151,6 +156,7 @@
                 Administrar Módulo →
             </a>
         </div>
+        @endif
 
         <!-- MUSICOTECA CARD (Próximamente) -->
         <div class="bg-white rounded-2xl border border-amber-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden group opacity-75">

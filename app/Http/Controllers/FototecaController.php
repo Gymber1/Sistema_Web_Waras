@@ -6,119 +6,132 @@ use Illuminate\Http\Request;
 use App\Models\Photo;
 use App\Models\Photographer;
 use App\Models\Category;
+use App\Models\Special;
+use App\Models\SiteSetting;
 
 class FototecaController extends Controller
 {
-    public function index()
+    private function dashboardData(string $activeSection): array
     {
-        if (auth()->check() && !auth()->user()->canAccessModule('fototeca')) {
-            abort(403, 'Acceso denegado a este módulo');
-        }
-
         $totalPhotos        = Photo::count();
         $totalPhotographers = Photographer::count();
         $totalCategories    = Category::where('type', 'fototeca')->count();
 
-        // All photos with their relations
-        $allPhotos = Photo::with(['photographer', 'photographers', 'categories'])->get();
+        $allPhotos = Photo::with(['photographers', 'categories'])->get();
 
-        // Group photos by their actual DB category names
         $photosByCategory = [];
         foreach ($allPhotos as $photo) {
+            $photographerName = $photo->photographers->first()?->full_name ?? 'Desconocido';
+            $photoData = [
+                'id'           => $photo->id,
+                'title'        => $photo->title,
+                'photographer' => $photographerName,
+                'year'         => $photo->year ?? 'S/F',
+                'source_type'  => $photo->source_type ?? 'local',
+                'image_url'    => $photo->thumbnail_path ? '/storage/' . $photo->thumbnail_path : ($photo->full_image_path ? '/storage/' . $photo->full_image_path : null),
+                'description'  => $photo->description ?? '',
+                'resolution'   => $photo->resolution ?? 'N/A',
+                'location'     => $photo->location ?? '',
+                'format'       => $photo->format ?? '',
+                'external_url' => $photo->external_url ?? '',
+                'detail_url'   => '/fototeca/galeria/' . $photo->id,
+            ];
             foreach ($photo->categories as $cat) {
-                $photosByCategory[$cat->name][] = [
-                    'id'             => $photo->id,
-                    'title'          => $photo->title,
-                    'photographer'   => $photo->photographer ? $photo->photographer->full_name : ($photo->photographers->first()?->full_name ?? 'Desconocido'),
-                    'year'           => $photo->capture_date ? $photo->capture_date->format('Y') : 'S/F',
-                    'source_type'    => $photo->source_type ?? 'local',
-                    'image_url'      => $photo->thumbnail_path ? '/storage/' . $photo->thumbnail_path : ($photo->full_image_path ? '/storage/' . $photo->full_image_path : null),
-                    'description'    => $photo->description ?? '',
-                    'resolution'     => $photo->resolution ?? 'N/A',
-                    'location'       => $photo->location ?? '',
-                    'format'         => $photo->format ?? '',
-                    'external_url'   => $photo->external_url ?? '',
-                ];
+                $photosByCategory[$cat->name][] = $photoData;
             }
-            // Photos with no categories go to 'Sin Categoría'
             if ($photo->categories->isEmpty()) {
-                $photosByCategory['Sin Categoría'][] = [
-                    'id'           => $photo->id,
-                    'title'        => $photo->title,
-                    'photographer' => $photo->photographer ? $photo->photographer->full_name : 'Desconocido',
-                    'year'         => $photo->capture_date ? $photo->capture_date->format('Y') : 'S/F',
-                    'source_type'  => $photo->source_type ?? 'local',
-                    'image_url'    => $photo->thumbnail_path ? '/storage/' . $photo->thumbnail_path : ($photo->full_image_path ? '/storage/' . $photo->full_image_path : null),
-                    'description'  => $photo->description ?? '',
-                    'resolution'   => $photo->resolution ?? 'N/A',
-                    'location'     => $photo->location ?? '',
-                    'format'       => $photo->format ?? '',
-                    'external_url' => $photo->external_url ?? '',
-                ];
+                $photosByCategory['Sin Categoría'][] = $photoData;
             }
         }
 
-        // Photographers data for the Fotógrafos section
         $photographersData = Photographer::withCount('photos')->get()->map(fn($p) => [
-            'id'          => $p->id,
-            'full_name'   => $p->full_name,
-            'photos_count'=> $p->photos_count,
-            'biography'   => $p->biography ?? '',
-            'photo_path'  => $p->photo_path ? '/storage/' . $p->photo_path : null,
+            'id'           => $p->id,
+            'full_name'    => $p->full_name,
+            'photos_count' => $p->photos_count,
+            'biography'    => $p->biography ?? '',
+            'photo_path'   => $p->photo_path ? '/storage/' . $p->photo_path : null,
         ])->values()->toArray();
 
-        // Categories for sidebar filters (fototeca type only)
+        $especialesData = Special::withCount('photos')->get()->map(fn($s) => [
+            'id'          => $s->id,
+            'title'       => $s->title,
+            'description' => $s->description ?? '',
+            'cover'       => $s->cover_image_path ? '/storage/' . $s->cover_image_path : null,
+            'photos_count'=> $s->photos_count,
+        ])->values()->toArray();
+
         $allCategories = Category::where('type', 'fototeca')
             ->whereNull('parent_id')
             ->with('subcategories')
             ->get();
 
-        $categoriesForFilters = $allCategories->map(fn($cat) => [
-            'id'       => $cat->id,
-            'name'     => $cat->name,
-            'slug'     => $cat->slug,
-            'children' => $cat->subcategories->map(fn($sub) => [
-                'id'   => $sub->id,
-                'name' => $sub->name,
-                'slug' => $sub->slug,
-            ])->toArray(),
-        ])->toArray();
+        $buildTree = function ($categories) use (&$buildTree) {
+            return $categories->map(fn($cat) => [
+                'id'       => $cat->id,
+                'name'     => $cat->name,
+                'slug'     => $cat->slug,
+                'children' => $buildTree($cat->subcategories),
+            ])->toArray();
+        };
 
-        return view('fototeca.dashboard', [
-            'totalPhotos'         => $totalPhotos,
-            'totalPhotographers'  => $totalPhotographers,
-            'totalCategories'     => $totalCategories,
-            'photosByCategory'    => $photosByCategory,
-            'photographersData'   => $photographersData,
-            'categoriesForFilters'=> $categoriesForFilters,
-            'canEditPanel'        => auth()->check() && (auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca')),
-        ]);
+        return [
+            'totalPhotos'          => $totalPhotos,
+            'totalPhotographers'   => $totalPhotographers,
+            'totalCategories'      => $totalCategories,
+            'photosByCategory'     => $photosByCategory,
+            'photographersData'    => $photographersData,
+            'especialesData'       => $especialesData,
+            'categoriesForFilters' => $buildTree($allCategories),
+            'activeSection'        => $activeSection,
+            'canEditPanel'         => auth()->check() && (auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca')),
+            'heroBg'               => ($p = SiteSetting::get('bg_fototeca')) ? asset('storage/' . $p) : null,
+        ];
+    }
+
+    public function index()
+    {
+        return view('fototeca.dashboard', $this->dashboardData('Inicio'));
+    }
+
+    public function indexGaleria()    { return view('fototeca.dashboard', $this->dashboardData('Galería')); }
+    public function indexFotografos() { return view('fototeca.dashboard', $this->dashboardData('Fotógrafos')); }
+    public function indexEspeciales() { return view('fototeca.dashboard', $this->dashboardData('Especiales')); }
+    public function indexAportantes() { return view('fototeca.dashboard', $this->dashboardData('Aportantes')); }
+
+    public function showPhoto(\App\Models\Photo $photo)
+    {
+        $photo->load(['photographers', 'categories']);
+        return view('fototeca.foto', compact('photo'));
+    }
+
+    public function showEspecial(\App\Models\Special $special)
+    {
+        $special->load(['photos.photographers', 'photos.categories']);
+        return view('fototeca.especial', compact('special'));
+    }
+
+    public function showPhotographer(\App\Models\Photographer $photographer)
+    {
+        $photographer->load('photos.categories');
+        return view('fototeca.fotografo', compact('photographer'));
     }
 
     public function getPhotosByCategory($categoryId)
     {
-        if (auth()->check() && !auth()->user()->canAccessModule('fototeca')) {
-            abort(403);
-        }
-
         $photos = Photo::whereHas('categories', function ($query) use ($categoryId) {
             $query->where('categories.id', $categoryId);
-        })->with(['photographer', 'categories'])->paginate(20);
+        })->with(['photographers', 'categories'])->paginate(20);
 
         return response()->json($photos);
     }
 
     public function search(Request $request)
     {
-        if (auth()->check() && !auth()->user()->canAccessModule('fototeca')) {
-            abort(403);
-        }
-
         $query = $request->get('q');
 
         $photos = Photo::where('title', 'like', "%{$query}%")
             ->orWhere('description', 'like', "%{$query}%")
-            ->with(['photographer', 'categories'])
+            ->with(['photographers', 'categories'])
             ->paginate(20);
 
         return response()->json($photos);
