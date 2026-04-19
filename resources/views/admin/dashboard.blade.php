@@ -1,633 +1,304 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Panel Administrativo - WARAS</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+@extends('layouts.admin')
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f5f6fa;
-            display: flex;
-        }
+@section('section', 'Dashboard')
 
-        .sidebar {
-            width: 250px;
-            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-            color: white;
-            min-height: 100vh;
-            padding: 2rem 0;
-            position: fixed;
-            left: 0;
-            top: 0;
-            overflow-y: auto;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-        }
+@section('content')
+<div class="p-6 md:p-10 max-w-7xl mx-auto">
+    <div class="mb-10">
+        <h1 class="text-4xl font-black text-slate-900 tracking-tight">Panel Administrativo</h1>
+        <p class="text-slate-500 mt-2 text-lg">Resumen general y control de acceso a los módulos de WARAS.</p>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- BIBLIOTECA CARD -->
+        <div class="bg-white rounded-2xl border border-emerald-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden group">
+            <div class="absolute inset-0 opacity-40 bg-gradient-to-br from-emerald-50 to-white -z-10 transition-opacity group-hover:opacity-100"></div>
+            
+            <div class="flex justify-between items-start mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 rounded-xl bg-emerald-100 shadow-inner">
+                        <span class="text-2xl">📚</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-emerald-800">Biblioteca Digital</h3>
+                        <p class="text-sm text-slate-500">Gestión de módulo</p>
+                    </div>
+                </div>
+                <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 border border-white/50 shadow-sm">✓ Operativo</span>
+            </div>
 
-        .sidebar-header {
-            padding: 0 1.5rem 2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 2rem;
-        }
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-emerald-800 mb-1">{{ $stats['biblioteca']['books'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Libros</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-emerald-800 mb-1">{{ $stats['biblioteca']['authors'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Autores</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-emerald-800 mb-1">{{ $stats['biblioteca']['categories'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Categorías</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-emerald-800 mb-1">{{ $stats['biblioteca']['publishers'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Editoriales</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-emerald-800 mb-1">{{ $stats['biblioteca']['magazines'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Revistas</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-emerald-800 mb-1">{{ $stats['biblioteca']['specials'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Especiales</span>
+                </div>
+            </div>
 
-        .sidebar-logo {
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-
-        .sidebar-logo-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-
-        .sidebar-section {
-            margin-bottom: 2rem;
-        }
-
-        .sidebar-section-title {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.5);
-            padding: 0 1.5rem 1rem;
-            letter-spacing: 1px;
-        }
-
-        .sidebar-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .sidebar-item {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            padding: 0.8rem 1.5rem;
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            border-left: 3px solid transparent;
-        }
-
-        .sidebar-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            border-left-color: #667eea;
-        }
-
-        .sidebar-item.active {
-            background: rgba(102, 126, 234, 0.1);
-            color: white;
-            border-left-color: #667eea;
-        }
-
-        .sidebar-item-icon {
-            font-size: 1.2rem;
-            width: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sidebar-item-text {
-            flex: 1;
-        }
-
-        .sidebar-item-badge {
-            background: #667eea;
-            color: white;
-            padding: 0.2rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        .sidebar-item-badge.inactive {
-            background: #cbd5e0;
-            color: #4a5568;
-        }
-
-        .main-content {
-            margin-left: 250px;
-            flex: 1;
-            min-height: 100vh;
-            padding: 2rem;
-        }
-
-        .header-bar {
-            background: white;
-            padding: 1.5rem 2rem;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .header-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #1a202c;
-        }
-
-        .header-user {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        .user-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.2rem;
-        }
-
-        .user-name {
-            font-weight: 600;
-            color: #1a202c;
-            font-size: 0.9rem;
-        }
-
-        .user-role {
-            font-size: 0.8rem;
-            color: #718096;
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .module-card {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            border-top: 4px solid #e2e8f0;
-        }
-
-        .module-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        }
-
-        .module-card.biblioteca {
-            border-top-color: #2c3e50;
-        }
-
-        .module-card.fototeca {
-            border-top-color: #e74c3c;
-        }
-
-        .module-card.musicoteca {
-            border-top-color: #f39c12;
-        }
-
-        .module-card.pinacoteca {
-            border-top-color: #9b59b6;
-        }
-
-        .module-card.efemeridades {
-            border-top-color: #1abc9c;
-        }
-
-        .module-header {
-            padding: 1.5rem;
-            background: #f7fafc;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .module-icon {
-            font-size: 2rem;
-        }
-
-        .module-titles {
-            flex: 1;
-        }
-
-        .module-name {
-            font-weight: 700;
-            color: #1a202c;
-            margin-bottom: 0.2rem;
-        }
-
-        .module-type {
-            font-size: 0.8rem;
-            color: #718096;
-        }
-
-        .module-content {
-            padding: 1.5rem;
-        }
-
-        .module-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-item {
-            background: #f7fafc;
-            padding: 1rem;
-            border-radius: 6px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #2d3748;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: #718096;
-            margin-top: 0.3rem;
-        }
-
-        .module-actions {
-            display: flex;
-            gap: 0.8rem;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 0.8rem;
-            border: none;
-            border-radius: 6px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5568d3;
-        }
-
-        .btn-secondary {
-            background: #e2e8f0;
-            color: #2d3748;
-        }
-
-        .btn-secondary:hover {
-            background: #cbd5e0;
-        }
-
-        .btn-disabled {
-            background: #cbd5e0;
-            color: #a0aec0;
-            cursor: not-allowed;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .status-operativo {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-
-        .status-desarrollo {
-            background: #fef5e7;
-            color: #6d4c41;
-        }
-
-        .status-planificado {
-            background: #ede9fe;
-            color: #581c87;
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                width: 200px;
-            }
-
-            .main-content {
-                margin-left: 200px;
-            }
-
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                position: absolute;
-                left: -200px;
-                width: 200px;
-                transition: left 0.3s ease;
-                z-index: 100;
-            }
-
-            .sidebar.active {
-                left: 0;
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .header-bar {
-                flex-direction: column;
-                gap: 1rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <!-- Sidebar Header -->
-        <div class="sidebar-header">
-            <div class="sidebar-logo">
-                <div class="sidebar-logo-icon">W</div>
-                <span>WARAS</span>
+            <div class="flex gap-3">
+                <a href="{{ route('admin.biblioteca.books') }}" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white shadow-emerald-200 text-center">
+                    Administrar Módulo →
+                </a>
+                <a href="{{ route('biblioteca.dashboard') }}" target="_blank" class="py-3 px-4 rounded-xl text-sm font-bold transition-all border border-emerald-300 text-emerald-700 hover:bg-emerald-50 bg-white shadow-sm whitespace-nowrap">
+                    Ver Sitio Público
+                </a>
             </div>
         </div>
 
-        <!-- Módulos Operativos -->
-        <div class="sidebar-section">
-            <div class="sidebar-section-title">Módulos Operativos</div>
-            <nav class="sidebar-nav">
-                <a href="#biblioteca" class="sidebar-item active">
-                    <span class="sidebar-item-icon">📚</span>
-                    <span class="sidebar-item-text">Biblioteca</span>
+        <!-- FOTOTECA CARD -->
+        <div class="bg-white rounded-2xl border border-blue-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden group">
+            <div class="absolute inset-0 opacity-40 bg-gradient-to-br from-blue-50 to-white -z-10 transition-opacity group-hover:opacity-100"></div>
+            
+            <div class="flex justify-between items-start mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 rounded-xl bg-blue-100 shadow-inner">
+                        <span class="text-2xl">📷</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-blue-800">Fototeca Digital</h3>
+                        <p class="text-sm text-slate-500">Gestión de módulo</p>
+                    </div>
+                </div>
+                <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-blue-100 text-blue-700 border border-white/50 shadow-sm">✓ Operativo</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-blue-800 mb-1">{{ $stats['fototeca']['photos'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Fotos</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-blue-800 mb-1">{{ $stats['fototeca']['photographers'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Fotógrafos</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-blue-800 mb-1">{{ $stats['fototeca']['categories'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Categorías</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-blue-800 mb-1">{{ $stats['fototeca']['subcategories'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Subcategorías</span>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <a href="{{ route('admin.fototeca.photos') }}" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-blue-200 text-center">
+                    Administrar Módulo →
                 </a>
-                <a href="#fototeca" class="sidebar-item">
-                    <span class="sidebar-item-icon">📷</span>
-                    <span class="sidebar-item-text">Fototeca</span>
+                <a href="{{ route('fototeca.dashboard') }}" target="_blank" class="py-3 px-4 rounded-xl text-sm font-bold transition-all border border-blue-300 text-blue-700 hover:bg-blue-50 bg-white shadow-sm whitespace-nowrap">
+                    Ver Sitio Público
                 </a>
-            </nav>
+            </div>
         </div>
 
-        <!-- Módulos en Desarrollo -->
-        <div class="sidebar-section">
-            <div class="sidebar-section-title">En Desarrollo</div>
-            <nav class="sidebar-nav">
-                <a href="#musicoteca" class="sidebar-item">
-                    <span class="sidebar-item-icon">🎵</span>
-                    <span class="sidebar-item-text">Musicoteca</span>
-                    <span class="sidebar-item-badge inactive">Pronto</span>
-                </a>
-            </nav>
+        <!-- USUARIOS CARD -->
+        <div class="bg-white rounded-2xl border border-violet-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden group">
+            <div class="absolute inset-0 opacity-40 bg-gradient-to-br from-violet-50 to-white -z-10 transition-opacity group-hover:opacity-100"></div>
+            
+            <div class="flex justify-between items-start mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 rounded-xl bg-violet-100 shadow-inner">
+                        <span class="text-2xl">👥</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-violet-800">Gestión de Usuarios</h3>
+                        <p class="text-sm text-slate-500">Administración del sistema</p>
+                    </div>
+                </div>
+                <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-violet-100 text-violet-700 border border-white/50 shadow-sm">✓ Operativo</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-violet-800 mb-1">{{ $stats['usuarios']['total'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-violet-800 mb-1">{{ $stats['usuarios']['admins'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Admins</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-violet-800 mb-1">{{ $stats['usuarios']['moderators'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Moderadores</span>
+                </div>
+            </div>
+
+            <div class="mb-6 p-4 bg-white/50 rounded-xl border border-violet-100">
+                <span class="text-sm font-bold text-violet-800">{{ auth()->user()->is_admin_global ? '🔑 Admin Global' : '🛡️ Moderador' }}</span>
+                <p class="text-xs text-slate-500 font-medium mt-1">Tu Rol Actual</p>
+            </div>
+
+            <a href="{{ route('admin.usuarios.index') }}" class="w-full py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white shadow-violet-200">
+                Administrar Módulo →
+            </a>
         </div>
 
-        <!-- Módulos Planificados -->
-        <div class="sidebar-section">
-            <div class="sidebar-section-title">Planificado</div>
-            <nav class="sidebar-nav">
-                <a href="#pinacoteca" class="sidebar-item">
-                    <span class="sidebar-item-icon">🎨</span>
-                    <span class="sidebar-item-text">Pinacoteca</span>
-                    <span class="sidebar-item-badge inactive">Pronto</span>
-                </a>
-                <a href="#efemeridades" class="sidebar-item">
-                    <span class="sidebar-item-icon">📅</span>
-                    <span class="sidebar-item-text">Efemeridades</span>
-                    <span class="sidebar-item-badge inactive">Pronto</span>
-                </a>
-            </nav>
+        <!-- MUSICOTECA CARD (Próximamente) -->
+        <div class="bg-white rounded-2xl border border-amber-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden group opacity-75">
+            <div class="absolute inset-0 opacity-40 bg-gradient-to-br from-amber-50 to-white -z-10 transition-opacity group-hover:opacity-100"></div>
+            
+            <div class="flex justify-between items-start mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 rounded-xl bg-amber-100 shadow-inner">
+                        <span class="text-2xl">🎵</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-amber-800">Musicoteca Digital</h3>
+                        <p class="text-sm text-slate-500">Gestión de módulo</p>
+                    </div>
+                </div>
+                <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 border border-white/50 shadow-sm">En Desarrollo</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-amber-800 mb-1">0</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Álbumes</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-amber-800 mb-1">0</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Canciones</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-amber-800 mb-1">0</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Artistas</span>
+                </div>
+            </div>
+
+            <button disabled class="w-full py-3 rounded-xl text-sm font-bold text-slate-400 bg-slate-100 cursor-not-allowed shadow-sm">
+                Próximamente
+            </button>
         </div>
 
-        <!-- Footer Sidebar -->
-        <div class="sidebar-section" style="margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 2rem;">
-            <nav class="sidebar-nav">
-                <a href="/" class="sidebar-item">
-                    <span class="sidebar-item-icon">🏠</span>
-                    <span class="sidebar-item-text">Volver al Portal</span>
-                </a>
-                <a href="#logout" class="sidebar-item">
-                    <span class="sidebar-item-icon">🚪</span>
-                    <span class="sidebar-item-text">Cerrar Sesión</span>
-                </a>
-            </nav>
+        <!-- PINACOTECA CARD (Planificado) -->
+        <div class="bg-white rounded-2xl border border-rose-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden group opacity-75">
+            <div class="absolute inset-0 opacity-40 bg-gradient-to-br from-rose-50 to-white -z-10 transition-opacity group-hover:opacity-100"></div>
+            
+            <div class="flex justify-between items-start mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 rounded-xl bg-rose-100 shadow-inner">
+                        <span class="text-2xl">🎨</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-rose-800">Pinacoteca Digital</h3>
+                        <p class="text-sm text-slate-500">Gestión de módulo</p>
+                    </div>
+                </div>
+                <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-rose-100 text-rose-700 border border-white/50 shadow-sm">Planificado</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-rose-800 mb-1">0</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Obras</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-rose-800 mb-1">0</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Artistas</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-rose-800 mb-1">0</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Colecciones</span>
+                </div>
+            </div>
+
+            <button disabled class="w-full py-3 rounded-xl text-sm font-bold text-slate-400 bg-slate-100 cursor-not-allowed shadow-sm">
+                Próximamente
+            </button>
+        </div>
+
+        <!-- EFEMERIDADES CARD (Planificado) -->
+        <div class="bg-white rounded-2xl border border-cyan-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden group opacity-75">
+            <div class="absolute inset-0 opacity-40 bg-gradient-to-br from-cyan-50 to-white -z-10 transition-opacity group-hover:opacity-100"></div>
+            
+            <div class="flex justify-between items-start mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 rounded-xl bg-cyan-100 shadow-inner">
+                        <span class="text-2xl">📅</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-cyan-800">Efemeridades Ancashinas</h3>
+                        <p class="text-sm text-slate-500">Gestión de módulo</p>
+                    </div>
+                </div>
+                <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-cyan-100 text-cyan-700 border border-white/50 shadow-sm">Planificado</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-cyan-800 mb-1">0</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Eventos</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-cyan-800 mb-1">0</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Fechas</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-cyan-800 mb-1">0</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Categorías</span>
+                </div>
+            </div>
+
+            <button disabled class="w-full py-3 rounded-xl text-sm font-bold text-slate-400 bg-slate-100 cursor-not-allowed shadow-sm">
+                Próximamente
+            </button>
+        </div>
+
+        <!-- KOHA CARD (Planificado) -->
+        <div class="bg-white rounded-2xl border border-slate-300 p-6 shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden group opacity-75">
+            <div class="absolute inset-0 opacity-40 bg-gradient-to-br from-slate-50 to-white -z-10 transition-opacity group-hover:opacity-100"></div>
+            
+            <div class="flex justify-between items-start mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 rounded-xl bg-slate-100 shadow-inner">
+                        <span class="text-2xl">📚</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-slate-800">Catálogo KOHA</h3>
+                        <p class="text-sm text-slate-500">Gestión de módulo</p>
+                    </div>
+                </div>
+                <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 border border-white/50 shadow-sm">Planificado</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-slate-800 mb-1">0</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Registros</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-slate-800 mb-1">0</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Usuarios</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-slate-800 mb-1">0</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Préstamos</span>
+                </div>
+            </div>
+
+            <button disabled class="w-full py-3 rounded-xl text-sm font-bold text-slate-400 bg-slate-100 cursor-not-allowed shadow-sm">
+                Próximamente
+            </button>
         </div>
     </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Header Bar -->
-        <div class="header-bar">
-            <div>
-                <h1 class="header-title">Panel Administrativo</h1>
-            </div>
-            <div class="header-user">
-                <div class="user-avatar">A</div>
-                <div class="user-info">
-                    <div class="user-name">Administrador</div>
-                    <div class="user-role">Admin Global</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Content Grid -->
-        <div class="content-grid">
-            <!-- Biblioteca Module -->
-            <div class="module-card biblioteca">
-                <div class="module-header">
-                    <div class="module-icon">📚</div>
-                    <div class="module-titles">
-                        <div class="module-name">Biblioteca Digital</div>
-                        <div class="module-type">Gestión de Libros y Autores</div>
-                    </div>
-                    <span class="status-badge status-operativo">Operativo</span>
-                </div>
-                <div class="module-content">
-                    <div class="module-stats">
-                        <div class="stat-item">
-                            <div class="stat-number">127</div>
-                            <div class="stat-label">Libros</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">103</div>
-                            <div class="stat-label">Autores</div>
-                        </div>
-                    </div>
-                    <div class="module-actions">
-                        <a href="/admin/biblioteca" class="btn btn-primary">Administrar</a>
-                        <a href="/biblioteca" class="btn btn-secondary">Ver</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Fototeca Module -->
-            <div class="module-card fototeca">
-                <div class="module-header">
-                    <div class="module-icon">📷</div>
-                    <div class="module-titles">
-                        <div class="module-name">Fototeca Digital</div>
-                        <div class="module-type">Gestión de Galerías</div>
-                    </div>
-                    <span class="status-badge status-operativo">Operativo</span>
-                </div>
-                <div class="module-content">
-                    <div class="module-stats">
-                        <div class="stat-item">
-                            <div class="stat-number">42</div>
-                            <div class="stat-label">Galerías</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">856</div>
-                            <div class="stat-label">Fotos</div>
-                        </div>
-                    </div>
-                    <div class="module-actions">
-                        <a href="/admin/fototeca" class="btn btn-primary">Administrar</a>
-                        <a href="/fototeca" class="btn btn-secondary">Ver</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Musicoteca Module -->
-            <div class="module-card musicoteca">
-                <div class="module-header">
-                    <div class="module-icon">🎵</div>
-                    <div class="module-titles">
-                        <div class="module-name">Musicoteca Digital</div>
-                        <div class="module-type">Gestión de Música</div>
-                    </div>
-                    <span class="status-badge status-desarrollo">En Desarrollo</span>
-                </div>
-                <div class="module-content">
-                    <div class="module-stats">
-                        <div class="stat-item">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">Álbumes</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">Canciones</div>
-                        </div>
-                    </div>
-                    <div class="module-actions">
-                        <button class="btn btn-disabled" disabled>En Desarrollo</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pinacoteca Module -->
-            <div class="module-card pinacoteca">
-                <div class="module-header">
-                    <div class="module-icon">🎨</div>
-                    <div class="module-titles">
-                        <div class="module-name">Pinacoteca Digital</div>
-                        <div class="module-type">Gestión de Arte</div>
-                    </div>
-                    <span class="status-badge status-planificado">Planificado</span>
-                </div>
-                <div class="module-content">
-                    <div class="module-stats">
-                        <div class="stat-item">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">Obras</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">Artistas</div>
-                        </div>
-                    </div>
-                    <div class="module-actions">
-                        <button class="btn btn-disabled" disabled>Próximamente</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Efemeridades Module -->
-            <div class="module-card efemeridades">
-                <div class="module-header">
-                    <div class="module-icon">📅</div>
-                    <div class="module-titles">
-                        <div class="module-name">Efemeridades Digital</div>
-                        <div class="module-type">Gestión de Eventos</div>
-                    </div>
-                    <span class="status-badge status-planificado">Planificado</span>
-                </div>
-                <div class="module-content">
-                    <div class="module-stats">
-                        <div class="stat-item">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">Eventos</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">Fechas</div>
-                        </div>
-                    </div>
-                    <div class="module-actions">
-                        <button class="btn btn-disabled" disabled>Próximamente</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Simple sidebar toggle
-        document.querySelectorAll('.sidebar-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-    </script>
-</body>
-</html>
+</div>
+@endsection

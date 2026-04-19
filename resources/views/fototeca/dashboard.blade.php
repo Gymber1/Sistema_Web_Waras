@@ -28,7 +28,7 @@
             width: 100%; 
             z-index: 1000; 
             transition: all 0.3s ease; 
-            background: transparent; /* <-- CAMBIADO AQUÍ */
+            background: rgba(0, 0, 0, 0.95);
             border-bottom: 1px solid rgba(255,255,255,0.1); 
             padding: 0.5rem 2rem; 
             backdrop-filter: blur(10px); 
@@ -198,69 +198,33 @@
                 <i class="fas fa-filter"></i> Filtros de Galería
             </div>
 
-            <div class="filter-section">
-                <button class="filter-section-title" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')">
-                    DISTRIBUCIÓN GEOGRÁFICA <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="filter-items">
-                    <button class="filter-item" data-category="Por Provincias">Por Provincias <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i></button>
-                    <button class="filter-item" data-category="Por Distritos">Por Distritos <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i></button>
-                    <button class="filter-item" data-category="Por Ciudades">Por Ciudades <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i></button>
-                    <button class="filter-item" data-category="Panorámica">Panorámica <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i></button>
-                    <button class="filter-item active" data-category="Plaza de Armas y Catedral">Plaza de Armas y Catedral <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i></button>
-                    <button class="filter-item" data-category="Barrios (Belén, La Soledad...)">Barrios <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i></button>
-                    <button class="filter-item" data-category="Puentes">Puentes <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i></button>
-                    <button class="filter-item" data-category="Calles">Calles <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i></button>
-                    <button class="filter-item" data-category="Casas y Edificios">Casas y Edificios <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i></button>
+            <div id="sidebarCategories">
+                @forelse($categoriesForFilters as $parent)
+                <div class="filter-section">
+                    <button class="filter-section-title" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')">
+                        {{ strtoupper($parent['name']) }} <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="filter-items">
+                        <button class="filter-item" data-category="{{ $parent['name'] }}">
+                            {{ $parent['name'] }} — Todas <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i>
+                        </button>
+                        @foreach($parent['children'] as $child)
+                        <button class="filter-item" data-category="{{ $child['name'] }}">
+                            {{ $child['name'] }} <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i>
+                        </button>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
-
-            <div class="filter-section">
-                <button class="filter-section-title collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')">
-                    SOCIEDAD Y CULTURA <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="filter-items collapsed">
-                    <button class="filter-item" data-category="Instituciones Sociales">Instituciones Sociales</button>
-                    <button class="filter-item" data-category="Instituciones Culturales">Instituciones Culturales</button>
-                    <button class="filter-item" data-category="Instituciones Educativas">Instituciones Educativas</button>
-                    <button class="filter-item" data-category="Deportes">Deportes</button>
-                    <button class="filter-item" data-category="Familias">Familias</button>
+                @empty
+                <div class="filter-section">
+                    <button class="filter-section-title">
+                        TODAS LAS FOTOGRAFÍAS <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="filter-items">
+                        <button class="filter-item active" data-category="all">Todas <i class="fas fa-chevron-right" style="font-size:0.6rem; opacity:0.5;"></i></button>
+                    </div>
                 </div>
-            </div>
-
-            <div class="filter-section">
-                <button class="filter-section-title collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')">
-                    FOTÓGRAFOS CONSAGRADOS <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="filter-items collapsed">
-                    <button class="filter-item" data-category="Siglo XIX">Siglo XIX</button>
-                    <button class="filter-item" data-category="Siglo XX">Siglo XX</button>
-                    <button class="filter-item" data-category="Siglo XXI">Siglo XXI</button>
-                    <button class="filter-item" data-category="Colecciones Temáticas">Colecciones Temáticas</button>
-                </div>
-            </div>
-
-            <div class="filter-section">
-                <button class="filter-section-title collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')">
-                    ESPECIALES <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="filter-items collapsed">
-                    <button class="filter-item" data-category="Desastres en Ancash">Desastres en Ancash</button>
-                    <button class="filter-item" data-category="Tradiciones y Costumbres">Tradiciones y Costumbres</button>
-                    <button class="filter-item" data-category="Patrimonio Arqueológico">Patrimonio Arqueológico</button>
-                    <button class="filter-item" data-category="Parque Nacional Huascarán">Parque Nacional Huascarán</button>
-                </div>
-            </div>
-
-            <div class="temporal-filter">
-                <label class="temporal-label">Distribución Temporal</label>
-                <select class="temporal-select">
-                    <option>Todas las épocas</option>
-                    <option>Antes del Terremoto</option>
-                    <option>Terremoto (1970)</option>
-                    <option>Después del Terremoto</option>
-                    <option>Siglo XXI</option>
-                </select>
+                @endforelse
             </div>
         </aside>
 
@@ -350,194 +314,132 @@
         <p class="footer-subtext">Preservando, digitalizando y compartiendo la memoria fotográfica e histórica de nuestra región.</p>
     </footer>
     <script>
-        // ========== ESTADO GLOBAL ==========
+        const PLACEHOLDER = 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+
+        // Datos desde el servidor
+        const photosByCategory   = @json($photosByCategory ?? []);
+        const photographersData  = @json($photographersData ?? []);
+        const categoriesFromDB   = @json($categoriesForFilters ?? []);
+
+        // Obtener la primera categoría disponible en la BD (o null)
+        const firstCategory = (() => {
+            for (const parent of categoriesFromDB) {
+                if (parent.children.length > 0) return parent.children[0].name;
+                return parent.name;
+            }
+            const keys = Object.keys(photosByCategory);
+            return keys.length > 0 ? keys[0] : 'all';
+        })();
+
         let state = {
-            activeTab: 'Inicio',
-            activeCategory: 'Plaza de Armas y Catedral'
+            activeTab:      'Galería',
+            activeCategory: firstCategory || 'all'
         };
 
-        // ========== DATOS ADAPTADOS DE LA BASE DE DATOS ==========
-        const photoData = {
-            'Plaza de Armas y Catedral': [
-                { 
-                    id: 1, 
-                    title: 'Nevado Huascarán desde el Valle', 
-                    photographer: 'Martín Chambi (Atribuido)', 
-                    year: '1932', 
-                    type: 'Placa de Vidrio', 
-                    imageUrl: 'https://images.unsplash.com/photo-1542224566-6e85f2e6772f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', 
-                    description: 'Impresionante captura del nevado Huascarán visto desde las afueras de Yungay antes del sismo de 1970. Esta fotografía en blanco y negro destaca por su alto contraste y detalle en las formaciones rocosas.', 
-                    resolution: '4500 x 3200 px', 
-                    location: 'Yungay, Ancash', 
-                    camera: 'Cámara de gran formato' 
-                },
-                { 
-                    id: 2, 
-                    title: 'Campesina en el Mercado', 
-                    photographer: 'Archivo Histórico', 
-                    year: '1955', 
-                    type: 'Negativo 35mm', 
-                    imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', 
-                    description: 'Retrato costumbrista de una mujer andina vistiendo el traje tradicional durante el mercado dominical en la plaza principal de Huaraz.', 
-                    resolution: '3200 x 2400 px', 
-                    location: 'Huaraz, Ancash', 
-                    camera: 'Leica III (estimado)' 
-                },
-                { 
-                    id: 3, 
-                    title: 'Callejón de Huaylas', 
-                    photographer: 'Carlos Zegarra', 
-                    year: '1980', 
-                    type: 'Diapositiva Color', 
-                    imageUrl: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', 
-                    description: 'Fotografía a color que muestra la inmensidad del Callejón de Huaylas al amanecer, con los primeros rayos de sol iluminando la Cordillera Blanca.', 
-                    resolution: '5120 x 3400 px', 
-                    location: 'Carhuaz, Ancash', 
-                    camera: 'Nikon F3, Lente 35mm' 
-                },
-                { 
-                    id: 4, 
-                    title: 'Restos Arqueológicos de Chavín', 
-                    photographer: 'Desconocido', 
-                    year: '1919', 
-                    type: 'Impresión en Papel', 
-                    imageUrl: 'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', 
-                    description: 'Una de las primeras documentaciones fotográficas de las cabezas clavas en su posición original en el templo de Chavín de Huántar.', 
-                    resolution: '2800 x 2800 px', 
-                    location: 'Chavín de Huántar', 
-                    camera: 'Desconocida' 
-                }
-            ],
-            // Datos por defecto si la categoría seleccionada aún no tiene fotos
-            'default': [
-                { 
-                    id: 99, 
-                    title: 'Fotografía de Archivo', 
-                    photographer: 'Autor Anónimo', 
-                    year: 'S/F', 
-                    type: 'Digitalizado', 
-                    imageUrl: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', 
-                    description: 'Registro visual perteneciente a esta colección. Actualmente en proceso de catalogación detallada por parte de la Fototeca WARAS.', 
-                    resolution: 'Variada', 
-                    location: 'Ancash', 
-                    camera: 'Varios formatos' 
-                }
-            ]
-        };
+        // Obtener fotos para la categoría/tab actual
+        function getCurrentPhotos() {
+            if (state.activeTab === 'Fotógrafos') return photographersData;
+            if (state.activeCategory === 'all') {
+                // Merge all photos
+                return Object.values(photosByCategory).flat();
+            }
+            return photosByCategory[state.activeCategory] || [];
+        }
 
-        // ========== FUNCIONES DE RENDERIZADO ==========
+        // Renderizar la grilla de fotos
         function renderPhotos() {
             const grid = document.getElementById('photosGrid');
-            // Busca las fotos de la categoría, si no hay, carga las 'default'
-            const photos = photoData[state.activeCategory] || photoData['default'];
-            
-            // Actualiza el contador de resultados
-            document.getElementById('photoCount').textContent = photos.length;
+            const items = getCurrentPhotos();
+            document.getElementById('photoCount').textContent = items.length;
 
-            // Genera las tarjetas HTML para cada foto
-            grid.innerHTML = photos.map((photo, index) => `
+            if (state.activeTab === 'Fotógrafos') {
+                grid.innerHTML = items.map((p, index) => `
+                    <div class="photo-card" data-index="${index}">
+                        <div class="photo-image-container" style="background:#111;">
+                            ${p.photo_path
+                                ? `<img src="${p.photo_path}" alt="${p.full_name}" class="photo-image">`
+                                : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-user" style="font-size:3rem;color:#555;"></i></div>`}
+                            <div class="photo-badge">${p.photos_count} fotos</div>
+                        </div>
+                        <div class="photo-title">${p.full_name}</div>
+                        <div class="photo-meta">
+                            <span>${p.biography ? p.biography.slice(0, 60) + '…' : 'Sin biografía'}</span>
+                        </div>
+                    </div>
+                `).join('');
+                return;
+            }
+
+            if (items.length === 0) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:4rem 0;color:#9ca3af;">No hay fotografías en esta categoría.</div>`;
+                return;
+            }
+
+            grid.innerHTML = items.map((photo, index) => `
                 <div class="photo-card" data-index="${index}">
                     <div class="photo-image-container">
-                        <img src="${photo.imageUrl}" alt="${photo.title}" class="photo-image">
+                        <img src="${photo.image_url || PLACEHOLDER}" alt="${photo.title}" class="photo-image"
+                             onerror="this.src='${PLACEHOLDER}'">
                         <div class="photo-overlay">
                             <button class="photo-overlay-btn"><i class="fas fa-eye"></i> Ver Fotografía</button>
                         </div>
-                        <div class="photo-badge">${photo.type}</div>
+                        <div class="photo-badge">${photo.format || photo.source_type || 'Archivo'}</div>
                     </div>
                     <div class="photo-title">${photo.title}</div>
                     <div class="photo-meta">
                         <span>${photo.photographer}</span>
-                        <span style="font-family: monospace;">${photo.year}</span>
+                        <span style="font-family:monospace;">${photo.year}</span>
                     </div>
                 </div>
             `).join('');
 
-            // Agrega el evento click a cada tarjeta para abrir los detalles
             document.querySelectorAll('.photo-card').forEach((card, index) => {
-                card.addEventListener('click', () => {
-                    showDetail(photos[index]);
-                });
+                card.addEventListener('click', () => showDetail(items[index]));
             });
         }
 
         function showDetail(photo) {
-            // Llenar datos de la vista de detalle con la foto seleccionada
-            document.getElementById('detailImage').src = photo.imageUrl;
-            document.getElementById('detailTitle').textContent = photo.title;
-            document.getElementById('detailPhotographer').textContent = photo.photographer;
-            document.getElementById('detailYear').textContent = photo.year;
-            document.getElementById('detailLocation').textContent = photo.location;
-            document.getElementById('detailResolution').textContent = photo.resolution;
-            document.getElementById('detailCamera').textContent = photo.camera;
-            document.getElementById('detailBadge').textContent = photo.type;
-            document.getElementById('detailDescription').textContent = photo.description;
+            const imgEl = document.getElementById('detailImage');
+            imgEl.src = photo.image_url || PLACEHOLDER;
+            imgEl.onerror = () => { imgEl.src = PLACEHOLDER; };
 
-            // Ocultar la grilla principal y mostrar la vista de detalles
+            document.getElementById('detailTitle').textContent       = photo.title;
+            document.getElementById('detailPhotographer').textContent= photo.photographer;
+            document.getElementById('detailYear').textContent        = photo.year;
+            document.getElementById('detailLocation').textContent    = photo.location || '—';
+            document.getElementById('detailResolution').textContent  = photo.resolution || '—';
+            document.getElementById('detailCamera').textContent      = photo.format || '—';
+            document.getElementById('detailBadge').textContent       = photo.format || photo.source_type || 'Archivo';
+            document.getElementById('detailDescription').textContent = photo.description || '';
+
             document.getElementById('mainWrapper').classList.add('hidden');
             document.getElementById('heroSection').classList.add('hidden');
             document.getElementById('detailView').classList.remove('hidden');
-
-            // Regresar el scroll hacia arriba suavemente
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function showGaleria() {
-            // Ocultar la vista de inicio/detalles y mostrar la galería con filtros
             document.getElementById('mainWrapper').classList.remove('hidden');
             document.getElementById('heroSection').classList.add('hidden');
             document.getElementById('detailView').classList.add('hidden');
-            
-            // Actualizar el título de la sección y renderizar
-            document.getElementById('sectionTitle').textContent = state.activeCategory;
+            document.getElementById('sectionTitle').textContent = state.activeCategory === 'all' ? 'Todas las Fotografías' : state.activeCategory;
             renderPhotos();
             updateNav();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function updateNav() {
-            // Actualizar estilo (línea blanca debajo) del navbar superior
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-tab') === state.activeTab);
             });
-            updateHeaderStyle(); // Llama a la corrección del fondo
         }
 
-        // NUEVA FUNCIÓN: Controla inteligentemente el color del header
-        function updateHeaderStyle() {
-            const header = document.getElementById('header');
-            const isDetailHidden = document.getElementById('detailView').classList.contains('hidden');
-            
-            // Si estamos en el Inicio y NO estamos viendo una foto en detalle
-            if (state.activeTab === 'Inicio' && isDetailHidden) {
-                if (window.scrollY > 50) {
-                    header.style.background = 'rgba(0, 0, 0, 0.98)';
-                    header.style.borderBottom = 'none';
-                } else {
-                    header.style.background = 'transparent';
-                    header.style.borderBottom = '1px solid rgba(255,255,255,0.2)';
-                }
-            } else {
-                // Si entramos a Galería, Fotógrafos o a ver una foto, el fondo DEBE ser negro
-                header.style.background = 'rgba(0, 0, 0, 0.98)';
-                header.style.borderBottom = 'none';
-            }
-        }
-
-        // ========== EVENT LISTENERS (INTERACTIVIDAD) ==========
-        
-        // Efecto scroll en el header (se vuelve negro sólido al bajar)
+        // Header scroll
         window.addEventListener('scroll', () => {
             const header = document.getElementById('header');
-            if (window.scrollY > 50) {
-                header.style.background = 'black';
-                header.style.borderBottom = 'none';
-            } else {
-                header.style.background = state.activeTab === 'Inicio' ? 'rgba(0,0,0,0.4)' : 'black';
-                header.style.borderBottom = state.activeTab === 'Inicio' ? '1px solid rgba(255,255,255,0.1)' : 'none';
-            }
+            header.style.background = window.scrollY > 50 ? 'black' : (state.activeTab === 'Inicio' ? 'rgba(0,0,0,0.4)' : 'black');
         });
 
-        // Click en el Logo para volver al Inicio
         document.getElementById('logoBtn').addEventListener('click', () => {
             state.activeTab = 'Inicio';
             document.getElementById('heroSection').classList.remove('hidden');
@@ -547,50 +449,43 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // Click en los botones del Menú de Navegación Principal
         document.querySelectorAll('.nav-item').forEach(btn => {
             btn.addEventListener('click', () => {
                 const tab = btn.getAttribute('data-tab');
                 state.activeTab = tab;
-                
                 if (tab === 'Inicio') {
                     document.getElementById('heroSection').classList.remove('hidden');
                     document.getElementById('mainWrapper').classList.add('hidden');
                     document.getElementById('detailView').classList.add('hidden');
+                    updateNav();
                 } else {
                     showGaleria();
                 }
-                updateNav();
             });
         });
 
-        // Click en los Filtros de la Barra Lateral
-        document.querySelectorAll('.filter-item').forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Quitar clase active de todos los botones
-                document.querySelectorAll('.filter-item').forEach(b => b.classList.remove('active'));
-                
-                // Agregar clase active al botón clickeado
-                btn.classList.add('active');
-                
-                // Cambiar el estado y actualizar UI
-                state.activeCategory = btn.getAttribute('data-category');
-                document.getElementById('sectionTitle').textContent = state.activeCategory;
-                
-                renderPhotos();
-            });
+        // Sidebar filter clicks (delegated)
+        document.getElementById('sidebarCategories').addEventListener('click', e => {
+            const btn = e.target.closest('.filter-item');
+            if (!btn) return;
+            document.querySelectorAll('.filter-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.activeCategory = btn.getAttribute('data-category');
+            document.getElementById('sectionTitle').textContent = state.activeCategory === 'all' ? 'Todas las Fotografías' : state.activeCategory;
+            renderPhotos();
         });
 
-        // Click en el botón "Atrás" de la Vista de Detalle
         document.getElementById('backBtn').addEventListener('click', () => {
             document.getElementById('detailView').classList.add('hidden');
             document.getElementById('mainWrapper').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // ========== INICIALIZACIÓN ==========
-        // Se ejecuta una vez al cargar la página para mostrar las fotos por defecto
-        renderPhotos(); 
+        // Marcar primera categoría del sidebar como activa
+        const firstFilterBtn = document.querySelector('.filter-item');
+        if (firstFilterBtn) firstFilterBtn.classList.add('active');
+
+        renderPhotos();
     </script>
 </body>
 </html>

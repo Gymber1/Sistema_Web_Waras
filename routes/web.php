@@ -1,49 +1,128 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\BibliotecaController;
+use App\Http\Controllers\FototecaController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\BibliotecaController as AdminBibliotecaController;
+use App\Http\Controllers\Admin\FototecaController as AdminFototecaController;
+use App\Http\Controllers\Admin\UserAdminController;
 
-Route::get('/', function () {
-    return view('home');
-})->name('home');
+// ============= PÚBLICAS =============
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Biblioteca Routes (Public)
-Route::prefix('biblioteca')->name('libroteca.')->group(function () {
-    Route::get('/', function () {
-        return view('biblioteca.dashboard');
-    })->name('dashboard');
+// Biblioteca (Pública)
+Route::prefix('biblioteca')->name('biblioteca.')->group(function () {
+    Route::get('/', [BibliotecaController::class, 'index'])->name('dashboard');
+    Route::get('/search', [BibliotecaController::class, 'search'])->name('search');
+    Route::get('/category/{category}', [BibliotecaController::class, 'getBooksByCategory'])->name('category');
+    Route::get('/autores/{author}', [BibliotecaController::class, 'showAuthor'])->name('autores.show');
 });
 
-// Fototeca Routes (Public)
+// Fototeca (Pública)
 Route::prefix('fototeca')->name('fototeca.')->group(function () {
-    Route::get('/', function () {
-        return view('fototeca.dashboard');
-    })->name('dashboard');
+    Route::get('/', [FototecaController::class, 'index'])->name('dashboard');
+    Route::get('/search', [FototecaController::class, 'search'])->name('search');
+    Route::get('/category/{category}', [FototecaController::class, 'getPhotosByCategory'])->name('category');
 });
 
-// Admin Routes
-Route::prefix('admin')->name('admin.')->group(function () {
-    // Dashboard Principal
-    Route::get('/', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+// ============= AUTENTICACIÓN =============
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    // Biblioteca Admin
-    Route::prefix('biblioteca')->name('biblioteca.')->group(function () {
-        Route::get('/', function () {
-            return view('admin.biblioteca.index');
-        })->name('index');
-    });
-
-    // Fototeca Admin
-    Route::prefix('fototeca')->name('fototeca.')->group(function () {
-        Route::get('/', function () {
-            return view('admin.fototeca.index');
-        })->name('index');
-    });
-});
-
+// ============= PROTEGIDAS (Requieren autenticación) =============
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    // Admin Panel (Solo Admins)
+    Route::middleware('can:access-admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', DashboardController::class)->name('dashboard');
+
+        // Biblioteca Admin
+        Route::prefix('biblioteca')->name('biblioteca.')->group(function () {
+            // Libros
+            Route::get('/books', [AdminBibliotecaController::class, 'indexBooks'])->name('books');
+            Route::get('/books/create', [AdminBibliotecaController::class, 'createBook'])->name('books.create');
+            Route::post('/books', [AdminBibliotecaController::class, 'storeBook'])->name('books.store');
+            Route::get('/books/{book}/edit', [AdminBibliotecaController::class, 'editBook'])->name('books.edit');
+            Route::put('/books/{book}', [AdminBibliotecaController::class, 'updateBook'])->name('books.update');
+            Route::delete('/books/{book}', [AdminBibliotecaController::class, 'destroyBook'])->name('books.destroy');
+
+            // Autores
+            Route::get('/authors', [AdminBibliotecaController::class, 'indexAuthors'])->name('authors');
+            Route::get('/authors/create', [AdminBibliotecaController::class, 'createAuthor'])->name('authors.create');
+            Route::post('/authors', [AdminBibliotecaController::class, 'storeAuthor'])->name('authors.store');
+            Route::get('/authors/{author}/edit', [AdminBibliotecaController::class, 'editAuthor'])->name('authors.edit');
+            Route::put('/authors/{author}', [AdminBibliotecaController::class, 'updateAuthor'])->name('authors.update');
+            Route::delete('/authors/{author}', [AdminBibliotecaController::class, 'destroyAuthor'])->name('authors.destroy');
+
+            // Editoriales
+            Route::get('/publishers', [AdminBibliotecaController::class, 'indexPublishers'])->name('publishers');
+            Route::get('/publishers/create', [AdminBibliotecaController::class, 'createPublisher'])->name('publishers.create');
+            Route::post('/publishers', [AdminBibliotecaController::class, 'storePublisher'])->name('publishers.store');
+            Route::get('/publishers/{publisher}/edit', [AdminBibliotecaController::class, 'editPublisher'])->name('publishers.edit');
+            Route::put('/publishers/{publisher}', [AdminBibliotecaController::class, 'updatePublisher'])->name('publishers.update');
+            Route::delete('/publishers/{publisher}', [AdminBibliotecaController::class, 'destroyPublisher'])->name('publishers.destroy');
+
+            // Categorías (incluye subcategorías vía parent_id)
+            Route::get('/categories', [AdminBibliotecaController::class, 'indexCategories'])->name('categories');
+            Route::get('/categories/create', [AdminBibliotecaController::class, 'createCategory'])->name('categories.create');
+            Route::post('/categories', [AdminBibliotecaController::class, 'storeCategory'])->name('categories.store');
+            Route::get('/categories/{category}/edit', [AdminBibliotecaController::class, 'editCategory'])->name('categories.edit');
+            Route::put('/categories/{category}', [AdminBibliotecaController::class, 'updateCategory'])->name('categories.update');
+            Route::delete('/categories/{category}', [AdminBibliotecaController::class, 'destroyCategory'])->name('categories.destroy');
+
+            // Revistas
+            Route::get('/magazines', [AdminBibliotecaController::class, 'indexMagazines'])->name('magazines');
+            Route::get('/magazines/create', [AdminBibliotecaController::class, 'createMagazine'])->name('magazines.create');
+            Route::post('/magazines', [AdminBibliotecaController::class, 'storeMagazine'])->name('magazines.store');
+            Route::get('/magazines/{book}/edit', [AdminBibliotecaController::class, 'editMagazine'])->name('magazines.edit');
+            Route::put('/magazines/{book}', [AdminBibliotecaController::class, 'updateMagazine'])->name('magazines.update');
+            Route::delete('/magazines/{book}', [AdminBibliotecaController::class, 'destroyMagazine'])->name('magazines.destroy');
+
+            // Especiales
+            Route::get('/specials', [AdminBibliotecaController::class, 'indexSpecials'])->name('specials');
+            Route::post('/specials', [AdminBibliotecaController::class, 'storeSpecial'])->name('specials.store');
+            Route::put('/specials/{special}', [AdminBibliotecaController::class, 'updateSpecial'])->name('specials.update');
+            Route::delete('/specials/{special}', [AdminBibliotecaController::class, 'destroySpecial'])->name('specials.destroy');
+        });
+
+        // Fototeca Admin
+        Route::prefix('fototeca')->name('fototeca.')->group(function () {
+            // Fotografías
+            Route::get('/photos', [AdminFototecaController::class, 'indexPhotos'])->name('photos');
+            Route::get('/photos/create', [AdminFototecaController::class, 'createPhoto'])->name('photos.create');
+            Route::post('/photos', [AdminFototecaController::class, 'storePhoto'])->name('photos.store');
+            Route::get('/photos/{photo}/edit', [AdminFototecaController::class, 'editPhoto'])->name('photos.edit');
+            Route::put('/photos/{photo}', [AdminFototecaController::class, 'updatePhoto'])->name('photos.update');
+            Route::delete('/photos/{photo}', [AdminFototecaController::class, 'destroyPhoto'])->name('photos.destroy');
+
+            // Fotógrafos
+            Route::get('/photographers', [AdminFototecaController::class, 'indexPhotographers'])->name('photographers');
+            Route::get('/photographers/create', [AdminFototecaController::class, 'createPhotographer'])->name('photographers.create');
+            Route::post('/photographers', [AdminFototecaController::class, 'storePhotographer'])->name('photographers.store');
+            Route::get('/photographers/{photographer}/edit', [AdminFototecaController::class, 'editPhotographer'])->name('photographers.edit');
+            Route::put('/photographers/{photographer}', [AdminFototecaController::class, 'updatePhotographer'])->name('photographers.update');
+            Route::delete('/photographers/{photographer}', [AdminFototecaController::class, 'destroyPhotographer'])->name('photographers.destroy');
+
+            // Categorías
+            Route::get('/categories', [AdminFototecaController::class, 'indexCategories'])->name('categories');
+            Route::get('/categories/create', [AdminFototecaController::class, 'createCategory'])->name('categories.create');
+            Route::post('/categories', [AdminFototecaController::class, 'storeCategory'])->name('categories.store');
+            Route::get('/categories/{category}/edit', [AdminFototecaController::class, 'editCategory'])->name('categories.edit');
+            Route::put('/categories/{category}', [AdminFototecaController::class, 'updateCategory'])->name('categories.update');
+            Route::delete('/categories/{category}', [AdminFototecaController::class, 'destroyCategory'])->name('categories.destroy');
+        });
+
+        // Usuarios Admin
+        Route::prefix('usuarios')->name('usuarios.')->group(function () {
+            Route::get('/', [UserAdminController::class, 'index'])->name('index');
+            Route::post('/', [UserAdminController::class, 'store'])->name('store');
+            Route::get('/{user}/edit', [UserAdminController::class, 'edit'])->name('edit');
+            Route::put('/{user}', [UserAdminController::class, 'update'])->name('update');
+            Route::delete('/{user}', [UserAdminController::class, 'destroy'])->name('destroy');
+            Route::post('/{user}/reset-password', [UserAdminController::class, 'resetPassword'])->name('reset-password');
+        });
+    });
 });

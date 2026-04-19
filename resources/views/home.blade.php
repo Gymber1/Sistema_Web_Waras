@@ -500,7 +500,15 @@
                 <a href="#contacto" class="nav-link">Contacto</a>
                 <div class="nav-buttons">
                     <a href="tel:+51952845942" class="btn-phone">Llamar: +51 952-845-942</a>
-                    <a href="{{ route('admin.dashboard') }}" class="btn-admin">Panel Admin</a>
+                    @if (auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
+                        <a href="{{ route('admin.dashboard') }}" class="btn-admin">Panel Admin</a>
+                        <a href="{{ route('logout') }}" class="btn-admin" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="btn-admin">Ingresar</a>
+                    @endif
                 </div>
             </nav>
         </div>
@@ -601,7 +609,11 @@
                         <a href="#servicios" class="footer-link">Servicios</a>
                         <a href="#acerca" class="footer-link">Acerca de</a>
                         <a href="#contacto" class="footer-link">Contacto</a>
-                        <a href="{{ route('admin.dashboard') }}" class="footer-link">Panel Admin</a>
+                        @if (auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
+                            <a href="{{ route('admin.dashboard') }}" class="footer-link">Panel Admin</a>
+                        @else
+                            <a href="{{ route('login') }}" class="footer-link">Ingresar</a>
+                        @endif
                     </div>
                 </div>
                 <div class="footer-column">

@@ -1,0 +1,23 @@
+1. Navegación Global:
+
+En la barra de navegación superior (Navbar) de Biblioteca, añade un botón al extremo derecho que diga 'Portal Principal'. Este botón debe redirigir a la landing page unificada del sistema. Asegúrate de que el diseño sea consistente con los botones de 'Ir al sitio web' o 'Cerrar Sesión' ya existentes.
+
+2. Accesos Directos en Dashboard:
+
+En las tarjetas del Panel Administrativo (Biblioteca, Fototeca), añade un botón secundario que diga 'Ver Sitio Público'.
+
+Al hacer clic, debe abrir en una pestaña nueva la sección correspondiente del usuario final (ej. la biblioteca).
+
+3. Lógica de Gestión de Usuarios y Permisos:
+
+Botones de Acción: Los botones de la columna 'Acciones' (Editar, Bloquear, Eliminar) en la tabla de usuarios no tienen funcionalidad. Necesito que generes las rutas y los métodos en el controlador para que sean operativos.
+
+Protección del Admin Global: En mi base de datos, el usuario con ID 1 (Administrador Sistema) tiene el campo is_deletable en 0.
+
+Requerimiento: Modifica la vista Blade para que, mediante un @if, el botón de Eliminar se oculte o se deshabilite específicamente para este usuario, evitando que el administrador principal sea borrado por error.
+
+4. Sidebar Dinámico y Jerárquico (Biblioteca):
+
+El menú 'Explorar Catálogo' muestra todas las categorías y subcategorías de golpe. Según mi 'Gestión de Categorías', tengo una estructura de niveles (Categoría Padre -> Subcategoría).
+
+Requerimiento: Implementa un sistema tipo Acordeón o Collapsible. El usuario solo debe ver las categorías principales (Ficción, No Ficción). Al hacer clic en una, se deben desplegar sus subcategorías (Cuento, Novela, Ciencia, etc.) mediante una transición suave. Esto debe ser responsivo y mantener el estado activo si el usuario está dentro de una de esas subcategorías.

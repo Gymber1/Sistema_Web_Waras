@@ -152,12 +152,14 @@
             align-items: center;
             justify-content: center;
             padding-top: 80px;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+            padding-bottom: 80px;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
                         url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
             background-attachment: fixed;
+            overflow: visible;
         }
 
-        .hero.hidden { 
+        .hero.hidden {
             display: none !important;
             visibility: hidden !important;
             height: 0 !important;
@@ -173,6 +175,7 @@
             text-align: center;
             color: white;
             margin-top: 4rem;
+            overflow: visible;
         }
 
         .hero-title {
@@ -253,6 +256,120 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(197, 160, 89, 0.4);
         }
+
+        /* Hero search dropdown */
+        .hero-search-container {
+            position: relative;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .hero-search-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+            z-index: 9999;
+            max-height: 420px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .hero-search-dropdown.open { display: block; }
+
+        .hsd-section-label {
+            padding: 0.6rem 1.25rem 0.3rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9ca3af;
+            background: #f9f8f6;
+            border-bottom: 1px solid #f0ede8;
+        }
+
+        .hsd-item {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.15s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .hsd-item:hover { background: #f9f8f6; }
+        .hsd-item:last-child { border-bottom: none; }
+
+        .hsd-thumb {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: linear-gradient(135deg,#2d3436,#636e72);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+            overflow: hidden;
+        }
+
+        .hsd-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+        .hsd-info { flex: 1; min-width: 0; }
+
+        .hsd-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .hsd-sub {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .hsd-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            background: #e5e7eb;
+            color: #6b7280;
+            flex-shrink: 0;
+            text-transform: uppercase;
+        }
+
+        .hsd-empty {
+            padding: 1.5rem;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+
+        .hsd-all-btn {
+            display: block;
+            padding: 0.75rem;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent);
+            cursor: pointer;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+            border: none;
+            width: 100%;
+            transition: background 0.15s;
+        }
+
+        .hsd-all-btn:hover { background: #f9f8f6; }
 
         /* Content Search */
         .content-search {
@@ -370,6 +487,91 @@
         }
 
         .category-btn .category-icon { opacity: 0.3; }
+
+        /* Accordion categories */
+        .acc-parent-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 2rem;
+            color: #374151;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .acc-parent-btn:hover {
+            background: #f0f4f8;
+            color: var(--primary);
+        }
+
+        .acc-parent-btn.open {
+            background: #f0f4f8;
+            color: var(--primary);
+            border-left-color: var(--accent);
+        }
+
+        .acc-chevron {
+            font-size: 0.7rem;
+            transition: transform 0.25s ease;
+            color: #9ca3af;
+        }
+
+        .acc-parent-btn.open .acc-chevron {
+            transform: rotate(90deg);
+            color: var(--accent);
+        }
+
+        .acc-children {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.3s ease;
+        }
+
+        .acc-children.open {
+            max-height: 600px;
+        }
+
+        .acc-child-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7rem 2rem 0.7rem 3rem;
+            color: #6b7280;
+            font-size: 0.8125rem;
+            font-weight: 400;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .acc-child-btn:hover {
+            background: #fafaf9;
+            color: var(--primary);
+        }
+
+        .acc-child-btn.active {
+            background: #fdf7ee;
+            color: var(--primary);
+            font-weight: 600;
+            border-left-color: var(--accent);
+        }
+
+        .acc-child-btn.active .category-icon {
+            opacity: 1;
+            color: var(--accent);
+        }
+
+        .acc-child-btn .category-icon { opacity: 0.3; }
 
         /* Filters */
         .filters-section {
@@ -517,7 +719,7 @@
         .book-cover {
             position: relative;
             width: 100%;
-            height: 240px;
+            aspect-ratio: 2 / 3;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1050,12 +1252,15 @@
         <div class="hero-content">
             <h1 class="hero-title">Biblioteca Digital Ancashina</h1>
             <p class="hero-subtitle">"Conocimiento e historia accesible para todos"</p>
-            <div class="search-wrapper">
-                <div class="search-wrapper-inner">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" placeholder="Buscar por título, autor, materia o palabra clave...">
+            <div class="hero-search-container">
+                <div class="search-wrapper">
+                    <div class="search-wrapper-inner">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="heroSearchInput" class="search-input" placeholder="Buscar por título, autor, materia o palabra clave..." autocomplete="off">
+                    </div>
+                    <button class="search-btn" id="heroSearchBtn">Buscar</button>
                 </div>
-                <button class="search-btn">Buscar</button>
+                <div class="hero-search-dropdown" id="heroDropdown"></div>
             </div>
         </div>
     </section>
@@ -1150,6 +1355,7 @@
 
     <!-- Detail View -->
     <div class="detail-view hidden" id="detailView">
+        <div style="max-width:900px; margin:0 auto;">
         <button class="detail-back-btn" id="backBtn">
             <i class="fas fa-arrow-left"></i> Atrás
         </button>
@@ -1193,8 +1399,8 @@
                         <span id="detailLanguage">Español</span>
                     </div>
                     <div class="meta-item">
-                        <i class="fas fa-star"></i>
-                        <span id="detailRating">0</span> votos
+                        <i class="fas fa-barcode"></i>
+                        ISBN: <span id="detailRating">N/A</span>
                     </div>
                 </div>
 
@@ -1230,6 +1436,7 @@
             <h2>Materiales Relacionados</h2>
             <div class="related-grid" id="relatedGrid"></div>
         </div>
+        </div><!-- end max-width wrapper -->
     </div>
 
     <!-- Footer -->
@@ -1239,134 +1446,99 @@
     </footer>
 
     <script>
-        // ========== CATEGORÍAS POR SECCIÓN ==========
+        // ========== CATEGORÍAS DINÁMICAS DESDE LARAVEL ==========
+        const categoriesFromDatabase = @json($categoriesForFilters ?? []);
+
+        // Flat list of {id, name} objects from DB (parents + children)
+        const allDbCategories = [];
+        categoriesFromDatabase.forEach(parent => {
+            allDbCategories.push({ id: parent.id, name: parent.name });
+            (parent.children || []).forEach(child => {
+                allDbCategories.push({ id: child.id, name: child.name });
+            });
+        });
+
+        // categoriesBySection stores arrays of {id, name} objects
+        // Books/Revistas use DB categories; others use label-only items (no filtering)
         const categoriesBySection = {
-            'Libros': [
-                'Generalidades', 'Filosofía y Psicología', 'Religión', 'Ciencias Sociales',
-                'Lenguas', 'Ciencias Naturales', 'Ciencias Aplicadas', 'Arte',
-                'Literatura', 'Historia Y Geografía'
-            ],
-            'Revistas': [
-                'Ciencia y Tecnología', 'Cultura y Arte', 'Historia', 'Política y Sociedad',
-                'Literatura y Poesía', 'Naturales y Medio Ambiente', 'Educación', 'Especializadas'
-            ],
-            'Editoriales': [
-                'Editorial WARAS', 'Universidad Nacional de Ancash', 'Fondo Editorial Andino',
-                'Ministerio de Cultura', 'Editorial Ancashina', 'Imprentas Locales'
-            ],
-            'Especiales': [
-                'Colecciones Raras', 'Documentos Históricos', 'Manuscritos Antiguos',
-                'Mapas Geográficos', 'Fotografías Históricas', 'Diarios y Crónicas'
-            ],
-            'Autores': [
-                'Escritores Ancashinos', 'Poetas', 'Historiadores', 'Cronistas',
-                'Investigadores', 'Académicos', 'Folcloristas', 'Periodistas'
-            ],
-            'Aportantes': [
-                'Donaciones Privadas', 'Universidades', 'Organizaciones Culturales',
-                'Museos y Archivos', 'Instituciones Públicas', 'Coleccionistas'
-            ]
+            'Libros':      allDbCategories.length ? allDbCategories : [{ id: null, name: 'Todos' }],
+            'Revistas':    allDbCategories.length ? allDbCategories : [{ id: null, name: 'Todos' }],
+            'Editoriales': [{ id: null, name: 'Todos' }],
+            'Especiales':  [{ id: null, name: 'Todos' }],
+            'Autores':     [{ id: null, name: 'Todos' }],
+            'Aportantes':  [{ id: null, name: 'Todos' }],
         };
 
+
+        // ========== DATOS DINÁMICOS DESDE LARAVEL ==========
+        const booksDataFromServer = @json($booksData ?? []);
+        
         // ========== DATOS POR SECCIÓN ==========
+        const COVER_COLORS = ['#5c4033','#2d4a6e','#3a5a40','#6b3a2a','#1a3a5c','#4a3a6b'];
+        const ICONS = { 'Libro': '📚', 'Revista': '📰', 'Artículo': '📄', 'Tesis': '🎓' };
+
+        function mapBook(book, idx) {
+            return {
+                id:           book.id,
+                title:        book.title,
+                author:       book.authors && book.authors.length > 0 ? book.authors[0].name : 'Anónimo',
+                authorId:     book.authors && book.authors.length > 0 ? book.authors[0].id : null,
+                year:         book.publication_date ? book.publication_date.split('T')[0].split('-')[0] : 'S/F',
+                type:         book.document_type || 'Libro',
+                description:  book.summary || 'Sin descripción disponible',
+                publisher:    book.publisher ? book.publisher.name : 'Sin editorial',
+                pages:        book.pages || 'N/A',
+                language:     book.language || 'Español',
+                isbn:         book.isbn || 'N/A',
+                color:        COVER_COLORS[idx % COVER_COLORS.length],
+                icon:         ICONS[book.document_type] || '📚',
+                cover_url:    book.cover_image_path ? '/storage/' + book.cover_image_path : null,
+                source_type:  book.source_type || 'none',
+                external_url: book.external_url || '',
+                pdf_path:     book.pdf_file_path || '',
+                categoryIds:  (book.categories || []).map(c => c.id),
+            };
+        }
+
         const dataBySectionAndCategory = {
             'Libros': {
-                'Historia Y Geografía': [
-                    { id: 1, title: 'Historia de Ancash I', author: 'Julio Ruiz', year: '1998', rating: 45, type: 'Libro', icon: '📚', pages: 342, language: 'Español', publisher: 'Ediciones Huascarán', color: '#5c4033', synopsis: 'Una exploración profunda de los eventos históricos que moldearon la región de Ancash desde la época preincaica hasta la colonia. Contiene ilustraciones y mapas detallados sobre la evolución de los pueblos.' },
-                    { id: 2, title: 'Geografía Regional del Santa', author: 'Instituto Geográfico', year: '2005', rating: 28, type: 'Mapa', icon: '🗺️', pages: 156, language: 'Español', publisher: 'INEGI', color: '#4a7c5e', synopsis: 'Análisis cartográfico exhaustivo de la región del Santa con datos actualizados sobre geografía, hidrología y características demográficas.' },
-                    { id: 3, title: 'Crónicas Coloniales', author: 'Pedro Mora', year: '1992', rating: 67, type: 'Libro', icon: '📚', pages: 298, language: 'Español', publisher: 'Editorial Andrés Bello', color: '#5c4033', synopsis: 'Compilación de crónicas y relatos de la época colonial en Ancash, documentando el encuentro entre culturas y la transformación social.' },
-                    { id: 4, title: 'Mapas Históricos', author: 'Cartografía Nacional', year: '2010', rating: 34, type: 'Mapa', icon: '🗺️', pages: 128, language: 'Español', publisher: 'Biblioteca Nacional', color: '#4a7c5e', synopsis: 'Colección de mapas históricos que documenta la evolución territorial y administrativa de Ancash a través de los siglos.' },
-                    { id: 5, title: 'Evolución Demográfica 1800-2020', author: 'INEI', year: '2021', rating: 89, type: 'Libro', icon: '📚', pages: 412, language: 'Español', publisher: 'Instituto Nacional de Estadística', color: '#5c4033', synopsis: 'Análisis estadístico y demográfico de la región de Ancash en los últimos 220 años, con gráficos y datos históricos.' },
-                    { id: 6, title: 'Batallas y Conflictos', author: 'Dr. Carlos Rivas', year: '1995', rating: 78, type: 'Libro', icon: '📚', pages: 267, language: 'Español', publisher: 'Fondo Editorial Andino', color: '#5c4033', synopsis: 'Estudio académico de los principales conflictos y batallas que ocurrieron en la región andina, especialmente en Ancash.' }
-                ],
-                'Literatura': [
-                    { id: 7, title: 'Cuentos Andinos Ancashinos', author: 'Marcos Yauri', year: '2012', rating: 134, type: 'Libro', icon: '📖', pages: 189, language: 'Español', publisher: 'Editorial Cultura Andina', color: '#8b3a3a', synopsis: 'Colección de cuentos tradicionales y contemporáneos que capturan la esencia de la cultura ancashina con narrativas cautivadoras.' },
-                    { id: 8, title: 'Poesía de la Cordillera', author: 'Luis Montoya', year: '2000', rating: 92, type: 'Libro', icon: '📖', pages: 234, language: 'Español', publisher: 'Poesía Contemporánea', color: '#8b3a3a', synopsis: 'Antología de poesía que celebra la majestuosidad de las montañas andinas y la riqueza cultural de sus pueblos.' },
-                    { id: 9, title: 'Narrativa Regional', author: 'Varios Autores', year: '2018', rating: 67, type: 'Libro', icon: '📖', pages: 301, language: 'Español', publisher: 'Ediciones Regionales', color: '#8b3a3a', synopsis: 'Compilación de obras narrativas de escritores ancashinos que exploran temas de identidad, tradición y modernidad.' },
-                    { id: 10, title: 'El Realismo Andino', author: 'Dr. Enrique Covarrubias', year: '2007', rating: 45, type: 'Libro', icon: '📖', pages: 276, language: 'Español', publisher: 'Academia Literaria', color: '#8b3a3a', synopsis: 'Análisis crítico y teórico del realismo en la literatura andina, explorando sus características y representantes principales.' },
-                    { id: 11, title: 'Tradiciones Populares', author: 'Folklore Institute', year: '2015', rating: 88, type: 'Libro', icon: '📖', pages: 312, language: 'Español', publisher: 'Instituto de Tradiciones', color: '#8b3a3a', synopsis: 'Registro documentado de tradiciones, leyendas y costumbres populares de las comunidades ancashinas.' },
-                    { id: 12, title: 'Mitología Andina', author: 'Anthropos Press', year: '2003', rating: 76, type: 'Libro', icon: '📖', pages: 267, language: 'Español', publisher: 'Anthropos Publishing', color: '#8b3a3a', synopsis: 'Estudio comprensivo de los mitos y creencias cosmológicas de las culturas andinas prehispánicas.' }
-                ],
-                'default': [
-                    { id: 1, title: 'Historia de Ancash I', author: 'Julio Ruiz', year: '1998', rating: 45, type: 'Libro', icon: '📚', pages: 342, language: 'Español', publisher: 'Ediciones Huascarán', color: '#5c4033', synopsis: 'Una exploración profunda de los eventos históricos que moldearon la región de Ancash.' },
-                    { id: 2, title: 'Geografía Regional del Santa', author: 'Instituto Geográfico', year: '2005', rating: 28, type: 'Mapa', icon: '🗺️', pages: 156, language: 'Español', publisher: 'INEGI', color: '#4a7c5e', synopsis: 'Análisis cartográfico exhaustivo de la región del Santa.' },
-                    { id: 3, title: 'Cuentos Andinos Ancashinos', author: 'Marcos Yauri', year: '2012', rating: 134, type: 'Libro', icon: '📖', pages: 189, language: 'Español', publisher: 'Editorial Cultura Andina', color: '#8b3a3a', synopsis: 'Colección de cuentos tradicionales y contemporáneos.' },
-                    { id: 4, title: 'Anales de la Literatura', author: 'Varios Autores', year: '1985', rating: 12, type: 'Revista', icon: '📰', pages: 98, language: 'Español', publisher: 'Editorial General', color: '#2c3e50', synopsis: 'Análisis de eventos literarios y cultural importantes.' }
-                ]
+                'default': (booksDataFromServer['Libros'] || []).map((book, idx) => mapBook(book, idx))
             },
             'Revistas': {
-                'Ciencia y Tecnología': [
-                    { id: 20, title: 'Revista de Ciencias Aplicadas', author: 'Dr. Fernando López', year: '2023', rating: 78, type: 'Revista', icon: '📰', pages: 124, language: 'Español', publisher: 'Academia Científica', color: '#2c3e50', synopsis: 'Publicación trimestral con artículos de investigación sobre ciencias aplicadas e innovación tecnológica.' },
-                    { id: 21, title: 'Tecnología en los Andes', author: 'Instituto Tecnológico', year: '2022', rating: 65, type: 'Revista', icon: '📰', pages: 112, language: 'Español', publisher: 'Instituto Andino', color: '#2c3e50', synopsis: 'Revista especializada en tecnología moderna y su aplicación en comunidades andinas.' },
-                    { id: 22, title: 'Investigaciones Modernas', author: 'Academia Ancashina', year: '2021', rating: 89, type: 'Revista', icon: '📰', pages: 156, language: 'Español', publisher: 'Academia Ancashina', color: '#2c3e50', synopsis: 'Compilación de investigaciones contemporáneas en diversas disciplinas científicas.' },
-                    { id: 23, title: 'Boletín Científico Mensual', author: 'CONCYTEC', year: '2023', rating: 92, type: 'Revista', icon: '📰', pages: 98, language: 'Español', publisher: 'CONCYTEC', color: '#2c3e50', synopsis: 'Boletín mensual con resúmenes de investigaciones y avances científicos nacionales.' },
-                    { id: 24, title: 'Reportes Tecnológicos', author: 'Ministerio de Ciencia', year: '2022', rating: 71, type: 'Revista', icon: '📰', pages: 134, language: 'Español', publisher: 'Ministerio de Ciencia', color: '#2c3e50', synopsis: 'Reportes técnicos sobre innovaciones y proyectos tecnológicos regionales.' },
-                    { id: 25, title: 'El Avance Digital', author: 'Varios', year: '2023', rating: 84, type: 'Revista', icon: '📰', pages: 108, language: 'Español', publisher: 'Editorial Digital', color: '#2c3e50', synopsis: 'Revista enfocada en transformación digital y tecnología de información.' }
-                ],
-                'default': [
-                    { id: 20, title: 'Revista Cultural Ancashina', author: 'Editorial WARAS', year: '2023', rating: 78, type: 'Revista', icon: '📰', pages: 124, language: 'Español', publisher: 'Editorial WARAS', color: '#2c3e50', synopsis: 'Publicación periódica sobre cultura y tradiciones de Ancash.' },
-                    { id: 21, title: 'Revista Histórica Regional', author: 'Museo Ancash', year: '2022', rating: 65, type: 'Revista', icon: '📰', pages: 112, language: 'Español', publisher: 'Museo Ancash', color: '#2c3e50', synopsis: 'Revista especializada en historia regional y patrimonio cultural.' },
-                    { id: 22, title: 'Boletín Informativo', author: 'Varios', year: '2023', rating: 59, type: 'Revista', icon: '📰', pages: 88, language: 'Español', publisher: 'WARAS', color: '#2c3e50', synopsis: 'Boletín informativo con noticias sobre actividades culturales.' },
-                    { id: 23, title: 'Publicación Trimestral', author: 'WARAS', year: '2023', rating: 72, type: 'Revista', icon: '📰', pages: 96, language: 'Español', publisher: 'WARAS', color: '#2c3e50', synopsis: 'Publicación trimestral con reportes y análisis culturales.' }
-                ]
+                'default': (booksDataFromServer['Revistas'] || []).map((book, idx) => mapBook(book, idx))
             },
-            'Editoriales': {
-                'default': [
-                    { id: 30, title: 'Catálogo Editorial WARAS 2023', author: 'Editorial WARAS', year: '2023', rating: 85, type: 'Catálogo', icon: '📚', pages: 156, language: 'Español', publisher: 'Editorial WARAS', color: '#5c4033', synopsis: 'Catálogo completo de publicaciones de WARAS con descripción de obras y autores.' },
-                    { id: 31, title: 'Publicaciones Universidad Nacional', author: 'UNASAM', year: '2023', rating: 78, type: 'Catálogo', icon: '📚', pages: 178, language: 'Español', publisher: 'UNASAM', color: '#5c4033', synopsis: 'Catálogo de investigaciones y publicaciones de la Universidad Nacional de Ancash.' },
-                    { id: 32, title: 'Obras Fondo Editorial Andino', author: 'Fondo Editorial', year: '2022', rating: 71, type: 'Catálogo', icon: '📚', pages: 134, language: 'Español', publisher: 'Fondo Editorial Andino', color: '#5c4033', synopsis: 'Listado completo de obras publicadas por el Fondo Editorial Andino.' },
-                    { id: 33, title: 'Patrimonio Impreso', author: 'Ministerio de Cultura', year: '2021', rating: 88, type: 'Libroguía', icon: '📚', pages: 198, language: 'Español', publisher: 'Ministerio de Cultura', color: '#5c4033', synopsis: 'Guía del patrimonio bibliográfico impreso de la región.' },
-                    { id: 34, title: 'Acervo Ancashino', author: 'Biblioteca Central', year: '2023', rating: 76, type: 'Catálogo', icon: '📚', pages: 145, language: 'Español', publisher: 'Biblioteca Central', color: '#5c4033', synopsis: 'Catálogo del acervo bibliográfico de la Biblioteca Central de Ancash.' },
-                    { id: 35, title: 'Índice de Publicaciones', author: 'Archivo Regional', year: '2022', rating: 69, type: 'Referencia', icon: '📚', pages: 234, language: 'Español', publisher: 'Archivo Regional', color: '#5c4033', synopsis: 'Índice sistemático de todas las publicaciones registradas en la región.' }
-                ]
-            },
-            'Especiales': {
-                'default': [
-                    { id: 40, title: 'Manuscritos del Siglo XVII', author: 'Archivo Antiguo', year: '1685', rating: 95, type: 'Manuscrito', icon: '✍️', pages: 156, language: 'Español', publisher: 'Archivo Antiguo', color: '#6b4423', synopsis: 'Colección de manuscritos originales del siglo XVII de gran valor histórico y literario.' },
-                    { id: 41, title: 'Colección de Mapas Antiguos', author: 'Cartografía Histórica', year: '1800', rating: 92, type: 'Mapa', icon: '🗺️', pages: 124, language: 'Español', publisher: 'Archivo Nacional', color: '#4a7c5e', synopsis: 'Mapas históricos y cartografía antigua de las regiones andinas.' },
-                    { id: 42, title: 'Fotografías 1900-1950', author: 'Fondo Fotográfico', year: '1925', rating: 88, type: 'Fotografía', icon: '📷', pages: 189, language: 'Español', publisher: 'Fondo Fotográfico', color: '#3d5a3d', synopsis: 'Archivo de fotografías históricas que documentan la vida y la sociedad ancashina.' },
-                    { id: 43, title: 'Diarios y Crónicas Coloniales', author: 'Archivo Histórico', year: '1750', rating: 94, type: 'Documento', icon: '📜', pages: 267, language: 'Español', publisher: 'Archivo Histórico', color: '#5c4033', synopsis: 'Diarios originales y crónicas de la época colonial de gran valor documental.' },
-                    { id: 44, title: 'Records Rarísimos del Perú', author: 'Biblioteca Nacional', year: '1600', rating: 96, type: 'Raro', icon: '💎', pages: 198, language: 'Español', publisher: 'Biblioteca Nacional Peruana', color: '#8b7355', synopsis: 'Compilación de documentos rarísimos y únicos sobre Perú y Ancash.' },
-                    { id: 45, title: 'Ediciones de Incunables', author: 'Colección Especial', year: '1500', rating: 98, type: 'Incunable', icon: '📖', pages: 112, language: 'Latín', publisher: 'Colección Especial', color: '#6b4423', synopsis: 'Colección de los primeros libros impresos, de extraordinario valor histórico.' }
-                ]
-            },
+            'Editoriales': { 'default': [] },
+            'Especiales':  { 'default': [] },
             'Autores': {
-                'default': [
-                    { id: 50, title: 'Grandes Escritores Ancashinos', author: 'Enciclopedia Autores', year: '2023', rating: 87, type: 'Antología', icon: '✍️', pages: 267, language: 'Español', publisher: 'Enciclopedia Nacional', color: '#5c4033', synopsis: 'Biografías y análisis crítico de los más importantes escritores ancashinos.' },
-                    { id: 51, title: 'Poetas de la Región', author: 'Varios', year: '2022', rating: 79, type: 'Antología', icon: '📝', pages: 189, language: 'Español', publisher: 'Antología Poética', color: '#5c4033', synopsis: 'Compilación de poesía de autores de toda la región andina.' },
-                    { id: 52, title: 'Historiadores Ancashinos', author: 'Academia', year: '2021', rating: 84, type: 'Referencia', icon: '📚', pages: 234, language: 'Español', publisher: 'Academia Histórica', color: '#5c4033', synopsis: 'Perfil y obra de los historiadores más importantes de Ancash.' },
-                    { id: 53, title: 'Cronistas del Siglo XX', author: 'Archivo Regional', year: '2020', rating: 81, type: 'Colección', icon: '📰', pages: 198, language: 'Español', publisher: 'Archivo Regional', color: '#5c4033', synopsis: 'Obras completas de cronistas del siglo XX que han documentado la historia regional.' },
-                    { id: 54, title: 'Obra Completa - Escritores Clásicos', author: 'Selección Editorial', year: '2019', rating: 92, type: 'Colección', icon: '📖', pages: 456, language: 'Español', publisher: 'Selección Editorial', color: '#5c4033', synopsis: 'Compilación completa de los escritores clásicos más importantes de Ancash.' },
-                    { id: 55, title: 'Autores Contemporáneos', author: 'Crítica Literaria', year: '2023', rating: 76, type: 'Análisis', icon: '✍️', pages: 167, language: 'Español', publisher: 'Instituto Literario', color: '#5c4033', synopsis: 'Análisis crítico de autores contemporáneos y sus contribuciones literarias.' }
-                ]
+                'default': (booksDataFromServer['Autores'] || []).map(author => ({
+                    id:          author.id,
+                    name:        author.name,
+                    biography:   author.biography || 'Sin biografía',
+                    nationality: author.nationality || 'Desconocida',
+                    photo_url:   author.photo_path ? '/storage/' + author.photo_path : null,
+                }))
             },
-            'Aportantes': {
-                'default': [
-                    { id: 60, title: 'Donaciones del Año 2023', author: 'WARAS Biblioteca', year: '2023', rating: 82, type: 'Informe', icon: '🎁', pages: 134, language: 'Español', publisher: 'WARAS', color: '#5c4033', synopsis: 'Informe detallado de todas las donaciones de libros recibidas en 2023.' },
-                    { id: 61, title: 'Contribuciones Universitarias', author: 'UNASAM y Universidades', year: '2023', rating: 78, type: 'Reporte', icon: '🏫', pages: 156, language: 'Español', publisher: 'UNASAM', color: '#5c4033', synopsis: 'Reporte de contribuciones de universidades y centros de investigación.' },
-                    { id: 62, title: 'Acervos de Organizaciones', author: 'ONGs Culturales', year: '2022', rating: 75, type: 'Catálogo', icon: '🤝', pages: 145, language: 'Español', publisher: 'WARAS', color: '#5c4033', synopsis: 'Catálogo de materiales donados por organizaciones culturales.' },
-                    { id: 63, title: 'Recaudos de Museos', author: 'Museos Ancashinos', year: '2022', rating: 89, type: 'Colección', icon: '🏢', pages: 178, language: 'Español', publisher: 'Museos Ancashinos', color: '#5c4033', synopsis: 'Listado de acervos donados por museos locales y regionales.' },
-                    { id: 64, title: 'Fondos Institucionales', author: 'Ministerios', year: '2021', rating: 84, type: 'Archivo', icon: '📦', pages: 167, language: 'Español', publisher: 'Gobierno Regional', color: '#5c4033', synopsis: 'Fondos y materiales aportados por instituciones públicas y ministerios.' },
-                    { id: 65, title: 'Colecciones Privadas Donadas', author: 'Mecenas', year: '2023', rating: 91, type: 'Especial', icon: '💰', pages: 189, language: 'Español', publisher: 'WARAS', color: '#5c4033', synopsis: 'Colecciones privadas de valor histórico donadas por mecenas y coleccionistas.' }
-                ]
-            }
+            'Aportantes': { 'default': [] }
         };
 
         let state = {
             activeTab: 'Inicio',
-            activeCategory: 'Historia Y Geografía',
-            isScrolled: false
+            activeCategory: null, // {id, name} or null
+            isScrolled: false,
+            openAccordion: null  // parent category id that is expanded in sidebar
         };
 
         // ========== OBTENER DATOS según TAB y CATEGORÍA ==========
         function getDataForSection() {
-            const sectionData = dataBySectionAndCategory[state.activeTab];
-            if (sectionData && sectionData[state.activeCategory]) {
-                return sectionData[state.activeCategory];
-            } else if (sectionData && sectionData['default']) {
-                return sectionData['default'];
+            const tab = state.activeTab;
+            const allItems = dataBySectionAndCategory[tab]?.['default'] || [];
+
+            // For Libros/Revistas filter by category id if one is selected
+            if ((tab === 'Libros' || tab === 'Revistas') && state.activeCategory && state.activeCategory.id !== null) {
+                const catId = state.activeCategory.id;
+                return allItems.filter(item => item.categoryIds && item.categoryIds.includes(catId));
             }
-            return [];
+            return allItems;
         }
 
         window.addEventListener('scroll', function() {
@@ -1389,31 +1561,115 @@
 
         function renderCategories() {
             const list = document.getElementById('categoriesList');
-            const currentCategories = categoriesBySection[state.activeTab] || categoriesBySection['Libros'];
-            
-            list.innerHTML = currentCategories.map(cat => `
-                <li>
-                    <button class="category-btn ${cat === state.activeCategory ? 'active' : ''}" data-category="${cat}">
-                        <span>${cat}</span>
+            const useAccordion = (state.activeTab === 'Libros' || state.activeTab === 'Revistas') && categoriesFromDatabase.length > 0;
+
+            if (useAccordion) {
+                const allActive = state.activeCategory && state.activeCategory.id === null;
+                const todosItem = `<li>
+                    <button class="category-btn ${allActive ? 'active' : ''}" data-category-id="" data-category-name="Todos">
+                        <span>Todos</span>
                         <i class="fas fa-chevron-right category-icon"></i>
                     </button>
-                </li>
-            `).join('');
+                </li>`;
 
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const newCategory = btn.getAttribute('data-category');
-                    state.activeCategory = newCategory;
-                    document.getElementById('sectionTitle').textContent = newCategory;
-                    document.getElementById('breadcrumbCategory').textContent = newCategory;
-                    document.getElementById('contentSearchInput').placeholder = `Buscar libros, autores o temas en ${newCategory}...`;
-                    
-                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    
-                    renderBooks();
+                // Build accordion: parent rows + collapsible children
+                list.innerHTML = todosItem + categoriesFromDatabase.map(parent => {
+                    const hasChildren = parent.children && parent.children.length > 0;
+                    const isOpen = state.openAccordion === parent.id;
+                    const childrenHtml = hasChildren ? parent.children.map(child => {
+                        const isActive = state.activeCategory && state.activeCategory.id === child.id;
+                        return `<button class="acc-child-btn ${isActive ? 'active' : ''}"
+                                    data-category-id="${child.id}"
+                                    data-category-name="${child.name}">
+                                    <span>${child.name}</span>
+                                    <i class="fas fa-chevron-right category-icon" style="font-size:0.65rem;"></i>
+                                </button>`;
+                    }).join('') : '';
+
+                    return `<li>
+                        <button class="acc-parent-btn ${isOpen ? 'open' : ''}" data-parent-id="${parent.id}">
+                            <span>${parent.name}</span>
+                            <i class="fas fa-chevron-right acc-chevron"></i>
+                        </button>
+                        ${hasChildren ? `<div class="acc-children ${isOpen ? 'open' : ''}" id="acc-children-${parent.id}">${childrenHtml}</div>` : ''}
+                    </li>`;
+                }).join('');
+
+                // "Todos" button
+                const todosBtn = list.querySelector('.category-btn');
+                if (todosBtn) {
+                    todosBtn.addEventListener('click', () => {
+                        state.activeCategory = { id: null, name: 'Todos' };
+                        state.openAccordion = null;
+                        document.getElementById('sectionTitle').textContent = state.activeTab;
+                        document.getElementById('breadcrumbCategory').textContent = state.activeTab;
+                        document.getElementById('contentSearchInput').placeholder = `Buscar en ${state.activeTab}...`;
+                        renderCategories();
+                        renderBooks();
+                    });
+                }
+
+                // Parent toggle
+                list.querySelectorAll('.acc-parent-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const pid = parseInt(btn.getAttribute('data-parent-id'));
+                        if (state.openAccordion === pid) {
+                            state.openAccordion = null;
+                        } else {
+                            state.openAccordion = pid;
+                        }
+                        renderCategories();
+                    });
                 });
-            });
+
+                // Child select
+                list.querySelectorAll('.acc-child-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = parseInt(btn.getAttribute('data-category-id'));
+                        const name = btn.getAttribute('data-category-name');
+                        // Find which parent owns this child
+                        const accChildren = btn.closest('.acc-children');
+                        if (accChildren) {
+                            const accParentBtn = accChildren.previousElementSibling;
+                            if (accParentBtn) state.openAccordion = parseInt(accParentBtn.getAttribute('data-parent-id'));
+                        }
+                        state.activeCategory = { id, name };
+                        document.getElementById('sectionTitle').textContent = name;
+                        document.getElementById('breadcrumbCategory').textContent = name;
+                        document.getElementById('contentSearchInput').placeholder = `Buscar libros, autores o temas en ${name}...`;
+                        list.querySelectorAll('.acc-child-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        renderBooks();
+                    });
+                });
+
+            } else {
+                // Flat list for other tabs
+                const currentCategories = categoriesBySection[state.activeTab] || categoriesBySection['Libros'];
+                list.innerHTML = currentCategories.map(cat => {
+                    const isActive = state.activeCategory && state.activeCategory.id === cat.id && state.activeCategory.name === cat.name;
+                    return `<li>
+                        <button class="category-btn ${isActive ? 'active' : ''}" data-category-id="${cat.id ?? ''}" data-category-name="${cat.name}">
+                            <span>${cat.name}</span>
+                            <i class="fas fa-chevron-right category-icon"></i>
+                        </button>
+                    </li>`;
+                }).join('');
+
+                list.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.getAttribute('data-category-id');
+                        const name = btn.getAttribute('data-category-name');
+                        state.activeCategory = { id: id ? parseInt(id) : null, name };
+                        document.getElementById('sectionTitle').textContent = name;
+                        document.getElementById('breadcrumbCategory').textContent = name;
+                        document.getElementById('contentSearchInput').placeholder = `Buscar libros, autores o temas en ${name}...`;
+                        list.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        renderBooks();
+                    });
+                });
+            }
         }
 
         function renderBooks() {
@@ -1423,31 +1679,55 @@
             // Actualizar contador de recursos
             document.getElementById('resourceNumber').textContent = items.length;
             
-            grid.innerHTML = items.map((item, index) => `
-                <div class="book-card">
-                    <div class="book-cover">
-                        <span class="book-badge">${item.type}</span>
-                        <span class="book-cover-icon">${item.icon}</span>
-                        <div class="book-cover-overlay">
-                            <button class="book-detail-btn" data-item-id="book-${index}">
-                                <i class="fas fa-eye"></i> Ver Detalles
-                            </button>
+            // Detectar si estamos mostrando autores o libros
+            const isAuthorsSection = state.activeTab === 'Autores';
+            
+            if (isAuthorsSection) {
+                // Template para AUTORES
+                grid.innerHTML = items.map((item, index) => `
+                    <div class="book-card">
+                        <div class="book-cover" style="background:linear-gradient(135deg,#2d3436 0%,#636e72 100%);">
+                            ${item.photo_url
+                                ? `<img src="${item.photo_url}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display='none'">`
+                                : `<i class="fas fa-user" style="font-size:3rem;color:white;opacity:0.6;position:relative;z-index:1;"></i>`}
                         </div>
-                    </div>
-                    <div class="book-info">
-                        <h3 class="book-title">${item.title}</h3>
-                        <p class="book-author">${item.author}</p>
-                        <p class="book-year">Publicación: ${item.year}</p>
-                        <div class="book-footer">
-                            <div class="book-rating">
-                                <i class="fas fa-star"></i>
-                                <span class="book-rating-value">${item.rating}</span>
+                        <div class="book-info">
+                            <h3 class="book-title">${item.name || 'Sin nombre'}</h3>
+                            <p class="book-author" style="color:#888; font-size:0.875rem;">${item.nationality || 'Desconocida'}</p>
+                            <p class="book-year" style="margin-top:0.4rem; color:#666; font-size:0.8rem; display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${item.biography || 'Sin biografía disponible'}</p>
+                            <div class="book-footer">
+                                <a href="/biblioteca/autores/${item.id}" class="book-read-link">Más información →</a>
                             </div>
-                            <a href="#" class="book-read-link">Leer →</a>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+            } else {
+                // Template para LIBROS Y REVISTAS
+                grid.innerHTML = items.map((item, index) => `
+                    <div class="book-card">
+                        <div class="book-cover" style="background:linear-gradient(135deg,${item.color} 0%,${item.color}cc 100%);">
+                            <span class="book-badge">${item.type}</span>
+                            ${item.cover_url
+                                ? `<img src="${item.cover_url}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
+                                : `<span class="book-cover-icon">${item.icon}</span>`}
+                            <div class="book-cover-overlay">
+                                <button class="book-detail-btn" data-item-id="book-${index}">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </button>
+                            </div>
+                        </div>
+                        <div class="book-info">
+                            <h3 class="book-title">${item.title}</h3>
+                            <p class="book-author">${item.author}</p>
+                            <p class="book-year">Publicación: ${item.year}</p>
+                            <div class="book-footer">
+                                <span style="font-size:0.75rem;color:#9ca3af;">${item.pages} págs.</span>
+                                <a href="#" class="book-read-link">Leer →</a>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
 
             // Agregar event listeners a los botones
             document.querySelectorAll('.book-detail-btn').forEach((btn, index) => {
@@ -1462,17 +1742,30 @@
         function showSection(tab) {
             const hero = document.getElementById('heroSection');
             const main = document.getElementById('mainWrapper');
-            
+            const detail = document.getElementById('detailView');
+
             state.activeTab = tab;
-            state.activeCategory = (categoriesBySection[tab] || categoriesBySection['Libros'])[0];
-            
+            state.openAccordion = null;
+
+            const useAccordion = (tab === 'Libros' || tab === 'Revistas') && categoriesFromDatabase.length > 0;
+            if (useAccordion) {
+                // Start with no category filter (show all)
+                state.activeCategory = { id: null, name: 'Todos' };
+            } else {
+                const firstCat = (categoriesBySection[tab] || categoriesBySection['Libros'])[0] || { id: null, name: tab };
+                state.activeCategory = firstCat;
+            }
+
+            const displayName = state.activeCategory.name;
+
             hero.classList.add('hidden');
+            detail.classList.add('hidden');
             main.classList.remove('hidden');
-            
-            document.getElementById('sectionTitle').textContent = state.activeCategory;
-            document.getElementById('breadcrumbCategory').textContent = state.activeCategory;
-            document.getElementById('contentSearchInput').placeholder = `Buscar libros, autores o temas en ${state.activeCategory}...`;
-            
+
+            document.getElementById('sectionTitle').textContent = tab;
+            document.getElementById('breadcrumbCategory').textContent = tab;
+            document.getElementById('contentSearchInput').placeholder = `Buscar en ${tab}...`;
+
             renderCategories();
             renderBooks();
             updateNavigation();
@@ -1483,13 +1776,15 @@
         function showHero() {
             const hero = document.getElementById('heroSection');
             const main = document.getElementById('mainWrapper');
-            
+            const detail = document.getElementById('detailView');
+
             state.activeTab = 'Inicio';
-            state.activeCategory = 'Historia Y Geografía';
-            
-            hero.classList.remove('hidden');
+            state.activeCategory = null;
+
+            detail.classList.add('hidden');
             main.classList.add('hidden');
-            
+            hero.classList.remove('hidden');
+
             updateNavigation();
             window.scrollTo({ top: 0, behavior: 'smooth' });
             window.dispatchEvent(new Event('scroll'));
@@ -1517,21 +1812,23 @@
             currentMaterial = item;
             
             // Llenar información
-            document.getElementById('detailTitle').textContent = item.title;
-            document.getElementById('detailAuthor').textContent = item.author;
-            document.getElementById('detailYear').textContent = item.year;
-            document.getElementById('detailPages').textContent = item.pages || 'N/A';
+            document.getElementById('detailTitle').textContent    = item.title;
+            document.getElementById('detailAuthor').textContent   = item.author;
+            document.getElementById('detailYear').textContent     = item.year;
+            document.getElementById('detailPages').textContent    = item.pages || 'N/A';
             document.getElementById('detailLanguage').textContent = item.language || 'Español';
-            document.getElementById('detailRating').textContent = item.rating;
-            document.getElementById('detailSynopsis').textContent = item.synopsis;
-            document.getElementById('detailPublisher').textContent = item.publisher;
-            document.getElementById('breadcrumb-category').textContent = state.activeCategory;
-            document.getElementById('breadcrumb-title').textContent = item.title;
+            document.getElementById('detailRating').textContent   = item.isbn || 'N/A';
+            document.getElementById('detailSynopsis').textContent = item.description;
+            document.getElementById('detailPublisher').textContent= item.publisher;
+            document.getElementById('breadcrumb-category').textContent = state.activeCategory ? state.activeCategory.name : '';
+            document.getElementById('breadcrumb-title').textContent    = item.title;
 
             // Cover info
             const detailCover = document.getElementById('detailCover');
-            detailCover.style.backgroundColor = item.color || '#5c4033';
-            document.getElementById('detailCoverIcon').textContent = item.icon;
+            detailCover.style.background = item.cover_url
+                ? `url('${item.cover_url}') center/cover no-repeat`
+                : `linear-gradient(135deg, ${item.color || '#5c4033'} 0%, ${item.color || '#5c4033'}cc 100%)`;
+            document.getElementById('detailCoverIcon').textContent = item.cover_url ? '' : item.icon;
 
             // Materiales relacionados
             renderRelatedMaterials(item);
@@ -1561,9 +1858,9 @@
 
             grid.innerHTML = related.map((item, index) => `
                 <div class="related-card" data-related-index="${index}">
-                    <div class="related-cover" style="background-color: ${item.color};">
+                    <div class="related-cover" style="background:${item.cover_url ? `url('${item.cover_url}') center/cover no-repeat` : `linear-gradient(135deg,${item.color || '#5c4033'} 0%,${item.color || '#5c4033'}cc 100%)`};">
                         <span class="related-badge">${item.type}</span>
-                        <span class="related-icon">${item.icon}</span>
+                        ${item.cover_url ? '' : `<span class="related-icon">${item.icon}</span>`}
                     </div>
                     <div class="related-info">
                         <div class="related-title">${item.title}</div>
@@ -1583,12 +1880,256 @@
 
         renderCategories();
         renderBooks();
-        
+
         // Back button event listener
         document.getElementById('backBtn').addEventListener('click', goBackToCatalog);
-        
+
         // Inicializar placeholder del search
-        document.getElementById('contentSearchInput').placeholder = `Buscar libros, autores o temas en ${state.activeCategory}...`;
+        const initCatName = state.activeCategory ? state.activeCategory.name : '';
+        document.getElementById('contentSearchInput').placeholder = `Buscar libros, autores o temas en ${initCatName}...`;
+
+        // Abrir sección correcta si se vuelve desde otra página (ej. autor detail)
+        const pendingTab = sessionStorage.getItem('biblioteca_tab');
+        if (pendingTab) {
+            sessionStorage.removeItem('biblioteca_tab');
+            const validTabs = ['Libros','Revistas','Editoriales','Especiales','Autores','Aportantes'];
+            if (validTabs.includes(pendingTab)) showSection(pendingTab);
+        }
+
+        // ========== BÚSQUEDA ==========
+
+        // Fuente de datos plana para búsqueda global
+        function getAllSearchableItems() {
+            const books   = dataBySectionAndCategory['Libros']['default']   || [];
+            const mags    = dataBySectionAndCategory['Revistas']['default'] || [];
+            const authors = dataBySectionAndCategory['Autores']['default']  || [];
+            return { books, mags, authors };
+        }
+
+        function normalizeStr(s) {
+            return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
+
+        // ---- HERO DROPDOWN ----
+        const heroInput    = document.getElementById('heroSearchInput');
+        const heroDropdown = document.getElementById('heroDropdown');
+        const heroBtn      = document.getElementById('heroSearchBtn');
+
+        function renderHeroDropdown(q) {
+            if (!q) { heroDropdown.classList.remove('open'); return; }
+            const nq = normalizeStr(q);
+            const { books, mags, authors } = getAllSearchableItems();
+
+            const matchBooks = books.filter(b =>
+                normalizeStr(b.title).includes(nq) ||
+                normalizeStr(b.author).includes(nq) ||
+                normalizeStr(b.description).includes(nq)
+            ).slice(0, 4);
+
+            const matchMags = mags.filter(b =>
+                normalizeStr(b.title).includes(nq) ||
+                normalizeStr(b.author).includes(nq)
+            ).slice(0, 3);
+
+            const matchAuthors = authors.filter(a =>
+                normalizeStr(a.name).includes(nq) ||
+                normalizeStr(a.nationality).includes(nq) ||
+                normalizeStr(a.biography).includes(nq)
+            ).slice(0, 3);
+
+            const total = matchBooks.length + matchMags.length + matchAuthors.length;
+
+            if (total === 0) {
+                heroDropdown.innerHTML = `<div class="hsd-empty">Sin resultados para "<strong>${q}</strong>"</div>`;
+                heroDropdown.classList.add('open');
+                return;
+            }
+
+            let html = '';
+
+            if (matchBooks.length) {
+                html += `<div class="hsd-section-label">Libros</div>`;
+                html += matchBooks.map(b => `
+                    <div class="hsd-item" data-action="book-detail" data-tab="Libros" data-id="${b.id}">
+                        <div class="hsd-thumb" style="background:${b.cover_url ? 'none' : `linear-gradient(135deg,${b.color},${b.color}cc)`};">
+                            ${b.cover_url ? `<img src="${b.cover_url}" alt="">` : b.icon}
+                        </div>
+                        <div class="hsd-info">
+                            <div class="hsd-title">${b.title}</div>
+                            <div class="hsd-sub">${b.author} · ${b.year}</div>
+                        </div>
+                        <span class="hsd-badge">Libro</span>
+                    </div>`).join('');
+            }
+
+            if (matchMags.length) {
+                html += `<div class="hsd-section-label">Revistas</div>`;
+                html += matchMags.map(b => `
+                    <div class="hsd-item" data-action="book-detail" data-tab="Revistas" data-id="${b.id}">
+                        <div class="hsd-thumb" style="background:linear-gradient(135deg,${b.color},${b.color}cc);">
+                            ${b.cover_url ? `<img src="${b.cover_url}" alt="">` : b.icon}
+                        </div>
+                        <div class="hsd-info">
+                            <div class="hsd-title">${b.title}</div>
+                            <div class="hsd-sub">${b.author} · ${b.year}</div>
+                        </div>
+                        <span class="hsd-badge">Revista</span>
+                    </div>`).join('');
+            }
+
+            if (matchAuthors.length) {
+                html += `<div class="hsd-section-label">Autores</div>`;
+                html += matchAuthors.map(a => `
+                    <a class="hsd-item" href="/biblioteca/autores/${a.id}">
+                        <div class="hsd-thumb">
+                            ${a.photo_url ? `<img src="${a.photo_url}" alt="">` : '<i class="fas fa-user" style="color:rgba(255,255,255,0.6);font-size:1rem;"></i>'}
+                        </div>
+                        <div class="hsd-info">
+                            <div class="hsd-title">${a.name}</div>
+                            <div class="hsd-sub">${a.nationality}</div>
+                        </div>
+                        <span class="hsd-badge">Autor</span>
+                    </a>`).join('');
+            }
+
+            html += `<button class="hsd-all-btn" id="hsdAllBtn">Ver todos los resultados para "${q}" →</button>`;
+
+            heroDropdown.innerHTML = html;
+            heroDropdown.classList.add('open');
+
+            // Clic en resultado libro/revista → abrir detalle
+            heroDropdown.querySelectorAll('.hsd-item[data-action="book-detail"]').forEach(el => {
+                el.addEventListener('click', () => {
+                    const tab = el.dataset.tab;
+                    const id  = parseInt(el.dataset.id);
+                    const allItems = dataBySectionAndCategory[tab]['default'];
+                    const item = allItems.find(i => i.id === id);
+                    if (!item) return;
+                    heroDropdown.classList.remove('open');
+                    heroInput.value = '';
+                    showSection(tab);
+                    showDetailView(item);
+                });
+            });
+
+            // "Ver todos" → ir a Libros con búsqueda activa
+            document.getElementById('hsdAllBtn')?.addEventListener('click', () => {
+                heroDropdown.classList.remove('open');
+                showSection('Libros');
+                const ci = document.getElementById('contentSearchInput');
+                ci.value = q;
+                ci.dispatchEvent(new Event('input'));
+            });
+        }
+
+        heroInput.addEventListener('input', () => renderHeroDropdown(heroInput.value.trim()));
+
+        heroBtn.addEventListener('click', () => {
+            const q = heroInput.value.trim();
+            if (!q) return;
+            heroDropdown.classList.remove('open');
+            showSection('Libros');
+            const ci = document.getElementById('contentSearchInput');
+            ci.value = q;
+            ci.dispatchEvent(new Event('input'));
+        });
+
+        heroInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') heroBtn.click();
+        });
+
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.hero-search-container')) {
+                heroDropdown.classList.remove('open');
+            }
+        });
+
+
+        // ---- BÚSQUEDA EN CATÁLOGO (filtra tarjetas visibles) ----
+        document.getElementById('contentSearchInput').addEventListener('input', function() {
+            const q = normalizeStr(this.value.trim());
+            const isAuthors = state.activeTab === 'Autores';
+
+            if (!q) { renderBooks(); return; }
+
+            const baseItems = getDataForSection();
+
+            const filtered = baseItems.filter(item => {
+                if (isAuthors) {
+                    return normalizeStr(item.name).includes(q) ||
+                           normalizeStr(item.nationality).includes(q) ||
+                           normalizeStr(item.biography).includes(q);
+                }
+                return normalizeStr(item.title).includes(q) ||
+                       normalizeStr(item.author).includes(q) ||
+                       normalizeStr(item.description).includes(q) ||
+                       normalizeStr(item.publisher).includes(q) ||
+                       normalizeStr(String(item.year)).includes(q);
+            });
+
+            // Renderizar resultados filtrados
+            const grid = document.getElementById('booksGrid');
+            document.getElementById('resourceNumber').textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af;">
+                    <i class="fas fa-search" style="font-size:2rem;margin-bottom:0.75rem;display:block;"></i>
+                    Sin resultados para "<strong style="color:#6b7280;">${this.value.trim()}</strong>"
+                </div>`;
+                return;
+            }
+
+            if (isAuthors) {
+                grid.innerHTML = filtered.map(item => `
+                    <div class="book-card">
+                        <div class="book-cover" style="background:linear-gradient(135deg,#2d3436 0%,#636e72 100%);">
+                            ${item.photo_url
+                                ? `<img src="${item.photo_url}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display='none'">`
+                                : `<i class="fas fa-user" style="font-size:3rem;color:white;opacity:0.6;position:relative;z-index:1;"></i>`}
+                        </div>
+                        <div class="book-info">
+                            <h3 class="book-title">${item.name || 'Sin nombre'}</h3>
+                            <p class="book-author" style="color:#888;font-size:0.875rem;">${item.nationality || 'Desconocida'}</p>
+                            <p class="book-year" style="margin-top:0.4rem;color:#666;font-size:0.8rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${item.biography || ''}</p>
+                            <div class="book-footer">
+                                <a href="/biblioteca/autores/${item.id}" class="book-read-link">Más información →</a>
+                            </div>
+                        </div>
+                    </div>`).join('');
+            } else {
+                grid.innerHTML = filtered.map((item, idx) => `
+                    <div class="book-card">
+                        <div class="book-cover" style="background:linear-gradient(135deg,${item.color} 0%,${item.color}cc 100%);">
+                            <span class="book-badge">${item.type}</span>
+                            ${item.cover_url
+                                ? `<img src="${item.cover_url}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
+                                : `<span class="book-cover-icon">${item.icon}</span>`}
+                            <div class="book-cover-overlay">
+                                <button class="book-detail-btn" data-search-idx="${idx}">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </button>
+                            </div>
+                        </div>
+                        <div class="book-info">
+                            <h3 class="book-title">${item.title}</h3>
+                            <p class="book-author">${item.author}</p>
+                            <p class="book-year">Publicación: ${item.year}</p>
+                            <div class="book-footer">
+                                <span style="font-size:0.75rem;color:#9ca3af;">${item.pages} págs.</span>
+                                <a href="#" class="book-read-link">Leer →</a>
+                            </div>
+                        </div>
+                    </div>`).join('');
+
+                grid.querySelectorAll('.book-detail-btn').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        e.preventDefault();
+                        const item = filtered[parseInt(btn.dataset.searchIdx)];
+                        if (item) showDetailView(item);
+                    });
+                });
+            }
+        });
     </script>
 </body>
 </html>

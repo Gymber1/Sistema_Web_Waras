@@ -22,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin_global',
+        'is_deletable',
     ];
 
     /**
@@ -44,6 +46,45 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin_global' => 'boolean',
+            'is_deletable' => 'boolean',
         ];
+    }
+
+    /**
+     * Relación muchos-a-muchos: un usuario puede ser moderador de varios módulos.
+     * Solo aplicable a usuarios que NO son admin global.
+     */
+    public function modules()
+    {
+        return $this->belongsToMany(
+            'App\Models\Module',
+            'module_moderators',
+            'user_id',
+            'module_id'
+        );
+    }
+
+    /**
+     * Determina si el usuario puede acceder a un módulo específico.
+     * Acceso permitido si:
+     * - Es admin global, O
+     * - Es moderador asignado a ese módulo
+     * 
+     * @param string $moduleSlugOrId Slug o ID del módulo
+     * @return bool
+     */
+    public function canAccessModule($moduleSlugOrId)
+    {
+        if ($this->is_admin_global) {
+            return true;
+        }
+
+        return $this->modules()
+            ->where(function ($query) use ($moduleSlugOrId) {
+                $query->where('slug', $moduleSlugOrId)
+                    ->orWhere('id', $moduleSlugOrId);
+            })
+            ->exists();
     }
 }
