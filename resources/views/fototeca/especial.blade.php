@@ -63,7 +63,7 @@
             <li><a href="{{ route('fototeca.dashboard') }}" class="nav-item">Inicio</a></li>
             <li><a href="{{ route('fototeca.dashboard') }}#Galería" class="nav-item">Galería</a></li>
             <li><a href="{{ route('fototeca.dashboard') }}#Fotógrafos" class="nav-item">Fotógrafos</a></li>
-            <li><a href="{{ route('fototeca.dashboard') }}#Especiales" class="nav-item active">Especiales</a></li>
+            <li><a href="{{ route('fototeca.dashboard') }}#Especiales" class="nav-item active">Destacados</a></li>
         </ul></nav>
     </div>
 </header>

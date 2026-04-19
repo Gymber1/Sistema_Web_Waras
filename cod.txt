@@ -1,33 +1,169 @@
-"Necesito integrar la funcionalidad de Especiales en el módulo de Fototeca dentro del Panel Administrativo de mi proyecto Laravel. El objetivo es que funcione de la misma manera que en la Biblioteca, permitiendo destacar fotos específicas para que aparezcan en la sección correspondiente del sitio público.
+import React, { useState } from 'react';
+import { Camera, Home, LayoutGrid, Plus, Minus } from 'lucide-react';
 
-Requerimientos Técnicos y de UI:
+export default function FototecaAportantes() {
+  // Estado para controlar qué acordeón está abierto
+  const [activeAccordion, setActiveAccordion] = useState('inicio');
 
-Actualización del Dashboard de Fototeca:
+  // Textos y contenido de la sección
+  const accordions = [
+    {
+      id: 'inicio',
+      title: 'Inicio',
+      content: 'Nace con la idea de fortalecer la Identidad Cultural de las nuevas generaciones del Departamento de Ancash. Fue promovido inicialmente por la Sociedad Unión Progreso Soledad, en el año 2010. Luego, fue asumido por la Biblioteca Pública Municipal de Huaraz, como un servicio y producto a desarrollar y difundir, como parte de su función de rescatar y promover Identidad.'
+    },
+    {
+      id: 'antecedentes',
+      title: 'Antecedentes',
+      content: 'El sistema educativo no incluye en su currículo temas de historia, literatura, geografía, ciencias, etc., de manera específica sobre nuestra Región, por lo cual, las nuevas generaciones desconocen de nuestra historia, recursos y cultura. Asimismo, los docentes expresan que, para poder cubrir estas necesidades temáticas carecen de fuentes bibliográficas de donde poder tomar datos, información y conocimientos para incluirlos en la malla curricular, denotando la carencia de bibliotecas y fuentes primarias para obtener física o virtualmente estos conocimientos. Ante esta situación paupérrima y de miseria de fuentes de información sobre nuestra identidad, es que se generó el proyecto denominado "PORTAL DE LA CIENCIA Y CULTURA ANCASHINA" , que tiene una estrategia novedosa, democrática e inclusiva, utilizando las TIC´s y la red de redes, para desde allí, publicar información sobre nuestra historia, geografía, aspectos sociales y recursos de nuestra Región, utilizando autores y bibliografía autorizadas. Para plasmar esta propuesta se planteó desarrollarlos por módulos, uno de los módulos es la Fototeca Digital Ancashina.'
+    },
+    {
+      id: 'finalidad',
+      title: 'Finalidad',
+      content: 'La Fototeca Digital Ancashina tiene por finalidad recopilar, preservar y difundir el patrimonio fotográfico de la Provincia de Huaraz, cuya concreción ha sido posible gracias a la alianza y cooperación entre la Biblioteca Municipal de Huaraz, la Sociedad Unión Progreso Soledad, el Club de Fotógrafos de Huaraz y La Sociedad Patriotica Sanchez Carrion - Luzuriaga y Mejía, con quienes se ha hecho posible la recopilación de fotografías históricas y fotografías de los últimos tiempos, todos ellos bajo temática referidos exclusivamente a Huaraz o Ancash, como Vida Social, Vida Cultural, Vida Religiosa, Vida Estudiantil, entre otros, como una manera de contar nuestra historia a través de imágenes. También es un centro de difusión de nuestros recursos paisajísticos y naturales para el mundo.'
+    },
+    {
+      id: 'responsables',
+      title: 'Responsables',
+      content: 'Giber Garcia Alamo y equipo del archivo fotográfico.'
+    }
+  ];
 
-Añade una nueva tarjeta de resumen (card) en el dashboard principal de Fototeca que muestre el conteo de 'Especiales' activos.
+  return (
+    <div className="flex flex-col min-h-screen bg-white font-sans selection:bg-slate-800 selection:text-white">
+      
+      {/* ================= HEADER OSCURO ================= */}
+      <header className="bg-[#050505] text-white px-6 md:px-12 py-5 flex flex-wrap gap-6 items-center justify-between sticky top-0 z-50">
+        {/* Logo */}
+        <div className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity">
+          <div className="w-10 h-10 border-2 border-white/20 rounded-full flex items-center justify-center">
+            <Camera className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="font-bold text-xl tracking-[0.15em] uppercase">Fototeca</span>
+            <span className="font-light text-sm text-slate-400 capitalize">Ancashina</span>
+          </div>
+        </div>
 
-Incluye un botón de 'Administrar Especiales' que redirija a la nueva ruta admin/fototeca/specials.
+        {/* Navegación Desktop */}
+        <nav className="hidden lg:flex items-center gap-8 text-[11px] font-bold tracking-[0.15em] uppercase">
+          <a href="#" className="text-slate-400 hover:text-white transition-colors py-2">Inicio</a>
+          <a href="#" className="text-slate-400 hover:text-white transition-colors py-2">Galería</a>
+          <a href="#" className="text-slate-400 hover:text-white transition-colors py-2">Fotógrafos</a>
+          <a href="#" className="text-slate-400 hover:text-white transition-colors py-2">Especiales</a>
+          <a href="#" className="text-white border-b-[3px] border-white py-2">Aportantes</a>
+        </nav>
 
-Modificación del Sidebar:
+        {/* Botones de Acción */}
+        <div className="hidden md:flex items-center gap-4">
+          <button className="flex items-center gap-2.5 px-5 py-2.5 bg-transparent border border-white/20 rounded text-[11px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors">
+            <Home className="w-4 h-4" /> Portal Principal
+          </button>
+          <button className="flex items-center gap-2.5 px-6 py-2.5 bg-white text-black rounded text-[11px] font-bold uppercase tracking-widest hover:bg-gray-200 transition-colors">
+            <LayoutGrid className="w-4 h-4" /> Panel
+          </button>
+        </div>
+      </header>
 
-Agrega la opción 'Especiales' dentro del submenú de Fototeca en el menú lateral izquierdo.
+      {/* ================= CONTENIDO PRINCIPAL ================= */}
+      <main className="flex-1 w-full max-w-[1400px] mx-auto px-6 md:px-12 py-16 md:py-24">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
+          
+          {/* COLUMNA IZQUIERDA: Acordeones de Información */}
+          <div className="lg:col-span-8">
+            
+            {/* Título Principal */}
+            <div className="flex items-center gap-6 mb-12">
+              <h1 className="text-3xl md:text-4xl font-light text-[#1F2937] tracking-wide uppercase">
+                Fototeca Digital Ancashina
+              </h1>
+              {/* Línea punteada decorativa (Desktop) */}
+              <div className="hidden sm:block flex-1 border-b border-dashed border-slate-300"></div>
+            </div>
 
-Debe seguir el mismo estilo y orden que en la sección de Biblioteca.
+            {/* Lista de Acordeones */}
+            <div className="space-y-3">
+              {accordions.map((acc) => {
+                const isActive = activeAccordion === acc.id;
+                return (
+                  <div key={acc.id} className="overflow-hidden rounded-sm transition-all duration-300 shadow-sm hover:shadow-md">
+                    <button
+                      onClick={() => setActiveAccordion(isActive ? null : acc.id)}
+                      className={`w-full flex items-center p-0 transition-colors ${isActive ? 'bg-[#FCFBF8]' : 'bg-[#F8F9FA]'}`}
+                    >
+                      <div className={`w-14 h-14 flex items-center justify-center text-white shrink-0 transition-colors ${isActive ? 'bg-[#986A41]' : 'bg-[#2A3441]'}`}>
+                        {isActive ? <Minus className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
+                      </div>
+                      <span className="px-6 font-medium text-slate-800 text-[15px] tracking-wide">
+                        {acc.title}
+                      </span>
+                    </button>
+                    
+                    {/* Contenido Desplegable */}
+                    <div 
+                      className={`transition-all duration-500 ease-in-out origin-top ${isActive ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}
+                    >
+                      <div className="p-8 text-[#5A6B81] text-[15px] leading-[1.8] bg-white border-x border-b border-slate-100 text-justify">
+                        {acc.content}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
-Nueva Vista de Gestión de Especiales (Fototeca):
+          {/* COLUMNA DERECHA: Tarjeta del Director */}
+          <div className="lg:col-span-4 flex flex-col items-center">
+            
+            {/* Título "Director" con líneas */}
+            <div className="w-full flex items-center gap-4 mb-10">
+              <h3 className="text-2xl font-light text-[#2A3441]">Director</h3>
+              <div className="flex-1 border-b border-dashed border-slate-300"></div>
+            </div>
 
-Crea la vista admin/biblioteca/specials siguiendo exactamente la estructura de la imagen de referencia de la Biblioteca.
+            {/* Tarjeta de Perfil */}
+            <div className="flex flex-col items-center text-center group cursor-default">
+              {/* Imagen con bordes decorativos */}
+              <div className="relative w-48 h-48 rounded-full p-1.5 border-[3px] border-[#F2D7B9] mb-6 shadow-xl group-hover:scale-105 transition-transform duration-500">
+                <img 
+                  src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                  alt="Director Giber Garcia Alamo" 
+                  className="w-full h-full object-cover rounded-full bg-slate-100"
+                />
+              </div>
+              
+              {/* Nombres y Cargo */}
+              <h4 className="text-lg font-black text-[#1E293B] mb-1.5 tracking-wide uppercase">
+                Giber Garcia Alamo
+              </h4>
+              <p className="text-[#64748B] italic text-[15px]">
+                Bibliotecologo
+              </p>
 
-Tabla de Datos: Debe listar todas las fotografías con columnas para: Miniatura (en aspecto horizontal/foto), Título, Fotógrafo, Categoría y el interruptor (toggle) de 'Especial'.
+              {/* Botón de Contacto (Opcional, estilo decorativo) */}
+              <button className="mt-8 px-6 py-2 border border-slate-300 text-slate-500 text-xs font-bold uppercase tracking-widest rounded hover:bg-slate-50 hover:text-slate-800 transition-colors">
+                Contactar
+              </button>
+            </div>
 
-Lógica de Tabs: Si en el futuro agregamos otros tipos de archivos a la Fototeca (como videos o álbumes), deja preparada la estructura de pestañas (tabs) que se ve en la Biblioteca. Por ahora, solo debe estar activa la pestaña de 'Fotografías'.
+          </div>
 
-Backend y Lógica de Datos:
+        </div>
+      </main>
 
-Asegúrate de que el interruptor (toggle) de 'Especial' funcione mediante una petición AJAX para que el administrador pueda marcar o desmarcar fotos rápidamente sin recargar la página.
+      {/* ================= FOOTER OSCURO ================= */}
+      <footer className="bg-[#050505] text-white py-16 flex flex-col items-center justify-center border-t border-white/10 mt-auto">
+        <Camera className="w-8 h-8 text-slate-600 mb-6" />
+        <p className="text-[13px] font-bold tracking-[0.15em] mb-3 text-center px-4 uppercase">
+          © 2026 FOTOTECA WARAS - Archivo Visual Ancashino
+        </p>
+        <p className="text-xs text-slate-500 font-medium text-center px-4 max-w-lg leading-relaxed">
+          Preservando, digitalizando y compartiendo la memoria fotográfica e histórica de nuestra región.
+        </p>
+      </footer>
 
-Modifica el controlador de Fototeca para manejar esta actualización en la base de datos (campo is_special o tabla pivote, según cómo esté estructurado).
-
-Vinculación con el Sitio Público:
-
-Asegúrate de que las fotos marcadas como 'Especial' en el panel se carguen dinámicamente en la vista pública de /fototeca/especiales, reemplazando los placeholders actuales.
+    </div>
+  );
+}

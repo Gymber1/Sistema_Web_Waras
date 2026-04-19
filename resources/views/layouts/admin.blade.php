@@ -11,19 +11,26 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
+
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        
+
         /* Colores temáticos por módulo */
         .theme-emerald { --theme-color: #10b981; }
         .theme-blue { --theme-color: #3b82f6; }
         .theme-violet { --theme-color: #a855f7; }
+
+        /* Sidebar mobile transitions */
+        #sidebar { transition: transform 0.25s ease; }
+        #sidebar-overlay { transition: opacity 0.25s ease; }
     </style>
 </head>
 <body class="bg-slate-100">
+    <!-- Mobile sidebar overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden opacity-0" onclick="closeSidebar()"></div>
+
     <div class="flex h-screen overflow-hidden">
         <!-- SIDEBAR -->
-        <aside class="w-72 bg-[#0b1120] text-slate-300 flex flex-col border-r border-slate-800 shadow-2xl">
+        <aside id="sidebar" class="fixed lg:relative z-50 lg:z-auto w-72 bg-[#0b1120] text-slate-300 flex flex-col border-r border-slate-800 shadow-2xl h-full -translate-x-full lg:translate-x-0">
             <!-- Logo -->
             <div class="h-20 flex items-center px-6 border-b border-white/5 bg-[#0f172a]">
                 <div class="flex gap-3 items-center">
@@ -154,21 +161,27 @@
         </aside>
 
         <!-- MAIN CONTENT -->
-        <div class="flex-1 flex flex-col h-screen overflow-hidden">
+        <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
             <!-- Topbar -->
-            <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0 shadow-sm">
-                <div class="flex items-center gap-2 text-sm font-bold text-slate-400 uppercase tracking-wider">
-                    <span class="text-indigo-600">WARAS Panel</span>
-                    <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    <span class="text-slate-700">@yield('section', 'Dashboard')</span>
+            <header class="h-16 lg:h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 shrink-0 shadow-sm gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <!-- Hamburger (mobile only) -->
+                    <button onclick="openSidebar()" class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
+                    <div class="flex items-center gap-2 text-sm font-bold text-slate-400 uppercase tracking-wider truncate">
+                        <span class="text-indigo-600 shrink-0">WARAS Panel</span>
+                        <svg class="w-4 h-4 opacity-50 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        <span class="text-slate-700 truncate">@yield('section', 'Dashboard')</span>
+                    </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <a href="{{ route('home') }}" target="_blank" class="text-sm font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-5 py-2.5 rounded-xl hover:bg-indigo-100 transition-colors shadow-sm">
+                <div class="flex items-center gap-2 shrink-0">
+                    <a href="{{ route('home') }}" target="_blank" class="hidden sm:block text-sm font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-4 py-2 rounded-xl hover:bg-indigo-100 transition-colors shadow-sm whitespace-nowrap">
                         Portal Principal
                     </a>
                     <form method="POST" action="{{ route('logout') }}" style="display: inline;">
                         @csrf
-                        <button type="submit" class="text-sm font-bold text-red-600 bg-red-50 px-5 py-2.5 rounded-xl hover:bg-red-100 transition-colors">
+                        <button type="submit" class="text-sm font-bold text-red-600 bg-red-50 px-4 py-2 rounded-xl hover:bg-red-100 transition-colors whitespace-nowrap">
                             Cerrar Sesión
                         </button>
                     </form>
@@ -205,6 +218,28 @@
     </div>
 
     <script>
+    function openSidebar() {
+        const sidebar  = document.getElementById('sidebar');
+        const overlay  = document.getElementById('sidebar-overlay');
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        requestAnimationFrame(() => overlay.classList.replace('opacity-0', 'opacity-100'));
+    }
+    function closeSidebar() {
+        const sidebar  = document.getElementById('sidebar');
+        const overlay  = document.getElementById('sidebar-overlay');
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.replace('opacity-100', 'opacity-0');
+        setTimeout(() => overlay.classList.add('hidden'), 250);
+    }
+
+    // Cierra el sidebar en móvil al hacer clic en cualquier enlace de navegación
+    document.getElementById('sidebar').addEventListener('click', function(e) {
+        if (window.innerWidth >= 1024) return; // solo en móvil/tablet
+        const link = e.target.closest('a[href]');
+        if (link) closeSidebar();
+    });
+
     function openLightbox(src, title) {
         const lb = document.getElementById('lightbox');
         document.getElementById('lightbox-img').src = src;

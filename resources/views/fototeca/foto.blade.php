@@ -21,7 +21,12 @@
         .nav-menu{display:flex;gap:2rem;list-style:none}
         .nav-item{color:#9ca3af;font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;text-decoration:none;padding:.5rem 0;border-bottom:2px solid transparent;transition:color .3s}
         .nav-item:hover{color:white}.nav-item.active{color:white;border-bottom-color:white}
-        @media(max-width:768px){.nav-menu{display:none}}
+        .hamburger-btn{display:none;background:none;border:none;cursor:pointer;color:white;padding:.5rem;min-width:44px;min-height:44px;align-items:center;justify-content:center}
+        .mobile-nav{display:none;position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:2000;flex-direction:column;align-items:center;justify-content:center;gap:2rem}
+        .mobile-nav.open{display:flex}
+        .mobile-nav-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;color:white;cursor:pointer;font-size:1.5rem;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
+        .mobile-nav-item{color:white;text-decoration:none;font-size:1.3rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;min-height:44px;display:flex;align-items:center}
+        @media(max-width:768px){.nav-menu{display:none}.hamburger-btn{display:flex}.page-body{padding:5rem 1rem 3rem}.photo-panel{min-height:250px}}
         .page-body{max-width:1100px;margin:0 auto;padding:5.5rem 1.5rem 4rem}
         .back-btn{display:inline-flex;align-items:center;gap:.5rem;background:white;border:1px solid #e5e7eb;color:#374151;font-size:.875rem;font-weight:600;padding:.5rem 1rem;border-radius:.375rem;margin-bottom:1.75rem;transition:all .2s;text-decoration:none}
         .back-btn:hover{background:black;color:white;border-color:black}
@@ -52,6 +57,13 @@
     </style>
 </head>
 <body>
+<div class="mobile-nav" id="mobileNav">
+    <button class="mobile-nav-close" onclick="document.getElementById('mobileNav').classList.remove('open');document.body.style.overflow=''"><i class="fas fa-times"></i></button>
+    <a href="{{ route('fototeca.dashboard') }}" class="mobile-nav-item">Inicio</a>
+    <a href="{{ route('fototeca.galeria.index') }}" class="mobile-nav-item">Galería</a>
+    <a href="{{ route('fototeca.fotografos.index') }}" class="mobile-nav-item">Fotógrafos</a>
+    <a href="{{ route('fototeca.especiales.index') }}" class="mobile-nav-item">Especiales</a>
+</div>
 <header class="header">
     <div class="header-container">
         <a href="{{ route('fototeca.dashboard') }}" class="logo">
@@ -63,10 +75,13 @@
         </a>
         <nav><ul class="nav-menu">
             <li><a href="{{ route('fototeca.dashboard') }}" class="nav-item">Inicio</a></li>
-            <li><a href="{{ route('fototeca.dashboard') }}#Galería" class="nav-item active">Galería</a></li>
-            <li><a href="{{ route('fototeca.dashboard') }}#Fotógrafos" class="nav-item">Fotógrafos</a></li>
-            <li><a href="{{ route('fototeca.dashboard') }}#Especiales" class="nav-item">Especiales</a></li>
+            <li><a href="{{ route('fototeca.galeria.index') }}" class="nav-item active">Galería</a></li>
+            <li><a href="{{ route('fototeca.fotografos.index') }}" class="nav-item">Fotógrafos</a></li>
+            <li><a href="{{ route('fototeca.especiales.index') }}" class="nav-item">Especiales</a></li>
         </ul></nav>
+        <button class="hamburger-btn" onclick="document.getElementById('mobileNav').classList.add('open');document.body.style.overflow='hidden'" aria-label="Menú">
+            <i class="fas fa-bars" style="font-size:1.3rem"></i>
+        </button>
     </div>
 </header>
 

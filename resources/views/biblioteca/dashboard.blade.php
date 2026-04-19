@@ -141,6 +141,12 @@
         }
 
         .header-actions { display: flex; align-items: center; gap: .625rem; margin-left: 1.5rem; }
+        /* Hamburger */
+        .hamburger-btn { display: none; background: none; border: none; cursor: pointer; color: white; padding: 0.5rem; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; }
+        .mobile-nav { display: none; position: fixed; inset: 0; background: rgba(27,42,71,0.98); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; gap: 1.75rem; }
+        .mobile-nav.open { display: flex; }
+        .mobile-nav-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: white; cursor: pointer; font-size: 1.5rem; min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+        .mobile-nav-item { color: white; text-decoration: none; font-size: 1.3rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; min-height: 44px; display: flex; align-items: center; }
         .header-btn { display: inline-flex; align-items: center; gap: .4rem; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: .45rem 1rem; border-radius: .375rem; text-decoration: none; transition: all .2s; white-space: nowrap; }
         .header-btn-outline { color: #e2e8f0; border: 1px solid rgba(255,255,255,.25); }
         .header-btn-outline:hover { background: rgba(255,255,255,.1); color: var(--accent); border-color: var(--accent); }
@@ -626,9 +632,35 @@
             background: var(--bg-light);
         }
 
+        /* Mobile sidebar overlay */
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 200; }
+        .sidebar-overlay.open { display: block; }
+
+        /* Full-width layout — sin sidebar (Especiales, Editoriales, Autores) */
+        .main-wrapper.no-sidebar .sidebar { display: none !important; }
+        .main-wrapper.no-sidebar .sidebar-toggle-btn { display: none !important; }
+        .main-wrapper.no-sidebar .content { padding: 2.5rem 4rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+        .main-wrapper.no-sidebar .books-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 2rem; }
         @media (max-width: 768px) {
-            .sidebar { display: none; }
+            .main-wrapper.no-sidebar .content { padding: 1.5rem 1rem; }
+            .main-wrapper.no-sidebar .books-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; }
+        }
+
+        /* Sidebar toggle button (mobile) */
+        .sidebar-toggle-btn { display: none; align-items: center; gap: 0.5rem; background: var(--primary); color: white; border: none; padding: 0.65rem 1.25rem; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; width: 100%; }
+
+        @media (max-width: 768px) {
+            .nav-menu { display: none; }
+            .header-actions { display: none; }
+            .hamburger-btn { display: flex; }
+            .hero-title { font-size: 2.2rem !important; }
+            .main-wrapper { margin-top: 56px; flex-direction: column; }
+            .sidebar { display: none; width: 100%; position: fixed; top: 0; left: 0; height: 100vh; z-index: 250; overflow-y: auto; max-height: none; }
+            .sidebar.mobile-open { display: block; }
+            .sidebar-toggle-btn { display: flex; }
             .content { padding: 1.5rem 1rem; }
+            .books-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; }
+            .toolbar { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
         }
 
         /* Breadcrumbs */
@@ -1229,6 +1261,18 @@
     </style>
 </head>
 <body>
+    <!-- Mobile nav overlay -->
+    <div class="mobile-nav" id="mobileNav">
+        <button class="mobile-nav-close" onclick="closeMobileNav()"><i class="fas fa-times"></i></button>
+        <a href="{{ route('biblioteca.inicio') }}" class="mobile-nav-item">Inicio</a>
+        <a href="{{ route('biblioteca.libros.index') }}" class="mobile-nav-item">Libros</a>
+        <a href="{{ route('biblioteca.revistas.index') }}" class="mobile-nav-item">Revistas</a>
+        <a href="{{ route('biblioteca.editoriales.index') }}" class="mobile-nav-item">Editoriales</a>
+        <a href="{{ route('biblioteca.especiales.index') }}" class="mobile-nav-item">Especiales</a>
+        <a href="{{ route('biblioteca.autores.index') }}" class="mobile-nav-item">Autores</a>
+        <a href="{{ route('home') }}" class="mobile-nav-item" style="font-size:1rem;opacity:0.6">Portal Principal</a>
+    </div>
+
     <!-- Header -->
     <header class="header" id="header">
         <div class="header-container">
@@ -1263,6 +1307,9 @@
                     @endif
                 @endauth
             </div>
+            <button class="hamburger-btn" onclick="openMobileNav()" aria-label="Abrir menú">
+                <i class="fas fa-bars" style="font-size:1.3rem"></i>
+            </button>
         </div>
     </header>
 
@@ -1284,13 +1331,19 @@
         </div>
     </section>
 
+    <!-- Mobile sidebar overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
     <!-- Main Content -->
     <div class="main-wrapper hidden" id="mainWrapper">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-filter"></i>
-                <span class="sidebar-title">Explorar Catálogo</span>
+        <aside class="sidebar" id="mobileSidebar">
+            <div class="sidebar-header" style="justify-content:space-between">
+                <div style="display:flex;align-items:center;gap:0.75rem">
+                    <i class="fas fa-filter"></i>
+                    <span class="sidebar-title">Explorar Catálogo</span>
+                </div>
+                <button onclick="closeMobileSidebar()" id="sidebarCloseBtn" style="background:none;border:none;color:white;font-size:1.25rem;cursor:pointer;display:none;padding:0"><i class="fas fa-times"></i></button>
             </div>
 
             <div class="categories-section">
@@ -1302,6 +1355,7 @@
 
         <!-- Content Area -->
         <main class="content">
+            <button class="sidebar-toggle-btn" onclick="openMobileSidebar()"><i class="fas fa-filter"></i>&nbsp; Filtrar por materia</button>
             <div class="breadcrumbs">
                 <a id="breadcrumbHome">Catálogo</a>
                 <span class="separator">›</span>
@@ -1800,6 +1854,7 @@
                         document.getElementById('contentSearchInput').placeholder = `Buscar en ${state.activeTab}...`;
                         renderCategories();
                         renderBooks();
+                        closeMobileSidebar();
                     });
                 }
 
@@ -1830,6 +1885,7 @@
                         document.getElementById('contentSearchInput').placeholder = `Buscar libros, autores o temas en ${name}...`;
                         renderCategories();
                         renderBooks();
+                        closeMobileSidebar();
                     });
                 });
 
@@ -1857,6 +1913,7 @@
                         list.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
                         renderBooks();
+                        closeMobileSidebar();
                     });
                 });
             }
@@ -1938,6 +1995,7 @@
             document.querySelectorAll('.book-detail-btn').forEach((btn, index) => {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
+                    closeMobileSidebar();
                     const item = items[index];
                     showDetailView(item);
                 });
@@ -1974,7 +2032,10 @@
                 state.activeCategory = firstCat;
             }
 
-            document.getElementById('mainWrapper').classList.remove('hidden');
+            const TABS_NO_SIDEBAR = new Set(['Especiales', 'Editoriales', 'Autores']);
+            const wrapper = document.getElementById('mainWrapper');
+            wrapper.classList.remove('hidden');
+            wrapper.classList.toggle('no-sidebar', TABS_NO_SIDEBAR.has(tab));
             document.getElementById('sectionTitle').textContent = tab;
             document.getElementById('breadcrumbCategory').textContent = tab;
             document.getElementById('contentSearchInput').placeholder = `Buscar en ${tab}...`;
@@ -2279,6 +2340,7 @@
                     if (!item) return;
                     heroDropdown.classList.remove('open');
                     heroInput.value = '';
+                    closeMobileSidebar();
                     showSection(tab);
                     showDetailView(item);
                 });
@@ -2300,6 +2362,7 @@
             const q = heroInput.value.trim();
             if (!q) return;
             heroDropdown.classList.remove('open');
+            closeMobileSidebar();
             showSection('Libros');
             const ci = document.getElementById('contentSearchInput');
             ci.value = q;
@@ -2319,10 +2382,12 @@
 
         // ---- BÚSQUEDA EN CATÁLOGO (filtra tarjetas visibles) ----
         document.getElementById('sortSelect').addEventListener('change', function() {
+            closeMobileSidebar();
             renderBooks();
         });
 
         document.getElementById('contentSearchInput').addEventListener('input', function() {
+            closeMobileSidebar();
             const q = normalizeStr(this.value.trim());
             const isAuthors = state.activeTab === 'Autores';
 
@@ -2400,12 +2465,35 @@
                 grid.querySelectorAll('.book-detail-btn').forEach(btn => {
                     btn.addEventListener('click', e => {
                         e.preventDefault();
+                        closeMobileSidebar();
                         const item = filtered[parseInt(btn.dataset.searchIdx)];
                         if (item) showDetailView(item);
                     });
                 });
             }
         });
+
+        // ========== MOBILE NAV ==========
+        function openMobileNav()  { document.getElementById('mobileNav').classList.add('open'); document.body.style.overflow = 'hidden'; }
+        function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); document.body.style.overflow = ''; }
+        window.openMobileNav  = openMobileNav;
+        window.closeMobileNav = closeMobileNav;
+
+        // ========== MOBILE SIDEBAR ==========
+        function openMobileSidebar() {
+            document.getElementById('mobileSidebar').classList.add('mobile-open');
+            document.getElementById('sidebarOverlay').classList.add('open');
+            document.getElementById('sidebarCloseBtn').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeMobileSidebar() {
+            document.getElementById('mobileSidebar').classList.remove('mobile-open');
+            document.getElementById('sidebarOverlay').classList.remove('open');
+            document.getElementById('sidebarCloseBtn').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        window.openMobileSidebar  = openMobileSidebar;
+        window.closeMobileSidebar = closeMobileSidebar;
     </script>
 </body>
 </html>

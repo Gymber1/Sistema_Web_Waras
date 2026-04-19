@@ -70,10 +70,25 @@
 
         .toast{display:none;font-size:.8rem;color:#6b7280;margin-top:.75rem}
 
+        .hamburger-btn{display:none;background:none;border:none;cursor:pointer;color:white;padding:.5rem;min-width:44px;min-height:44px;align-items:center;justify-content:center}
+        .mobile-nav{display:none;position:fixed;inset:0;background:rgba(27,42,71,.98);z-index:2000;flex-direction:column;align-items:center;justify-content:center;gap:1.75rem}
+        .mobile-nav.open{display:flex}
+        .mobile-nav-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;color:white;cursor:pointer;font-size:1.5rem;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
+        .mobile-nav-item{color:white;text-decoration:none;font-size:1.3rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;min-height:44px;display:flex;align-items:center}
         @media(max-width:640px){.detail-card{flex-direction:column;align-items:center}.cover-box{width:160px}.cover-img,.cover-placeholder{width:160px}}
+        @media(max-width:1024px){.nav-menu{display:none}.hamburger-btn{display:flex}.page-body{padding:5.5rem 1rem 3rem}}
     </style>
 </head>
 <body>
+<div class="mobile-nav" id="mobileNav">
+    <button class="mobile-nav-close" onclick="document.getElementById('mobileNav').classList.remove('open');document.body.style.overflow=''"><i class="fas fa-times"></i></button>
+    <a href="{{ route('biblioteca.inicio') }}" class="mobile-nav-item">Inicio</a>
+    <a href="{{ route('biblioteca.libros.index') }}" class="mobile-nav-item">Libros</a>
+    <a href="{{ route('biblioteca.revistas.index') }}" class="mobile-nav-item">Revistas</a>
+    <a href="{{ route('biblioteca.editoriales.index') }}" class="mobile-nav-item">Editoriales</a>
+    <a href="{{ route('biblioteca.especiales.index') }}" class="mobile-nav-item">Especiales</a>
+    <a href="{{ route('biblioteca.autores.index') }}" class="mobile-nav-item">Autores</a>
+</div>
 <header class="header">
     <div class="header-container">
         <a href="{{ route('biblioteca.dashboard') }}" class="logo">
@@ -87,12 +102,15 @@
         </a>
         <nav class="nav-menu">
             <a href="{{ route('biblioteca.dashboard') }}" class="nav-item">Inicio</a>
-            <a href="{{ route('biblioteca.dashboard') }}#Libros" class="nav-item active">Libros</a>
-            <a href="{{ route('biblioteca.dashboard') }}#Revistas" class="nav-item">Revistas</a>
-            <a href="{{ route('biblioteca.dashboard') }}#Editoriales" class="nav-item">Editoriales</a>
-            <a href="{{ route('biblioteca.dashboard') }}#Especiales" class="nav-item">Especiales</a>
-            <a href="{{ route('biblioteca.dashboard') }}#Autores" class="nav-item">Autores</a>
+            <a href="{{ route('biblioteca.libros.index') }}" class="nav-item active">Libros</a>
+            <a href="{{ route('biblioteca.revistas.index') }}" class="nav-item">Revistas</a>
+            <a href="{{ route('biblioteca.editoriales.index') }}" class="nav-item">Editoriales</a>
+            <a href="{{ route('biblioteca.especiales.index') }}" class="nav-item">Especiales</a>
+            <a href="{{ route('biblioteca.autores.index') }}" class="nav-item">Autores</a>
         </nav>
+        <button class="hamburger-btn" onclick="document.getElementById('mobileNav').classList.add('open');document.body.style.overflow='hidden'" aria-label="Menú">
+            <i class="fas fa-bars" style="font-size:1.3rem"></i>
+        </button>
     </div>
 </header>
 

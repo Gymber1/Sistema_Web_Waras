@@ -454,39 +454,47 @@
             font-size: 0.9rem;
         }
 
+        /* Hamburger */
+        .hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; color: white; }
+        .hamburger-btn svg { width: 26px; height: 26px; }
+        .mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(13,148,136,0.97); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; }
+        .mobile-menu.open { display: flex; }
+        .mobile-menu-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: white; cursor: pointer; }
+        .mobile-menu-close svg { width: 28px; height: 28px; }
+        .mobile-nav-link { color: white; text-decoration: none; font-size: 1.5rem; font-weight: 700; letter-spacing: 0.05em; min-height: 44px; display: flex; align-items: center; }
+        .mobile-nav-btn { color: white; background: rgba(255,255,255,0.15); border: 2px solid white; padding: 0.75rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 1rem; min-height: 44px; display: flex; align-items: center; }
+
         /* Responsive Design */
         @media (max-width: 768px) {
-            .hero-title {
-                font-size: 2.5rem;
-            }
-
-            .hero-subtitle {
-                font-size: 1rem;
-            }
-
-            .section-title {
-                font-size: 2rem;
-            }
-
-            nav {
-                gap: 1rem;
-            }
-
-            .nav-link {
-                display: none;
-            }
-
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .footer-grid {
-                grid-template-columns: 1fr;
-            }
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1rem; }
+            .section-title { font-size: 2rem; }
+            nav { gap: 1rem; }
+            .nav-link { display: none; }
+            .nav-buttons { display: none; }
+            .hamburger-btn { display: block; }
+            .services-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
+    <!-- Mobile nav menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-menu-close" onclick="closeMobileMenu()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <a href="{{ route('home') }}" class="mobile-nav-link">Inicio</a>
+        <a href="#servicios" class="mobile-nav-link" onclick="closeMobileMenu()">Servicios</a>
+        <a href="{{ route('nosotros') }}" class="mobile-nav-link">Acerca de</a>
+        <a href="{{ route('contacto') }}" class="mobile-nav-link">Contacto</a>
+        @if (auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
+            <a href="{{ route('admin.dashboard') }}" class="mobile-nav-btn">Panel Admin</a>
+        @else
+            <a href="{{ route('login') }}" class="mobile-nav-btn">Ingresar</a>
+        @endif
+    </div>
+
     <!-- Navigation -->
     <header class="header" id="header">
         <div class="nav-wrapper">
@@ -503,7 +511,7 @@
                     <a href="tel:+51952845942" class="btn-phone">Llamar: +51 952-845-942</a>
                     @if (auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
                         <a href="{{ route('admin.dashboard') }}" class="btn-admin">Panel Admin</a>
-                        <a href="{{ route('logout') }}" class="btn-admin" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                        <a href="{{ route('logout') }}" class="btn-admin" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Cerrar Sesion</a>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
                         </form>
@@ -511,6 +519,10 @@
                         <a href="{{ route('login') }}" class="btn-admin">Ingresar</a>
                     @endif
                 </div>
+                <!-- Hamburger (mobile) -->
+                <button class="hamburger-btn" onclick="openMobileMenu()" aria-label="Abrir menú">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
             </nav>
         </div>
     </header>
@@ -653,6 +665,11 @@
                 }
             });
         });
+
+        function openMobileMenu()  { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow = 'hidden'; }
+        function closeMobileMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow = ''; }
+        window.openMobileMenu  = openMobileMenu;
+        window.closeMobileMenu = closeMobileMenu;
     </script>
 </body>
 </html>

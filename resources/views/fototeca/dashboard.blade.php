@@ -48,6 +48,13 @@
         .nav-item:hover { color: white; }
         .nav-item.active { color: white; border-bottom-color: white; }
         .header-actions { display: flex; align-items: center; gap: .625rem; margin-left: 1.5rem; }
+
+        /* Hamburger */
+        .hamburger-btn { display: none; background: none; border: none; cursor: pointer; color: white; padding: 0.5rem; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; }
+        .mobile-nav { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; }
+        .mobile-nav.open { display: flex; }
+        .mobile-nav-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: white; cursor: pointer; font-size: 1.5rem; min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+        .mobile-nav-item { color: white; text-decoration: none; font-size: 1.4rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; min-height: 44px; display: flex; align-items: center; }
         .header-btn { display: inline-flex; align-items: center; gap: .4rem; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: .45rem 1rem; border-radius: .25rem; text-decoration: none; transition: all .2s; white-space: nowrap; }
         .header-btn-outline { color: #9ca3af; border: 1px solid rgba(255,255,255,.2); }
         .header-btn-outline:hover { background: rgba(255,255,255,.08); color: white; border-color: rgba(255,255,255,.4); }
@@ -81,6 +88,52 @@
 
         .sidebar { width: 300px; background: white; border-right: 1px solid #e5e7eb; flex-shrink: 0; overflow-y: auto; max-height: calc(100vh - 72px); position: sticky; top: 72px; align-self: flex-start; }
         .sidebar-header { display: flex; align-items: center; gap: 0.75rem; padding: 1.5rem 2rem; background: black; color: white; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Mobile sidebar overlay */
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 200; }
+        .sidebar-overlay.open { display: block; }
+
+        /* Full-width layout — sin sidebar (Especiales, Fotógrafos) */
+        .main-wrapper.no-sidebar .sidebar { display: none !important; }
+        .main-wrapper.no-sidebar .sidebar-toggle-btn { display: none !important; }
+        .main-wrapper.no-sidebar .content { padding: 2.5rem 4rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+        .main-wrapper.no-sidebar .photos-grid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2.5rem; }
+        @media (max-width: 768px) {
+            .main-wrapper.no-sidebar .content { padding: 1.5rem 1.25rem; }
+            .main-wrapper.no-sidebar .photos-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+        }
+
+        /* Sidebar toggle button (mobile) */
+        .sidebar-toggle-btn { display: none; align-items: center; gap: 0.5rem; background: black; color: white; border: none; padding: 0.6rem 1.25rem; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 0; width: 100%; }
+        .sidebar-toggle-btn i { font-size: 0.9rem; }
+
+        @media (max-width: 768px) {
+            .nav-menu { display: none; }
+            .header-actions { display: none; }
+            .hamburger-btn { display: flex; }
+            .hero-title { font-size: 2.2rem; }
+            .hero-subtitle { font-size: 1rem; }
+            .search-wrapper { flex-direction: column; }
+            .search-btn { padding: 0.75rem; border-radius: 0; }
+            .main-wrapper { margin-top: 56px; flex-direction: column; }
+            .sidebar { display: none; width: 100%; max-height: none; position: fixed; top: 0; left: 0; height: 100vh; z-index: 250; overflow-y: auto; }
+            .sidebar.mobile-open { display: block; }
+            .sidebar-toggle-btn { display: flex; }
+            .content { padding: 1.5rem 1.25rem; }
+            .search-bar { flex-direction: column; gap: 0.75rem; }
+            .sort-controls { width: 100%; }
+            .photos-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+            .detail-view { padding: 1.5rem 1rem; margin-top: 56px; }
+            .detail-header { flex-direction: column; }
+            .detail-info { min-width: unset; padding: 1.5rem; }
+            .detail-image-box { min-height: 250px; }
+            .detail-meta { grid-template-columns: 1fr 1fr; gap: 1rem; }
+        }
+
+        @media (max-width: 480px) {
+            .photos-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+            .detail-meta { grid-template-columns: 1fr; }
+        }
 
         /* Accordion sidebar */
         .acc-todos-btn { width: 100%; padding: 0.875rem 2rem; font-size: 0.85rem; font-weight: 600; color: #374151; background: transparent; border: none; border-left: 3px solid transparent; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
@@ -177,6 +230,17 @@
     </style>
 </head>
 <body>
+    <!-- Mobile nav overlay -->
+    <div class="mobile-nav" id="mobileNav">
+        <button class="mobile-nav-close" onclick="closeMobileNav()"><i class="fas fa-times"></i></button>
+        <a href="{{ route('fototeca.inicio') }}" class="mobile-nav-item">Inicio</a>
+        <a href="{{ route('fototeca.galeria.index') }}" class="mobile-nav-item">Galería</a>
+        <a href="{{ route('fototeca.fotografos.index') }}" class="mobile-nav-item">Fotógrafos</a>
+        <a href="{{ route('fototeca.especiales.index') }}" class="mobile-nav-item">Especiales</a>
+        <a href="{{ route('fototeca.aportantes.index') }}" class="mobile-nav-item">Aportantes</a>
+        <a href="{{ route('home') }}" class="mobile-nav-item" style="font-size:1rem;color:#9ca3af">Portal Principal</a>
+    </div>
+
     <header class="header" id="header">
         <div class="header-container">
             <button class="logo" id="logoBtn">
@@ -207,6 +271,9 @@
                     @endif
                 @endauth
             </div>
+            <button class="hamburger-btn" onclick="openMobileNav()" aria-label="Abrir menú">
+                <i class="fas fa-bars" style="font-size:1.3rem"></i>
+            </button>
         </div>
     </header>
 
@@ -227,15 +294,20 @@
         </div>
     </section>
 
+    <!-- Mobile sidebar overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
     <div class="main-wrapper hidden" id="mainWrapper">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-filter"></i> Explorar Catálogo
+        <aside class="sidebar" id="mobileSidebar">
+            <div class="sidebar-header" style="justify-content:space-between">
+                <span><i class="fas fa-filter"></i> Explorar Catálogo</span>
+                <button onclick="closeMobileSidebar()" style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;padding:0 0.25rem;display:none" id="sidebarCloseBtn"><i class="fas fa-times"></i></button>
             </div>
             <ul id="sidebarCategories" style="list-style:none; padding:0; margin:0;"></ul>
         </aside>
 
         <main class="content">
+            <button class="sidebar-toggle-btn" onclick="openMobileSidebar()"><i class="fas fa-filter"></i> Filtrar por categoría</button>
             <div class="content-header">
                 <h2 class="content-title" id="sectionTitle">Plaza de Armas y Catedral</h2>
                 <p class="content-subtitle">Explorando el archivo histórico y fotográfico.</p>
@@ -315,152 +387,152 @@
         </div>
     </div>
 
-    <!-- ===== SECCIÓN NOSOTROS / APORTANTES ===== -->
-    <div id="aportantesSection" style="display:none; background:#f5f5f7; margin-top:56px; padding:0 0 4rem;">
+    <!-- ===== SECCIÓN APORTANTES ===== -->
+    <div id="aportantesSection" style="display:none; background:white; margin-top:56px; min-height:calc(100vh - 56px);">
+        <div id="aportantesGrid" style="max-width:1400px; margin:0 auto; padding:4rem 3rem; display:grid; grid-template-columns:1fr 340px; gap:6rem; align-items:start;">
 
-        <!-- Hero Banner -->
-        <div style="background:linear-gradient(135deg,#000 60%,#1a1a1a); color:white; padding:4rem 2rem; text-align:center; position:relative; overflow:hidden;">
-            <div style="position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1920&q=40') center/cover;opacity:.08;"></div>
-            <div style="position:relative;max-width:800px;margin:0 auto;">
-                <div style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border:2px solid rgba(255,255,255,.3);border-radius:50%;margin-bottom:1.5rem;">
-                    <i class="fas fa-camera" style="font-size:1.5rem;"></i>
+            <!-- COLUMNA IZQUIERDA: Acordeones -->
+            <div id="aportantesLeft">
+                <!-- Título con línea punteada -->
+                <div style="display:flex; align-items:center; gap:1.5rem; margin-bottom:3rem;">
+                    <h1 id="aportantesTitle" style="font-size:2rem; font-weight:300; color:#1F2937; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap;">Fototeca Digital Ancashina</h1>
+                    <div style="flex:1; border-bottom:1px dashed #cbd5e1;"></div>
                 </div>
-                <h1 style="font-size:2.5rem;font-weight:800;letter-spacing:-.5px;margin-bottom:1rem;text-transform:uppercase;letter-spacing:.1em;">Fototeca Ancashina</h1>
-                <p style="font-size:1.1rem;font-weight:300;color:#d1d5db;line-height:1.8;max-width:640px;margin:0 auto;">
-                    Archivo visual que preserva, digitaliza y difunde la memoria fotográfica e histórica del Departamento de Áncash.
-                </p>
-            </div>
-        </div>
 
-        <div style="max-width:1000px;margin:0 auto;padding:3rem 1.5rem;">
+                <!-- Lista de acordeones -->
+                <div style="display:flex; flex-direction:column; gap:0.75rem;" id="aportantesAccordion">
 
-            <!-- Quiénes somos -->
-            <div style="background:white;border:1px solid #e5e7eb;padding:2.5rem;margin-bottom:2rem;">
-                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #111;">
-                    <div style="width:36px;height:36px;background:black;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fas fa-landmark" style="color:white;font-size:.85rem;"></i>
-                    </div>
-                    <h2 style="font-size:1.25rem;font-weight:800;color:black;text-transform:uppercase;letter-spacing:.05em;">Quiénes Somos</h2>
-                </div>
-                <p style="font-size:.95rem;color:#4b5563;line-height:1.85;margin-bottom:1rem;">
-                    La <strong>Asociación Waras: Ciencia y Cultura</strong> nació de un grupo de ciudadanos comprometidos con el desarrollo económico, social, científico y cultural del Departamento de Áncash. Ante el vacío histórico del Estado en la protección de la identidad cultural, decidieron aportar para viabilizar el progreso sostenido de nuestra región.
-                </p>
-                <p style="font-size:.95rem;color:#4b5563;line-height:1.85;">
-                    Áncash es una región privilegiada, con una profunda tradición cultural que subsiste a través del tiempo y una diversidad de recursos naturales únicos. Esta fototeca es uno de los espacios que buscamos construir para sistematizar, preservar y difundir la ciencia y cultura ancashina.
-                </p>
-            </div>
-
-            <!-- Finalidad + Objetivos -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;">
-                <div style="background:white;border:1px solid #e5e7eb;padding:2rem;">
-                    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;">
-                        <div style="width:32px;height:32px;background:black;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i class="fas fa-bullseye" style="color:white;font-size:.75rem;"></i>
+                    <div class="aport-item" data-id="inicio">
+                        <button class="aport-btn aport-active" onclick="toggleAportante('inicio')" style="width:100%; display:flex; align-items:center; padding:0; border:none; cursor:pointer; background:#FCFBF8; box-shadow:0 1px 3px rgba(0,0,0,.08);">
+                            <div class="aport-icon" style="width:56px; height:56px; display:flex; align-items:center; justify-content:center; background:#986A41; flex-shrink:0; transition:background .2s;">
+                                <i class="fas fa-minus" style="color:white; font-size:1rem;"></i>
+                            </div>
+                            <span style="padding:0 1.5rem; font-size:.9375rem; font-weight:500; color:#1e293b; letter-spacing:.02em;">Inicio</span>
+                        </button>
+                        <div class="aport-content" style="max-height:1000px; overflow:hidden; transition:max-height .4s ease, opacity .3s ease; opacity:1;">
+                            <div style="padding:2rem; font-size:.9375rem; color:#5A6B81; line-height:1.8; background:white; border:1px solid #f1f5f9; border-top:none; text-align:justify;">
+                                Nace con la idea de fortalecer la Identidad Cultural de las nuevas generaciones del Departamento de Ancash. Fue promovido inicialmente por la Sociedad Unión Progreso Soledad, en el año 2010. Luego, fue asumido por la Biblioteca Pública Municipal de Huaraz, como un servicio y producto a desarrollar y difundir, como parte de su función de rescatar y promover Identidad.
+                            </div>
                         </div>
-                        <h3 style="font-size:1rem;font-weight:800;color:black;text-transform:uppercase;letter-spacing:.05em;">Finalidad</h3>
                     </div>
-                    <p style="font-size:.875rem;color:#4b5563;line-height:1.8;">
-                        Promover estudios, investigaciones, capacitaciones y espacios que aporten al desarrollo económico, social, ambiental, cultural y científico del Departamento de Áncash para la mejora de la calidad de vida de sus ciudadanos.
-                    </p>
-                </div>
-                <div style="background:black;color:white;padding:2rem;">
-                    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;">
-                        <div style="width:32px;height:32px;border:1px solid rgba(255,255,255,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i class="fas fa-flag" style="font-size:.75rem;"></i>
-                        </div>
-                        <h3 style="font-size:1rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;">Objetivos Generales</h3>
-                    </div>
-                    <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.75rem;">
-                        <li style="display:flex;gap:.75rem;align-items:flex-start;font-size:.875rem;color:#d1d5db;line-height:1.6;">
-                            <i class="fas fa-chevron-right" style="color:white;margin-top:.2rem;flex-shrink:0;font-size:.65rem;"></i>
-                            Contribuir al Desarrollo Económico y Social del Departamento de Ancash.
-                        </li>
-                        <li style="display:flex;gap:.75rem;align-items:flex-start;font-size:.875rem;color:#d1d5db;line-height:1.6;">
-                            <i class="fas fa-chevron-right" style="color:white;margin-top:.2rem;flex-shrink:0;font-size:.65rem;"></i>
-                            Preservar y Difundir la Cultura Ancashina.
-                        </li>
-                    </ul>
-                </div>
-            </div>
 
-            <!-- Valores -->
-            <div style="background:white;border:1px solid #e5e7eb;padding:2.5rem;margin-bottom:2rem;">
-                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.75rem;padding-bottom:1rem;border-bottom:2px solid #111;">
-                    <div style="width:36px;height:36px;background:black;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fas fa-heart" style="color:white;font-size:.85rem;"></i>
+                    <div class="aport-item" data-id="antecedentes">
+                        <button class="aport-btn" onclick="toggleAportante('antecedentes')" style="width:100%; display:flex; align-items:center; padding:0; border:none; cursor:pointer; background:#F8F9FA; box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                            <div class="aport-icon" style="width:56px; height:56px; display:flex; align-items:center; justify-content:center; background:#2A3441; flex-shrink:0; transition:background .2s;">
+                                <i class="fas fa-plus" style="color:white; font-size:1rem;"></i>
+                            </div>
+                            <span style="padding:0 1.5rem; font-size:.9375rem; font-weight:500; color:#1e293b; letter-spacing:.02em;">Antecedentes</span>
+                        </button>
+                        <div class="aport-content" style="max-height:0; overflow:hidden; transition:max-height .4s ease, opacity .3s ease; opacity:0;">
+                            <div style="padding:2rem; font-size:.9375rem; color:#5A6B81; line-height:1.8; background:white; border:1px solid #f1f5f9; border-top:none; text-align:justify;">
+                                El sistema educativo no incluye en su currículo temas de historia, literatura, geografía, ciencias, etc., de manera específica sobre nuestra Región, por lo cual, las nuevas generaciones desconocen de nuestra historia, recursos y cultura. Asimismo, los docentes expresan que, para poder cubrir estas necesidades temáticas carecen de fuentes bibliográficas de donde poder tomar datos, información y conocimientos para incluirlos en la malla curricular, denotando la carencia de bibliotecas y fuentes primarias para obtener física o virtualmente estos conocimientos. Ante esta situación paupérrima y de miseria de fuentes de información sobre nuestra identidad, es que se generó el proyecto denominado "PORTAL DE LA CIENCIA Y CULTURA ANCASHINA", que tiene una estrategia novedosa, democrática e inclusiva, utilizando las TIC´s y la red de redes, para desde allí, publicar información sobre nuestra historia, geografía, aspectos sociales y recursos de nuestra Región, utilizando autores y bibliografía autorizadas. Para plasmar esta propuesta se planteó desarrollarlos por módulos, uno de los módulos es la Fototeca Digital Ancashina.
+                            </div>
+                        </div>
                     </div>
-                    <h2 style="font-size:1.25rem;font-weight:800;color:black;text-transform:uppercase;letter-spacing:.05em;">Nuestros Valores</h2>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;">
-                    @foreach([['fa-balance-scale','Equidad'],['fa-hands-helping','Fraternidad'],['fa-hand-holding-heart','Solidaridad'],['fa-leaf','Armonía'],['fa-dove','Libertad']] as [$icon,$valor])
-                    <div style="text-align:center;padding:1.25rem .75rem;border:1px solid #e5e7eb;transition:all .2s;"
-                         onmouseover="this.style.background='black';this.style.color='white';this.style.borderColor='black'"
-                         onmouseout="this.style.background='';this.style.color='';this.style.borderColor='#e5e7eb'">
-                        <i class="fas {{ $icon }}" style="font-size:1.5rem;margin-bottom:.5rem;display:block;"></i>
-                        <span style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">{{ $valor }}</span>
+
+                    <div class="aport-item" data-id="finalidad">
+                        <button class="aport-btn" onclick="toggleAportante('finalidad')" style="width:100%; display:flex; align-items:center; padding:0; border:none; cursor:pointer; background:#F8F9FA; box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                            <div class="aport-icon" style="width:56px; height:56px; display:flex; align-items:center; justify-content:center; background:#2A3441; flex-shrink:0; transition:background .2s;">
+                                <i class="fas fa-plus" style="color:white; font-size:1rem;"></i>
+                            </div>
+                            <span style="padding:0 1.5rem; font-size:.9375rem; font-weight:500; color:#1e293b; letter-spacing:.02em;">Finalidad</span>
+                        </button>
+                        <div class="aport-content" style="max-height:0; overflow:hidden; transition:max-height .4s ease, opacity .3s ease; opacity:0;">
+                            <div style="padding:2rem; font-size:.9375rem; color:#5A6B81; line-height:1.8; background:white; border:1px solid #f1f5f9; border-top:none; text-align:justify;">
+                                La Fototeca Digital Ancashina tiene por finalidad recopilar, preservar y difundir el patrimonio fotográfico de la Provincia de Huaraz, cuya concreción ha sido posible gracias a la alianza y cooperación entre la Biblioteca Municipal de Huaraz, la Sociedad Unión Progreso Soledad, el Club de Fotógrafos de Huaraz y La Sociedad Patriotica Sanchez Carrion - Luzuriaga y Mejía, con quienes se ha hecho posible la recopilación de fotografías históricas y fotografías de los últimos tiempos, todos ellos bajo temática referidos exclusivamente a Huaraz o Ancash, como Vida Social, Vida Cultural, Vida Religiosa, Vida Estudiantil, entre otros, como una manera de contar nuestra historia a través de imágenes. También es un centro de difusión de nuestros recursos paisajísticos y naturales para el mundo.
+                            </div>
+                        </div>
                     </div>
-                    @endforeach
+
+                    <div class="aport-item" data-id="responsables">
+                        <button class="aport-btn" onclick="toggleAportante('responsables')" style="width:100%; display:flex; align-items:center; padding:0; border:none; cursor:pointer; background:#F8F9FA; box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                            <div class="aport-icon" style="width:56px; height:56px; display:flex; align-items:center; justify-content:center; background:#2A3441; flex-shrink:0; transition:background .2s;">
+                                <i class="fas fa-plus" style="color:white; font-size:1rem;"></i>
+                            </div>
+                            <span style="padding:0 1.5rem; font-size:.9375rem; font-weight:500; color:#1e293b; letter-spacing:.02em;">Responsables</span>
+                        </button>
+                        <div class="aport-content" style="max-height:0; overflow:hidden; transition:max-height .4s ease, opacity .3s ease; opacity:0;">
+                            <div style="padding:2rem; font-size:.9375rem; color:#5A6B81; line-height:1.8; background:white; border:1px solid #f1f5f9; border-top:none; text-align:justify;">
+                                Giber Garcia Alamo y equipo del archivo fotográfico.
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            <!-- Beneficiarios -->
-            <div style="background:white;border:1px solid #e5e7eb;padding:2.5rem;margin-bottom:2rem;">
-                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #111;">
-                    <div style="width:36px;height:36px;background:black;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fas fa-users" style="color:white;font-size:.85rem;"></i>
-                    </div>
-                    <h2 style="font-size:1.25rem;font-weight:800;color:black;text-transform:uppercase;letter-spacing:.05em;">Beneficiarios</h2>
+            <!-- COLUMNA DERECHA: Director -->
+            <div id="aportantesRight" style="display:flex; flex-direction:column; align-items:center;">
+                <!-- Título con línea (oculto en móvil) -->
+                <div id="directorTitleRow" style="width:100%; display:flex; align-items:center; gap:1rem; margin-bottom:2.5rem;">
+                    <h3 style="font-size:1.5rem; font-weight:300; color:#2A3441; white-space:nowrap;">Director</h3>
+                    <div style="flex:1; border-bottom:1px dashed #cbd5e1;"></div>
                 </div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.75rem;">
-                    @foreach(['Estudiantes de primaria y secundaria de Áncash','Estudiantes de nivel superior de Áncash','Docentes de nivel básico y superior','Autoridades y sociedad civil','Empresarios e inversores regionales','Turistas nacionales e internacionales','Público interesado en la cultura ancashina'] as $ben)
-                    <div style="display:flex;gap:.75rem;align-items:flex-start;padding:.875rem;background:#f9fafb;border:1px solid #f3f4f6;">
-                        <i class="fas fa-check" style="color:black;margin-top:.2rem;flex-shrink:0;font-size:.75rem;"></i>
-                        <span style="font-size:.875rem;color:#374151;line-height:1.5;">{{ $ben }}</span>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
 
-            <!-- Contacto -->
-            <div style="background:black;color:white;padding:2.5rem;">
-                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.75rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.15);">
-                    <div style="width:36px;height:36px;border:1px solid rgba(255,255,255,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fas fa-envelope" style="font-size:.85rem;"></i>
+                <!-- Tarjeta de perfil -->
+                <div id="directorCard" style="display:flex; flex-direction:column; align-items:center; text-align:center;">
+                    <div id="directorAvatar" style="width:192px; height:192px; border-radius:50%; border:3px solid #F2D7B9; margin-bottom:1.5rem; box-shadow:0 10px 40px rgba(0,0,0,.15); overflow:hidden; flex-shrink:0;">
+                        <img src="{{ asset('giber.png') }}" alt="Giber Garcia Alamo" style="width:100%; height:100%; object-fit:cover; display:block;">
                     </div>
-                    <h2 style="font-size:1.25rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;">Contáctanos</h2>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;">
-                    <div style="display:flex;gap:1rem;align-items:flex-start;">
-                        <div style="width:40px;height:40px;border:1px solid rgba(255,255,255,.2);border-radius:.25rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <div>
-                            <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:.25rem;">Ubicación</p>
-                            <p style="font-size:.9rem;color:#e5e7eb;line-height:1.6;">Departamento de Áncash, Perú</p>
-                        </div>
-                    </div>
-                    <div style="display:flex;gap:1rem;align-items:flex-start;">
-                        <div style="width:40px;height:40px;border:1px solid rgba(255,255,255,.2);border-radius:.25rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <div>
-                            <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:.25rem;">Correo Electrónico</p>
-                            <p style="font-size:.9rem;color:#e5e7eb;">asociacion@waras.pe</p>
-                        </div>
-                    </div>
-                    <div style="display:flex;gap:1rem;align-items:flex-start;">
-                        <div style="width:40px;height:40px;border:1px solid rgba(255,255,255,.2);border-radius:.25rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i class="fas fa-globe"></i>
-                        </div>
-                        <div>
-                            <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:.25rem;">Misión</p>
-                            <p style="font-size:.875rem;color:#9ca3af;line-height:1.6;font-style:italic;">"Ama Llulla, Ama Quella, Ama Sua"</p>
-                        </div>
-                    </div>
+                    <h4 id="directorName" style="font-size:1rem; font-weight:900; color:#1E293B; letter-spacing:.05em; text-transform:uppercase; margin-bottom:.375rem;">Giber Garcia Alamo</h4>
+                    <p style="font-size:.9375rem; color:#64748B; font-style:italic;">Bibliotecologo</p>
+                    <button style="margin-top:2rem; padding:.5rem 1.5rem; border:1px solid #cbd5e1; background:transparent; color:#64748b; font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; cursor:pointer; transition:all .2s;"
+                            onmouseover="this.style.background='#f8fafc';this.style.color='#1e293b'"
+                            onmouseout="this.style.background='transparent';this.style.color='#64748b'">
+                        Contactar
+                    </button>
                 </div>
             </div>
 
         </div>
+
+        <style>
+            @media (max-width: 900px) {
+                #aportantesGrid {
+                    grid-template-columns: 1fr !important;
+                    gap: 0 !important;
+                    padding: 2rem 1.25rem !important;
+                }
+                #aportantesTitle {
+                    font-size: 1.2rem !important;
+                    white-space: normal !important;
+                }
+                /* Director arriba, en fila horizontal */
+                #aportantesRight {
+                    order: -1;
+                    flex-direction: row !important;
+                    align-items: center !important;
+                    gap: 1.25rem !important;
+                    padding-bottom: 1.75rem !important;
+                    margin-bottom: 1.75rem !important;
+                    border-bottom: 1px solid #e5e7eb !important;
+                }
+                #directorTitleRow { display: none !important; }
+                #directorCard {
+                    flex-direction: row !important;
+                    text-align: left !important;
+                    gap: 1.25rem !important;
+                }
+                #directorAvatar {
+                    width: 80px !important;
+                    height: 80px !important;
+                    margin-bottom: 0 !important;
+                    flex-shrink: 0 !important;
+                }
+                #directorName { font-size: .85rem !important; }
+            }
+            @media (max-width: 480px) {
+                #directorCard {
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    text-align: center !important;
+                }
+                #directorAvatar {
+                    width: 120px !important;
+                    height: 120px !important;
+                }
+            }
+        </style>
     </div>
 
     <footer class="footer">
@@ -587,7 +659,7 @@
                     </div>
                 `).join('');
                 document.querySelectorAll('#photosGrid .photo-card').forEach((card, index) => {
-                    card.addEventListener('click', () => showDetail(items[index]));
+                    card.addEventListener('click', () => { closeMobileSidebar(); showDetail(items[index]); });
                 });
                 return;
             }
@@ -699,6 +771,7 @@
                 document.getElementById('sectionTitle').textContent = state.activeTab;
                 renderSidebar();
                 renderPhotos();
+                closeMobileSidebar();
             });
 
             // Accordion parent toggle (cualquier profundidad) — Set-based para multinivel
@@ -714,6 +787,7 @@
                         state.openAccordions.add(pid);
                     }
                     renderSidebar();
+                    // No cierra el sidebar al expandir/colapsar — el usuario sigue navegando
                 });
             });
 
@@ -724,8 +798,9 @@
                     const name = btn.getAttribute('data-cat-name');
                     state.activeCategory = { id, name };
                     document.getElementById('sectionTitle').textContent = name;
-                    renderSidebar(); // re-render para mantener abierto el ancestro
+                    renderSidebar();
                     renderPhotos();
+                    closeMobileSidebar();
                 });
             });
 
@@ -737,6 +812,7 @@
                     document.getElementById('sectionTitle').textContent = name;
                     renderSidebar();
                     renderPhotos();
+                    closeMobileSidebar();
                 });
             });
         }
@@ -774,6 +850,9 @@
             document.getElementById('aportantesSection').style.display = 'none';
         }
 
+        // Tabs que no necesitan sidebar de categorías
+        const TABS_NO_SIDEBAR = new Set(['Especiales', 'Fotógrafos']);
+
         // ========== MOSTRAR GALERÍA / SECCIONES ==========
         function showSection(tab) {
             state.activeTab = tab;
@@ -788,7 +867,9 @@
             } else if (tab === 'Inicio') {
                 document.getElementById('heroSection').classList.remove('hidden');
             } else {
-                document.getElementById('mainWrapper').classList.remove('hidden');
+                const wrapper = document.getElementById('mainWrapper');
+                wrapper.classList.remove('hidden');
+                wrapper.classList.toggle('no-sidebar', TABS_NO_SIDEBAR.has(tab));
                 document.getElementById('sectionTitle').textContent = tab;
                 document.getElementById('contentSearchInput').value = '';
                 renderSidebar();
@@ -817,10 +898,12 @@
 
         // ========== BÚSQUEDA EN CONTENIDO ==========
         document.getElementById('contentSearchInput')?.addEventListener('input', () => {
+            closeMobileSidebar();
             renderPhotos();
         });
 
         document.getElementById('sortSelect').addEventListener('change', () => {
+            closeMobileSidebar();
             renderPhotos();
         });
 
@@ -866,6 +949,7 @@
         });
         document.querySelector('.search-btn')?.addEventListener('click', () => {
             const q = document.getElementById('heroSearchInput').value.trim();
+            closeMobileSidebar();
             showSection('Galería');
             if (q) {
                 document.getElementById('contentSearchInput').value = q;
@@ -886,6 +970,69 @@
             const sectionTab = validTabs.includes(serverActiveSection) ? serverActiveSection : 'Inicio';
             showSection(sectionTab);
         }
+
+        // ========== MOBILE NAV ==========
+        function openMobileNav()  { document.getElementById('mobileNav').classList.add('open'); document.body.style.overflow = 'hidden'; }
+        function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); document.body.style.overflow = ''; }
+        window.openMobileNav  = openMobileNav;
+        window.closeMobileNav = closeMobileNav;
+
+        // ========== MOBILE SIDEBAR ==========
+        function openMobileSidebar() {
+            document.getElementById('mobileSidebar').classList.add('mobile-open');
+            document.getElementById('sidebarOverlay').classList.add('open');
+            document.getElementById('sidebarCloseBtn').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeMobileSidebar() {
+            document.getElementById('mobileSidebar').classList.remove('mobile-open');
+            document.getElementById('sidebarOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        window.openMobileSidebar  = openMobileSidebar;
+        window.closeMobileSidebar = closeMobileSidebar;
+
+        // ========== ACORDEÓN APORTANTES ==========
+        function toggleAportante(id) {
+            const items = document.querySelectorAll('#aportantesAccordion .aport-item');
+            items.forEach(item => {
+                const isTarget = item.getAttribute('data-id') === id;
+                const btn      = item.querySelector('.aport-btn');
+                const icon     = item.querySelector('.aport-icon');
+                const iconEl   = item.querySelector('.aport-icon i');
+                const content  = item.querySelector('.aport-content');
+
+                if (isTarget) {
+                    const isOpen = content.style.maxHeight !== '0px' && content.style.maxHeight !== '';
+                    if (isOpen) {
+                        // Cerrar
+                        content.style.maxHeight = '0px';
+                        content.style.opacity   = '0';
+                        btn.style.background    = '#F8F9FA';
+                        icon.style.background   = '#2A3441';
+                        iconEl.className        = 'fas fa-plus';
+                        iconEl.style.color      = 'white';
+                    } else {
+                        // Abrir
+                        content.style.maxHeight = '1000px';
+                        content.style.opacity   = '1';
+                        btn.style.background    = '#FCFBF8';
+                        icon.style.background   = '#986A41';
+                        iconEl.className        = 'fas fa-minus';
+                        iconEl.style.color      = 'white';
+                    }
+                } else {
+                    // Cerrar los demás
+                    content.style.maxHeight = '0px';
+                    content.style.opacity   = '0';
+                    btn.style.background    = '#F8F9FA';
+                    icon.style.background   = '#2A3441';
+                    iconEl.className        = 'fas fa-plus';
+                    iconEl.style.color      = 'white';
+                }
+            });
+        }
+        window.toggleAportante = toggleAportante;
     </script>
 </body>
 </html>
