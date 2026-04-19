@@ -2495,5 +2495,6 @@
         window.openMobileSidebar  = openMobileSidebar;
         window.closeMobileSidebar = closeMobileSidebar;
     </script>
+    <x-floating-buttons />
 </body>
 </html>

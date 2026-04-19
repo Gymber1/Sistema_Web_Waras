@@ -141,9 +141,13 @@ Route::middleware('auth')->group(function () {
 
         // Configurar Web (solo admin global)
         Route::middleware('can:admin-only')->prefix('web-config')->name('web-config.')->group(function () {
-            Route::get('/', [WebConfigController::class, 'index'])->name('index');
-            Route::post('/{key}', [WebConfigController::class, 'update'])->name('update');
+            Route::get('/',         [WebConfigController::class, 'index'])->name('index');
+            Route::get('/fondos',   [WebConfigController::class, 'fondos'])->name('fondos');
+            Route::get('/contacto', [WebConfigController::class, 'contacto'])->name('contacto');
+            Route::post('/{key}',   [WebConfigController::class, 'update'])->name('update');
             Route::delete('/{key}', [WebConfigController::class, 'destroy'])->name('destroy');
+            Route::post('/contact/update',    [WebConfigController::class, 'updateContact'])->name('contact.update');
+            Route::delete('/contact/{key}',   [WebConfigController::class, 'destroyContact'])->name('contact.destroy');
         });
 
         // Usuarios Admin (solo admin global)

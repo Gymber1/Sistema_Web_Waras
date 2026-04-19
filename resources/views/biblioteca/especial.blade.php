@@ -126,5 +126,6 @@
         });
     });
 </script>
+    <x-floating-buttons />
 </body>
 </html>

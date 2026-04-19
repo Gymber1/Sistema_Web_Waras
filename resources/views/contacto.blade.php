@@ -290,5 +290,6 @@
         }, 3000);
     });
 </script>
+    <x-floating-buttons />
 </body>
 </html>

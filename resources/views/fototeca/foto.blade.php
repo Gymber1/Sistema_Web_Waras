@@ -189,5 +189,6 @@
         }).finally(() => { toast.style.display='block'; setTimeout(()=>{toast.style.display='none'},2500); });
     });
 </script>
+    <x-floating-buttons />
 </body>
 </html>

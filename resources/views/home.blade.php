@@ -671,5 +671,6 @@
         window.openMobileMenu  = openMobileMenu;
         window.closeMobileMenu = closeMobileMenu;
     </script>
+    <x-floating-buttons />
 </body>
 </html>

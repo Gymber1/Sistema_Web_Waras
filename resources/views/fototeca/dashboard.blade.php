@@ -1034,5 +1034,6 @@
         }
         window.toggleAportante = toggleAportante;
     </script>
+    <x-floating-buttons />
 </body>
 </html>

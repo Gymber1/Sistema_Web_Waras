@@ -407,6 +407,6 @@
         <div class="footer-bottom">&copy; 2024 WARAS — Asociación de Ciencia y Cultura Ancashina. Todos los derechos reservados.</div>
     </div>
 </footer>
-
+    <x-floating-buttons />
 </body>
 </html>
