@@ -1728,7 +1728,20 @@
             'Revistas': {
                 'default': (booksDataFromServer['Revistas'] || []).map((book, idx) => mapBook(book, idx))
             },
-            'Editoriales': { 'default': [] },
+            'Editoriales': {
+                'default': (booksDataFromServer['Editoriales'] || []).map(pub => ({
+                    id:          pub.id,
+                    name:        pub.name,
+                    description: pub.description || '',
+                    email:       pub.email || '',
+                    website:     pub.website || '',
+                    phone:       pub.phone || '',
+                    address:     pub.address || '',
+                    logo_url:    pub.logo_path ? '/storage/' + pub.logo_path : null,
+                    books_count: pub.books ? pub.books.length : 0,
+                    detail_url:  '/biblioteca/editoriales/' + pub.id,
+                }))
+            },
             'Especiales':  { 'default': (booksDataFromServer['Especiales'] || []).map((book, idx) => mapBook(book, idx)) },
             'Autores': {
                 'default': (booksDataFromServer['Autores'] || []).map(author => ({
@@ -1939,9 +1952,32 @@
             // Actualizar contador de recursos
             document.getElementById('resourceNumber').textContent = items.length;
 
-            // Detectar si estamos mostrando autores o libros
-            const isAuthorsSection = state.activeTab === 'Autores';
-            
+            // Detectar tipo de sección
+            const isAuthorsSection    = state.activeTab === 'Autores';
+            const isEditorialesSection = state.activeTab === 'Editoriales';
+
+            if (isEditorialesSection) {
+                grid.innerHTML = items.length === 0
+                    ? `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af;"><i class="fas fa-building" style="font-size:2rem;margin-bottom:0.75rem;display:block;"></i>Sin editoriales registradas.</div>`
+                    : items.map(item => `
+                    <div class="book-card" style="cursor:pointer;" onclick="window.location.href='${item.detail_url}'">
+                        <div class="book-cover" style="aspect-ratio:unset;height:10rem;background:#f9f8f6;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;padding:1rem;">
+                            ${item.logo_url
+                                ? `<img src="${item.logo_url}" alt="${item.name}" style="max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;" onerror="this.style.display='none'">`
+                                : `<i class="fas fa-building" style="font-size:2.5rem;color:#9ca3af;"></i>`}
+                        </div>
+                        <div class="book-info">
+                            <h3 class="book-title">${item.name}</h3>
+                            <p class="book-author" style="color:#888;font-size:0.875rem;">${item.books_count} publicación${item.books_count !== 1 ? 'es' : ''}</p>
+                            <p class="book-year" style="margin-top:0.4rem;color:#666;font-size:0.8rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${item.description || (item.email || item.website || '')}</p>
+                            <div class="book-footer">
+                                <a href="${item.detail_url}" class="book-read-link" onclick="event.stopPropagation()">Ver editorial →</a>
+                            </div>
+                        </div>
+                    </div>`).join('');
+                return;
+            }
+
             if (isAuthorsSection) {
                 // Template para AUTORES
                 grid.innerHTML = items.map((item, index) => `
@@ -2233,10 +2269,11 @@
 
         // Fuente de datos plana para búsqueda global
         function getAllSearchableItems() {
-            const books   = dataBySectionAndCategory['Libros']['default']   || [];
-            const mags    = dataBySectionAndCategory['Revistas']['default'] || [];
-            const authors = dataBySectionAndCategory['Autores']['default']  || [];
-            return { books, mags, authors };
+            const books      = dataBySectionAndCategory['Libros']['default']      || [];
+            const mags       = dataBySectionAndCategory['Revistas']['default']    || [];
+            const authors    = dataBySectionAndCategory['Autores']['default']     || [];
+            const publishers = dataBySectionAndCategory['Editoriales']['default'] || [];
+            return { books, mags, authors, publishers };
         }
 
         function normalizeStr(s) {
@@ -2251,7 +2288,7 @@
         function renderHeroDropdown(q) {
             if (!q) { heroDropdown.classList.remove('open'); return; }
             const nq = normalizeStr(q);
-            const { books, mags, authors } = getAllSearchableItems();
+            const { books, mags, authors, publishers } = getAllSearchableItems();
 
             const matchBooks = books.filter(b =>
                 normalizeStr(b.title).includes(nq) ||
@@ -2270,7 +2307,12 @@
                 normalizeStr(a.biography).includes(nq)
             ).slice(0, 3);
 
-            const total = matchBooks.length + matchMags.length + matchAuthors.length;
+            const matchPublishers = publishers.filter(p =>
+                normalizeStr(p.name).includes(nq) ||
+                normalizeStr(p.description).includes(nq)
+            ).slice(0, 2);
+
+            const total = matchBooks.length + matchMags.length + matchAuthors.length + matchPublishers.length;
 
             if (total === 0) {
                 heroDropdown.innerHTML = `<div class="hsd-empty">Sin resultados para "<strong>${q}</strong>"</div>`;
@@ -2322,6 +2364,21 @@
                             <div class="hsd-sub">${a.nationality}</div>
                         </div>
                         <span class="hsd-badge">Autor</span>
+                    </a>`).join('');
+            }
+
+            if (matchPublishers.length) {
+                html += `<div class="hsd-section-label">Editoriales</div>`;
+                html += matchPublishers.map(p => `
+                    <a class="hsd-item" href="/biblioteca/editoriales/${p.id}">
+                        <div class="hsd-thumb" style="background:linear-gradient(135deg,#1b2a47,#2d4a6e);">
+                            ${p.logo_url ? `<img src="${p.logo_url}" alt="" style="padding:4px;object-fit:contain;">` : '<i class="fas fa-building" style="color:rgba(255,255,255,0.6);font-size:1rem;"></i>'}
+                        </div>
+                        <div class="hsd-info">
+                            <div class="hsd-title">${p.name}</div>
+                            <div class="hsd-sub">${p.books_count} publicación${p.books_count !== 1 ? 'es' : ''}</div>
+                        </div>
+                        <span class="hsd-badge">Editorial</span>
                     </a>`).join('');
             }
 
@@ -2389,7 +2446,8 @@
         document.getElementById('contentSearchInput').addEventListener('input', function() {
             closeMobileSidebar();
             const q = normalizeStr(this.value.trim());
-            const isAuthors = state.activeTab === 'Autores';
+            const isAuthors      = state.activeTab === 'Autores';
+            const isEditoriales  = state.activeTab === 'Editoriales';
 
             if (!q) { renderBooks(); return; }
 
@@ -2400,6 +2458,11 @@
                     return normalizeStr(item.name).includes(q) ||
                            normalizeStr(item.nationality).includes(q) ||
                            normalizeStr(item.biography).includes(q);
+                }
+                if (isEditoriales) {
+                    return normalizeStr(item.name).includes(q) ||
+                           normalizeStr(item.description).includes(q) ||
+                           normalizeStr(item.address).includes(q);
                 }
                 return normalizeStr(item.title).includes(q) ||
                        normalizeStr(item.author).includes(q) ||
@@ -2420,7 +2483,24 @@
                 return;
             }
 
-            if (isAuthors) {
+            if (isEditoriales) {
+                grid.innerHTML = filtered.map(item => `
+                    <div class="book-card" style="cursor:pointer;" onclick="window.location.href='${item.detail_url}'">
+                        <div class="book-cover" style="aspect-ratio:unset;height:10rem;background:#f9f8f6;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;padding:1rem;">
+                            ${item.logo_url
+                                ? `<img src="${item.logo_url}" alt="${item.name}" style="max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;" onerror="this.style.display='none'">`
+                                : `<i class="fas fa-building" style="font-size:2.5rem;color:#9ca3af;"></i>`}
+                        </div>
+                        <div class="book-info">
+                            <h3 class="book-title">${item.name}</h3>
+                            <p class="book-author" style="color:#888;font-size:0.875rem;">${item.books_count} publicación${item.books_count !== 1 ? 'es' : ''}</p>
+                            <p class="book-year" style="margin-top:0.4rem;color:#666;font-size:0.8rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${item.description || (item.email || item.website || '')}</p>
+                            <div class="book-footer">
+                                <a href="${item.detail_url}" class="book-read-link" onclick="event.stopPropagation()">Ver editorial →</a>
+                            </div>
+                        </div>
+                    </div>`).join('');
+            } else if (isAuthors) {
                 grid.innerHTML = filtered.map(item => `
                     <div class="book-card">
                         <div class="book-cover" style="background:linear-gradient(135deg,#2d3436 0%,#636e72 100%);">

@@ -1,0 +1,542 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Check, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Facebook, 
+  Instagram, 
+  Twitter, 
+  ChevronRight,
+  Menu,
+  X,
+  Scale,
+  Handshake,
+  HeartHandshake,
+  Leaf,
+  Bird,
+  Search,
+  BookOpen,
+  Camera,
+  Music,
+  Palette,
+  Send
+} from 'lucide-react';
+
+const App = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
+  // Efecto para cambiar el color del navbar al hacer scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const colecciones = [
+    {
+      id: 1,
+      titulo: "Biblioteca",
+      desc: "Colección completa de libros y publicaciones.",
+      estado: "OPERATIVO",
+      img: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&q=80"
+    },
+    {
+      id: 2,
+      titulo: "Fototeca",
+      desc: "Archivo fotográfico y memoria visual de la región.",
+      estado: "OPERATIVO",
+      img: "https://images.unsplash.com/photo-1452830978618-d6feae7d0faa?auto=format&fit=crop&q=80"
+    },
+    {
+      id: 3,
+      titulo: "Musicoteca",
+      desc: "Composiciones y géneros musicales ancashinos.",
+      estado: "EN DESARROLLO",
+      img: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&q=80"
+    }
+  ];
+
+  const valores = [
+    { icon: <Scale className="w-8 h-8" />, name: "Equidad" },
+    { icon: <Handshake className="w-8 h-8" />, name: "Fraternidad" },
+    { icon: <HeartHandshake className="w-8 h-8" />, name: "Solidaridad" },
+    { icon: <Leaf className="w-8 h-8" />, name: "Armonía" },
+    { icon: <Bird className="w-8 h-8" />, name: "Libertad" }
+  ];
+
+  return (
+    <div className="font-sans text-gray-800 bg-[#f9f8f6] min-h-screen">
+      
+      {/* NAVBAR */}
+      <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-[#111] py-3 shadow-lg' : 'bg-black/40 py-5 backdrop-blur-sm'}`}>
+        <div className="container mx-auto px-6 flex justify-between items-center">
+          {/* Logo */}
+          <div className="text-2xl font-serif text-[#cda274] tracking-widest cursor-pointer">
+            WARAS
+          </div>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center space-x-8 text-xs font-semibold tracking-widest text-white uppercase">
+            <a href="#inicio" className="hover:text-[#cda274] transition-colors">Inicio</a>
+            <a href="#nosotros" className="hover:text-[#cda274] transition-colors">Acerca De</a>
+            <a href="#colecciones" className="hover:text-[#cda274] transition-colors">Colecciones</a>
+            <button onClick={() => setIsContactModalOpen(true)} className="hover:text-[#cda274] transition-colors uppercase tracking-widest focus:outline-none">Contacto</button>
+            <button className="bg-[#cda274] text-white px-6 py-3 hover:bg-[#b88e62] transition-colors">
+              PANEL ADMIN
+            </button>
+          </div>
+
+          {/* Mobile Toggle */}
+          <div className="md:hidden">
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-white">
+              {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-[#111] absolute w-full left-0 top-full flex flex-col px-6 py-4 space-y-4 text-sm font-semibold tracking-widest text-white uppercase shadow-xl border-t border-gray-800">
+            <a href="#inicio" onClick={() => setMobileMenuOpen(false)}>Inicio</a>
+            <a href="#nosotros" onClick={() => setMobileMenuOpen(false)}>Acerca De</a>
+            <a href="#colecciones" onClick={() => setMobileMenuOpen(false)}>Colecciones</a>
+            <button onClick={() => { setMobileMenuOpen(false); setIsContactModalOpen(true); }} className="text-left hover:text-[#cda274] transition-colors uppercase tracking-widest focus:outline-none">Contacto</button>
+          </div>
+        )}
+      </nav>
+
+      {/* HERO SECTION */}
+      <section id="inicio" className="relative h-screen flex items-center justify-center">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1542224566-6e85f2e6772f?auto=format&fit=crop&q=80')" }}
+        >
+          {/* Dark Overlay */}
+          <div className="absolute inset-0 bg-black/60"></div>
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-20">
+          <p className="text-[#cda274] uppercase tracking-[0.3em] text-sm md:text-base mb-4">
+            Asociación de Ciencia y Cultura
+          </p>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-6 leading-tight">
+            PORTAL UNIFICADO<br/>EN ÁNCASH
+          </h1>
+          <p className="text-gray-300 text-lg md:text-xl font-light max-w-2xl mx-auto italic">
+            "Descubre nuestras colecciones de libros, fotos, música, artes y eventos históricos que preservan la memoria de nuestra región."
+          </p>
+          <button className="mt-10 bg-[#cda274] text-white px-8 py-4 uppercase tracking-widest text-sm hover:bg-white hover:text-[#cda274] transition-all duration-300">
+            Explorar Servicios
+          </button>
+        </div>
+      </section>
+
+      {/* ABOUT US SECTION */}
+      <section id="nosotros" className="py-24 px-6 container mx-auto max-w-7xl">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          
+          {/* Left: Images */}
+          <div className="relative">
+            <div className="flex gap-6">
+              <img 
+                src="https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?auto=format&fit=crop&q=80" 
+                alt="Naturaleza Ancash" 
+                className="w-1/2 h-[400px] object-cover mt-12"
+              />
+              <img 
+                src="https://images.unsplash.com/photo-1533601017-dc61895e03c0?auto=format&fit=crop&q=80" 
+                alt="Cultura Ancash" 
+                className="w-1/2 h-[400px] object-cover"
+              />
+            </div>
+          </div>
+
+          {/* Right: Text Content */}
+          <div>
+            <p className="text-[#cda274] uppercase tracking-[0.2em] text-xs font-semibold mb-3">
+              Asociación Waras: Ciencia y Cultura
+            </p>
+            <h2 className="text-4xl md:text-5xl font-serif text-gray-900 mb-6 leading-tight">
+              Protegiendo la Identidad Cultural de Áncash
+            </h2>
+            <p className="text-gray-500 mb-6 leading-relaxed font-light">
+              Nacimos ante el vacío estructural e histórico del Estado en la protección de la identidad cultural. Un grupo de ciudadanos conscientes decidió aportar para viabilizar el progreso sostenido de Áncash.
+            </p>
+            <p className="text-gray-500 mb-10 leading-relaxed font-light">
+              Áncash es una región privilegiada, con una profunda tradición cultural que subsiste a través del tiempo. Este portal digital es uno de los espacios que construimos para sistematizar, preservar y difundir el conocimiento.
+            </p>
+
+            {/* Feature small boxes */}
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div className="border border-gray-200 p-6 bg-white hover:border-[#cda274] transition-colors cursor-pointer group">
+                <h4 className="font-serif text-xl mb-2 text-gray-800 group-hover:text-[#cda274] transition-colors">Desarrollo Regional</h4>
+                <p className="text-sm text-gray-500 font-light">Contribuir al Desarrollo Económico y Social del Departamento.</p>
+              </div>
+              <div className="border border-gray-200 p-6 bg-white hover:border-[#cda274] transition-colors cursor-pointer group">
+                <h4 className="font-serif text-xl mb-2 text-gray-800 group-hover:text-[#cda274] transition-colors">Preservación</h4>
+                <p className="text-sm text-gray-500 font-light">Preservar y Difundir la Cultura Ancashina al mundo entero.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* COLLECTIONS / SERVICES (Rooms style) */}
+      <section id="colecciones" className="py-24 bg-white">
+        <div className="container mx-auto px-6 max-w-7xl text-center mb-16">
+          <p className="text-[#cda274] uppercase tracking-[0.2em] text-xs font-semibold mb-3">
+            Nuestro Acervo Cultural
+          </p>
+          <h2 className="text-4xl md:text-5xl font-serif text-gray-900">
+            Explora Nuestras Colecciones
+          </h2>
+        </div>
+
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="grid md:grid-cols-3 gap-8">
+            {colecciones.map((col) => (
+              <div key={col.id} className="relative group h-[500px] overflow-hidden bg-gray-900 cursor-pointer">
+                {/* Background Image */}
+                <img 
+                  src={col.img} 
+                  alt={col.titulo}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-50"
+                />
+                
+                {/* Status Vertical Tag (Luxury Style) */}
+                <div className="absolute top-8 right-8 border border-white/40 px-2 py-6 flex items-center justify-center backdrop-blur-sm bg-black/20">
+                  <span className="text-white text-xs uppercase tracking-[0.2em] [writing-mode:vertical-rl] transform rotate-180">
+                    {col.estado}
+                  </span>
+                </div>
+
+                {/* Content Bottom */}
+                <div className="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-black/90 to-transparent">
+                  <h3 className="text-white font-serif text-3xl mb-2">{col.titulo}</h3>
+                  <p className="text-gray-300 text-sm font-light mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-4 group-hover:translate-y-0">
+                    {col.desc}
+                  </p>
+                  <a href="#" className="inline-flex items-center text-[#cda274] uppercase tracking-widest text-xs font-semibold hover:text-white transition-colors">
+                    Explorar <ChevronRight size={14} className="ml-1" />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Boton ver más centrado */}
+          <div className="text-center mt-12">
+            <button className="border border-[#cda274] text-[#cda274] px-8 py-3 uppercase tracking-widest text-sm hover:bg-[#cda274] hover:text-white transition-all duration-300">
+              Ver Catálogo Completo
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* VALUES SECTION (Facilities style) */}
+      <section className="py-24 bg-[#f9f8f6]">
+        <div className="container mx-auto px-6 max-w-5xl text-center">
+          <p className="text-[#cda274] uppercase tracking-[0.2em] text-xs font-semibold mb-3">
+            Nuestros Pilares
+          </p>
+          <h2 className="text-3xl md:text-4xl font-serif text-gray-900 mb-16">
+            Valores Institucionales
+          </h2>
+
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {valores.map((val, idx) => (
+              <div key={idx} className="bg-white p-8 flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-[#cda274] mb-4">
+                  {val.icon}
+                </div>
+                <h4 className="font-serif text-lg text-gray-800">{val.name}</h4>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SPECIFIC OBJECTIVES (Spa/Club style) */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-6 max-w-6xl">
+          <div className="flex flex-col lg:flex-row items-stretch">
+            
+            {/* Text Side (Left in this layout, opposite of About) */}
+            <div className="lg:w-1/2 p-10 lg:p-16 bg-[#fbf9f6] flex flex-col justify-center">
+              <p className="text-[#cda274] uppercase tracking-[0.2em] text-xs font-semibold mb-3">
+                Plan de Acción
+              </p>
+              <h2 className="text-3xl md:text-4xl font-serif text-gray-900 mb-6">
+                Objetivos Específicos
+              </h2>
+              <p className="text-gray-500 mb-8 font-light italic">
+                Nuestras metas a corto y largo plazo para asegurar el impacto positivo en la región.
+              </p>
+              
+              <ul className="space-y-4 text-sm text-gray-600 font-light">
+                <li className="flex items-start">
+                  <Check className="text-[#cda274] mr-3 mt-1 flex-shrink-0 w-4 h-4" />
+                  <span>Promover e impulsar las ciencias, arte, identidad y cultura.</span>
+                </li>
+                <li className="flex items-start">
+                  <Check className="text-[#cda274] mr-3 mt-1 flex-shrink-0 w-4 h-4" />
+                  <span>Fomentar la investigación y capacitación educativa, artística y cultural.</span>
+                </li>
+                <li className="flex items-start">
+                  <Check className="text-[#cda274] mr-3 mt-1 flex-shrink-0 w-4 h-4" />
+                  <span>Ejecutar proyectos que desarrollen capacidades científicas y tecnológicas.</span>
+                </li>
+                <li className="flex items-start">
+                  <Check className="text-[#cda274] mr-3 mt-1 flex-shrink-0 w-4 h-4" />
+                  <span>Promover la ciudadanía activa y la participación cívica.</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Image Side */}
+            <div className="lg:w-1/2 min-h-[400px]">
+              <img 
+                src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80" 
+                alt="Montañas Ancash" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* BENEFICIARIES (Testimonial dark style) */}
+      <section className="py-24 bg-[#111] relative text-center">
+        <div className="container mx-auto px-6 max-w-5xl relative z-10">
+          <p className="text-[#cda274] uppercase tracking-[0.2em] text-xs font-semibold mb-3">
+            Impacto Social
+          </p>
+          <h2 className="text-3xl md:text-4xl font-serif text-white mb-16">
+            Nuestros Beneficiarios
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { title: "Estudiantes", desc: "Nivel primaria, secundaria y superior de toda la región de Áncash." },
+              { title: "Comunidad Educativa", desc: "Docentes de nivel básico y superior, así como investigadores." },
+              { title: "Sociedad Civil", desc: "Autoridades, empresarios, inversores y turistas internacionales." }
+            ].map((item, idx) => (
+              <div key={idx} className="bg-white/5 border border-white/10 p-10 hover:bg-white/10 transition-colors">
+                <div className="w-16 h-1 bg-[#cda274] mx-auto mb-6"></div>
+                <h4 className="font-serif text-xl text-white mb-4">{item.title}</h4>
+                <p className="text-gray-400 text-sm font-light italic">
+                  "{item.desc}"
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer id="contacto" className="bg-[#1a1a1a] pt-20 pb-10">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 border-b border-gray-800 pb-16">
+            
+            {/* Col 1: Logo & Info */}
+            <div className="md:col-span-1">
+              <h2 className="text-3xl font-serif text-[#cda274] tracking-widest mb-6">WARAS</h2>
+              <p className="text-gray-400 text-sm font-light leading-relaxed mb-6">
+                Portal integrado de acceso a colecciones de ciencia, cultura y patrimonio. Preservando la memoria de nuestra región.
+              </p>
+              <div className="flex space-x-4">
+                <a href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-[#cda274] hover:text-white transition-colors">
+                  <Facebook size={16} />
+                </a>
+                <a href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-[#cda274] hover:text-white transition-colors">
+                  <Twitter size={16} />
+                </a>
+                <a href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-[#cda274] hover:text-white transition-colors">
+                  <Instagram size={16} />
+                </a>
+              </div>
+            </div>
+
+            {/* Col 2: Enlaces */}
+            <div>
+              <h4 className="text-white font-serif text-xl mb-6">Explorar</h4>
+              <ul className="space-y-3 text-sm font-light text-gray-400">
+                <li><a href="#" className="hover:text-[#cda274] transition-colors flex items-center"><ChevronRight size={14} className="mr-2"/> Servicios</a></li>
+                <li><a href="#" className="hover:text-[#cda274] transition-colors flex items-center"><ChevronRight size={14} className="mr-2"/> Acerca de</a></li>
+                <li><a href="#" className="hover:text-[#cda274] transition-colors flex items-center"><ChevronRight size={14} className="mr-2"/> Biblioteca</a></li>
+                <li><a href="#" className="hover:text-[#cda274] transition-colors flex items-center"><ChevronRight size={14} className="mr-2"/> Fototeca</a></li>
+              </ul>
+            </div>
+
+            {/* Col 3: Contacto */}
+            <div>
+              <h4 className="text-white font-serif text-xl mb-6">Contacto Us</h4>
+              <ul className="space-y-4 text-sm font-light text-gray-400">
+                <li className="flex items-start">
+                  <MapPin size={16} className="text-[#cda274] mr-3 mt-1 flex-shrink-0" />
+                  <span>Esq. Av. Luzuriaga con Av. 28 de Julio<br/>Huaraz, Áncash, Perú</span>
+                </li>
+                <li className="flex items-center">
+                  <Phone size={16} className="text-[#cda274] mr-3 flex-shrink-0" />
+                  <span>+51 952-845-942</span>
+                </li>
+                <li className="flex items-center">
+                  <Mail size={16} className="text-[#cda274] mr-3 flex-shrink-0" />
+                  <span>giber.garcia@pcca.org</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Col 4: Newsletter / Principios */}
+            <div>
+              <h4 className="text-white font-serif text-xl mb-6">Principios Incas</h4>
+              <blockquote className="border-l-2 border-[#cda274] pl-4 italic text-gray-400 text-sm font-light mb-6">
+                "Ama Llulla, Ama Quella, Ama Sua"
+              </blockquote>
+              
+              <div className="relative mt-8">
+                <input 
+                  type="email" 
+                  placeholder="Suscríbete al boletín..." 
+                  className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 text-sm focus:outline-none focus:border-[#cda274]"
+                />
+                <button className="absolute right-0 top-0 h-full px-4 bg-[#cda274] text-white hover:bg-[#b88e62] transition-colors">
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <div className="flex flex-col md:flex-row justify-between items-center text-xs font-light text-gray-500">
+            <p>Copyright © 2024 WARAS - Asociación de Ciencia y Cultura Ancashina.</p>
+            <div className="space-x-4 mt-4 md:mt-0">
+              <a href="#" className="hover:text-white transition-colors">Política de Privacidad</a>
+              <a href="#" className="hover:text-white transition-colors">Términos de Uso</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* MODAL DE CONTACTO ESTILO LUXURY */}
+      {isContactModalOpen && (
+        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md overflow-y-auto">
+          <div className="min-h-screen px-4 py-12 flex items-center justify-center">
+            <div className="relative w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-12 items-center">
+              
+              {/* Botón Cerrar */}
+              <button 
+                onClick={() => setIsContactModalOpen(false)}
+                className="absolute -top-12 right-0 lg:-top-8 lg:-right-8 text-gray-400 hover:text-white transition-colors focus:outline-none"
+              >
+                <X size={36} />
+              </button>
+
+              {/* Columna Izquierda: Información */}
+              <div className="lg:w-1/2 text-white">
+                <div className="inline-block border border-white/20 bg-white/5 px-4 py-1 rounded-full mb-6 text-xs uppercase tracking-widest text-[#cda274] font-semibold">
+                  Contacto Directo
+                </div>
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif mb-6 leading-tight">
+                  Si está interesado en nuestra labor, <span className="italic text-[#cda274]">póngase en contacto.</span>
+                </h2>
+                <p className="text-gray-400 font-light text-lg leading-relaxed mb-10">
+                  El proceso es simple, solo tiene que llenar el formulario y enviar. También cuenta con información más específica como correos y números telefónicos a continuación.
+                </p>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {/* Dirección */}
+                  <div className="sm:col-span-2 bg-[#1a1a1a] border border-gray-800 p-6 flex items-start">
+                    <div className="bg-[#111] p-3 border border-gray-800 mr-4 text-[#cda274]">
+                      <MapPin size={24} />
+                    </div>
+                    <div>
+                      <h4 className="text-xs uppercase tracking-widest text-gray-500 mb-1 font-semibold">Dirección</h4>
+                      <p className="text-sm text-gray-300 font-light">Esq. Av. Luzuriaga con Av. 28 de Julio<br/>Huaraz, Áncash, Perú</p>
+                    </div>
+                  </div>
+                  
+                  {/* Teléfono */}
+                  <div className="bg-[#1a1a1a] border border-gray-800 p-6 flex items-start">
+                    <div className="bg-[#111] p-3 border border-gray-800 mr-4 text-[#cda274]">
+                      <Phone size={24} />
+                    </div>
+                    <div>
+                      <h4 className="text-xs uppercase tracking-widest text-gray-500 mb-1 font-semibold">Teléfonos</h4>
+                      <p className="text-sm text-gray-300 font-light">952 845 942</p>
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div className="bg-[#1a1a1a] border border-gray-800 p-6 flex items-start overflow-hidden">
+                    <div className="bg-[#111] p-3 border border-gray-800 mr-4 text-[#cda274]">
+                      <Mail size={24} />
+                    </div>
+                    <div className="truncate">
+                      <h4 className="text-xs uppercase tracking-widest text-gray-500 mb-1 font-semibold">Email</h4>
+                      <p className="text-sm text-gray-300 font-light truncate">giber.garcia@pcca.org</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Columna Derecha: Formulario */}
+              <div className="lg:w-1/2 w-full mt-8 lg:mt-0">
+                <div className="bg-[#1a1a1a] border border-gray-800 p-8 md:p-12 shadow-2xl relative">
+                  <h3 className="text-3xl font-serif text-white mb-2">Envíenos un mensaje</h3>
+                  <p className="text-gray-400 font-light text-sm mb-8">Responderemos lo más pronto posible.</p>
+
+                  <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                    <div>
+                      <label className="block text-xs uppercase tracking-widest text-gray-500 mb-2 font-semibold">Nombres Completos</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ej. Juan Pérez" 
+                        className="w-full bg-[#111] border border-gray-800 text-white p-4 font-light text-sm focus:border-[#cda274] outline-none transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase tracking-widest text-gray-500 mb-2 font-semibold">Correo Electrónico</label>
+                      <input 
+                        type="email" 
+                        placeholder="ejemplo@correo.com" 
+                        className="w-full bg-[#111] border border-gray-800 text-white p-4 font-light text-sm focus:border-[#cda274] outline-none transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase tracking-widest text-gray-500 mb-2 font-semibold">Mensaje</label>
+                      <textarea 
+                        rows="4"
+                        placeholder="Escriba su consulta o comentario aquí..." 
+                        className="w-full bg-[#111] border border-gray-800 text-white p-4 font-light text-sm focus:border-[#cda274] outline-none transition-colors resize-none"
+                      ></textarea>
+                    </div>
+                    <button className="w-full bg-[#cda274] hover:bg-[#b88e62] text-white py-4 px-6 uppercase tracking-widest text-sm transition-colors flex justify-center items-center mt-4 focus:outline-none">
+                      Enviar Mensaje <Send size={18} className="ml-2" />
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+};
+
+export default App;

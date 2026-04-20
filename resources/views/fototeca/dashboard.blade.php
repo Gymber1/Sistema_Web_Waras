@@ -70,7 +70,8 @@
         .hero-title .light { font-weight: 300; }
         .hero-subtitle { font-size: 1.25rem; font-weight: 300; margin-bottom: 3rem; color: #d1d5db; max-width: 600px; margin-left: auto; margin-right: auto; }
 
-        .search-wrapper { width: 100%; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.25rem; display: flex; padding: 0.25rem; max-width: 800px; margin: 0 auto; transition: background 0.3s; }
+        .hero-search-container { position: relative; width: 100%; max-width: 800px; margin: 0 auto; }
+        .search-wrapper { width: 100%; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.25rem; display: flex; padding: 0.25rem; transition: background 0.3s; }
         .search-wrapper:focus-within { background: white; }
         .search-inner { flex: 1; display: flex; align-items: center; padding-left: 1.25rem; gap: 1rem; }
         .search-icon { color: white; transition: color 0.3s; }
@@ -222,6 +223,22 @@
         .btn-icon { flex: 0 0 auto; width: 3rem; padding: 0; background: white; border: 1px solid #e5e7eb; color: #4b5563; }
         .btn-icon:hover { border-color: black; color: black; }
 
+        /* Hero Search Dropdown */
+        .hero-search-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 999; max-height: 420px; overflow-y: auto; }
+        .hero-search-dropdown.open { display: block; }
+        .hsd-section-label { padding: 0.5rem 1rem 0.25rem; font-size: 0.65rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; }
+        .hsd-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 1rem; cursor: pointer; transition: background 0.15s; text-decoration: none; color: inherit; }
+        .hsd-item:hover { background: #f9fafb; }
+        .hsd-thumb { width: 44px; height: 36px; border-radius: 4px; background: #111; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .hsd-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .hsd-info { flex: 1; min-width: 0; }
+        .hsd-title { font-size: 0.85rem; font-weight: 600; color: #1f2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .hsd-sub { font-size: 0.75rem; color: #9ca3af; }
+        .hsd-badge { font-size: 0.65rem; font-weight: 700; color: #6b7280; background: #f3f4f6; padding: 0.15rem 0.5rem; border-radius: 999px; flex-shrink: 0; }
+        .hsd-empty { padding: 1.25rem 1rem; font-size: 0.875rem; color: #6b7280; text-align: center; }
+        .hsd-all-btn { width: 100%; padding: 0.75rem 1rem; background: #f9fafb; border: none; border-top: 1px solid #e5e7eb; color: #374151; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-align: center; transition: background 0.15s; }
+        .hsd-all-btn:hover { background: #f3f4f6; }
+
         /* Footer */
         .footer { background: black; color: white; padding: 3rem 2rem; text-align: center; margin-top: auto; }
         .footer-icon { opacity: 0.5; margin-bottom: 1rem; }
@@ -284,12 +301,15 @@
             </div>
             <h1 class="hero-title">Fototeca <span class="light">Ancashina</span></h1>
             <p class="hero-subtitle">Preservando y compartiendo la memoria visual, histórica y cultural de nuestra región.</p>
-            <div class="search-wrapper">
-                <div class="search-inner">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" id="heroSearchInput" placeholder="Buscar fotografías, lugares, años o autores...">
+            <div class="hero-search-container">
+                <div class="search-wrapper">
+                    <div class="search-inner">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="heroSearchInput" placeholder="Buscar fotografías, lugares, años o autores...">
+                    </div>
+                    <button class="search-btn" id="heroSearchBtn">Buscar</button>
                 </div>
-                <button class="search-btn">Buscar</button>
+                <div class="hero-search-dropdown" id="heroDropdown"></div>
             </div>
         </div>
     </section>
@@ -580,13 +600,16 @@
                 base = photosByCategory[catName] || [];
             }
 
-            const q = document.getElementById('contentSearchInput')?.value?.toLowerCase().trim();
+            const rawQ = document.getElementById('contentSearchInput')?.value?.trim();
+            const q = rawQ ? (rawQ).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') : '';
             if (q) {
+                const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
                 base = base.filter(p =>
-                    (p.title || '').toLowerCase().includes(q) ||
-                    (p.photographer || '').toLowerCase().includes(q) ||
-                    (p.description || '').toLowerCase().includes(q) ||
-                    (p.location || '').toLowerCase().includes(q)
+                    norm(p.title).includes(q) ||
+                    norm(p.photographer).includes(q) ||
+                    norm(p.description).includes(q) ||
+                    norm(p.location).includes(q) ||
+                    norm(String(p.year)).includes(q)
                 );
             }
             return base;
@@ -613,24 +636,24 @@
 
             if (state.activeTab === 'Fotógrafos') {
                 grid.innerHTML = items.map(p => `
-                    <div class="photo-card">
+                    <div class="photo-card" onclick="window.location.href='/fototeca/fotografos/${p.id}';sessionStorage.setItem('fototeca_tab','Fotógrafos')" style="cursor:pointer;">
                         <div class="photo-image-container" style="background:#111;">
                             ${p.photo_path
                                 ? `<img src="${p.photo_path}" alt="${p.full_name}" class="photo-image" onerror="this.style.display='none'">`
                                 : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-user" style="font-size:3rem;color:#555;"></i></div>`}
-                            <div class="photo-badge">${p.photos_count} fotos</div>
+                            <div class="photo-badge">${p.photos_count} foto${p.photos_count !== 1 ? 's' : ''}</div>
                             <div class="photo-overlay">
-                                <a href="/fototeca/fotografos/${p.id}" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')"
-                                   class="photo-overlay-btn"><i class="fas fa-user"></i> Ver Perfil</a>
+                                <a href="/fototeca/fotografos/${p.id}" onclick="event.stopPropagation();sessionStorage.setItem('fototeca_tab','Fotógrafos')"
+                                   class="photo-overlay-btn" style="font-size:0.85rem;padding:0.65rem 1.75rem;"><i class="fas fa-user"></i> Ver Perfil</a>
                             </div>
                         </div>
-                        <div class="photo-title">${p.full_name}</div>
-                        <div class="photo-meta"><span>${p.biography ? p.biography.slice(0, 80) + '…' : 'Sin biografía'}</span></div>
-                        <div style="padding:0.5rem 0 0.25rem;">
-                            <a href="/fototeca/fotografos/${p.id}" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')"
-                               style="font-size:0.8rem;font-weight:700;color:black;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid black;padding-bottom:1px;transition:opacity 0.2s;"
+                        <div class="photo-title" style="font-size:1rem;font-weight:700;">${p.full_name}</div>
+                        <div class="photo-meta"><span>${p.biography ? p.biography.slice(0, 90) + '…' : 'Sin biografía'}</span></div>
+                        <div style="padding:0.5rem 0 0.75rem;">
+                            <a href="/fototeca/fotografos/${p.id}" onclick="event.stopPropagation();sessionStorage.setItem('fototeca_tab','Fotógrafos')"
+                               style="font-size:0.85rem;font-weight:700;color:black;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid black;padding-bottom:2px;transition:opacity 0.2s;"
                                onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'">
-                                Más información →
+                                Ver Perfil →
                             </a>
                         </div>
                     </div>
@@ -937,23 +960,125 @@
         });
 
         // ========== BÚSQUEDA HERO ==========
-        document.getElementById('heroSearchInput')?.addEventListener('keydown', e => {
-            if (e.key === 'Enter') {
-                const q = e.target.value.trim();
-                if (q) {
-                    showSection('Galería');
-                    document.getElementById('contentSearchInput').value = q;
-                    renderPhotos();
-                }
+        const heroInput    = document.getElementById('heroSearchInput');
+        const heroDropdown = document.getElementById('heroDropdown');
+        const heroBtn      = document.getElementById('heroSearchBtn');
+
+        function normalizeStr(s) {
+            return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
+
+        function renderHeroDropdown(q) {
+            if (!q) { heroDropdown.classList.remove('open'); return; }
+            const nq = normalizeStr(q);
+
+            const allPhotos = Object.values(photosByCategory).flat();
+            const seen = new Set();
+            const unique = allPhotos.filter(p => { if (seen.has(p.id)) return false; seen.add(p.id); return true; });
+
+            const matchPhotos = unique.filter(p =>
+                normalizeStr(p.title).includes(nq) ||
+                normalizeStr(p.photographer).includes(nq) ||
+                normalizeStr(p.description).includes(nq) ||
+                normalizeStr(p.location).includes(nq) ||
+                normalizeStr(String(p.year)).includes(nq)
+            ).slice(0, 5);
+
+            const matchPhotographers = photographersData.filter(p =>
+                normalizeStr(p.full_name).includes(nq) ||
+                normalizeStr(p.biography).includes(nq)
+            ).slice(0, 3);
+
+            const total = matchPhotos.length + matchPhotographers.length;
+
+            if (total === 0) {
+                heroDropdown.innerHTML = `<div class="hsd-empty">Sin resultados para "<strong>${q}</strong>"</div>`;
+                heroDropdown.classList.add('open');
+                return;
             }
-        });
-        document.querySelector('.search-btn')?.addEventListener('click', () => {
-            const q = document.getElementById('heroSearchInput').value.trim();
+
+            let html = '';
+
+            if (matchPhotos.length) {
+                html += `<div class="hsd-section-label">Fotografías</div>`;
+                html += matchPhotos.map(p => `
+                    <div class="hsd-item" data-action="photo" data-id="${p.id}">
+                        <div class="hsd-thumb">
+                            ${p.image_url ? `<img src="${p.image_url}" alt="" onerror="this.style.display='none'">` : '<i class="fas fa-image" style="color:rgba(255,255,255,0.5);font-size:0.9rem;"></i>'}
+                        </div>
+                        <div class="hsd-info">
+                            <div class="hsd-title">${p.title}</div>
+                            <div class="hsd-sub">${p.photographer}${p.year && p.year !== 'S/F' ? ' · ' + p.year : ''}</div>
+                        </div>
+                        <span class="hsd-badge">Foto</span>
+                    </div>`).join('');
+            }
+
+            if (matchPhotographers.length) {
+                html += `<div class="hsd-section-label">Fotógrafos</div>`;
+                html += matchPhotographers.map(p => `
+                    <a class="hsd-item" href="/fototeca/fotografos/${p.id}">
+                        <div class="hsd-thumb">
+                            ${p.photo_path ? `<img src="${p.photo_path}" alt="" onerror="this.style.display='none'">` : '<i class="fas fa-user" style="color:rgba(255,255,255,0.5);font-size:0.9rem;"></i>'}
+                        </div>
+                        <div class="hsd-info">
+                            <div class="hsd-title">${p.full_name}</div>
+                            <div class="hsd-sub">${p.photos_count} foto${p.photos_count !== 1 ? 's' : ''}</div>
+                        </div>
+                        <span class="hsd-badge">Fotógrafo</span>
+                    </a>`).join('');
+            }
+
+            html += `<button class="hsd-all-btn" id="hsdAllBtn">Ver todos los resultados para "${q}" →</button>`;
+
+            heroDropdown.innerHTML = html;
+            heroDropdown.classList.add('open');
+
+            heroDropdown.querySelectorAll('.hsd-item[data-action="photo"]').forEach(el => {
+                el.addEventListener('click', () => {
+                    const id = parseInt(el.dataset.id);
+                    const allFlat = Object.values(photosByCategory).flat();
+                    const item = allFlat.find(p => p.id === id);
+                    if (!item) return;
+                    heroDropdown.classList.remove('open');
+                    heroInput.value = '';
+                    closeMobileSidebar();
+                    showSection('Galería');
+                    showDetailView(item);
+                });
+            });
+
+            document.getElementById('hsdAllBtn')?.addEventListener('click', () => {
+                heroDropdown.classList.remove('open');
+                closeMobileSidebar();
+                showSection('Galería');
+                const ci = document.getElementById('contentSearchInput');
+                ci.value = q;
+                ci.dispatchEvent(new Event('input'));
+            });
+        }
+
+        heroInput.addEventListener('input', () => renderHeroDropdown(heroInput.value.trim()));
+
+        heroBtn.addEventListener('click', () => {
+            const q = heroInput.value.trim();
+            heroDropdown.classList.remove('open');
             closeMobileSidebar();
             showSection('Galería');
             if (q) {
-                document.getElementById('contentSearchInput').value = q;
-                renderPhotos();
+                const ci = document.getElementById('contentSearchInput');
+                ci.value = q;
+                ci.dispatchEvent(new Event('input'));
+            }
+        });
+
+        heroInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') heroBtn.click();
+        });
+
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.hero-search-container')) {
+                heroDropdown.classList.remove('open');
             }
         });
 

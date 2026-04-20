@@ -74,7 +74,10 @@ class FototecaController extends Controller
             'external_url' => $request->source_type === 'external' ? $request->external_url : null,
         ];
 
-        if ($request->hasFile('image_file')) {
+        if ($request->source_type === 'external') {
+            $data['full_image_path'] = null;
+            $data['thumbnail_path']  = null;
+        } elseif ($request->hasFile('image_file')) {
             $path = $request->file('image_file')->store('photos', 'public');
             $data['full_image_path'] = $path;
             $data['thumbnail_path']  = $path;
@@ -126,7 +129,10 @@ class FototecaController extends Controller
             'external_url' => $request->source_type === 'external' ? $request->external_url : null,
         ];
 
-        if ($request->hasFile('image_file')) {
+        if ($request->source_type === 'external') {
+            $data['full_image_path'] = null;
+            $data['thumbnail_path']  = null;
+        } elseif ($request->hasFile('image_file')) {
             $path = $request->file('image_file')->store('photos', 'public');
             $data['full_image_path'] = $path;
             $data['thumbnail_path']  = $path;

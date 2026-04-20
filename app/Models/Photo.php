@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Storage;
 
 class Photo extends Model
 {
@@ -32,6 +33,24 @@ class Photo extends Model
     protected $casts = [
         'is_special' => 'boolean',
     ];
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if ($this->source_type === 'external') {
+            return $this->external_url ?: null;
+        }
+        $path = $this->full_image_path ?? $this->thumbnail_path;
+        return $path ? Storage::url($path) : null;
+    }
+
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        if ($this->source_type === 'external') {
+            return $this->external_url ?: null;
+        }
+        $path = $this->thumbnail_path ?? $this->full_image_path;
+        return $path ? Storage::url($path) : null;
+    }
 
     public function photographers(): BelongsToMany
     {

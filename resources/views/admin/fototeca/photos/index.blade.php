@@ -50,15 +50,10 @@
                     @forelse($photos as $photo)
                     <tr class="hover:bg-slate-50 group photo-row">
                         <td class="py-3 px-4">
-                            @if($photo->thumbnail_path)
-                                <img src="{{ Storage::url($photo->thumbnail_path) }}" alt="{{ $photo->title }}"
+                            @if($photo->thumbnail_url)
+                                <img src="{{ $photo->thumbnail_url }}" alt="{{ $photo->title }}"
                                     class="w-14 h-10 object-cover rounded-md shadow cursor-zoom-in hover:opacity-80 transition-opacity"
-                                    onclick="openLightbox('{{ Storage::url($photo->full_image_path ?? $photo->thumbnail_path) }}', '{{ addslashes($photo->title) }}')"
-                                    onerror="this.style.display='none'">
-                            @elseif($photo->external_url)
-                                <img src="{{ $photo->external_url }}" alt="{{ $photo->title }}"
-                                    class="w-14 h-10 object-cover rounded-md shadow cursor-zoom-in hover:opacity-80 transition-opacity"
-                                    onclick="openLightbox('{{ $photo->external_url }}', '{{ addslashes($photo->title) }}')"
+                                    onclick="openLightbox('{{ $photo->image_url }}', '{{ addslashes($photo->title) }}')"
                                     onerror="this.style.display='none'">
                             @else
                                 <div class="w-14 h-10 bg-blue-100 rounded-md flex items-center justify-center text-blue-400 text-xl">📷</div>

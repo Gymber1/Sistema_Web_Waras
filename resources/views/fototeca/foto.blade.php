@@ -10,24 +10,30 @@
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         html,body{font-family:'Poppins',sans-serif;color:#333;line-height:1.6;background:#f5f5f7}
+        body{min-height:100vh;display:flex;flex-direction:column}
         :root{--primary:#111;--accent:#E53935}
-        .header{position:fixed;top:0;width:100%;z-index:1000;background:rgba(0,0,0,.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.1);padding:.5rem 2rem}
+        .header{position:fixed;top:0;width:100%;z-index:1000;background:rgba(0,0,0,.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.1);padding:.5rem 2rem;transition:all .3s ease}
         .header-container{max-width:1600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
         .logo{display:flex;align-items:center;gap:.75rem;text-decoration:none;color:white;background:none;border:none;cursor:pointer}
         .logo-icon{width:32px;height:32px;border:2px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .3s}
         .logo:hover .logo-icon{transform:scale(1.1)}
+        .logo-text{display:flex;align-items:center;gap:.5rem}
         .logo-main{font-size:1.25rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
         .logo-sub{font-size:1.25rem;font-weight:300;color:#9ca3af}
         .nav-menu{display:flex;gap:2rem;list-style:none}
-        .nav-item{color:#9ca3af;font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;text-decoration:none;padding:.5rem 0;border-bottom:2px solid transparent;transition:color .3s}
+        .nav-item{background:none;border:none;color:#9ca3af;cursor:pointer;font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;text-decoration:none;padding:.5rem 0;border-bottom:2px solid transparent;transition:color .3s ease}
         .nav-item:hover{color:white}.nav-item.active{color:white;border-bottom-color:white}
+        .header-actions{display:flex;align-items:center;gap:.625rem;margin-left:1.5rem}
+        .header-btn{display:inline-flex;align-items:center;gap:.4rem;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.45rem 1rem;border-radius:.25rem;text-decoration:none;transition:all .2s;white-space:nowrap}
+        .header-btn-outline{color:#9ca3af;border:1px solid rgba(255,255,255,.2)}.header-btn-outline:hover{background:rgba(255,255,255,.08);color:white;border-color:rgba(255,255,255,.4)}
+        .header-btn-solid{background:white;color:black;border:1px solid white}.header-btn-solid:hover{background:#e5e7eb;border-color:#e5e7eb}
         .hamburger-btn{display:none;background:none;border:none;cursor:pointer;color:white;padding:.5rem;min-width:44px;min-height:44px;align-items:center;justify-content:center}
         .mobile-nav{display:none;position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:2000;flex-direction:column;align-items:center;justify-content:center;gap:2rem}
         .mobile-nav.open{display:flex}
         .mobile-nav-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;color:white;cursor:pointer;font-size:1.5rem;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
-        .mobile-nav-item{color:white;text-decoration:none;font-size:1.3rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;min-height:44px;display:flex;align-items:center}
-        @media(max-width:768px){.nav-menu{display:none}.hamburger-btn{display:flex}.page-body{padding:5rem 1rem 3rem}.photo-panel{min-height:250px}}
-        .page-body{max-width:1100px;margin:0 auto;padding:5.5rem 1.5rem 4rem}
+        .mobile-nav-item{color:white;text-decoration:none;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;min-height:44px;display:flex;align-items:center}
+        @media(max-width:768px){.nav-menu{display:none}.header-actions{display:none}.hamburger-btn{display:flex}.page-body{padding:5rem 1rem 3rem}.photo-panel{min-height:250px}}
+        .page-body{max-width:1100px;margin:0 auto;padding:5.5rem 1.5rem 4rem;flex:1}
         .back-btn{display:inline-flex;align-items:center;gap:.5rem;background:white;border:1px solid #e5e7eb;color:#374151;font-size:.875rem;font-weight:600;padding:.5rem 1rem;border-radius:.375rem;margin-bottom:1.75rem;transition:all .2s;text-decoration:none}
         .back-btn:hover{background:black;color:white;border-color:black}
         .breadcrumbs{display:flex;align-items:center;gap:.5rem;font-size:.825rem;color:#9ca3af;margin-bottom:2rem}
@@ -41,6 +47,7 @@
         .photo-badge{background:#f3f4f6;color:#374151;padding:.25rem .75rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;display:inline-block;width:fit-content;margin-bottom:1rem}
         .photo-title{font-size:1.75rem;font-weight:800;color:black;letter-spacing:-.5px;margin-bottom:1rem;line-height:1.2}
         .photographer-line{display:flex;align-items:center;gap:.5rem;color:#4b5563;font-size:.95rem;font-weight:500;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid #e5e7eb}
+        .photographer-link{color:#4b5563;text-decoration:none;font-weight:600}.photographer-link:hover{color:black;text-decoration:underline}
         .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.75rem}
         .meta-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:.2rem}
         .meta-value{font-size:.875rem;color:#374151;font-weight:500;display:flex;align-items:center;gap:.4rem}
@@ -59,26 +66,43 @@
 <body>
 <div class="mobile-nav" id="mobileNav">
     <button class="mobile-nav-close" onclick="document.getElementById('mobileNav').classList.remove('open');document.body.style.overflow=''"><i class="fas fa-times"></i></button>
-    <a href="{{ route('fototeca.dashboard') }}" class="mobile-nav-item">Inicio</a>
-    <a href="{{ route('fototeca.galeria.index') }}" class="mobile-nav-item">Galería</a>
-    <a href="{{ route('fototeca.fotografos.index') }}" class="mobile-nav-item">Fotógrafos</a>
-    <a href="{{ route('fototeca.especiales.index') }}" class="mobile-nav-item">Especiales</a>
+    <a href="{{ route('fototeca.inicio') }}" class="mobile-nav-item" onclick="sessionStorage.setItem('fototeca_tab','Inicio')">Inicio</a>
+    <a href="{{ route('fototeca.galeria.index') }}" class="mobile-nav-item" onclick="sessionStorage.setItem('fototeca_tab','Galería')">Galería</a>
+    <a href="{{ route('fototeca.fotografos.index') }}" class="mobile-nav-item" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')">Fotógrafos</a>
+    <a href="{{ route('fototeca.especiales.index') }}" class="mobile-nav-item" onclick="sessionStorage.setItem('fototeca_tab','Especiales')">Especiales</a>
+    <a href="{{ route('fototeca.aportantes.index') }}" class="mobile-nav-item" onclick="sessionStorage.setItem('fototeca_tab','Aportantes')">Aportantes</a>
+    <a href="{{ route('home') }}" class="mobile-nav-item" style="font-size:1rem;color:#9ca3af">Portal Principal</a>
 </div>
-<header class="header">
+<header class="header" id="header">
     <div class="header-container">
-        <a href="{{ route('fototeca.dashboard') }}" class="logo">
+        <a href="{{ route('fototeca.inicio') }}" class="logo">
             <div class="logo-icon"><i class="fas fa-camera"></i></div>
-            <div style="display:flex;align-items:center;gap:.5rem">
+            <div class="logo-text">
                 <span class="logo-main">Fototeca</span>
                 <span class="logo-sub">Ancashina</span>
             </div>
         </a>
-        <nav><ul class="nav-menu">
-            <li><a href="{{ route('fototeca.dashboard') }}" class="nav-item">Inicio</a></li>
-            <li><a href="{{ route('fototeca.galeria.index') }}" class="nav-item active">Galería</a></li>
-            <li><a href="{{ route('fototeca.fotografos.index') }}" class="nav-item">Fotógrafos</a></li>
-            <li><a href="{{ route('fototeca.especiales.index') }}" class="nav-item">Especiales</a></li>
-        </ul></nav>
+        <nav>
+            <div class="nav-menu">
+                <a href="{{ route('fototeca.inicio') }}" class="nav-item" onclick="sessionStorage.setItem('fototeca_tab','Inicio')">Inicio</a>
+                <a href="{{ route('fototeca.galeria.index') }}" class="nav-item active" onclick="sessionStorage.setItem('fototeca_tab','Galería')">Galería</a>
+                <a href="{{ route('fototeca.fotografos.index') }}" class="nav-item" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')">Fotógrafos</a>
+                <a href="{{ route('fototeca.especiales.index') }}" class="nav-item" onclick="sessionStorage.setItem('fototeca_tab','Especiales')">Especiales</a>
+                <a href="{{ route('fototeca.aportantes.index') }}" class="nav-item" onclick="sessionStorage.setItem('fototeca_tab','Aportantes')">Aportantes</a>
+            </div>
+        </nav>
+        <div class="header-actions">
+            <a href="{{ route('home') }}" class="header-btn header-btn-outline">
+                <i class="fas fa-home"></i> Portal Principal
+            </a>
+            @auth
+                @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca'))
+                <a href="{{ route('admin.dashboard') }}" class="header-btn header-btn-solid">
+                    <i class="fas fa-th-large"></i> Panel
+                </a>
+                @endif
+            @endauth
+        </div>
         <button class="hamburger-btn" onclick="document.getElementById('mobileNav').classList.add('open');document.body.style.overflow='hidden'" aria-label="Menú">
             <i class="fas fa-bars" style="font-size:1.3rem"></i>
         </button>
@@ -97,8 +121,8 @@
 
     <div class="detail-layout">
         <div class="photo-panel">
-            @if($photo->full_image_path || $photo->thumbnail_path)
-                <img src="{{ Storage::url($photo->full_image_path ?? $photo->thumbnail_path) }}"
+            @if($photo->image_url)
+                <img src="{{ $photo->image_url }}"
                      alt="{{ $photo->title }}" class="main-photo"
                      onerror="this.style.display='none'">
             @else
@@ -113,7 +137,12 @@
             @if($photo->photographers->count())
             <div class="photographer-line">
                 <i class="fas fa-user-circle"></i>
-                <span>{{ $photo->photographers->map->full_name->join(', ') }}</span>
+                <span>
+                    @foreach($photo->photographers as $i => $photographer)
+                        @if($i > 0), @endif
+                        <a href="{{ route('fototeca.fotografos.show', $photographer) }}" class="photographer-link">{{ $photographer->full_name }}</a>
+                    @endforeach
+                </span>
             </div>
             @endif
 

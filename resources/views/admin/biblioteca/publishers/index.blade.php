@@ -37,6 +37,7 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50/80 border-b border-slate-200">
+                        <th class="py-4 px-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Logo</th>
                         <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Nombre</th>
                         <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Libros</th>
                         <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Email</th>
@@ -48,7 +49,7 @@
 
                     {{-- Fila nueva editorial --}}
                     <tr id="new-pub-row" class="hidden bg-emerald-50/60 border-b-2 border-emerald-200">
-                        <td colspan="5" class="py-4 px-6">
+                        <td colspan="6" class="py-4 px-6">
                             <form action="{{ route('admin.biblioteca.publishers.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
@@ -84,6 +85,16 @@
                     @forelse($publishers as $pub)
                     {{-- Fila vista --}}
                     <tr id="view-pub-{{ $pub->id }}" class="hover:bg-slate-50 group pub-row transition-opacity">
+                        <td class="py-3 px-4">
+                            @if($pub->logo_path)
+                                <img src="{{ Storage::url($pub->logo_path) }}" alt="{{ $pub->name }}"
+                                    class="w-10 h-10 rounded object-contain bg-white border border-slate-200 cursor-zoom-in hover:opacity-80 transition-opacity"
+                                    onclick="openLightbox('{{ Storage::url($pub->logo_path) }}', '{{ addslashes($pub->name) }}')"
+                                    onerror="this.style.display='none'">
+                            @else
+                                <div class="w-10 h-10 bg-emerald-50 rounded border border-slate-200 flex items-center justify-center text-emerald-400 text-lg">🏢</div>
+                            @endif
+                        </td>
                         <td class="py-3 px-6 text-sm font-semibold text-slate-800 pub-name">{{ $pub->name }}</td>
                         <td class="py-3 px-6 text-sm text-slate-600">{{ $pub->books_count }}</td>
                         <td class="py-3 px-6 text-sm text-slate-600">{{ $pub->email ?? '—' }}</td>
@@ -105,7 +116,7 @@
                     </tr>
                     {{-- Fila edición inline --}}
                     <tr id="edit-pub-{{ $pub->id }}" class="hidden bg-amber-50/40 border-l-4 border-amber-400">
-                        <td colspan="5" class="py-4 px-6">
+                        <td colspan="6" class="py-4 px-6">
                             <form action="{{ route('admin.biblioteca.publishers.update', $pub) }}" method="POST" enctype="multipart/form-data">
                                 @csrf @method('PUT')
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
@@ -153,7 +164,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="5" class="py-16 text-center text-slate-400">No hay editoriales registradas.</td></tr>
+                    <tr><td colspan="6" class="py-16 text-center text-slate-400">No hay editoriales registradas.</td></tr>
                     @endforelse
 
                 </tbody>
@@ -192,5 +203,38 @@ document.getElementById('search-input').addEventListener('input', function() {
         row.style.display = row.querySelector('.pub-name').textContent.toLowerCase().includes(q) ? '' : 'none';
     });
 });
+
+function openLightbox(src, title) {
+    const lb = document.getElementById('pub-lightbox');
+    document.getElementById('lb-img').src = src;
+    document.getElementById('lb-title').textContent = title;
+    document.getElementById('lb-link').href = src;
+    lb.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+    document.getElementById('pub-lightbox').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 </script>
+
+{{-- Lightbox modal --}}
+<div id="pub-lightbox" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onclick="closeLightbox()">
+    <div class="relative max-w-3xl w-full mx-4" onclick="event.stopPropagation()">
+        <div class="flex items-center justify-between mb-3 px-1">
+            <span id="lb-title" class="text-white font-bold text-sm truncate"></span>
+            <div class="flex items-center gap-3">
+                <a id="lb-link" href="#" target="_blank" rel="noopener"
+                   class="text-xs text-slate-300 hover:text-white font-semibold border border-slate-500 hover:border-white px-3 py-1 rounded-lg transition-colors">
+                    Ver original
+                </a>
+                <button onclick="closeLightbox()" class="text-slate-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </div>
+        <img id="lb-img" src="" alt="" class="max-h-[80vh] mx-auto rounded-xl shadow-2xl object-contain bg-white/5">
+    </div>
+</div>
 @endsection

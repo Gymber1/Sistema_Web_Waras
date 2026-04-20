@@ -31,10 +31,10 @@
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 space-y-6">
 
             {{-- Vista previa imagen actual --}}
-            @if($photo->full_image_path)
+            @if($photo->image_url)
             <div class="flex items-start gap-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                <img src="{{ Storage::url($photo->full_image_path) }}" class="w-20 h-20 object-cover rounded-xl border border-blue-200 flex-shrink-0 cursor-zoom-in"
-                    onclick="openLightbox('{{ Storage::url($photo->full_image_path) }}', '{{ addslashes($photo->title) }}')"
+                <img src="{{ $photo->image_url }}" class="w-20 h-20 object-cover rounded-xl border border-blue-200 flex-shrink-0 cursor-zoom-in"
+                    onclick="openLightbox('{{ $photo->image_url }}', '{{ addslashes($photo->title) }}')"
                     onerror="this.style.display='none'">
                 <div>
                     <p class="text-sm font-bold text-blue-700">Imagen actual cargada</p>

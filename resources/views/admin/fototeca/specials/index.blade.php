@@ -45,8 +45,8 @@
                     <tr class="hover:bg-slate-50 transition-colors" data-name="{{ strtolower($photo->title) }}">
                         {{-- Miniatura horizontal --}}
                         <td class="py-3 px-6">
-                            @if($photo->thumbnail_path || $photo->full_image_path)
-                                <img src="{{ Storage::url($photo->thumbnail_path ?? $photo->full_image_path) }}"
+                            @if($photo->thumbnail_url)
+                                <img src="{{ $photo->thumbnail_url }}"
                                      alt="{{ $photo->title }}"
                                      class="w-24 h-16 object-cover rounded-lg border border-slate-100">
                             @else
