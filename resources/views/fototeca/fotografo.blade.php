@@ -417,11 +417,9 @@
         <a href="{{ route('fototeca.fotografos.index') }}" class="g-nav-link active" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')">Fotógrafos</a>
         <a href="{{ route('fototeca.especiales.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Especiales')">Especiales</a>
         <a href="{{ route('fototeca.aportantes.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Aportantes')">Aportantes</a>
-    </div>
-    <div class="g-nav-actions">
         <a href="{{ route('home') }}" class="g-nav-btn">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-            Portal
+            Portal Principal
         </a>
         @auth
             @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca'))

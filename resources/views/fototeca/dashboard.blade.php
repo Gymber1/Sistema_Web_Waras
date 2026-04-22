@@ -86,6 +86,7 @@
             display: flex;
             gap: 2rem;
             align-items: center;
+            margin: 0 auto;
         }
         .global-nav-links a, .global-nav-links button {
             color: var(--text-muted);
@@ -360,6 +361,131 @@
             transition: background 0.15s;
         }
         .hsd-all-btn:hover { background: rgba(201,149,106,0.1); color: var(--text-accent); }
+
+        /* ── INICIO SECTION ─────────────────────────────────────────── */
+        .inicio-section { background: var(--bg-page); }
+        .inicio-section.hidden { display: none !important; }
+
+        .stats-bar {
+            background: #111111;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            border-bottom: 1px solid var(--border-line);
+        }
+        .stat-item {
+            padding: 2.2rem 1rem; text-align: center;
+            border-right: 1px solid var(--border-line);
+        }
+        .stat-item:last-child { border-right: none; }
+        .stat-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.6rem; font-weight: 700; color: var(--gold);
+            line-height: 1; display: block;
+        }
+        .stat-label {
+            font-size: .6rem; font-weight: 600; letter-spacing: .18em;
+            text-transform: uppercase; color: var(--text-muted); margin-top: .45rem; display: block;
+        }
+
+        .inicio-carousel-section { padding: 3.5rem 0; overflow: hidden; }
+        .inicio-carousel-section + .inicio-carousel-section { border-top: 1px solid var(--border-line); }
+        .inicio-carousel-header {
+            max-width: 1400px; margin: 0 auto 2rem; padding: 0 2rem;
+            display: flex; align-items: baseline; gap: 1rem;
+        }
+        .inicio-carousel-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem; color: var(--text-primary);
+        }
+        .inicio-carousel-count {
+            font-size: .75rem; color: var(--text-muted); font-weight: 500;
+        }
+        .inicio-carousel-track-wrap {
+            position: relative; width: 100%; overflow: hidden; padding: 1rem 0 1.5rem;
+        }
+        .inicio-carousel-track {
+            display: flex; align-items: stretch;
+            will-change: transform; transition: transform 600ms ease-in-out;
+        }
+        .inicio-carousel-controls {
+            max-width: 1400px; margin: 1rem auto 0; padding: 0 2rem;
+            display: flex; align-items: center; gap: 1rem;
+        }
+
+        /* Card de fotografía (carrusel) */
+        .ftc-carousel-card {
+            flex-shrink: 0; width: 180px; margin: 0 10px;
+            background: var(--bg-card); border-radius: 6px;
+            border: 1px solid var(--border-line);
+            cursor: pointer; overflow: hidden;
+            transform: translateZ(0);
+            transition: border-color .25s, box-shadow .25s;
+        }
+        .ftc-carousel-card:hover { border-color: var(--gold); box-shadow: 0 6px 20px rgba(0,0,0,.4); }
+        .ftc-card-cover {
+            width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block;
+            background: #111; filter: sepia(0.15);
+        }
+        .ftc-card-cover-placeholder {
+            width: 100%; aspect-ratio: 4/3;
+            background: #1a1a1a;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted); font-size: 2rem;
+        }
+        .ftc-card-body { padding: .6rem .8rem; }
+        .ftc-card-title {
+            font-size: .78rem; color: var(--text-primary); line-height: 1.35;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .ftc-card-sub { font-size: .65rem; color: var(--text-muted); margin-top: .25rem;
+            display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        /* Card de fotógrafo (carrusel) */
+        .ftc-author-card {
+            flex-shrink: 0; width: 150px; margin: 0 10px;
+            background: var(--bg-card); border-radius: 6px;
+            border: 1px solid var(--border-line);
+            cursor: pointer; overflow: hidden;
+            transform: translateZ(0);
+            transition: border-color .25s, box-shadow .25s;
+            text-align: center;
+        }
+        .ftc-author-card:hover { border-color: var(--gold); box-shadow: 0 6px 20px rgba(0,0,0,.4); }
+        .ftc-author-avatar {
+            width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block;
+            background: #111;
+        }
+        .ftc-author-placeholder {
+            width: 100%; aspect-ratio: 1/1;
+            background: #1a1a1a;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; color: var(--text-muted);
+        }
+        .ftc-author-body { padding: .65rem .75rem; }
+        .ftc-author-name {
+            font-size: .78rem; font-weight: 600; color: var(--text-primary);
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .ftc-author-count { font-size: .65rem; color: var(--text-muted); margin-top: .2rem; }
+
+        /* Controles carrusel */
+        .ico-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--gold); color: #000; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; font-weight: 700;
+            transition: background .2s, transform .15s;
+            box-shadow: 0 2px 8px rgba(197,166,109,.3);
+            flex-shrink: 0;
+        }
+        .ico-btn:hover { background: var(--gold-hover); transform: scale(1.08); }
+        .ico-dots { display: flex; gap: .5rem; align-items: center; }
+        .ico-dot {
+            height: 7px; border-radius: 4px;
+            background: #444; cursor: pointer;
+            transition: all .35s; width: 7px;
+        }
+        .ico-dot.active { background: var(--gold); width: 24px; }
 
         /* ── LAYOUT GALLERY ─────────────────────────────────────────── */
         .gallery-layout {
@@ -1079,6 +1205,75 @@
         </div>
     </section>
 
+    <!-- ── INICIO SECTION ────────────────────────────────────────── -->
+    <div class="inicio-section hidden" id="inicioSection">
+
+        <!-- Contadores -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-num">{{ $totalPhotos }}</span>
+                <span class="stat-label">Galería</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">{{ $totalPhotographers }}</span>
+                <span class="stat-label">Fotógrafos</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">{{ count($especialesData) }}</span>
+                <span class="stat-label">Especiales</span>
+            </div>
+        </div>
+
+        <!-- Carrusel: Galería -->
+        <div class="inicio-carousel-section">
+            <div class="inicio-carousel-header">
+                <h2 class="inicio-carousel-title">Galería</h2>
+                <span class="inicio-carousel-count">{{ $totalPhotos }} fotografías</span>
+            </div>
+            <div class="inicio-carousel-track-wrap">
+                <div class="inicio-carousel-track" id="trackGaleria"></div>
+            </div>
+            <div class="inicio-carousel-controls">
+                <button class="ico-btn" onclick="moveFtcCarousel('galeria',-1)">‹</button>
+                <div class="ico-dots" id="dotsGaleria"></div>
+                <button class="ico-btn" onclick="moveFtcCarousel('galeria',1)">›</button>
+            </div>
+        </div>
+
+        <!-- Carrusel: Fotógrafos -->
+        <div class="inicio-carousel-section">
+            <div class="inicio-carousel-header">
+                <h2 class="inicio-carousel-title">Fotógrafos</h2>
+                <span class="inicio-carousel-count">{{ $totalPhotographers }} registrados</span>
+            </div>
+            <div class="inicio-carousel-track-wrap">
+                <div class="inicio-carousel-track" id="trackFotografos"></div>
+            </div>
+            <div class="inicio-carousel-controls">
+                <button class="ico-btn" onclick="moveFtcCarousel('fotografos',-1)">‹</button>
+                <div class="ico-dots" id="dotsFotografos"></div>
+                <button class="ico-btn" onclick="moveFtcCarousel('fotografos',1)">›</button>
+            </div>
+        </div>
+
+        <!-- Carrusel: Especiales -->
+        <div class="inicio-carousel-section" style="padding-bottom:4rem;">
+            <div class="inicio-carousel-header">
+                <h2 class="inicio-carousel-title">Especiales</h2>
+                <span class="inicio-carousel-count">{{ count($especialesData) }} fotografías</span>
+            </div>
+            <div class="inicio-carousel-track-wrap">
+                <div class="inicio-carousel-track" id="trackEspeciales"></div>
+            </div>
+            <div class="inicio-carousel-controls">
+                <button class="ico-btn" onclick="moveFtcCarousel('especiales',-1)">‹</button>
+                <div class="ico-dots" id="dotsEspeciales"></div>
+                <button class="ico-btn" onclick="moveFtcCarousel('especiales',1)">›</button>
+            </div>
+        </div>
+
+    </div>
+
     <!-- ── SIDEBAR OVERLAY (móvil) ────────────────────────────────── -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
@@ -1525,6 +1720,7 @@
         // ── SECCIONES ────────────────────────────────────────────────
         function hideAllSections() {
             document.getElementById('heroSection').classList.add('hidden');
+            document.getElementById('inicioSection').classList.add('hidden');
             document.getElementById('galleryLayout').classList.add('hidden');
             document.getElementById('aportantesSection').style.display = 'none';
         }
@@ -1541,6 +1737,7 @@
                 document.getElementById('aportantesSection').style.display = 'block';
             } else if (tab === 'Inicio') {
                 document.getElementById('heroSection').classList.remove('hidden');
+                document.getElementById('inicioSection').classList.remove('hidden');
             } else {
                 const layout = document.getElementById('galleryLayout');
                 layout.classList.remove('hidden');
@@ -1752,6 +1949,181 @@
             });
         }
         window.toggleAportante = toggleAportante;
+
+        // ========== CARRUSELES DE INICIO ==========
+        (function() {
+            const CARD_W_PHOTO  = 180 + 20;
+            const CARD_W_AUTHOR = 150 + 20;
+
+            const rawGaleria    = Object.values(photosByCategory).flat().filter((p, i, a) => a.findIndex(x => x.id === p.id) === i);
+            const rawFotografos = photographersData;
+            const rawEspeciales = especialesData;
+
+            function photoCardHTML(photo) {
+                return `<div class="ftc-carousel-card" onclick="window.location.href='${photo.detail_url}'">
+                    ${photo.image_url
+                        ? `<img class="ftc-card-cover" src="${photo.image_url}" alt="${photo.title}" loading="lazy" onerror="this.style.display='none'">`
+                        : `<div class="ftc-card-cover-placeholder">📷</div>`}
+                    <div class="ftc-card-body">
+                        <p class="ftc-card-title">${photo.title}</p>
+                        <p class="ftc-card-sub">${photo.photographer}</p>
+                    </div>
+                </div>`;
+            }
+
+            function fotografoCardHTML(p) {
+                return `<div class="ftc-author-card" onclick="window.location.href='/fototeca/fotografos/${p.id}'">
+                    ${p.photo_path
+                        ? `<img class="ftc-author-avatar" src="${p.photo_path}" alt="${p.full_name}" loading="lazy" onerror="this.style.display='none'">`
+                        : `<div class="ftc-author-placeholder">👤</div>`}
+                    <div class="ftc-author-body">
+                        <p class="ftc-author-name">${p.full_name}</p>
+                        <p class="ftc-author-count">${p.photos_count} foto${p.photos_count !== 1 ? 's' : ''}</p>
+                    </div>
+                </div>`;
+            }
+
+            function especialCardHTML(photo) {
+                return `<div class="ftc-carousel-card" onclick="window.location.href='${photo.detail_url}'">
+                    ${photo.image_url
+                        ? `<img class="ftc-card-cover" src="${photo.image_url}" alt="${photo.title}" loading="lazy" onerror="this.style.display='none'">`
+                        : `<div class="ftc-card-cover-placeholder">⭐</div>`}
+                    <div class="ftc-card-body">
+                        <p class="ftc-card-title">${photo.title}</p>
+                        <p class="ftc-card-sub">${photo.photographer}</p>
+                    </div>
+                </div>`;
+            }
+
+            function shuffle(arr) {
+                const a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            function fillTo(base, minLen) {
+                let out = [];
+                while (out.length < minLen) out = out.concat(base);
+                return out;
+            }
+
+            function buildCarousel(trackId, dotsId, rawItems, cardFn, cardW) {
+                if (!rawItems.length) return null;
+                const track  = document.getElementById(trackId);
+                const dotsEl = document.getElementById(dotsId);
+                if (!track || !dotsEl) return null;
+
+                const base = shuffle(rawItems).slice(0, 20);
+                const n    = base.length;
+
+                const visibleCount = Math.ceil(window.innerWidth / cardW) + 2;
+                const minTotal     = visibleCount * 7;
+                const pool         = fillTo(base, minTotal);
+                const total        = pool.length;
+
+                track.innerHTML = pool.map(cardFn).join('');
+                track.style.gap = '0';
+
+                let current = Math.floor(total / 2);
+                current = Math.round(current / n) * n;
+                let busy = false;
+                let autoTimer;
+
+                dotsEl.innerHTML = '';
+                const dotCount = Math.min(n, 8);
+                for (let i = 0; i < dotCount; i++) {
+                    const d = document.createElement('div');
+                    d.className = 'ico-dot' + (i === 0 ? ' active' : '');
+                    const target = current + i;
+                    d.addEventListener('click', () => { if (!busy) go(target); });
+                    dotsEl.appendChild(d);
+                }
+
+                function applyTransform(animated) {
+                    track.style.transition = animated ? 'transform 500ms ease-in-out' : 'none';
+                    track.style.transform  = `translateX(${-current * cardW}px)`;
+                }
+
+                function updateDots() {
+                    dotsEl.querySelectorAll('.ico-dot').forEach((d, i) => {
+                        d.classList.toggle('active', i === ((current % n + n) % n));
+                    });
+                }
+
+                function go(next) {
+                    if (busy) return;
+                    busy = true;
+                    current = next;
+                    applyTransform(true);
+                    updateDots();
+                    setTimeout(() => {
+                        const safeZone = visibleCount * 2;
+                        if (current >= total - safeZone) {
+                            current -= Math.floor(total / 2 / n) * n;
+                            applyTransform(false);
+                            updateDots();
+                        } else if (current < safeZone) {
+                            current += Math.floor(total / 2 / n) * n;
+                            applyTransform(false);
+                            updateDots();
+                        }
+                        busy = false;
+                    }, 520);
+                }
+
+                function startAuto() {
+                    clearInterval(autoTimer);
+                    autoTimer = setInterval(() => { if (!busy) go(current + 1); }, 3500);
+                }
+
+                applyTransform(false);
+                updateDots();
+                startAuto();
+
+                return {
+                    go,
+                    startAuto,
+                    get current() { return current; },
+                    get autoTimer() { return autoTimer; }
+                };
+            }
+
+            const ftcCarousels = {};
+
+            function initCarousels() {
+                ftcCarousels.galeria    = buildCarousel('trackGaleria',    'dotsGaleria',    rawGaleria,    photoCardHTML,    CARD_W_PHOTO);
+                ftcCarousels.fotografos = buildCarousel('trackFotografos', 'dotsFotografos', rawFotografos, fotografoCardHTML, CARD_W_AUTHOR);
+                ftcCarousels.especiales = buildCarousel('trackEspeciales', 'dotsEspeciales', rawEspeciales, especialCardHTML, CARD_W_PHOTO);
+            }
+
+            window.moveFtcCarousel = function(name, dir) {
+                const c = ftcCarousels[name];
+                if (!c) return;
+                clearInterval(c.autoTimer);
+                c.go(c.current + dir);
+                c.startAuto();
+            };
+
+            let initialized = false;
+            const observer = new MutationObserver(() => {
+                const sec = document.getElementById('inicioSection');
+                if (sec && !sec.classList.contains('hidden') && !initialized) {
+                    initialized = true;
+                    initCarousels();
+                }
+            });
+            const sec = document.getElementById('inicioSection');
+            if (sec) observer.observe(sec, { attributes: true, attributeFilter: ['class'] });
+
+            if (sec && !sec.classList.contains('hidden')) {
+                initialized = true;
+                initCarousels();
+            }
+        })();
+        // ========== FIN CARRUSELES ==========
 
         // ── INICIO ───────────────────────────────────────────────────
         const validTabs = ['Inicio','Galería','Fotógrafos','Especiales','Aportantes'];

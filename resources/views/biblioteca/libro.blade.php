@@ -70,13 +70,19 @@
 
         .toast{display:none;font-size:.8rem;color:#6b7280;margin-top:.75rem}
 
+        .header-actions{display:flex;align-items:center;gap:.625rem;margin-left:1.5rem}
+        .header-btn{display:inline-flex;align-items:center;gap:.4rem;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.45rem 1rem;border-radius:.375rem;text-decoration:none;transition:all .2s;white-space:nowrap}
+        .header-btn-outline{color:#e2e8f0;border:1px solid rgba(255,255,255,.25)}
+        .header-btn-outline:hover{background:rgba(255,255,255,.1);color:var(--accent);border-color:var(--accent)}
+        .header-btn-solid{background:var(--accent);color:var(--primary);border:1px solid var(--accent)}
+        .header-btn-solid:hover{background:#b08d4b;border-color:#b08d4b}
         .hamburger-btn{display:none;background:none;border:none;cursor:pointer;color:white;padding:.5rem;min-width:44px;min-height:44px;align-items:center;justify-content:center}
         .mobile-nav{display:none;position:fixed;inset:0;background:rgba(27,42,71,.98);z-index:2000;flex-direction:column;align-items:center;justify-content:center;gap:1.75rem}
         .mobile-nav.open{display:flex}
         .mobile-nav-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;color:white;cursor:pointer;font-size:1.5rem;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
         .mobile-nav-item{color:white;text-decoration:none;font-size:1.3rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;min-height:44px;display:flex;align-items:center}
         @media(max-width:640px){.detail-card{flex-direction:column;align-items:center}.cover-box{width:160px}.cover-img,.cover-placeholder{width:160px}}
-        @media(max-width:1024px){.nav-menu{display:none}.hamburger-btn{display:flex}.page-body{padding:5.5rem 1rem 3rem}}
+        @media(max-width:1024px){.nav-menu{display:none}.hamburger-btn{display:flex}.header-actions{margin-left:0}.page-body{padding:5.5rem 1rem 3rem}}
     </style>
 </head>
 <body>
@@ -88,6 +94,8 @@
     <a href="{{ route('biblioteca.editoriales.index') }}" class="mobile-nav-item">Editoriales</a>
     <a href="{{ route('biblioteca.especiales.index') }}" class="mobile-nav-item">Especiales</a>
     <a href="{{ route('biblioteca.autores.index') }}" class="mobile-nav-item">Autores</a>
+    <a href="{{ route('biblioteca.aportantes.index') }}" class="mobile-nav-item">Aportantes</a>
+    <a href="{{ route('home') }}" class="mobile-nav-item" style="font-size:1rem;opacity:0.6">Portal Principal</a>
 </div>
 <header class="header">
     <div class="header-container">
@@ -107,7 +115,20 @@
             <a href="{{ route('biblioteca.editoriales.index') }}" class="nav-item">Editoriales</a>
             <a href="{{ route('biblioteca.especiales.index') }}" class="nav-item">Especiales</a>
             <a href="{{ route('biblioteca.autores.index') }}" class="nav-item">Autores</a>
+            <a href="{{ route('biblioteca.aportantes.index') }}" class="nav-item">Aportantes</a>
         </nav>
+        <div class="header-actions">
+            <a href="{{ route('home') }}" class="header-btn header-btn-outline">
+                <i class="fas fa-home"></i> Portal Principal
+            </a>
+            @auth
+                @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('biblioteca'))
+                <a href="{{ route('admin.dashboard') }}" class="header-btn header-btn-solid">
+                    <i class="fas fa-th-large"></i> Panel
+                </a>
+                @endif
+            @endauth
+        </div>
         <button class="hamburger-btn" onclick="document.getElementById('mobileNav').classList.add('open');document.body.style.overflow='hidden'" aria-label="Menú">
             <i class="fas fa-bars" style="font-size:1.3rem"></i>
         </button>

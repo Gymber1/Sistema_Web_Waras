@@ -7,7 +7,8 @@
       "Bash(php -r \"require 'vendor/autoload.php';\")",
       "Bash(php -r ' *)",
       "Bash(xargs ls *)",
-      "Bash(xargs grep *)"
+      "Bash(xargs grep *)",
+      "Bash(php -r \"require 'c:/Users/NITRO/Documents/Proyectos/Waras/vendor/autoload.php';\")"
     ]
   }
 }

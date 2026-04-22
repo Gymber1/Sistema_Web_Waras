@@ -2467,14 +2467,20 @@
         // Activar sección según la ruta visitada (definida por el servidor)
         const validTabs = ['Inicio','Libros','Revistas','Editoriales','Especiales','Autores','Aportantes'];
 
-        // Fallback sessionStorage para compatibilidad con páginas de detalle
-        const pendingTab = sessionStorage.getItem('biblioteca_tab');
-        if (pendingTab && validTabs.includes(pendingTab)) {
+        // serverActiveSection tiene prioridad cuando la URL apunta a una sección concreta.
+        // sessionStorage solo aplica cuando se llega al dashboard raíz (/biblioteca o /biblioteca/inicio).
+        const sectionTab = validTabs.includes(serverActiveSection) ? serverActiveSection : 'Inicio';
+        if (sectionTab !== 'Inicio') {
             sessionStorage.removeItem('biblioteca_tab');
-            if (pendingTab === 'Inicio') showHero(); else showSection(pendingTab);
+            showSection(sectionTab);
         } else {
-            const sectionTab = validTabs.includes(serverActiveSection) ? serverActiveSection : 'Inicio';
-            if (sectionTab === 'Inicio') showHero(); else showSection(sectionTab);
+            const pendingTab = sessionStorage.getItem('biblioteca_tab');
+            if (pendingTab && validTabs.includes(pendingTab)) {
+                sessionStorage.removeItem('biblioteca_tab');
+                if (pendingTab === 'Inicio') showHero(); else showSection(pendingTab);
+            } else {
+                showHero();
+            }
         }
 
         // ========== BÚSQUEDA ==========

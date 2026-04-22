@@ -250,6 +250,34 @@
         .btn-submit.loading .btn-inner { display: none; }
         .btn-submit.loading .spinner { display: block; }
 
+        /* Botón portal */
+        .portal-btn {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.5rem;
+            z-index: 100;
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            padding: .5rem 1.1rem;
+            background: #16a34a;
+            color: #fff;
+            font-family: inherit;
+            font-size: .78rem;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: .5rem;
+            letter-spacing: .04em;
+            transition: background .2s, transform .15s, box-shadow .2s;
+            box-shadow: 0 4px 16px rgba(22,163,74,.4);
+        }
+        .portal-btn:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(22,163,74,.5);
+        }
+        .portal-btn:active { transform: translateY(0); }
+
         /* Footer */
         .login-footer {
             text-align: center;
@@ -264,6 +292,11 @@
 <body>
     <div class="bg-layer"></div>
     <div class="bg-overlay"></div>
+
+    <a href="{{ route('home') }}" class="portal-btn">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Portal Principal
+    </a>
 
     <div class="wrapper">
         <!-- Logo -->
