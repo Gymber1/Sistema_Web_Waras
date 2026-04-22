@@ -327,6 +327,64 @@
             pointer-events: none;
         }
 
+        /* ── RELACIONADAS ── */
+        .related-section {
+            max-width: 1280px; margin: 0 auto; padding: 3.5rem 2rem 4rem;
+        }
+        .related-header {
+            display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;
+        }
+        .related-line { flex: 1; height: 1px; background: var(--border-line); }
+        .related-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; font-weight: 400; color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .related-card {
+            border-radius: 6px; overflow: hidden; cursor: pointer;
+            border: 1px solid var(--border-line);
+            background: var(--bg-card);
+            transition: border-color 0.25s ease;
+            text-decoration: none; display: block;
+            transform: translateZ(0);
+        }
+        .related-card:hover { border-color: var(--border-gold); }
+        .related-card-img-wrap {
+            position: relative; aspect-ratio: 4/3; overflow: hidden; background: #111;
+            transform: translateZ(0);
+        }
+        .related-card-img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.4s ease;
+            will-change: transform;
+        }
+        .related-card:hover .related-card-img { transform: scale(1.06); }
+        .related-card-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(10,10,10,0.85) 0%, transparent 55%);
+            opacity: 0; transition: opacity 0.25s ease;
+            display: flex; align-items: flex-end; padding: 0.75rem;
+            will-change: opacity;
+        }
+        .related-card:hover .related-card-overlay { opacity: 1; }
+        .related-card-year { font-size: 0.68rem; color: var(--gold); font-style: italic; }
+        .related-card-info { padding: 0.75rem 0.85rem; }
+        .related-card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.85rem; color: #fff; line-height: 1.3;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+            transition: color 0.2s;
+        }
+        .related-card:hover .related-card-title { color: var(--gold); }
+        .related-card-author {
+            font-size: 0.65rem; color: var(--text-muted); margin-top: 0.3rem;
+        }
+
         /* ── FOOTER ── */
         .g-footer {
             background: var(--bg-page);
@@ -527,6 +585,36 @@
     <img src="" alt="" class="lightbox-img" id="lightboxImg" draggable="false">
     <p class="lightbox-hint">Clic para ampliar · Esc para cerrar</p>
 </div>
+
+@if($related->count())
+<section class="related-section">
+    <div class="related-header">
+        <span class="related-line"></span>
+        <h2 class="related-title">Más del Archivo</h2>
+        <span class="related-line"></span>
+    </div>
+    <div class="related-grid">
+        @foreach($related as $rel)
+        <a href="{{ route('fototeca.galeria.show', $rel->id) }}" class="related-card">
+            <div class="related-card-img-wrap">
+                @if($rel->thumbnail_url || $rel->image_url)
+                    <img src="{{ $rel->thumbnail_url ?? $rel->image_url }}" alt="{{ $rel->title }}" class="related-card-img" loading="lazy">
+                @endif
+                <div class="related-card-overlay">
+                    <span class="related-card-year">{{ $rel->year ?? 'S/F' }}</span>
+                </div>
+            </div>
+            <div class="related-card-info">
+                <p class="related-card-title">{{ $rel->title }}</p>
+                @if($rel->photographers->first())
+                <p class="related-card-author">{{ $rel->photographers->first()->full_name }}</p>
+                @endif
+            </div>
+        </a>
+        @endforeach
+    </div>
+</section>
+@endif
 
 <footer class="g-footer">
     © 2024 FOTOTECA Digital Ancashina — Patrimonio Visual de la Región Ancash

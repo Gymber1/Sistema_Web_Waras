@@ -110,7 +110,28 @@ class FototecaController extends Controller
     public function showPhoto(\App\Models\Photo $photo)
     {
         $photo->load(['photographers', 'categories']);
-        return view('fototeca.foto', compact('photo'));
+
+        $catIds = $photo->categories->pluck('id');
+        $related = \App\Models\Photo::where('id', '!=', $photo->id)
+            ->when($catIds->isNotEmpty(), fn($q) =>
+                $q->whereHas('categories', fn($q2) => $q2->whereIn('categories.id', $catIds))
+            )
+            ->with(['photographers', 'categories'])
+            ->inRandomOrder()
+            ->limit(6)
+            ->get();
+
+        if ($related->count() < 4) {
+            $extra = \App\Models\Photo::where('id', '!=', $photo->id)
+                ->whereNotIn('id', $related->pluck('id'))
+                ->with(['photographers', 'categories'])
+                ->inRandomOrder()
+                ->limit(6 - $related->count())
+                ->get();
+            $related = $related->merge($extra);
+        }
+
+        return view('fototeca.foto', compact('photo', 'related'));
     }
 
     public function showEspecial(\App\Models\Special $special)

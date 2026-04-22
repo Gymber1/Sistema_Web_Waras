@@ -270,6 +270,139 @@
             box-shadow: 0 5px 15px rgba(197, 160, 89, 0.4);
         }
 
+        /* ── INICIO SECTION ── */
+        .inicio-section { background: #f9f8f6; }
+        .inicio-section.hidden { display: none !important; }
+
+        /* Contadores */
+        .stats-bar {
+            background: var(--primary-dark);
+            display: grid; grid-template-columns: repeat(5, 1fr);
+        }
+        .stat-item {
+            padding: 2.2rem 1rem; text-align: center;
+            border-right: 1px solid rgba(255,255,255,.07);
+        }
+        .stat-item:last-child { border-right: none; }
+        .stat-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.6rem; font-weight: 700; color: var(--accent);
+            line-height: 1; display: block;
+        }
+        .stat-label {
+            font-size: .6rem; font-weight: 600; letter-spacing: .18em;
+            text-transform: uppercase; color: rgba(255,255,255,.45); margin-top: .45rem; display: block;
+        }
+        @media(max-width: 768px) {
+            .stats-bar { grid-template-columns: repeat(3, 1fr); }
+            .stat-item:nth-child(4), .stat-item:nth-child(5) { border-top: 1px solid rgba(255,255,255,.07); }
+        }
+
+        /* Carruseles de inicio */
+        .inicio-carousel-section { padding: 3.5rem 0; overflow: hidden; }
+        .inicio-carousel-section + .inicio-carousel-section { border-top: 1px solid #e5e7eb; }
+        .inicio-carousel-header {
+            max-width: 1400px; margin: 0 auto 2rem; padding: 0 2rem;
+            display: flex; align-items: baseline; gap: 1rem;
+        }
+        .inicio-carousel-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem; color: var(--primary);
+        }
+        .inicio-carousel-count {
+            font-size: .75rem; color: #9ca3af; font-weight: 500;
+        }
+        .inicio-carousel-track-wrap {
+            position: relative; width: 100%; overflow: hidden; padding: 1rem 0 1.5rem;
+        }
+        .inicio-carousel-track {
+            display: flex; align-items: stretch;
+            will-change: transform; transition: transform 600ms ease-in-out;
+        }
+
+        /* Card de libro (carrusel) */
+        .bib-carousel-card {
+            flex-shrink: 0; width: 180px; margin: 0 10px;
+            background: white; border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0,0,0,.06);
+            cursor: pointer; overflow: hidden;
+            transform: translateZ(0);
+            transition: border-color .25s, box-shadow .25s;
+        }
+        .bib-carousel-card:hover { border-color: var(--accent); box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+        .bib-card-cover {
+            width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block;
+            background: #eee;
+        }
+        .bib-card-cover-placeholder {
+            width: 100%; aspect-ratio: 2/3;
+            background: linear-gradient(135deg, var(--primary) 0%, #2d4a6e 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,.3); font-size: 2rem;
+        }
+        .bib-card-body { padding: .7rem .8rem; }
+        .bib-card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: .8rem; color: #111; line-height: 1.35;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .bib-card-sub { font-size: .67rem; color: #9ca3af; margin-top: .3rem;
+            display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        /* Card de autor (carrusel) */
+        .bib-author-card {
+            flex-shrink: 0; width: 150px; margin: 0 10px;
+            background: white; border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0,0,0,.06);
+            cursor: pointer; overflow: hidden;
+            transform: translateZ(0);
+            transition: border-color .25s, box-shadow .25s;
+            text-align: center;
+        }
+        .bib-author-card:hover { border-color: var(--accent); box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+        .bib-author-avatar {
+            width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block;
+            background: #eee;
+        }
+        .bib-author-placeholder {
+            width: 100%; aspect-ratio: 1/1;
+            background: linear-gradient(135deg, #2d4a6e 0%, var(--primary) 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; color: rgba(255,255,255,.3);
+        }
+        .bib-author-body { padding: .65rem .75rem; }
+        .bib-author-name {
+            font-size: .78rem; font-weight: 600; color: #111;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .bib-author-nat { font-size: .65rem; color: #9ca3af; margin-top: .2rem; }
+
+        /* Controles carrusel */
+        .inicio-carousel-controls {
+            max-width: 1400px; margin: 1rem auto 0; padding: 0 2rem;
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .ico-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--accent); color: white; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; font-weight: 700;
+            transition: background .2s, transform .15s;
+            box-shadow: 0 2px 8px rgba(197,160,89,.3);
+            flex-shrink: 0;
+        }
+        .ico-btn:hover { background: var(--accent-hover); transform: scale(1.08); }
+        .ico-dots { display: flex; gap: .5rem; align-items: center; }
+        .ico-dot {
+            height: 7px; border-radius: 4px;
+            background: #cbd5e1; cursor: pointer;
+            transition: all .35s; width: 7px;
+        }
+        .ico-dot.active { background: var(--accent); width: 24px; }
+
         /* Hero search dropdown */
         .hero-search-container {
             position: relative;
@@ -1331,6 +1464,83 @@
         </div>
     </section>
 
+    <!-- INICIO SECTION -->
+    <div class="inicio-section hidden" id="inicioSection">
+
+        <!-- Contadores -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-num" id="statLibros">{{ $booksData['Libros'] ? count($booksData['Libros']) : 0 }}</span>
+                <span class="stat-label">Libros</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num" id="statRevistas">{{ $booksData['Revistas'] ? count($booksData['Revistas']) : 0 }}</span>
+                <span class="stat-label">Revistas</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">{{ $totalAuthors }}</span>
+                <span class="stat-label">Autores</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">{{ $totalPublishers }}</span>
+                <span class="stat-label">Editoriales</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">{{ $booksData['Especiales'] ? count($booksData['Especiales']) : 0 }}</span>
+                <span class="stat-label">Especiales</span>
+            </div>
+        </div>
+
+        <!-- Carrusel: Libros -->
+        <div class="inicio-carousel-section">
+            <div class="inicio-carousel-header">
+                <h2 class="inicio-carousel-title">Libros</h2>
+                <span class="inicio-carousel-count">{{ count($booksData['Libros']) }} títulos</span>
+            </div>
+            <div class="inicio-carousel-track-wrap">
+                <div class="inicio-carousel-track" id="trackLibros"></div>
+            </div>
+            <div class="inicio-carousel-controls">
+                <button class="ico-btn" onclick="moveCarousel('libros',-1)">‹</button>
+                <div class="ico-dots" id="dotsLibros"></div>
+                <button class="ico-btn" onclick="moveCarousel('libros',1)">›</button>
+            </div>
+        </div>
+
+        <!-- Carrusel: Autores -->
+        <div class="inicio-carousel-section">
+            <div class="inicio-carousel-header">
+                <h2 class="inicio-carousel-title">Autores</h2>
+                <span class="inicio-carousel-count">{{ $totalAuthors }} registrados</span>
+            </div>
+            <div class="inicio-carousel-track-wrap">
+                <div class="inicio-carousel-track" id="trackAutores"></div>
+            </div>
+            <div class="inicio-carousel-controls">
+                <button class="ico-btn" onclick="moveCarousel('autores',-1)">‹</button>
+                <div class="ico-dots" id="dotsAutores"></div>
+                <button class="ico-btn" onclick="moveCarousel('autores',1)">›</button>
+            </div>
+        </div>
+
+        <!-- Carrusel: Revistas -->
+        <div class="inicio-carousel-section" style="padding-bottom:4rem;">
+            <div class="inicio-carousel-header">
+                <h2 class="inicio-carousel-title">Revistas</h2>
+                <span class="inicio-carousel-count">{{ count($booksData['Revistas']) }} títulos</span>
+            </div>
+            <div class="inicio-carousel-track-wrap">
+                <div class="inicio-carousel-track" id="trackRevistas"></div>
+            </div>
+            <div class="inicio-carousel-controls">
+                <button class="ico-btn" onclick="moveCarousel('revistas',-1)">‹</button>
+                <div class="ico-dots" id="dotsRevistas"></div>
+                <button class="ico-btn" onclick="moveCarousel('revistas',1)">›</button>
+            </div>
+        </div>
+
+    </div>
+
     <!-- Mobile sidebar overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
 
@@ -2040,6 +2250,7 @@
 
         function hideAllSections() {
             document.getElementById('heroSection').classList.add('hidden');
+            document.getElementById('inicioSection').classList.add('hidden');
             document.getElementById('mainWrapper').classList.add('hidden');
             document.getElementById('detailView').classList.add('hidden');
             document.getElementById('aportantesSection').style.display = 'none';
@@ -2089,6 +2300,7 @@
 
             hideAllSections();
             document.getElementById('heroSection').classList.remove('hidden');
+            document.getElementById('inicioSection').classList.remove('hidden');
 
             updateNavigation();
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2572,6 +2784,207 @@
             document.getElementById('sidebarCloseBtn').style.display = 'none';
             document.body.style.overflow = '';
         }
+        window.openMobileSidebar  = openMobileSidebar;
+        window.closeMobileSidebar = closeMobileSidebar;
+
+        // ========== CARRUSELES DE INICIO ==========
+        (function() {
+            const CARD_W_BOOK   = 180 + 20;   // width + margin*2
+            const CARD_W_AUTHOR = 150 + 20;
+            const VISIBLE       = Math.floor(window.innerWidth / CARD_W_BOOK) + 2;
+
+            const rawLibros   = @json($booksData['Libros'] ?? []);
+            const rawAutores  = @json($booksData['Autores'] ?? []);
+            const rawRevistas = @json($booksData['Revistas'] ?? []);
+
+            const routes = {
+                libro:   '/biblioteca/libros/',
+                autor:   '/biblioteca/autores/',
+                revista: '/biblioteca/revistas/',
+            };
+
+            function bookCardHTML(book) {
+                const cover = book.cover_image_path ? `/storage/${book.cover_image_path}` : null;
+                const authors = (book.authors || []).map(a => a.name).join(', ') || 'Desconocido';
+                return `<div class="bib-carousel-card" onclick="window.location.href='${routes.libro}${book.id}'">
+                    ${cover
+                        ? `<img class="bib-card-cover" src="${cover}" alt="${book.title}" loading="lazy" onerror="this.style.display='none'">`
+                        : `<div class="bib-card-cover-placeholder">📚</div>`}
+                    <div class="bib-card-body">
+                        <p class="bib-card-title">${book.title}</p>
+                        <p class="bib-card-sub">${authors}</p>
+                    </div>
+                </div>`;
+            }
+
+            function authorCardHTML(author) {
+                const photo = author.photo_path ? `/storage/${author.photo_path}` : null;
+                return `<div class="bib-author-card" onclick="window.location.href='${routes.autor}${author.id}'">
+                    ${photo
+                        ? `<img class="bib-author-avatar" src="${photo}" alt="${author.name}" loading="lazy" onerror="this.style.display='none'">`
+                        : `<div class="bib-author-placeholder">👤</div>`}
+                    <div class="bib-author-body">
+                        <p class="bib-author-name">${author.name}</p>
+                        <p class="bib-author-nat">${author.nationality || ''}</p>
+                    </div>
+                </div>`;
+            }
+
+            function revistaCardHTML(book) {
+                const cover = book.cover_image_path ? `/storage/${book.cover_image_path}` : null;
+                const pub = book.publisher ? book.publisher.name : '';
+                return `<div class="bib-carousel-card" onclick="window.location.href='${routes.revista}${book.id}'">
+                    ${cover
+                        ? `<img class="bib-card-cover" src="${cover}" alt="${book.title}" loading="lazy" onerror="this.style.display='none'">`
+                        : `<div class="bib-card-cover-placeholder">📰</div>`}
+                    <div class="bib-card-body">
+                        <p class="bib-card-title">${book.title}</p>
+                        <p class="bib-card-sub">${pub}</p>
+                    </div>
+                </div>`;
+            }
+
+            // Mezcla aleatoria (Fisher-Yates)
+            function shuffle(arr) {
+                const a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            // Rellena hasta minLen repitiendo el array base
+            function fillTo(base, minLen) {
+                let out = [];
+                while (out.length < minLen) out = out.concat(base);
+                return out;
+            }
+
+            function buildCarousel(trackId, dotsId, rawItems, cardFn, cardW) {
+                if (!rawItems.length) return null;
+
+                const track  = document.getElementById(trackId);
+                const dotsEl = document.getElementById(dotsId);
+                if (!track || !dotsEl) return null;
+
+                // Máximo 20 al azar
+                const base = shuffle(rawItems).slice(0, 20);
+                const n    = base.length; // tamaño del "ciclo" para dots
+
+                // Necesitamos al menos: 3 pantallas llenas a cada lado + pantalla central
+                const visibleCount = Math.ceil(window.innerWidth / cardW) + 2;
+                const minTotal     = visibleCount * 7; // 7 pantallas de margen
+                const pool         = fillTo(base, minTotal);
+                const total        = pool.length;
+
+                track.innerHTML = pool.map(cardFn).join('');
+                track.style.gap = '0';
+
+                // Empezar en el centro del pool
+                let current  = Math.floor(total / 2);
+                // Ajustar al múltiplo de n más cercano al centro
+                current = Math.round(current / n) * n;
+                let busy     = false;
+                let autoTimer;
+
+                // Dots (máx 8)
+                dotsEl.innerHTML = '';
+                const dotCount = Math.min(n, 8);
+                for (let i = 0; i < dotCount; i++) {
+                    const d = document.createElement('div');
+                    d.className = 'ico-dot' + (i === 0 ? ' active' : '');
+                    const target = current + i;
+                    d.addEventListener('click', () => { if (!busy) go(target); });
+                    dotsEl.appendChild(d);
+                }
+
+                function applyTransform(animated) {
+                    track.style.transition = animated ? 'transform 500ms ease-in-out' : 'none';
+                    track.style.transform  = `translateX(${-current * cardW}px)`;
+                }
+
+                function updateDots() {
+                    dotsEl.querySelectorAll('.ico-dot').forEach((d, i) => {
+                        d.classList.toggle('active', i === ((current % n + n) % n));
+                    });
+                }
+
+                function go(next) {
+                    if (busy) return;
+                    busy = true;
+                    current = next;
+                    applyTransform(true);
+                    updateDots();
+                    setTimeout(() => {
+                        // Si nos acercamos demasiado a los bordes, teleport al centro
+                        const safeZone = visibleCount * 2;
+                        if (current >= total - safeZone) {
+                            current -= Math.floor(total / 2 / n) * n;
+                            applyTransform(false);
+                            updateDots();
+                        } else if (current < safeZone) {
+                            current += Math.floor(total / 2 / n) * n;
+                            applyTransform(false);
+                            updateDots();
+                        }
+                        busy = false;
+                    }, 520);
+                }
+
+                function startAuto() {
+                    clearInterval(autoTimer);
+                    autoTimer = setInterval(() => { if (!busy) go(current + 1); }, 3500);
+                }
+
+                applyTransform(false);
+                updateDots();
+                startAuto();
+
+                return {
+                    go,
+                    startAuto,
+                    get current() { return current; },
+                    get autoTimer() { return autoTimer; }
+                };
+            }
+
+            const carousels = {};
+
+            function initCarousels() {
+                carousels.libros   = buildCarousel('trackLibros',   'dotsLibros',   rawLibros,   bookCardHTML,   CARD_W_BOOK);
+                carousels.autores  = buildCarousel('trackAutores',  'dotsAutores',  rawAutores,  authorCardHTML, CARD_W_AUTHOR);
+                carousels.revistas = buildCarousel('trackRevistas', 'dotsRevistas', rawRevistas, revistaCardHTML, CARD_W_BOOK);
+            }
+
+            window.moveCarousel = function(name, dir) {
+                const c = carousels[name];
+                if (!c) return;
+                clearInterval(c.autoTimer);
+                c.go(c.current + dir);
+                c.startAuto();
+            };
+
+            // Inicializar cuando la sección sea visible por primera vez
+            let initialized = false;
+            const observer = new MutationObserver(() => {
+                const sec = document.getElementById('inicioSection');
+                if (sec && !sec.classList.contains('hidden') && !initialized) {
+                    initialized = true;
+                    initCarousels();
+                }
+            });
+            const sec = document.getElementById('inicioSection');
+            if (sec) observer.observe(sec, { attributes: true, attributeFilter: ['class'] });
+
+            // Si ya está visible al cargar (activeSection === 'Inicio')
+            if (sec && !sec.classList.contains('hidden')) {
+                initialized = true;
+                initCarousels();
+            }
+        })();
+        // ========== FIN CARRUSELES ==========
+
         window.openMobileSidebar  = openMobileSidebar;
         window.closeMobileSidebar = closeMobileSidebar;
     </script>

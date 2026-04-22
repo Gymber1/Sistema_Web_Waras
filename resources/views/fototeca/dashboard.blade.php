@@ -665,10 +665,10 @@
             border: 1px solid var(--border-line);
             border-radius: var(--radius-card);
             overflow: hidden;
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            transition: border-color 0.25s ease;
+            transform: translateZ(0);
         }
         .photo-card-inner:hover {
-            transform: translateY(-4px);
             border-color: rgba(197,166,109,0.5);
         }
         .photo-card-img-wrap {
@@ -676,13 +676,28 @@
             aspect-ratio: 4/3;
             overflow: hidden;
             background: #111;
+            transform: translateZ(0);
         }
         .photo-card-img {
             width: 100%; height: 100%; object-fit: cover; display: block;
-            transition: transform 0.7s ease;
+            transition: transform 0.4s ease;
+            will-change: transform;
         }
         .photo-card-inner:hover .photo-card-img { transform: scale(1.05); }
-        .photo-card-overlay { display: none; }
+        .photo-card-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(10,10,10,0.88) 0%, transparent 55%);
+            opacity: 0; transition: opacity 0.25s ease;
+            display: flex; align-items: flex-end;
+            will-change: opacity;
+        }
+        .photo-card-inner:hover .photo-card-overlay { opacity: 1; }
+        .photo-card-overlay-content { padding: 0.85rem 1rem; width: 100%; }
+        .overlay-year { font-size: 0.72rem; color: var(--gold); font-family: 'Libre Baskerville', serif; font-style: italic; }
+        .overlay-location {
+            font-size: 0.68rem; color: var(--text-secondary);
+            display: flex; align-items: center; gap: 0.3rem; margin-top: 0.2rem;
+        }
         .photo-card-badge {
             position: absolute; top: 0.75rem; left: 0.75rem;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
@@ -1341,6 +1356,7 @@
                                 <div class="photo-card-overlay">
                                     <div class="photo-card-overlay-content">
                                         <p class="overlay-year">${photo.year||'S/F'}</p>
+                                        ${photo.location ? `<p class="overlay-location"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>${photo.location}</p>` : ''}
                                     </div>
                                 </div>
                                 ${photo.format ? `<span class="photo-card-badge">${photo.format}</span>` : ''}

@@ -86,17 +86,29 @@
             .hamburger-btn { display: block; }
         }
 
-        /* ── HERO ── */
+        /* ── HERO SLIDER ── */
         .hero-section {
             position: relative; height: 100vh;
             display: flex; align-items: center; justify-content: center;
             overflow: hidden;
         }
-        .hero-bg {
+        .hero-slide-bg {
             position: absolute; inset: 0;
-            background-size: cover; background-position: center; background-repeat: no-repeat;
+            width: 100%; height: 100%;
+            background-size: 110%;
+            background-position: center;
+            background-repeat: no-repeat;
+            animation: kenBurns 8s cubic-bezier(0.3, 0, 0.7, 1) forwards;
         }
-        .hero-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.60); }
+        @keyframes kenBurns {
+            from { transform: scale(1) translateZ(0); }
+            to { transform: scale(1.05) translateZ(0); }
+        }
+        .hero-overlay { 
+            position: absolute; inset: 0; 
+            background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.4) 100%);
+            mix-blend-mode: multiply;
+        }
         .hero-content {
             position: relative; z-index: 2;
             text-align: center; color: white;
@@ -199,187 +211,419 @@
 
         /* ── COLLECTIONS ── */
         .collections-section {
-            padding: 7rem 2rem;
+            padding: 6rem 0 5rem;
             background: white;
+            overflow: hidden;
         }
         .section-header {
             text-align: center; max-width: 600px;
-            margin: 0 auto 4rem;
+            margin: 0 auto 4rem; padding: 0 2rem;
         }
         .section-eyebrow {
-            color: #cda274; font-size: .7rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: .25em;
-            margin-bottom: .75rem;
+            color: #C8A97E; font-size: .65rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .3em;
+            margin-bottom: 1rem;
         }
         .section-title {
             font-family: 'Playfair Display', serif;
             font-size: clamp(2rem, 3.5vw, 3rem);
-            color: #111;
+            color: #111827;
         }
-        .collections-grid {
-            max-width: 1300px; margin: 0 auto;
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+
+        /* Slider full-width */
+        .collections-wrapper {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            padding: 2.5rem 0;
         }
+        .collections-carousel-container {
+            position: relative;
+            width: 100%;
+        }
+        .collections-carousel {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            will-change: transform;
+            transition: transform 1500ms ease-in-out;
+        }
+
+        /* Cards al estilo pro.txt — sin border-radius, efecto escala */
         .collection-card {
-            position: relative; height: 520px;
-            overflow: hidden; background: #111; cursor: pointer;
+            position: relative;
+            height: 500px;
+            width: 420px;
+            overflow: hidden;
+            background: #111;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: transform 1500ms ease-in-out, opacity 1500ms ease-in-out, box-shadow 0.3s ease;
+            transform-origin: center;
+        }
+        .collection-card.inactive {
+            transform: scale(0.85);
+            opacity: 0.4;
+        }
+        .collection-card.active {
+            transform: scale(1);
+            opacity: 1;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            z-index: 2;
         }
         .collection-img {
             position: absolute; inset: 0;
             width: 100%; height: 100%; object-fit: cover;
-            opacity: .7; transition: transform .7s ease, opacity .5s ease;
+            transition: transform 2000ms ease;
         }
-        .collection-card:hover .collection-img { transform: scale(1.08); opacity: .5; }
+        .collection-card:hover .collection-img { transform: scale(1.08); }
+        .collection-gradient {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%);
+        }
         .collection-tag {
-            position: absolute; top: 2rem; right: 2rem;
+            position: absolute; top: 1.5rem; right: 1.5rem;
             border: 1px solid rgba(255,255,255,.35);
-            background: rgba(0,0,0,.2); backdrop-filter: blur(4px);
-            padding: .5rem .6rem;
+            background: rgba(0,0,0,.4); backdrop-filter: blur(6px);
+            padding: .6rem .5rem;
             writing-mode: vertical-rl; transform: rotate(180deg);
-            color: white; font-size: .65rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: .18em;
+            color: white; font-size: .6rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .25em;
         }
         .collection-bottom {
             position: absolute; bottom: 0; left: 0; right: 0;
-            padding: 2rem;
-            background: linear-gradient(to top, rgba(0,0,0,.9) 0%, transparent 100%);
+            padding: 2rem 2rem 2.5rem;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.7s ease 0.1s, transform 0.7s ease 0.1s;
+        }
+        .collection-card.active .collection-bottom {
+            opacity: 1;
+            transform: translateY(0);
         }
         .collection-title {
             font-family: 'Playfair Display', serif;
-            font-size: 2rem; color: white; margin-bottom: .4rem;
+            font-size: 2rem; color: white; margin-bottom: .35rem;
         }
-        .collection-desc {
-            font-size: .82rem; color: rgba(255,255,255,.7);
-            font-weight: 300; margin-bottom: 1.25rem;
-            max-height: 0; overflow: hidden;
-            transition: max-height .5s ease, opacity .5s ease; opacity: 0;
+        .collection-type {
+            font-size: .65rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .2em;
+            color: #C8A97E;
         }
-        .collection-card:hover .collection-desc { max-height: 60px; opacity: 1; }
-        .collection-link {
-            color: #cda274; font-size: .7rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: .12em;
-            text-decoration: none; display: inline-flex; align-items: center; gap: .3rem;
-            transition: color .3s;
+
+        /* Controles */
+        .carousel-controls {
+            display: flex; flex-direction: column;
+            align-items: center; gap: 2rem;
+            margin-top: 2rem;
         }
-        .collection-link:hover { color: white; }
+        .carousel-controls-row {
+            display: flex; align-items: center; gap: 1.5rem;
+        }
+        .carousel-btn {
+            background: #C8A97E; color: white; border: none;
+            width: 42px; height: 42px; border-radius: 50%;
+            cursor: pointer; transition: all .2s;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; font-weight: 700;
+            box-shadow: 0 4px 12px rgba(200,169,126,0.35);
+        }
+        .carousel-btn:hover { background: #b3956d; transform: scale(1.08); }
+        .carousel-dots {
+            display: flex; gap: .6rem; align-items: center;
+        }
+        .carousel-dot {
+            height: 8px; border-radius: 4px;
+            background: #cbd5e1; cursor: pointer; transition: all .4s;
+            width: 8px;
+        }
+        .carousel-dot.active {
+            background: #C8A97E; width: 32px;
+        }
         .collections-cta {
-            text-align: center; margin-top: 3rem;
+            text-align: center;
         }
         .btn-outline-gold {
             display: inline-block;
-            border: 1px solid #cda274; color: #cda274;
-            padding: .85rem 2.5rem;
-            font-size: .75rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: .15em;
+            border: 1px solid #C8A97E; color: #C8A97E;
+            padding: .9rem 2.5rem;
+            font-size: .7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .2em;
             text-decoration: none;
-            transition: all .3s;
+            transition: all .25s;
+            border-radius: 2px;
         }
-        .btn-outline-gold:hover { background: #cda274; color: white; }
+        .btn-outline-gold:hover { background: #C8A97E; color: white; }
 
-        @media(max-width: 900px) {
-            .collections-grid { grid-template-columns: 1fr; }
-            .collection-card { height: 380px; }
+        @media(max-width: 768px) {
+            .collection-card { height: 400px; width: 300px; }
+            .carousel-btn { width: 36px; height: 36px; font-size: 1rem; }
         }
 
-        /* ── VALUES ── */
-        .values-section {
-            padding: 7rem 2rem;
-            background: #f9f8f6;
+        /* ── ORGANIZACIÓN ── */
+        .org-section { padding: 6rem 2rem; background: #f9f8f6; }
+        .org-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
         }
-        .values-grid {
-            max-width: 1100px; margin: 0 auto;
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem;
+        .org-img-wrap {
+            position: relative;
         }
-        .value-card {
-            background: white; padding: 2.5rem 1rem;
-            display: flex; flex-direction: column; align-items: center;
-            text-align: center;
-            box-shadow: 0 1px 4px rgba(0,0,0,.06);
-            transition: box-shadow .3s;
+        .org-img-shadow {
+            position: absolute; inset: 0;
+            background: #cda274; border-radius: 16px;
+            transform: translate(14px, 14px);
+            opacity: 0.2;
+            transition: transform .5s ease;
         }
-        .value-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); }
-        .value-icon {
-            color: #cda274; font-size: 2rem; margin-bottom: 1rem;
-            width: 40px; height: 40px;
+        .org-img-wrap:hover .org-img-shadow { transform: translate(20px, 20px); }
+        .org-img-clip {
+            position: relative; z-index: 1;
+            width: 100%; aspect-ratio: 4/3;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #1a1a1a;
             display: flex; align-items: center; justify-content: center;
         }
-        .value-name {
+        .org-img {
+            width: 100%; height: 100%; object-fit: contain;
+            display: block;
+            filter: grayscale(1);
+            transition: filter .7s ease;
+        }
+        .org-img-wrap:hover .org-img { filter: grayscale(0); }
+        .org-img-label {
+            position: absolute; bottom: 1.5rem; left: 1.5rem; z-index: 2;
+            background: rgba(255,255,255,.92); backdrop-filter: blur(8px);
+            padding: .55rem 1.25rem; border-radius: 6px;
+            font-size: .65rem; font-weight: 700; color: #cda274;
+            text-transform: uppercase; letter-spacing: .18em;
+        }
+        .org-eyebrow {
+            display: flex; align-items: center; gap: .75rem; margin-bottom: 1.25rem;
+        }
+        .org-eyebrow-icon {
+            width: 32px; height: 32px; background: rgba(205,162,116,.12);
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-size: .9rem;
+        }
+        .org-eyebrow-text {
+            font-size: .65rem; font-weight: 700; color: #9ca3af;
+            text-transform: uppercase; letter-spacing: .2em;
+        }
+        .org-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1rem; color: #374151;
+            font-size: clamp(1.8rem, 3vw, 2.7rem);
+            color: #111; line-height: 1.2; margin-bottom: 1.5rem;
         }
-
-        @media(max-width: 768px) {
-            .values-grid { grid-template-columns: repeat(2, 1fr); }
+        .org-title em { color: #cda274; font-style: italic; }
+        .org-text {
+            color: #6b7280; font-size: .92rem; font-weight: 300;
+            line-height: 1.9; margin-bottom: .9rem;
         }
-
-        /* ── OBJECTIVES ── */
-        .objectives-section {
-            background: white;
-        }
-        .objectives-inner {
-            max-width: 1300px; margin: 0 auto;
-            display: flex;
-        }
-        .objectives-text {
-            flex: 1; padding: 6rem 4rem 6rem 2rem;
-            background: #fbf9f6;
-            display: flex; flex-direction: column; justify-content: center;
-        }
-        .objectives-image {
-            flex: 1; min-height: 500px;
-        }
-        .objectives-image img {
-            width: 100%; height: 100%; object-fit: cover; display: block;
-        }
-        .check-list { list-style: none; display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
-        .check-list li {
-            display: flex; align-items: flex-start; gap: .75rem;
-            font-size: .9rem; color: #4b5563; font-weight: 300;
-        }
-        .check-icon {
-            color: #cda274; flex-shrink: 0; margin-top: .15rem;
-            font-size: 1rem;
-        }
-
+        .org-text strong { color: #374151; font-weight: 500; }
         @media(max-width: 900px) {
-            .objectives-inner { flex-direction: column; }
-            .objectives-text { padding: 4rem 2rem; }
-            .objectives-image { min-height: 300px; }
+            .org-inner { grid-template-columns: 1fr; gap: 3rem; }
         }
 
-        /* ── BENEFICIARIES ── */
-        .beneficiaries-section {
-            padding: 7rem 2rem;
-            background: #111;
+        /* Finalidad + Objetivo General */
+        .org-cards-section { background: white; padding: 5rem 2rem; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
+        .org-cards-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .org-card {
+            padding: 2.5rem; border-radius: 20px; transition: box-shadow .3s;
         }
-        .beneficiaries-grid {
-            max-width: 1100px; margin: 0 auto;
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
-            margin-top: 4rem;
+        .org-card:hover { box-shadow: 0 12px 32px rgba(0,0,0,.08); }
+        .org-card-light { background: #f4f9f9; border: 1px solid rgba(205,162,116,.2); }
+        .org-card-dark { background: #1a3a3c; color: white; position: relative; overflow: hidden; }
+        .org-card-dark::before {
+            content: ''; position: absolute; right: -2rem; top: -2rem;
+            width: 120px; height: 120px; background: rgba(255,255,255,.06);
+            border-radius: 50%; filter: blur(20px);
         }
-        .benefit-card {
-            background: rgba(255,255,255,.05);
-            border: 1px solid rgba(255,255,255,.1);
-            padding: 3rem 2rem;
-            text-align: center;
-            transition: background .3s;
+        .org-card-icon {
+            width: 44px; height: 44px; border-radius: 10px; margin-bottom: 1.25rem;
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
         }
-        .benefit-card:hover { background: rgba(255,255,255,.1); }
-        .benefit-line {
-            width: 3rem; height: 2px; background: #cda274;
-            margin: 0 auto 1.5rem;
-        }
-        .benefit-title {
+        .org-card-icon-light { background: white; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+        .org-card-icon-dark { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2); }
+        .org-card-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.25rem; color: white; margin-bottom: 1rem;
+            font-size: 1.4rem; margin-bottom: 1rem;
         }
-        .benefit-desc {
-            font-size: .85rem; color: #9ca3af;
-            font-weight: 300; font-style: italic;
+        .org-card-light .org-card-title { color: #111; }
+        .org-card-dark .org-card-title { color: white; position: relative; z-index: 1; }
+        .org-card-text { font-size: .875rem; line-height: 1.8; color: #6b7280; }
+        .org-card-list { list-style: none; display: flex; flex-direction: column; gap: .85rem; position: relative; z-index: 1; }
+        .org-card-list li { display: flex; align-items: flex-start; gap: .65rem; font-size: .875rem; color: rgba(255,255,255,.8); font-weight: 300; line-height: 1.6; }
+        .org-card-list-arrow { color: #cda274; flex-shrink: 0; margin-top: .1rem; }
+        @media(max-width: 768px) { .org-cards-inner { grid-template-columns: 1fr; } }
+
+        /* Líneas de trabajo */
+        .org-lines-section { padding: 6rem 2rem; background: #f9f8f6; }
+        .org-lines-inner { max-width: 1100px; margin: 0 auto; }
+        .org-lines-header { text-align: center; margin-bottom: 4rem; }
+        .org-lines-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.6rem, 2.5vw, 2.2rem); color: #111; margin-bottom: .75rem;
+        }
+        .org-lines-sub { font-size: .85rem; color: #9ca3af; max-width: 560px; margin: 0 auto; line-height: 1.7; }
+        .org-lines-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
+        .org-lines-col-label {
+            font-size: .62rem; font-weight: 700; color: #cda274;
+            text-transform: uppercase; letter-spacing: .22em;
+            border-bottom: 1px solid #e5e7eb; padding-bottom: 1rem; margin-bottom: 1.5rem;
+        }
+        .org-lines-list { list-style: none; display: flex; flex-direction: column; gap: .5rem; }
+        .org-lines-item {
+            display: flex; align-items: flex-start; gap: .85rem;
+            padding: .75rem 1rem; border-radius: 10px; border: 1px solid transparent;
+            transition: all .25s; font-size: .855rem; color: #4b5563; font-weight: 300; line-height: 1.5;
+        }
+        .org-lines-item:hover { background: white; border-color: #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+        .org-lines-check {
+            width: 22px; height: 22px; background: rgba(205,162,116,.1);
+            border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            margin-top: .1rem; font-size: .65rem; color: #cda274;
+        }
+        .org-beneficiaries-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
+        .org-beneficiary-item {
+            background: white; border: 1px solid #e5e7eb; border-radius: 10px;
+            padding: .85rem 1rem; display: flex; align-items: center; gap: .7rem;
+            font-size: .82rem; color: #374151; font-weight: 500;
+            box-shadow: 0 1px 4px rgba(0,0,0,.04);
+        }
+        .org-beneficiary-dot { width: 8px; height: 8px; border-radius: 50%; background: #cda274; flex-shrink: 0; }
+        @media(max-width: 768px) {
+            .org-lines-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+            .org-beneficiaries-grid { grid-template-columns: 1fr; }
         }
 
-        @media(max-width: 768px) {
-            .beneficiaries-grid { grid-template-columns: 1fr; }
+        /* ── PREMIOS ── */
+        .premios-hero {
+            background: #0f2628; padding: 5rem 2rem 8rem;
+            text-align: center;
+        }
+        .premios-badge {
+            display: inline-flex; align-items: center; gap: .5rem;
+            padding: .45rem 1.1rem; border-radius: 999px;
+            background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+            margin-bottom: 2rem;
+        }
+        .premios-badge-icon { color: #cda274; font-size: .8rem; }
+        .premios-badge-text {
+            font-size: .6rem; font-weight: 700; color: white;
+            text-transform: uppercase; letter-spacing: .2em;
+        }
+        .premios-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.7rem, 3.5vw, 3rem); color: white;
+            max-width: 800px; margin: 0 auto 1.5rem; line-height: 1.25;
+        }
+        .premios-title em { color: #cda274; font-style: italic; }
+        .premios-subtitle {
+            font-size: .95rem; color: rgba(255,255,255,.65); font-weight: 300;
+            max-width: 680px; margin: 0 auto; line-height: 1.8;
+        }
+
+        .premios-video-wrap {
+            max-width: 960px; margin: -4rem auto 0; padding: 0 2rem;
+        }
+        .premios-video {
+            position: relative; width: 100%; aspect-ratio: 16/9;
+            background: #0a0a0a; border-radius: 16px; overflow: hidden;
+            box-shadow: 0 32px 80px rgba(0,0,0,.45);
+            border: 3px solid white; cursor: pointer;
+        }
+        .premios-video-bg {
+            width: 100%; height: 100%; object-fit: cover; opacity: .55;
+            transition: transform .7s ease;
+        }
+        .premios-video:hover .premios-video-bg { transform: scale(1.04); }
+        .premios-video-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.15) 60%, transparent 100%);
+        }
+        .premios-video-play {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .premios-play-btn {
+            width: 72px; height: 50px; background: #e00; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            transition: background .25s;
+        }
+        .premios-video:hover .premios-play-btn { background: #c00; }
+        .premios-play-triangle {
+            width: 0; height: 0;
+            border-top: 11px solid transparent;
+            border-bottom: 11px solid transparent;
+            border-left: 20px solid white;
+            margin-left: 4px;
+        }
+        .premios-video-info {
+            position: absolute; bottom: 1.5rem; left: 2rem; right: 2rem;
+            display: flex; justify-content: space-between; align-items: flex-end;
+        }
+        .premios-video-name { font-size: 1.3rem; font-weight: 700; color: white; }
+        .premios-video-role { font-size: .7rem; color: rgba(255,255,255,.7); text-transform: uppercase; letter-spacing: .15em; margin-top: .2rem; }
+        .premios-video-yt {
+            background: rgba(0,0,0,.5); backdrop-filter: blur(8px);
+            padding: .45rem .9rem; border-radius: 8px;
+            font-size: .7rem; color: white; font-weight: 700; letter-spacing: .05em;
+        }
+
+        .premios-reconocimiento {
+            max-width: 960px; margin: 3rem auto 5rem; padding: 0 2rem;
+        }
+        .premios-rec-card {
+            background: white; border-radius: 20px; padding: 3.5rem 3rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,.07); border: 1px solid #f0ede9;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+        }
+        .premios-rec-label {
+            font-size: .62rem; font-weight: 700; color: #9ca3af;
+            text-transform: uppercase; letter-spacing: .22em; margin-bottom: 2rem;
+        }
+        .premios-ministerio {
+            display: flex; border-radius: 8px; overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,.12); border: 1px solid #e5e7eb;
+        }
+        .premios-ministerio-peru {
+            background: #c8102e; color: white; padding: .9rem 1.5rem;
+            display: flex; align-items: center; gap: .75rem;
+        }
+        .premios-ministerio-escudo {
+            width: 28px; height: 28px; background: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .premios-ministerio-escudo-inner {
+            width: 20px; height: 20px; border: 2px solid #c8102e; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 5px; font-weight: 900; color: #c8102e; letter-spacing: -.5px;
+        }
+        .premios-ministerio-peru-text { font-size: 1.15rem; font-weight: 900; letter-spacing: .05em; }
+        .premios-ministerio-nombre {
+            background: #1f2937; color: white; padding: .9rem 2rem;
+            font-size: 1rem; font-weight: 600; letter-spacing: .03em;
+            display: flex; align-items: center;
+        }
+        .premios-director {
+            margin-top: 3rem; padding-top: 2.5rem; border-top: 1px solid #f0ede9;
+            width: 100%; display: flex; align-items: center; justify-content: center; gap: 1.25rem;
+        }
+        .premios-director-avatar {
+            width: 56px; height: 56px; border-radius: 50%; object-fit: cover;
+            border: 2px solid #cda274;
+        }
+        .premios-director-label {
+            font-size: .62rem; font-weight: 700; color: #9ca3af;
+            text-transform: uppercase; letter-spacing: .18em; margin-bottom: .3rem;
+        }
+        .premios-director-name { font-size: 1.1rem; font-weight: 700; color: #111; }
+        @media(max-width: 640px) {
+            .premios-director { flex-direction: column; }
+            .premios-rec-card { padding: 2.5rem 1.5rem; }
+            .premios-video-wrap, .premios-reconocimiento { padding: 0 1rem; }
         }
 
         /* ── FOOTER ── */
@@ -477,6 +721,46 @@
             .footer-grid { grid-template-columns: 1fr; }
         }
 
+        /* ── PAGE VIEWS ── */
+        .page-view { animation: viewIn .45s ease both; }
+        @keyframes viewIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ── SUBVIEW HERO BANNER ── */
+        .subview-hero {
+            position: relative; height: 52vh; min-height: 360px;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center; overflow: hidden;
+        }
+        .subview-hero-bg {
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center;
+        }
+        .subview-hero-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom, rgba(10,10,10,.7) 0%, rgba(10,10,10,.55) 50%, #0f2628 100%);
+        }
+        .subview-hero-content {
+            position: relative; z-index: 1; padding: 2rem; margin-top: 4rem;
+            max-width: 700px;
+        }
+        .subview-hero-badge {
+            display: inline-flex; align-items: center; gap: .5rem;
+            padding: .4rem 1rem; border-radius: 999px;
+            background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+            font-size: .6rem; font-weight: 700; color: white;
+            text-transform: uppercase; letter-spacing: .18em;
+            margin-bottom: 1.5rem;
+        }
+        .subview-hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            color: white; line-height: 1.15; margin-bottom: 1rem;
+        }
+        .subview-hero-sub {
+            font-size: .95rem; color: rgba(255,255,255,.65);
+            font-weight: 300; line-height: 1.7; max-width: 560px; margin: 0 auto;
+        }
+
         /* ── CONTACT MODAL ── */
         .modal-overlay {
             display: none; position: fixed; inset: 0; z-index: 5000;
@@ -569,9 +853,10 @@
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
         <button class="mobile-menu-close" onclick="closeMobileMenu()">&#10005;</button>
-        <a href="{{ route('home') }}" class="mobile-nav-link">Inicio</a>
-        <a href="#nosotros" class="mobile-nav-link" onclick="closeMobileMenu()">Acerca De</a>
-        <a href="#colecciones" class="mobile-nav-link" onclick="closeMobileMenu()">Colecciones</a>
+        <a href="{{ route('home') }}" class="mobile-nav-link" onclick="showView('inicio');closeMobileMenu();return false;">Inicio</a>
+        <button onclick="showView('organizacion');closeMobileMenu();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Organización</button>
+        <button onclick="showView('inicio');closeMobileMenu();setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Colecciones</button>
+        <button onclick="showView('premios');closeMobileMenu();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Premios</button>
         <button onclick="closeMobileMenu(); openContactModal();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Contacto</button>
         @if(auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
             <a href="{{ route('admin.dashboard') }}" class="mobile-nav-btn">Panel Admin</a>
@@ -585,9 +870,10 @@
         <div class="nav-wrapper">
             <a href="{{ route('home') }}" class="logo">WARAS</a>
             <nav class="desktop-nav">
-                <a href="{{ route('home') }}" class="nav-link">Inicio</a>
-                <a href="#nosotros" class="nav-link">Acerca De</a>
-                <a href="#colecciones" class="nav-link">Colecciones</a>
+                <a href="{{ route('home') }}" class="nav-link" onclick="showView('inicio');return false;">Inicio</a>
+                <button onclick="showView('organizacion')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Organización</button>
+                <a href="#colecciones" class="nav-link" onclick="showView('inicio');setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);return false;">Colecciones</a>
+                <button onclick="showView('premios')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Premios</button>
                 <button onclick="openContactModal()" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Contacto</button>
                 @if(auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
                     <a href="{{ route('admin.dashboard') }}" class="btn-admin">Panel Admin</a>
@@ -604,9 +890,12 @@
         </div>
     </header>
 
-    <!-- Hero -->
+    <!-- ===== VISTA: INICIO ===== -->
+    <div id="view-inicio" class="page-view">
+
+    <!-- Hero Slider -->
     <section class="hero-section" id="inicio">
-        <div class="hero-bg" style="background-image: url('{{ $heroBg }}')"></div>
+        <div class="hero-slide-bg" style="background-image: url('{{ $heroBg }}');"></div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <p class="hero-eyebrow">Asociación de Ciencia y Cultura</p>
@@ -619,35 +908,7 @@
         </div>
     </section>
 
-    <!-- About -->
-    <section class="about-section" id="nosotros">
-        <div class="about-inner">
-            <div class="about-images">
-                <img class="about-img-1"
-                     src="https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?auto=format&fit=crop&w=600&q=80"
-                     alt="Naturaleza Áncash">
-                <img class="about-img-2"
-                     src="https://images.unsplash.com/photo-1533601017-dc61895e03c0?auto=format&fit=crop&w=600&q=80"
-                     alt="Cultura Áncash">
-            </div>
-            <div>
-                <p class="about-eyebrow">Asociación Waras: Ciencia y Cultura</p>
-                <h2 class="about-title">Protegiendo la Identidad Cultural de Áncash</h2>
-                <p class="about-text">Nacimos ante el vacío estructural e histórico del Estado en la protección de la identidad cultural. Un grupo de ciudadanos conscientes decidió aportar para viabilizar el progreso sostenido de Áncash.</p>
-                <p class="about-text">Áncash es una región privilegiada, con una profunda tradición cultural que subsiste a través del tiempo. Este portal digital es uno de los espacios que construimos para sistematizar, preservar y difundir el conocimiento.</p>
-                <div class="about-boxes">
-                    <div class="about-box">
-                        <h4>Desarrollo Regional</h4>
-                        <p>Contribuir al Desarrollo Económico y Social del Departamento.</p>
-                    </div>
-                    <div class="about-box">
-                        <h4>Preservación</h4>
-                        <p>Preservar y Difundir la Cultura Ancashina al mundo entero.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+
 
     <!-- Collections -->
     <section class="collections-section" id="colecciones">
@@ -655,124 +916,251 @@
             <p class="section-eyebrow">Nuestro Acervo Cultural</p>
             <h2 class="section-title">Explora Nuestras Colecciones</h2>
         </div>
-        <div class="collections-grid">
-            <!-- Biblioteca -->
-            <div class="collection-card">
-                <img class="collection-img"
-                     src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=900&q=80"
-                     alt="Biblioteca">
-                <div class="collection-tag">Operativo</div>
-                <div class="collection-bottom">
-                    <h3 class="collection-title">Biblioteca</h3>
-                    <p class="collection-desc">Colección completa de libros y publicaciones.</p>
-                    <a href="{{ route('biblioteca.dashboard') }}" class="collection-link">Explorar ›</a>
+        <div class="collections-wrapper">
+            <div class="collections-carousel-container">
+                <div class="collections-carousel" id="collectionsCarousel">
+                    <!-- Biblioteca -->
+                    <div class="collection-card" data-url="{{ route('biblioteca.dashboard') }}">
+                        <img class="collection-img" src="{{ $heroBgBiblioteca }}" alt="Biblioteca">
+                        <div class="collection-gradient"></div>
+                        <div class="collection-tag">Operativo</div>
+                        <div class="collection-bottom">
+                            <h3 class="collection-title">Biblioteca</h3>
+                            <p class="collection-type">Acceso Libre</p>
+                        </div>
+                    </div>
+                    <!-- Fototeca -->
+                    <div class="collection-card" data-url="{{ route('fototeca.inicio') }}">
+                        <img class="collection-img" src="{{ $heroBgFototeca }}" alt="Fototeca">
+                        <div class="collection-gradient"></div>
+                        <div class="collection-tag">Operativo</div>
+                        <div class="collection-bottom">
+                            <h3 class="collection-title">Fototeca</h3>
+                            <p class="collection-type">Acceso Libre</p>
+                        </div>
+                    </div>
+                    <!-- Efemérides -->
+                    <div class="collection-card">
+                        <img class="collection-img" src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=900&q=80" alt="Efemérides">
+                        <div class="collection-gradient"></div>
+                        <div class="collection-tag">Pronto</div>
+                        <div class="collection-bottom">
+                            <h3 class="collection-title">Efemérides</h3>
+                            <p class="collection-type">Próximamente</p>
+                        </div>
+                    </div>
+                    <!-- Catálogo KOHA -->
+                    <div class="collection-card">
+                        <img class="collection-img" src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=900&q=80" alt="Catálogo KOHA">
+                        <div class="collection-gradient"></div>
+                        <div class="collection-tag">Pronto</div>
+                        <div class="collection-bottom">
+                            <h3 class="collection-title">Catálogo KOHA</h3>
+                            <p class="collection-type">Próximamente</p>
+                        </div>
+                    </div>
+                    <!-- Musicoteca -->
+                    <div class="collection-card">
+                        <img class="collection-img" src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=900&q=80" alt="Musicoteca">
+                        <div class="collection-gradient"></div>
+                        <div class="collection-tag">Pronto</div>
+                        <div class="collection-bottom">
+                            <h3 class="collection-title">Musicoteca</h3>
+                            <p class="collection-type">Próximamente</p>
+                        </div>
+                    </div>
+                    <!-- Pinacoteca -->
+                    <div class="collection-card">
+                        <img class="collection-img" src="https://images.unsplash.com/photo-1578301978162-7aae4d755744?auto=format&fit=crop&w=900&q=80" alt="Pinacoteca">
+                        <div class="collection-gradient"></div>
+                        <div class="collection-tag">Pronto</div>
+                        <div class="collection-bottom">
+                            <h3 class="collection-title">Pinacoteca</h3>
+                            <p class="collection-type">Próximamente</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <!-- Fototeca -->
-            <div class="collection-card">
-                <img class="collection-img"
-                     src="https://images.unsplash.com/photo-1452830978618-d6feae7d0faa?auto=format&fit=crop&w=900&q=80"
-                     alt="Fototeca">
-                <div class="collection-tag">Operativo</div>
-                <div class="collection-bottom">
-                    <h3 class="collection-title">Fototeca</h3>
-                    <p class="collection-desc">Archivo fotográfico y memoria visual de la región.</p>
-                    <a href="{{ route('fototeca.inicio') }}" class="collection-link">Explorar ›</a>
+            <div class="carousel-controls">
+                <div class="carousel-controls-row">
+                    <button class="carousel-btn" id="prevBtn" onclick="scrollCarousel('prev')">‹</button>
+                    <div class="carousel-dots" id="carouselDots"></div>
+                    <button class="carousel-btn" id="nextBtn" onclick="scrollCarousel('next')">›</button>
                 </div>
             </div>
-            <!-- Musicoteca -->
-            <div class="collection-card">
-                <img class="collection-img"
-                     src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=900&q=80"
-                     alt="Musicoteca">
-                <div class="collection-tag">En Desarrollo</div>
-                <div class="collection-bottom">
-                    <h3 class="collection-title">Musicoteca</h3>
-                    <p class="collection-desc">Composiciones y géneros musicales ancashinos.</p>
-                    <span class="collection-link" style="cursor:default;opacity:.6;">Próximamente ›</span>
-                </div>
-            </div>
-        </div>
-        <div class="collections-cta">
-            <a href="#colecciones" class="btn-outline-gold">Ver Catálogo Completo</a>
         </div>
     </section>
 
-    <!-- Values -->
-    <section class="values-section">
-        <div class="section-header">
-            <p class="section-eyebrow">Nuestros Pilares</p>
-            <h2 class="section-title">Valores Institucionales</h2>
+    </div><!-- /view-inicio -->
+
+    <!-- ===== VISTA: ORGANIZACIÓN ===== -->
+    <div id="view-organizacion" class="page-view" style="display:none;">
+
+    <!-- Hero Banner -->
+    <section class="subview-hero">
+        <div class="subview-hero-bg" style="background-image:url('{{ $heroBg }}');"></div>
+        <div class="subview-hero-overlay"></div>
+        <div class="subview-hero-content">
+            <h1 class="subview-hero-title">Nuestra Organización</h1>
+            <p class="subview-hero-sub">Conoce la misión, visión y los valores que impulsan la preservación del patrimonio regional.</p>
         </div>
-        <div class="values-grid">
-            <div class="value-card">
-                <div class="value-icon">⚖️</div>
-                <span class="value-name">Equidad</span>
+    </section>
+
+    <!-- ORGANIZACIÓN: Quiénes Somos -->
+    <section class="org-section" id="organizacion">
+        <div class="org-inner">
+            <div class="org-img-wrap">
+                <div class="org-img-shadow"></div>
+                <div class="org-img-clip">
+                    <img class="org-img"
+                         src="/Fundadores.jpg"
+                         alt="Fundadores Asociación Waras">
+                </div>
+                <span class="org-img-label">Fundadores de WARAS</span>
             </div>
-            <div class="value-card">
-                <div class="value-icon">🤝</div>
-                <span class="value-name">Fraternidad</span>
-            </div>
-            <div class="value-card">
-                <div class="value-icon">💛</div>
-                <span class="value-name">Solidaridad</span>
-            </div>
-            <div class="value-card">
-                <div class="value-icon">🌿</div>
-                <span class="value-name">Armonía</span>
-            </div>
-            <div class="value-card">
-                <div class="value-icon">🕊️</div>
-                <span class="value-name">Libertad</span>
+            <div>
+                <div class="org-eyebrow">
+                    <div class="org-eyebrow-icon">👥</div>
+                    <span class="org-eyebrow-text">Quiénes Somos</span>
+                </div>
+                <h2 class="org-title">Asociación Waras:<br><em>Ciencia y Cultura</em></h2>
+                <p class="org-text">La <strong>Asociación Waras: Ciencia y Cultura</strong> nació ante el vacío estructural e histórico del Estado en la protección de la identidad cultural.</p>
+                <p class="org-text">Un grupo de ciudadanos conscientes de que la protección del Medio Ambiente, la Educación, la Cultura y la Investigación son el germen para un sólido Desarrollo Económico y Social decidió aportar para viabilizar el progreso sostenido de Áncash.</p>
+                <p class="org-text">Áncash es una región privilegiada, con una profunda tradición cultural que subsiste a través del tiempo y una diversidad de recursos naturales únicos. Este portal digital es uno de los espacios que construimos para sistematizar, preservar y difundir el conocimiento.</p>
             </div>
         </div>
     </section>
 
-    <!-- Objectives -->
-    <section class="objectives-section">
-        <div class="objectives-inner">
-            <div class="objectives-text">
-                <p class="about-eyebrow">Plan de Acción</p>
-                <h2 class="about-title">Objetivos Específicos</h2>
-                <p class="about-text" style="font-style:italic;">Nuestras metas a corto y largo plazo para asegurar el impacto positivo en la región.</p>
-                <ul class="check-list">
-                    <li><span class="check-icon">✓</span> Promover e impulsar las ciencias, arte, identidad y cultura.</li>
-                    <li><span class="check-icon">✓</span> Fomentar la investigación y capacitación educativa, artística y cultural.</li>
-                    <li><span class="check-icon">✓</span> Ejecutar proyectos que desarrollen capacidades científicas y tecnológicas.</li>
-                    <li><span class="check-icon">✓</span> Promover la ciudadanía activa y la participación cívica.</li>
+    <!-- ORGANIZACIÓN: Finalidad + Objetivos -->
+    <section class="org-cards-section">
+        <div class="org-cards-inner">
+            <div class="org-card org-card-light">
+                <div class="org-card-icon org-card-icon-light">🎯</div>
+                <h3 class="org-card-title">Nuestra Finalidad</h3>
+                <p class="org-card-text">Promover estudios, investigaciones, capacitaciones, propuestas y espacios que aporten al desarrollo económico, social, ambiental, cultural, educacional, científico, tecnológico, y ciudadanía en el departamento de Áncash para la mejora de la calidad de vida de sus ciudadanos.</p>
+            </div>
+            <div class="org-card org-card-dark">
+                <div class="org-card-icon org-card-icon-dark">🏆</div>
+                <h3 class="org-card-title">Objetivo General</h3>
+                <ul class="org-card-list">
+                    <li><span class="org-card-list-arrow">›</span> Contribuir al Desarrollo Económico y Social del Departamento de Ancash.</li>
+                    <li><span class="org-card-list-arrow">›</span> Preservar y Difundir la Cultura Ancashina al mundo a través de plataformas digitales.</li>
                 </ul>
             </div>
-            <div class="objectives-image">
-                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=80"
-                     alt="Montañas Áncash">
+        </div>
+    </section>
+
+    <!-- ORGANIZACIÓN: Líneas de trabajo + Beneficiarios -->
+    <section class="org-lines-section">
+        <div class="org-lines-inner">
+            <div class="org-lines-header">
+                <h2 class="org-lines-title">Líneas de Trabajo y Alcance</h2>
+                <p class="org-lines-sub">Estrategias específicas orientadas a la investigación, desarrollo y preservación del acervo ancashino.</p>
+            </div>
+            <div class="org-lines-grid">
+                <div>
+                    <p class="org-lines-col-label">Objetivos Específicos</p>
+                    <ul class="org-lines-list">
+                        <li class="org-lines-item"><span class="org-lines-check">✓</span> Promover e impulsar las ciencias, arte, identidad, ciudadanía y cultura.</li>
+                        <li class="org-lines-item"><span class="org-lines-check">✓</span> Promover la investigación y capacitación educativa, artística y ambiental.</li>
+                        <li class="org-lines-item"><span class="org-lines-check">✓</span> Promover y ejecutar proyectos y programas que desarrollen capacidades científicas.</li>
+                        <li class="org-lines-item"><span class="org-lines-check">✓</span> Lograr el desarrollo de nuestros fines en alianza y convenios con instituciones.</li>
+                        <li class="org-lines-item"><span class="org-lines-check">✓</span> Desarrollar un Sistema y Portal de Información de alcance regional.</li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="org-lines-col-label">Nuestros Beneficiarios</p>
+                    <div class="org-beneficiaries-grid">
+                        <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Estudiantes de primaria y secundaria</div>
+                        <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Estudiantes de nivel superior</div>
+                        <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Docentes de nivel básico y superior</div>
+                        <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Autoridades y partidos políticos</div>
+                        <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Empresarios e inversores regionales</div>
+                        <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Turistas nacionales e internacionales</div>
+                        <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Población con interés en ciencia</div>
+                        <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Investigadores culturales</div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Beneficiaries -->
-    <section class="beneficiaries-section">
-        <div style="text-align:center;">
-            <p class="section-eyebrow">Impacto Social</p>
-            <h2 class="section-title" style="color:white;">Nuestros Beneficiarios</h2>
+    </div><!-- /view-organizacion -->
+
+    <!-- ===== VISTA: PREMIOS ===== -->
+    <div id="view-premios" class="page-view" style="display:none;">
+
+    <!-- Hero Banner -->
+    <section class="subview-hero">
+        <div class="subview-hero-bg" style="background-image:url('{{ $heroBg }}');"></div>
+        <div class="subview-hero-overlay"></div>
+        <div class="subview-hero-content">
+            <h1 class="subview-hero-title">Premios y Reconocimientos</h1>
+            <p class="subview-hero-sub">Logros y respaldos institucionales que garantizan la calidad y sostenibilidad de nuestro proyecto.</p>
         </div>
-        <div class="beneficiaries-grid">
-            <div class="benefit-card">
-                <div class="benefit-line"></div>
-                <h4 class="benefit-title">Estudiantes</h4>
-                <p class="benefit-desc">"Nivel primaria, secundaria y superior de toda la región de Áncash."</p>
+    </section>
+
+    <!-- PREMIOS -->
+    <section id="premios">
+        <div class="premios-hero" style="display:none;">
+            <div class="premios-badge">
+                <span class="premios-badge-icon">★</span>
+                <span class="premios-badge-text">Proyecto Ganador Nacional</span>
             </div>
-            <div class="benefit-card">
-                <div class="benefit-line"></div>
-                <h4 class="benefit-title">Comunidad Educativa</h4>
-                <p class="benefit-desc">"Docentes de nivel básico y superior, así como investigadores."</p>
+            <h2 class="premios-title">
+                Mejoramiento y Sostenibilidad del Portal de la<br>
+                <em>Ciencia y Cultura Ancashina</em>
+            </h2>
+            <p class="premios-subtitle">Proyecto ganador del Ministerio de Cultura con el cual pretendemos recopilar y difundir el Patrimonio Documental Ancashino en una plataforma virtual que permita el acceso universal a fuentes bibliográficas y documentales ancashinas.</p>
+        </div>
+
+        <div class="premios-video-wrap">
+            <div class="premios-video">
+                <img class="premios-video-bg"
+                     src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1200&q=80"
+                     alt="Video portada">
+                <div class="premios-video-overlay"></div>
+                <div class="premios-video-play">
+                    <div class="premios-play-btn">
+                        <div class="premios-play-triangle"></div>
+                    </div>
+                </div>
+                <div class="premios-video-info">
+                    <div>
+                        <p class="premios-video-name">Giber García Álamo</p>
+                        <p class="premios-video-role">Director del Proyecto</p>
+                    </div>
+                    <span class="premios-video-yt">Mirar en YouTube</span>
+                </div>
             </div>
-            <div class="benefit-card">
-                <div class="benefit-line"></div>
-                <h4 class="benefit-title">Sociedad Civil</h4>
-                <p class="benefit-desc">"Autoridades, empresarios, inversores y turistas internacionales."</p>
+        </div>
+
+        <div class="premios-reconocimiento">
+            <div class="premios-rec-card">
+                <p class="premios-rec-label">Beneficiario de las Líneas de Apoyo Económico para el Sector Cultura</p>
+                <div class="premios-ministerio">
+                    <div class="premios-ministerio-peru">
+                        <div class="premios-ministerio-escudo">
+                            <div class="premios-ministerio-escudo-inner">PERÚ</div>
+                        </div>
+                        <span class="premios-ministerio-peru-text">PERÚ</span>
+                    </div>
+                    <div class="premios-ministerio-nombre">Ministerio de Cultura</div>
+                </div>
+                <div class="premios-director">
+                    <img class="premios-director-avatar"
+                         src="/giber.png"
+                         alt="Giber García Álamo">
+                    <div>
+                        <p class="premios-director-label">Director del Proyecto</p>
+                        <p class="premios-director-name">Giber García Álamo</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
+
+    </div><!-- /view-premios -->
 
     <!-- Footer -->
     <footer class="footer" id="contacto-footer">
@@ -792,8 +1180,9 @@
                 <div>
                     <h4 class="footer-heading">Explorar</h4>
                     <div class="footer-links">
-                        <a href="#colecciones" class="footer-link">› Servicios</a>
-                        <a href="#nosotros" class="footer-link">› Acerca de</a>
+                        <a href="#colecciones" class="footer-link" onclick="showView('inicio');setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);return false;">› Servicios</a>
+                        <a href="#" class="footer-link" onclick="showView('organizacion');return false;">› Organización</a>
+                        <a href="#" class="footer-link" onclick="showView('premios');return false;">› Premios</a>
                         <a href="{{ route('biblioteca.dashboard') }}" class="footer-link">› Biblioteca</a>
                         <a href="{{ route('fototeca.inicio') }}" class="footer-link">› Fototeca</a>
                     </div>
@@ -896,14 +1285,31 @@
     </div>
 
     <script>
-        // Navbar scroll
+        // Navbar — highlight active link on scroll
         window.addEventListener('scroll', () => {
-            document.getElementById('header').classList.toggle('scrolled', window.scrollY > 50);
+            const links = document.querySelectorAll('.desktop-nav .nav-link');
+            links.forEach(l => l.classList.remove('active-white'));
+            // Keep Inicio highlighted when at top
+            if (window.scrollY < 100) links[0]?.classList.add('active-white');
         });
 
         // Mobile menu
         function openMobileMenu()  { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow = 'hidden'; }
         function closeMobileMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow = ''; }
+
+        // ── VISTAS (Inicio / Organización / Premios) ──
+        function showView(name) {
+            ['inicio','organizacion','premios'].forEach(v => {
+                const el = document.getElementById('view-' + v);
+                if (el) el.style.display = (v === name) ? '' : 'none';
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Si se vuelve a inicio, reinicia el carrusel
+            if (name === 'inicio') {
+                const carousel = document.getElementById('collectionsCarousel');
+                if (carousel && window._carouselInit) window._carouselInit();
+            }
+        }
         window.openMobileMenu  = openMobileMenu;
         window.closeMobileMenu = closeMobileMenu;
 
@@ -924,6 +1330,126 @@
                 if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); }
             });
         });
+
+        // ========== CAROUSEL SLIDER - BUCLE INFINITO ==========
+        (function() {
+            const carousel   = document.getElementById('collectionsCarousel');
+            const origCards  = Array.from(carousel.querySelectorAll('.collection-card'));
+            const n          = origCards.length;
+            const CARD_W     = window.innerWidth < 768 ? 300 : 420;
+            const GAP        = window.innerWidth < 768 ? 16 : 32;
+            const SHIFT      = CARD_W + GAP;
+            const ANIM_MS    = 700;
+            const AUTO_DELAY = 4000;
+
+            // Triplicar para bucle infinito
+            carousel.innerHTML = '';
+            [...origCards, ...origCards, ...origCards].forEach(c => carousel.appendChild(c.cloneNode(true)));
+            carousel.style.gap = GAP + 'px';
+
+            let current  = n;
+            let busy     = false;   // bloquea cualquier acción mientras anima o hace teleport
+            let autoTimer;
+
+            const allCards = () => carousel.querySelectorAll('.collection-card');
+
+            function applyTransform(animated) {
+                carousel.style.transition = animated ? `transform ${ANIM_MS}ms ease-in-out` : 'none';
+                carousel.style.transform  = `translateX(calc(-${current * SHIFT}px + 50vw - ${CARD_W / 2}px))`;
+            }
+
+            function updateStates() {
+                allCards().forEach((card, i) => {
+                    card.classList.toggle('active',   i === current);
+                    card.classList.toggle('inactive', i !== current);
+                });
+            }
+
+            function updateDots() {
+                document.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+                    dot.classList.toggle('active', i === (current % n));
+                });
+            }
+
+            function teleportIfNeeded() {
+                // Al llegar al tercer bloque, salta silenciosamente al segundo (central)
+                if (current >= n * 2) {
+                    current = current - n;
+                    applyTransform(false);
+                } else if (current < n) {
+                    current = current + n;
+                    applyTransform(false);
+                }
+            }
+
+            function go(newCurrent) {
+                if (busy) return;
+                busy = true;
+                current = newCurrent;
+                applyTransform(true);
+                updateStates();
+                updateDots();
+                setTimeout(() => {
+                    teleportIfNeeded();
+                    updateStates();
+                    updateDots();
+                    busy = false;
+                }, ANIM_MS + 20);
+            }
+
+            function initDots() {
+                const container = document.getElementById('carouselDots');
+                container.innerHTML = '';
+                for (let i = 0; i < n; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+                    dot.addEventListener('click', () => {
+                        if (busy) return;
+                        clearInterval(autoTimer);
+                        go(n + i);
+                        startAuto();
+                    });
+                    container.appendChild(dot);
+                }
+            }
+
+            function startAuto() {
+                clearInterval(autoTimer);
+                autoTimer = setInterval(() => {
+                    if (busy) return;
+                    go(current + 1);
+                }, AUTO_DELAY);
+            }
+
+            window.scrollCarousel = function(dir) {
+                if (busy) return;
+                clearInterval(autoTimer);
+                go(current + (dir === 'next' ? 1 : -1));
+                startAuto();
+            };
+
+            // Click en tarjeta activa → navegar; click en inactiva → centrar
+            carousel.addEventListener('click', function(e) {
+                const card = e.target.closest('.collection-card');
+                if (!card) return;
+                const idx = Array.from(allCards()).indexOf(card);
+                if (idx === current) {
+                    const url = card.dataset.url;
+                    if (url) window.location.href = url;
+                } else {
+                    if (busy) return;
+                    clearInterval(autoTimer);
+                    go(idx);
+                    startAuto();
+                }
+            });
+
+            initDots();
+            applyTransform(false);
+            updateStates();
+            updateDots();
+            startAuto();
+        })();
     </script>
     <x-floating-buttons />
 </body>
