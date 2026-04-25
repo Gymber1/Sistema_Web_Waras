@@ -30,6 +30,7 @@
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 space-y-6">
 
+            {{-- Título --}}
             <div>
                 <label class="block text-sm font-bold text-slate-700 mb-1.5">Título <span class="text-red-500">*</span></label>
                 <input type="text" name="title" value="{{ old('title') }}" required
@@ -38,8 +39,9 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
+                {{-- Autores (multiselect chips) --}}
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Autores / Editores</label>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Autores</label>
                     <div id="chips-authors" class="flex flex-wrap gap-2 p-3 border border-slate-300 rounded-xl bg-white min-h-[48px]"></div>
                     <div class="relative mt-2">
                         <input type="text" id="search-authors" placeholder="Buscar y agregar autor..."
@@ -55,79 +57,134 @@
                     </div>
                 </div>
 
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Categorías</label>
-                    <div id="chips-categories" class="flex flex-wrap gap-2 p-3 border border-slate-300 rounded-xl bg-white min-h-[48px]"></div>
-                    <div class="relative mt-2">
-                        <input type="text" id="search-categories" placeholder="Buscar y agregar categoría..."
-                            oninput="filterDropdown(this,'dropdown-categories')" onfocus="showDropdown('dropdown-categories')"
-                            class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
-                        <div id="dropdown-categories" class="tag-dropdown hidden absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-52 overflow-y-auto">
-                            @foreach($categories as $cat)
-                            <button type="button" data-id="{{ $cat->id }}" data-name="{{ $cat->name }}"
-                                onclick="addChip(this,'chips-categories','categories')"
-                                class="w-full text-left px-4 py-2.5 hover:bg-emerald-50 text-sm border-b border-slate-50 last:border-0"
-                                style="padding-left: {{ 16 + $cat->depth * 16 }}px">
-                                {{ $cat->depth > 0 ? str_repeat('— ', $cat->depth) : '' }}{{ $cat->name }}
-                            </button>
-                            @endforeach
-                        </div>
-                    </div>
+                {{-- Tipo de documento --}}
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Tipo de documento <span class="text-red-500">*</span></label>
+                    <select name="document_type" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+                        <option value="Revista" @selected(old('document_type','Revista')==='Revista')>Revista</option>
+                        <option value="Libro"   @selected(old('document_type')==='Libro')>Libros y artículos</option>
+                        <option value="Artículo" @selected(old('document_type')==='Artículo')>Artículo</option>
+                        <option value="Tesis"   @selected(old('document_type')==='Tesis')>Tesis</option>
+                    </select>
                 </div>
 
+                {{-- Sección --}}
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Editorial</label>
-                    <select name="publisher_id" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
-                        <option value="">Sin editorial</option>
-                        @foreach($publishers as $pub)
-                        <option value="{{ $pub->id }}" @selected(old('publisher_id') == $pub->id)>{{ $pub->name }}</option>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Sección <span class="text-red-500">*</span></label>
+                    <select name="section" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+                        <option value="Biblioteca Digital" @selected(old('section','Biblioteca Digital')==='Biblioteca Digital')>Biblioteca Digital</option>
+                        <option value="Waras Editorial"    @selected(old('section')==='Waras Editorial')>Waras Editorial</option>
+                    </select>
+                </div>
+
+                {{-- Categoría --}}
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Categoría</label>
+                    <select name="category_id" id="category_id" onchange="loadSubcategories(this.value)"
+                        class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+                        <option value="">— Sin categoría —</option>
+                        @foreach($categories as $cat)
+                        <option value="{{ $cat->id }}" @selected(old('category_id') == $cat->id)>{{ $cat->name }}</option>
                         @endforeach
                     </select>
                 </div>
 
+                {{-- SubCategoría --}}
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">SubCategoría</label>
+                    <select name="subcategory_id" id="subcategory_id"
+                        class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white disabled:opacity-50"
+                        {{ old('category_id') ? '' : 'disabled' }}>
+                        <option value="">— Selecciona primero una categoría —</option>
+                    </select>
+                </div>
+
+                {{-- Resumen --}}
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Resumen</label>
+                    <textarea name="summary" rows="4"
+                        class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none resize-y">{{ old('summary') }}</textarea>
+                </div>
+
+                {{-- Pie de Imprenta --}}
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Pie de Imprenta
+                        <span class="text-slate-400 font-normal">(Lugar, editorial, año)</span>
+                    </label>
+                    <input type="text" name="imprint" value="{{ old('imprint') }}" placeholder="Ej. Huaraz: UNASAM, 2020"
+                        class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+
+                {{-- N° Páginas --}}
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">N° Páginas</label>
+                    <input type="number" name="pages" value="{{ old('pages') }}" min="1"
+                        class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+
+                {{-- Fecha de publicación --}}
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Fecha de publicación</label>
                     <input type="date" name="publication_date" value="{{ old('publication_date') }}"
                         class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
 
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Páginas</label>
-                    <input type="number" name="pages" value="{{ old('pages') }}" min="1"
+                {{-- Descriptores --}}
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Descriptores</label>
+                    <div id="chips-descriptors" class="flex flex-wrap gap-2 p-3 border border-slate-300 rounded-xl bg-white min-h-[48px]"></div>
+                    <div class="relative mt-2">
+                        <input type="text" id="search-descriptors" placeholder="Buscar y agregar descriptor..."
+                            oninput="filterDropdown(this,'dropdown-descriptors')" onfocus="showDropdown('dropdown-descriptors')"
+                            class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
+                        <div id="dropdown-descriptors" class="tag-dropdown hidden absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-52 overflow-y-auto">
+                            @foreach($descriptors as $descriptor)
+                            <button type="button" data-id="{{ $descriptor->id }}" data-name="{{ $descriptor->name }}"
+                                onclick="addChip(this,'chips-descriptors','descriptors')"
+                                class="w-full text-left px-4 py-2.5 hover:bg-emerald-50 text-sm border-b border-slate-50 last:border-0">{{ $descriptor->name }}</button>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Proveído --}}
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Proveído
+                        <span class="text-slate-400 font-normal">(origen o donante del material)</span>
+                    </label>
+                    <input type="text" name="provider" value="{{ old('provider') }}" placeholder="Ej. Donación Familia Alba"
                         class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
 
+                {{-- Tipo de acceso --}}
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Tipo de acceso <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Tipo de Acceso <span class="text-red-500">*</span></label>
                     <select name="source_type" id="source_type" onchange="toggleSourceFields()"
                         class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
-                        <option value="none" @selected(old('source_type','none')==='none')>Sin acceso</option>
+                        <option value="none"     @selected(old('source_type','none')==='none')>Sin acceso</option>
                         <option value="external" @selected(old('source_type')==='external')>URL externa</option>
-                        <option value="pdf" @selected(old('source_type')==='pdf')>Archivo PDF</option>
+                        <option value="pdf"      @selected(old('source_type')==='pdf')>Carga de archivo PDF</option>
                     </select>
                 </div>
 
+                {{-- URL externa (condicional) --}}
                 <div id="field-external" style="display:none">
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">URL externa</label>
                     <input type="url" name="external_url" value="{{ old('external_url') }}" placeholder="https://..."
                         class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
 
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Sinopsis</label>
-                    <textarea name="summary" rows="3"
-                        class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none resize-y">{{ old('summary') }}</textarea>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Imagen de portada</label>
-                    <input type="file" name="cover_image" accept="image/*"
-                        class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-emerald-100 file:text-emerald-700 file:font-semibold hover:file:bg-emerald-200">
-                </div>
-
+                {{-- PDF (condicional) --}}
                 <div id="field-pdf" style="display:none">
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Archivo PDF</label>
                     <input type="file" name="pdf_file" accept=".pdf"
+                        class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-emerald-100 file:text-emerald-700 file:font-semibold hover:file:bg-emerald-200">
+                </div>
+
+                {{-- Imagen de portada --}}
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Imagen de portada</label>
+                    <input type="file" name="cover_image" accept="image/*"
                         class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-emerald-100 file:text-emerald-700 file:font-semibold hover:file:bg-emerald-200">
                 </div>
 
@@ -143,6 +200,36 @@
     </form>
 </div>
 <script>
+const subcatsMap = @json(
+    $categories->mapWithKeys(fn($cat) => [
+        $cat->id => $cat->subcategories->map(fn($s) => ['id' => $s->id, 'name' => $s->name])->values()
+    ])
+);
+
+function loadSubcategories(catId) {
+    const sel = document.getElementById('subcategory_id');
+    sel.innerHTML = '<option value="">— Sin subcategoría —</option>';
+    if (!catId || !subcatsMap[catId] || subcatsMap[catId].length === 0) {
+        sel.disabled = true;
+        return;
+    }
+    subcatsMap[catId].forEach(sub => {
+        const opt = document.createElement('option');
+        opt.value = sub.id;
+        opt.textContent = sub.name;
+        sel.appendChild(opt);
+    });
+    sel.disabled = false;
+}
+
+// Restaurar subcategorías si hay old() tras error de validación
+@if(old('category_id'))
+document.addEventListener('DOMContentLoaded', function() {
+    loadSubcategories('{{ old('category_id') }}');
+    document.getElementById('subcategory_id').value = '{{ old('subcategory_id') }}';
+});
+@endif
+
 function removeChip(btn) { btn.closest('.chip').remove(); }
 function showDropdown(id) { document.getElementById(id).classList.remove('hidden'); }
 function filterDropdown(input, dropdownId) {
@@ -150,7 +237,6 @@ function filterDropdown(input, dropdownId) {
     const dropdown = document.getElementById(dropdownId);
     dropdown.classList.toggle('hidden', q.length === 0);
     dropdown.querySelectorAll('button').forEach(btn => { btn.style.display = btn.dataset.name?.toLowerCase().includes(q) ? '' : 'none'; });
-    dropdown.querySelectorAll('div').forEach(div => { div.style.display = ''; });
 }
 function addChip(btn, chipsId, field) {
     const id = btn.dataset.id, name = btn.dataset.name;
@@ -171,5 +257,6 @@ function toggleSourceFields() {
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.relative')) document.querySelectorAll('.tag-dropdown').forEach(d => d.classList.add('hidden'));
 });
+toggleSourceFields();
 </script>
 @endsection

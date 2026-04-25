@@ -415,7 +415,6 @@
     <a href="{{ route('fototeca.inicio') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Inicio')">Inicio</a>
     <a href="{{ route('fototeca.galeria.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Galería')">Galería</a>
     <a href="{{ route('fototeca.fotografos.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')">Fotógrafos</a>
-    <a href="{{ route('fototeca.especiales.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Especiales')">Especiales</a>
     <a href="{{ route('fototeca.aportantes.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Aportantes')">Aportantes</a>
 </div>
 
@@ -429,7 +428,6 @@
         <a href="{{ route('fototeca.inicio') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Inicio')">Inicio</a>
         <a href="{{ route('fototeca.galeria.index') }}" class="g-nav-link active" onclick="sessionStorage.setItem('fototeca_tab','Galería')">Galería</a>
         <a href="{{ route('fototeca.fotografos.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')">Fotógrafos</a>
-        <a href="{{ route('fototeca.especiales.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Especiales')">Especiales</a>
         <a href="{{ route('fototeca.aportantes.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Aportantes')">Aportantes</a>
         <a href="{{ route('home') }}" class="g-nav-btn">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>

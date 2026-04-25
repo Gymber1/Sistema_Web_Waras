@@ -19,7 +19,6 @@ class FototecaController extends Controller
             'photos'        => Photo::count(),
             'photographers' => Photographer::count(),
             'categories'    => Category::where('type', 'fototeca')->count(),
-            'specials'      => Photo::where('is_special', true)->count(),
         ];
 
         return view('admin.fototeca.index', compact('stats'));
@@ -236,18 +235,17 @@ class FototecaController extends Controller
         return redirect()->route('admin.fototeca.photographers')->with('success', 'Fotógrafo eliminado.');
     }
 
-    // ============= CATEGORÍAS =============
+    // ============= CATEGORÍAS (Nivel 1) =============
 
     public function indexCategories()
     {
-        $allCategories = Category::flatTree('fototeca');
-        return view('admin.fototeca.categories.index', compact('allCategories'));
+        $categories = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->get();
+        return view('admin.fototeca.categories.index', compact('categories'));
     }
 
     public function createCategory()
     {
-        $allCategories = Category::flatTree('fototeca');
-        return view('admin.fototeca.categories.create', compact('allCategories'));
+        return view('admin.fototeca.categories.create');
     }
 
     public function storeCategory(Request $request)
@@ -255,7 +253,6 @@ class FototecaController extends Controller
         $request->validate([
             'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
-            'parent_id'   => 'nullable|exists:categories,id',
         ]);
 
         Category::create([
@@ -263,7 +260,7 @@ class FototecaController extends Controller
             'slug'        => $this->uniqueSlug($request->name, Category::class),
             'description' => $request->description,
             'type'        => 'fototeca',
-            'parent_id'   => $request->parent_id,
+            'parent_id'   => null,
         ]);
 
         return redirect()->route('admin.fototeca.categories')->with('success', 'Categoría agregada correctamente.');
@@ -271,8 +268,7 @@ class FototecaController extends Controller
 
     public function editCategory(Category $category)
     {
-        $allCategories = Category::flatTree('fototeca');
-        return view('admin.fototeca.categories.edit', compact('category', 'allCategories'));
+        return view('admin.fototeca.categories.edit', compact('category'));
     }
 
     public function updateCategory(Request $request, Category $category)
@@ -280,13 +276,11 @@ class FototecaController extends Controller
         $request->validate([
             'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
-            'parent_id'   => 'nullable|exists:categories,id',
         ]);
 
         $category->update([
             'name'        => $request->name,
             'description' => $request->description,
-            'parent_id'   => $request->parent_id,
         ]);
 
         return redirect()->route('admin.fototeca.categories')->with('success', 'Categoría actualizada correctamente.');
@@ -298,18 +292,142 @@ class FototecaController extends Controller
         return redirect()->route('admin.fototeca.categories')->with('success', 'Categoría eliminada.');
     }
 
-    // ============= ESPECIALES =============
+    // ============= SUBCATEGORÍAS (Nivel 2) =============
 
-    public function indexSpecials()
+    public function indexSubcategories()
     {
-        $photos = Photo::with(['photographers', 'categories'])->orderBy('title')->get();
-        return view('admin.fototeca.specials.index', compact('photos'));
+        $subcategories = Category::where('type', 'fototeca')
+            ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
+            ->with('parent')
+            ->orderBy('name')
+            ->get();
+        $parentCategories = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->get();
+        return view('admin.fototeca.subcategories.index', compact('subcategories', 'parentCategories'));
     }
 
-    public function toggleSpecial(Request $request, Photo $photo)
+    public function createSubcategory()
     {
-        $photo->update(['is_special' => !$photo->is_special]);
-        return response()->json(['is_special' => $photo->is_special]);
+        $parentCategories = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->get();
+        return view('admin.fototeca.subcategories.create', compact('parentCategories'));
+    }
+
+    public function storeSubcategory(Request $request)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'parent_id' => 'required|exists:categories,id',
+        ]);
+
+        Category::create([
+            'name'      => $request->name,
+            'slug'      => $this->uniqueSlug($request->name, Category::class),
+            'type'      => 'fototeca',
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return redirect()->route('admin.fototeca.subcategories')->with('success', 'SubCategoría agregada correctamente.');
+    }
+
+    public function editSubcategory(Category $category)
+    {
+        $parentCategories = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->get();
+        return view('admin.fototeca.subcategories.edit', compact('category', 'parentCategories'));
+    }
+
+    public function updateSubcategory(Request $request, Category $category)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'parent_id' => 'required|exists:categories,id',
+        ]);
+
+        $category->update([
+            'name'      => $request->name,
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return redirect()->route('admin.fototeca.subcategories')->with('success', 'SubCategoría actualizada correctamente.');
+    }
+
+    public function destroySubcategory(Category $category)
+    {
+        $category->delete();
+        return redirect()->route('admin.fototeca.subcategories')->with('success', 'SubCategoría eliminada.');
+    }
+
+    // ============= SUBNIVEL (Nivel 3) =============
+
+    public function indexSublevels()
+    {
+        $sublevels = Category::where('type', 'fototeca')
+            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id'))
+            ->with(['parent', 'parent.parent'])
+            ->orderBy('name')
+            ->get();
+        $parentCategories = Category::where('type', 'fototeca')
+            ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
+            ->with('parent')
+            ->orderBy('name')
+            ->get();
+        return view('admin.fototeca.sublevels.index', compact('sublevels', 'parentCategories'));
+    }
+
+    public function createSublevel()
+    {
+        $parentCategories = Category::where('type', 'fototeca')
+            ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
+            ->with('parent')
+            ->orderBy('name')
+            ->get();
+        return view('admin.fototeca.sublevels.create', compact('parentCategories'));
+    }
+
+    public function storeSublevel(Request $request)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'parent_id' => 'required|exists:categories,id',
+        ]);
+
+        Category::create([
+            'name'      => $request->name,
+            'slug'      => $this->uniqueSlug($request->name, Category::class),
+            'type'      => 'fototeca',
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return redirect()->route('admin.fototeca.sublevels')->with('success', 'SubNivel agregado correctamente.');
+    }
+
+    public function editSublevel(Category $category)
+    {
+        $parentCategories = Category::where('type', 'fototeca')
+            ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
+            ->with('parent')
+            ->orderBy('name')
+            ->get();
+        return view('admin.fototeca.sublevels.edit', compact('category', 'parentCategories'));
+    }
+
+    public function updateSublevel(Request $request, Category $category)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'parent_id' => 'required|exists:categories,id',
+        ]);
+
+        $category->update([
+            'name'      => $request->name,
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return redirect()->route('admin.fototeca.sublevels')->with('success', 'SubNivel actualizado correctamente.');
+    }
+
+    public function destroySublevel(Category $category)
+    {
+        $category->delete();
+        return redirect()->route('admin.fototeca.sublevels')->with('success', 'SubNivel eliminado.');
     }
 
     // ============= HELPERS =============

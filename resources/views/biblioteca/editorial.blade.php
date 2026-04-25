@@ -66,12 +66,11 @@
 <div class="mobile-nav" id="mobileNav">
     <button class="mobile-nav-close" onclick="document.getElementById('mobileNav').classList.remove('open');document.body.style.overflow=''"><i class="fas fa-times"></i></button>
     <a href="{{ route('biblioteca.inicio') }}" class="mobile-nav-item">Inicio</a>
-    <a href="{{ route('biblioteca.libros.index') }}" class="mobile-nav-item">Libros</a>
+    <a href="{{ route('biblioteca.libros.index') }}" class="mobile-nav-item">Biblioteca Digital</a>
+    <a href="{{ route('biblioteca.editorial.index') }}" class="mobile-nav-item">Waras Editorial</a>
     <a href="{{ route('biblioteca.revistas.index') }}" class="mobile-nav-item">Revistas</a>
-    <a href="{{ route('biblioteca.editoriales.index') }}" class="mobile-nav-item active">Editoriales</a>
-    <a href="{{ route('biblioteca.especiales.index') }}" class="mobile-nav-item">Especiales</a>
     <a href="{{ route('biblioteca.autores.index') }}" class="mobile-nav-item">Autores</a>
-    <a href="{{ route('biblioteca.aportantes.index') }}" class="mobile-nav-item">Aportantes</a>
+    <a href="{{ route('biblioteca.especiales.index') }}" class="mobile-nav-item">Especiales</a>
     <a href="{{ route('home') }}" class="mobile-nav-item" style="font-size:1rem;opacity:0.6">Portal Principal</a>
 </div>
 <header class="header">
@@ -81,13 +80,12 @@
             <span class="logo-text">WARAS</span><span class="logo-sub">Biblioteca</span>
         </a>
         <nav class="nav-menu">
-            <a href="{{ route('biblioteca.dashboard') }}" class="nav-item">Inicio</a>
-            <a href="{{ route('biblioteca.libros.index') }}" class="nav-item">Libros</a>
+            <a href="{{ route('biblioteca.inicio') }}" class="nav-item">Inicio</a>
+            <a href="{{ route('biblioteca.libros.index') }}" class="nav-item">Biblioteca Digital</a>
+            <a href="{{ route('biblioteca.editorial.index') }}" class="nav-item active">Waras Editorial</a>
             <a href="{{ route('biblioteca.revistas.index') }}" class="nav-item">Revistas</a>
-            <a href="{{ route('biblioteca.editoriales.index') }}" class="nav-item active">Editoriales</a>
-            <a href="{{ route('biblioteca.especiales.index') }}" class="nav-item">Especiales</a>
             <a href="{{ route('biblioteca.autores.index') }}" class="nav-item">Autores</a>
-            <a href="{{ route('biblioteca.aportantes.index') }}" class="nav-item">Aportantes</a>
+            <a href="{{ route('biblioteca.especiales.index') }}" class="nav-item">Especiales</a>
         </nav>
         <div class="header-actions">
             <a href="{{ route('home') }}" class="header-btn header-btn-outline">

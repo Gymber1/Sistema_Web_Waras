@@ -13,9 +13,9 @@
         <div>
             <div class="flex items-center gap-3 flex-wrap">
                 <h1 class="text-2xl font-black text-slate-900">Agregar categoría</h1>
-                <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider">BIBLIOTECA</span>
+                <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider">CATEGORÍA</span>
             </div>
-            <p class="text-slate-500 text-sm mt-1">Elige un padre para crear una subcategoría. Sin padre = categoría raíz.</p>
+            <p class="text-slate-500 text-sm mt-1">Las categorías son el nivel superior de clasificación.</p>
         </div>
     </div>
 
@@ -28,36 +28,12 @@
     <form action="{{ route('admin.biblioteca.categories.store') }}" method="POST">
         @csrf
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 space-y-6">
-
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
             <div>
                 <label class="block text-sm font-bold text-slate-700 mb-1.5">Nombre <span class="text-red-500">*</span></label>
                 <input type="text" name="name" value="{{ old('name') }}" required autofocus
                     class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
             </div>
-
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1.5">
-                    Categoría padre
-                    <span class="text-slate-400 font-normal">(dejar vacío para categoría raíz)</span>
-                </label>
-                <select name="parent_id" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
-                    <option value="">— Sin padre (categoría principal) —</option>
-                    @foreach($allCategories as $cat)
-                    <option value="{{ $cat->id }}"
-                        @selected(old('parent_id', request('parent_id')) == $cat->id)>
-                        {{ str_repeat('　', $cat->depth) }}{{ $cat->depth > 0 ? '└ ' : '' }}{{ $cat->name }}
-                    </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1.5">Descripción</label>
-                <textarea name="description" rows="3"
-                    class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none resize-y">{{ old('description') }}</textarea>
-            </div>
-
         </div>
 
         <div class="mt-6 flex gap-3 justify-end">

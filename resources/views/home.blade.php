@@ -22,9 +22,11 @@
             transition: all 0.3s ease;
         }
         .header.scrolled {
-            background: #111;
+            background: rgba(10,10,10,0.97);
+            backdrop-filter: blur(12px);
             padding: 0.75rem 0;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 24px rgba(0,0,0,0.6);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
         .nav-wrapper {
             max-width: 1300px; margin: 0 auto; padding: 0 2rem;
@@ -239,7 +241,10 @@
         }
         .collections-carousel-container {
             position: relative;
-            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            overflow: hidden;
         }
         .collections-carousel {
             display: flex;
@@ -854,9 +859,10 @@
     <div class="mobile-menu" id="mobileMenu">
         <button class="mobile-menu-close" onclick="closeMobileMenu()">&#10005;</button>
         <a href="{{ route('home') }}" class="mobile-nav-link" onclick="showView('inicio');closeMobileMenu();return false;">Inicio</a>
-        <button onclick="showView('organizacion');closeMobileMenu();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Organización</button>
         <button onclick="showView('inicio');closeMobileMenu();setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Colecciones</button>
+        <button onclick="showView('organizacion');closeMobileMenu();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Organización</button>
         <button onclick="showView('premios');closeMobileMenu();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Premios</button>
+        <button onclick="showView('aportantes');closeMobileMenu();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Aportantes</button>
         <button onclick="closeMobileMenu(); openContactModal();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Contacto</button>
         @if(auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
             <a href="{{ route('admin.dashboard') }}" class="mobile-nav-btn">Panel Admin</a>
@@ -871,9 +877,10 @@
             <a href="{{ route('home') }}" class="logo">WARAS</a>
             <nav class="desktop-nav">
                 <a href="{{ route('home') }}" class="nav-link" onclick="showView('inicio');return false;">Inicio</a>
-                <button onclick="showView('organizacion')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Organización</button>
                 <a href="#colecciones" class="nav-link" onclick="showView('inicio');setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);return false;">Colecciones</a>
+                <button onclick="showView('organizacion')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Organización</button>
                 <button onclick="showView('premios')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Premios</button>
+                <button onclick="showView('aportantes')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Aportantes</button>
                 <button onclick="openContactModal()" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Contacto</button>
                 @if(auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
                     <a href="{{ route('admin.dashboard') }}" class="btn-admin">Panel Admin</a>
@@ -899,7 +906,7 @@
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <p class="hero-eyebrow">Asociación de Ciencia y Cultura</p>
-            <h1 class="hero-title">PORTAL UNIFICADO<br>EN ÁNCASH</h1>
+            <h1 class="hero-title">WARAS</h1>
             <p class="hero-subtitle">"Descubre nuestras colecciones de libros, fotos, música, artes y eventos históricos que preservan la memoria de nuestra región."</p>
             <a href="#colecciones" class="hero-cta">Explorar Servicios</a>
         </div>
@@ -1020,7 +1027,6 @@
             </div>
             <div>
                 <div class="org-eyebrow">
-                    <div class="org-eyebrow-icon">👥</div>
                     <span class="org-eyebrow-text">Quiénes Somos</span>
                 </div>
                 <h2 class="org-title">Asociación Waras:<br><em>Ciencia y Cultura</em></h2>
@@ -1035,12 +1041,16 @@
     <section class="org-cards-section">
         <div class="org-cards-inner">
             <div class="org-card org-card-light">
-                <div class="org-card-icon org-card-icon-light">🎯</div>
+                <div class="">
+                    <img src="/Nuestra_Finalidad.png" alt="Nuestra Finalidad" style="width:100px;height:50px;object-fit:contain;">
+                </div>
                 <h3 class="org-card-title">Nuestra Finalidad</h3>
                 <p class="org-card-text">Promover estudios, investigaciones, capacitaciones, propuestas y espacios que aporten al desarrollo económico, social, ambiental, cultural, educacional, científico, tecnológico, y ciudadanía en el departamento de Áncash para la mejora de la calidad de vida de sus ciudadanos.</p>
             </div>
             <div class="org-card org-card-dark">
-                <div class="org-card-icon org-card-icon-dark">🏆</div>
+                <div class="">
+                    <img src="/Objetivo_General.png" alt="Objetivo General" style="width:100px;height:50px;object-fit:contain;">
+                </div>
                 <h3 class="org-card-title">Objetivo General</h3>
                 <ul class="org-card-list">
                     <li><span class="org-card-list-arrow">›</span> Contribuir al Desarrollo Económico y Social del Departamento de Ancash.</li>
@@ -1162,6 +1172,118 @@
 
     </div><!-- /view-premios -->
 
+    <!-- ===== VISTA: APORTANTES ===== -->
+    <div id="view-aportantes" class="page-view" style="display:none;">
+
+        {{-- Hero Banner (mismo patrón que Organización y Premios) --}}
+        <section class="subview-hero">
+            <div class="subview-hero-bg" style="background-image:url('{{ $heroBg }}');"></div>
+            <div class="subview-hero-overlay"></div>
+            <div class="subview-hero-content">
+                <h1 class="subview-hero-title">Aportantes y Aliados</h1>
+                <p class="subview-hero-sub">Un grupo de ciudadanos, empresas e instituciones que hacen posible la preservación de nuestro legado cultural.</p>
+            </div>
+        </section>
+
+        {{-- Sección principal: categorías + director --}}
+        <section style="padding:6rem 2rem;background:#f9f8f6;">
+            <div style="max-width:1200px;margin:0 auto;">
+
+                {{-- Encabezado de sección --}}
+                <div class="section-header" style="margin-bottom:4rem;">
+                    <p class="section-eyebrow">Red de Colaboración Cultural</p>
+                    <h2 class="section-title">Nuestros Aportantes</h2>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 340px;gap:4rem;align-items:start;">
+
+                    {{-- Columna izquierda: categorías --}}
+                    <div style="display:flex;flex-direction:column;gap:3.5rem;">
+                        @foreach($aportantes['categorias'] as $cat)
+                        <div>
+                            {{-- Título de categoría --}}
+                            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;">
+                                <div style="width:36px;height:36px;background:rgba(205,162,116,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    @php
+                                        $slugs = ['building','heart','landmark','star','users','book','globe','leaf','award','briefcase'];
+                                        $isImg = $cat['icono'] && !in_array($cat['icono'], $slugs);
+                                    @endphp
+                                    @if($isImg)
+                                        <img src="{{ $cat['icono'] }}" alt="" style="width:20px;height:20px;object-fit:contain;">
+                                    @elseif($cat['icono'] === 'building')
+                                        <svg width="18" height="18" fill="none" stroke="#cda274" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                    @elseif($cat['icono'] === 'heart')
+                                        <svg width="18" height="18" fill="none" stroke="#cda274" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                    @elseif($cat['icono'] === 'star')
+                                        <svg width="18" height="18" fill="none" stroke="#cda274" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    @elseif($cat['icono'] === 'users')
+                                        <svg width="18" height="18" fill="none" stroke="#cda274" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    @elseif($cat['icono'] === 'book')
+                                        <svg width="18" height="18" fill="none" stroke="#cda274" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                                    @elseif($cat['icono'] === 'globe')
+                                        <svg width="18" height="18" fill="none" stroke="#cda274" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                    @elseif($cat['icono'] === 'leaf')
+                                        <svg width="18" height="18" fill="none" stroke="#cda274" stroke-width="2" viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 19.23A2 2 0 0 0 5.59 22c5.26-1.34 9.29-4.28 11.41-8.67C18 11 17.63 8.63 17 8z"/><path d="M3.82 19.23C3 20.23 2 21 2 21s0-6 5-10c1.35-1.08 3-1.67 5-2"/></svg>
+                                    @elseif($cat['icono'] === 'award')
+                                        <svg width="18" height="18" fill="none" stroke="#cda274" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+                                    @elseif($cat['icono'] === 'briefcase')
+                                        <svg width="18" height="18" fill="none" stroke="#cda274" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                                    @else
+                                        <svg width="18" height="18" fill="none" stroke="#cda274" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+                                    @endif
+                                </div>
+                                <div>
+                                    <p style="font-size:.65rem;font-weight:700;color:#cda274;text-transform:uppercase;letter-spacing:.2em;margin-bottom:.2rem;">Categoría</p>
+                                    <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#111;font-weight:700;">{{ $cat['titulo'] }}</h3>
+                                </div>
+                            </div>
+                            <div style="height:1px;background:#e5e7eb;margin-bottom:1.5rem;"></div>
+
+                            {{-- Items --}}
+                            <div style="display:flex;flex-direction:column;gap:1.25rem;">
+                                @foreach($cat['items'] as $item)
+                                <div class="about-box" style="display:flex;gap:1.5rem;align-items:flex-start;padding:1.75rem;cursor:default;">
+                                    @if($item['foto'])
+                                        <img src="{{ $item['foto'] }}" alt="{{ $item['nombre'] }}" loading="lazy"
+                                             style="width:80px;height:80px;object-fit:cover;flex-shrink:0;border:1px solid #e5e7eb;">
+                                    @else
+                                        <div style="width:80px;height:80px;flex-shrink:0;border:1px solid #e5e7eb;background:#f9f8f6;display:flex;align-items:center;justify-content:center;">
+                                            <svg width="32" height="32" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                        </div>
+                                    @endif
+                                    <div>
+                                        <h4 style="font-family:'Playfair Display',serif;font-size:1.05rem;color:#111;margin-bottom:.5rem;">{{ $item['nombre'] }}</h4>
+                                        <p class="about-text" style="margin:0;font-size:.875rem;">{{ $item['descripcion'] }}</p>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Columna derecha: Director --}}
+                    <div style="position:sticky;top:7rem;">
+                        <p style="font-size:.65rem;font-weight:700;color:#cda274;text-transform:uppercase;letter-spacing:.2em;margin-bottom:1.5rem;">Director</p>
+                        <div style="background:white;border:1px solid #e5e7eb;padding:2rem;text-align:center;">
+                            <div style="position:relative;width:140px;height:140px;margin:0 auto 1.5rem;">
+                                <img src="{{ $aportantes['director']['foto'] }}" alt="{{ $aportantes['director']['nombre'] }}"
+                                     style="width:140px;height:140px;object-fit:cover;border-radius:50%;border:3px solid #e5e7eb;"
+                                     onerror="this.style.display='none'">
+                                <div style="position:absolute;inset:-6px;border-radius:50%;border:1px solid #cda274;opacity:.4;pointer-events:none;"></div>
+                            </div>
+                            <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#111;margin-bottom:.4rem;">{{ $aportantes['director']['nombre'] }}</p>
+                            <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:.95rem;color:#cda274;margin-bottom:1rem;">{{ $aportantes['director']['cargo'] }}</p>
+                            <p class="about-text" style="font-size:.82rem;text-align:left;margin:0;">{{ $aportantes['director']['bio'] }}</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </div><!-- /view-aportantes -->
+
     <!-- Footer -->
     <footer class="footer" id="contacto-footer">
         <div class="footer-inner">
@@ -1191,15 +1313,21 @@
                 <div>
                     <h4 class="footer-heading">Contacto</h4>
                     <div class="footer-contact-item">
-                        <span class="footer-contact-icon">📍</span>
+                        <div class="">
+                            <img src="/Direccion.png" alt="Dirección" style="width:30px;height:30px;object-fit:contain;">
+                        </div>
                         <span>Esq. Av. Luzuriaga con Av. 28 de Julio<br>Huaraz, Áncash, Perú</span>
                     </div>
                     <div class="footer-contact-item">
-                        <span class="footer-contact-icon">📞</span>
+                        <div class="">
+                            <img src="/Telefono.png" alt="Teléfonos" style="width:30px;height:30px;object-fit:contain;">
+                        </div>
                         <span>+51 952-845-942</span>
                     </div>
                     <div class="footer-contact-item">
-                        <span class="footer-contact-icon">✉️</span>
+                        <div class="">
+                            <img src="/Email.png" alt="Correo Electrónico" style="width:30px;height:30px;object-fit:contain;">
+                        </div>
                         <span>giber.garcia@pcca.org</span>
                     </div>
                 </div>
@@ -1234,7 +1362,9 @@
                 <p class="modal-desc">El proceso es simple, solo tiene que llenar el formulario y enviar. También cuenta con información más específica como correos y números telefónicos a continuación.</p>
                 <div class="modal-contact-cards">
                     <div class="modal-contact-card full">
-                        <div class="modal-contact-icon-wrap">📍</div>
+                        <div class="modal-contact-icon-wrap">
+                            <img src="/Direccion.png" alt="Dirección" style="width:50px;height:50px;object-fit:contain;">
+                        </div>
                         <div>
                             <p class="modal-contact-label">Dirección</p>
                             <p class="modal-contact-value">Esq. Av. Luzuriaga con Av. 28 de Julio<br>Huaraz, Áncash, Perú</p>
@@ -1242,14 +1372,18 @@
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
                         <div class="modal-contact-card">
-                            <div class="modal-contact-icon-wrap">📞</div>
+                            <div class="modal-contact-icon-wrap">
+                                <img src="/Telefono.png" alt="Teléfonos" style="width:50px;height:50px;object-fit:contain;">
+                            </div>
                             <div>
                                 <p class="modal-contact-label">Teléfonos</p>
                                 <p class="modal-contact-value">952 845 942</p>
                             </div>
                         </div>
                         <div class="modal-contact-card">
-                            <div class="modal-contact-icon-wrap">✉️</div>
+                            <div class="modal-contact-icon-wrap">
+                                <img src="/Email.png" alt="Email" style="width:50px;height:50px;object-fit:contain;">
+                            </div>
                             <div>
                                 <p class="modal-contact-label">Email</p>
                                 <p class="modal-contact-value" style="word-break:break-all;">giber.garcia@pcca.org</p>
@@ -1285,13 +1419,15 @@
     </div>
 
     <script>
-        // Navbar — highlight active link on scroll
+        // Navbar — oscurecer al hacer scroll
+        const _header = document.getElementById('header');
         window.addEventListener('scroll', () => {
-            const links = document.querySelectorAll('.desktop-nav .nav-link');
-            links.forEach(l => l.classList.remove('active-white'));
-            // Keep Inicio highlighted when at top
-            if (window.scrollY < 100) links[0]?.classList.add('active-white');
-        });
+            if (window.scrollY > 40) {
+                _header.classList.add('scrolled');
+            } else {
+                _header.classList.remove('scrolled');
+            }
+        }, { passive: true });
 
         // Mobile menu
         function openMobileMenu()  { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow = 'hidden'; }
@@ -1299,12 +1435,11 @@
 
         // ── VISTAS (Inicio / Organización / Premios) ──
         function showView(name) {
-            ['inicio','organizacion','premios'].forEach(v => {
+            ['inicio','organizacion','premios','aportantes'].forEach(v => {
                 const el = document.getElementById('view-' + v);
                 if (el) el.style.display = (v === name) ? '' : 'none';
             });
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            // Si se vuelve a inicio, reinicia el carrusel
             if (name === 'inicio') {
                 const carousel = document.getElementById('collectionsCarousel');
                 if (carousel && window._carouselInit) window._carouselInit();
@@ -1333,14 +1468,16 @@
 
         // ========== CAROUSEL SLIDER - BUCLE INFINITO ==========
         (function() {
-            const carousel   = document.getElementById('collectionsCarousel');
-            const origCards  = Array.from(carousel.querySelectorAll('.collection-card'));
-            const n          = origCards.length;
-            const CARD_W     = window.innerWidth < 768 ? 300 : 420;
-            const GAP        = window.innerWidth < 768 ? 16 : 32;
-            const SHIFT      = CARD_W + GAP;
-            const ANIM_MS    = 700;
-            const AUTO_DELAY = 4000;
+            const carousel     = document.getElementById('collectionsCarousel');
+            const carouselWrap = carousel.closest('.collections-carousel-container');
+            const origCards    = Array.from(carousel.querySelectorAll('.collection-card'));
+            const n            = origCards.length;
+            const ANIM_MS      = 700;
+            const AUTO_DELAY   = 4000;
+
+            let CARD_W = window.innerWidth < 768 ? 300 : 420;
+            let GAP    = window.innerWidth < 768 ? 16  : 32;
+            let SHIFT  = CARD_W + GAP;
 
             // Triplicar para bucle infinito
             carousel.innerHTML = '';
@@ -1348,15 +1485,30 @@
             carousel.style.gap = GAP + 'px';
 
             let current  = n;
-            let busy     = false;   // bloquea cualquier acción mientras anima o hace teleport
+            let busy     = false;
             let autoTimer;
 
             const allCards = () => carousel.querySelectorAll('.collection-card');
 
+            // Calcula el offset usando el ancho real del contenedor (no 50vw)
+            function getOffset() {
+                const containerW = carouselWrap.getBoundingClientRect().width;
+                return (containerW / 2) - (CARD_W / 2);
+            }
+
             function applyTransform(animated) {
                 carousel.style.transition = animated ? `transform ${ANIM_MS}ms ease-in-out` : 'none';
-                carousel.style.transform  = `translateX(calc(-${current * SHIFT}px + 50vw - ${CARD_W / 2}px))`;
+                carousel.style.transform  = `translateX(${getOffset() - current * SHIFT}px)`;
             }
+
+            // Recalcular en resize
+            window.addEventListener('resize', () => {
+                CARD_W = window.innerWidth < 768 ? 300 : 420;
+                GAP    = window.innerWidth < 768 ? 16  : 32;
+                SHIFT  = CARD_W + GAP;
+                carousel.style.gap = GAP + 'px';
+                applyTransform(false);
+            }, { passive: true });
 
             function updateStates() {
                 allCards().forEach((card, i) => {

@@ -22,16 +22,16 @@ Route::prefix('biblioteca')->name('biblioteca.')->group(function () {
     Route::get('/inicio', [BibliotecaController::class, 'index'])->name('inicio');
     Route::get('/libros', [BibliotecaController::class, 'indexLibros'])->name('libros.index');
     Route::get('/revistas', [BibliotecaController::class, 'indexRevistas'])->name('revistas.index');
-    Route::get('/editoriales', [BibliotecaController::class, 'indexEditoriales'])->name('editoriales.index');
     Route::get('/autores', [BibliotecaController::class, 'indexAutores'])->name('autores.index');
     Route::get('/especiales', [BibliotecaController::class, 'indexEspeciales'])->name('especiales.index');
+    Route::get('/especiales/{special}', [BibliotecaController::class, 'showEspecial'])->name('especiales.show');
+    Route::get('/editorial', [BibliotecaController::class, 'indexEditorial'])->name('editorial.index');
     Route::get('/nosotros', [BibliotecaController::class, 'indexAportantes'])->name('aportantes.index');
     Route::get('/search', [BibliotecaController::class, 'search'])->name('search');
     Route::get('/category/{category}', [BibliotecaController::class, 'getBooksByCategory'])->name('category');
     Route::get('/autores/{author}', [BibliotecaController::class, 'showAuthor'])->name('autores.show');
     Route::get('/libros/{book}', [BibliotecaController::class, 'showBook'])->name('libros.show');
     Route::get('/revistas/{book}', [BibliotecaController::class, 'showRevista'])->name('revistas.show');
-    Route::get('/editoriales/{publisher}', [BibliotecaController::class, 'showEditorial'])->name('editoriales.show');
 });
 
 // Fototeca (Pública)
@@ -40,7 +40,6 @@ Route::prefix('fototeca')->name('fototeca.')->group(function () {
     Route::get('/inicio', [FototecaController::class, 'index'])->name('inicio');
     Route::get('/galeria', [FototecaController::class, 'indexGaleria'])->name('galeria.index');
     Route::get('/fotografos', [FototecaController::class, 'indexFotografos'])->name('fotografos.index');
-    Route::get('/especiales', [FototecaController::class, 'indexEspeciales'])->name('especiales.index');
     Route::get('/nosotros', [FototecaController::class, 'indexAportantes'])->name('aportantes.index');
     Route::get('/search', [FototecaController::class, 'search'])->name('search');
     Route::get('/category/{category}', [FototecaController::class, 'getPhotosByCategory'])->name('category');
@@ -102,9 +101,30 @@ Route::middleware('auth')->group(function () {
             Route::put('/magazines/{book}', [AdminBibliotecaController::class, 'updateMagazine'])->name('magazines.update');
             Route::delete('/magazines/{book}', [AdminBibliotecaController::class, 'destroyMagazine'])->name('magazines.destroy');
 
-            // Especiales
+            // Descriptores
+            Route::get('/descriptors', [AdminBibliotecaController::class, 'indexDescriptors'])->name('descriptors');
+            Route::post('/descriptors', [AdminBibliotecaController::class, 'storeDescriptor'])->name('descriptors.store');
+            Route::delete('/descriptors/{descriptor}', [AdminBibliotecaController::class, 'destroyDescriptor'])->name('descriptors.destroy');
+
+            // SubCategorías
+            Route::get('/subcategories', [AdminBibliotecaController::class, 'indexSubcategories'])->name('subcategories');
+            Route::get('/subcategories/create', [AdminBibliotecaController::class, 'createSubcategory'])->name('subcategories.create');
+            Route::post('/subcategories', [AdminBibliotecaController::class, 'storeSubcategory'])->name('subcategories.store');
+            Route::get('/subcategories/{category}/edit', [AdminBibliotecaController::class, 'editSubcategory'])->name('subcategories.edit');
+            Route::put('/subcategories/{category}', [AdminBibliotecaController::class, 'updateSubcategory'])->name('subcategories.update');
+            Route::delete('/subcategories/{category}', [AdminBibliotecaController::class, 'destroySubcategory'])->name('subcategories.destroy');
+
+            // Especiales (grupos/colecciones)
             Route::get('/specials', [AdminBibliotecaController::class, 'indexSpecials'])->name('specials');
-            Route::post('/specials/{book}/toggle', [AdminBibliotecaController::class, 'toggleSpecial'])->name('specials.toggle');
+            Route::get('/specials/create', [AdminBibliotecaController::class, 'createSpecial'])->name('specials.create');
+            Route::post('/specials', [AdminBibliotecaController::class, 'storeSpecial'])->name('specials.store');
+            Route::get('/specials/assign-books', [AdminBibliotecaController::class, 'assignBooksIndex'])->name('specials.assign-books');
+            Route::get('/specials/{special}/manage', [AdminBibliotecaController::class, 'manageSpecial'])->name('specials.manage');
+            Route::get('/specials/{special}/edit', [AdminBibliotecaController::class, 'editSpecial'])->name('specials.edit');
+            Route::put('/specials/{special}', [AdminBibliotecaController::class, 'updateSpecial'])->name('specials.update');
+            Route::delete('/specials/{special}', [AdminBibliotecaController::class, 'destroySpecial'])->name('specials.destroy');
+            Route::post('/specials/{special}/assign', [AdminBibliotecaController::class, 'assignBook'])->name('specials.assign');
+            Route::delete('/specials/{special}/books/{book}', [AdminBibliotecaController::class, 'unassignBook'])->name('specials.unassign');
         });
 
         // Fototeca Admin
@@ -126,7 +146,7 @@ Route::middleware('auth')->group(function () {
             Route::put('/photographers/{photographer}', [AdminFototecaController::class, 'updatePhotographer'])->name('photographers.update');
             Route::delete('/photographers/{photographer}', [AdminFototecaController::class, 'destroyPhotographer'])->name('photographers.destroy');
 
-            // Categorías
+            // Categorías (Nivel 1)
             Route::get('/categories', [AdminFototecaController::class, 'indexCategories'])->name('categories');
             Route::get('/categories/create', [AdminFototecaController::class, 'createCategory'])->name('categories.create');
             Route::post('/categories', [AdminFototecaController::class, 'storeCategory'])->name('categories.store');
@@ -134,9 +154,22 @@ Route::middleware('auth')->group(function () {
             Route::put('/categories/{category}', [AdminFototecaController::class, 'updateCategory'])->name('categories.update');
             Route::delete('/categories/{category}', [AdminFototecaController::class, 'destroyCategory'])->name('categories.destroy');
 
-            // Especiales
-            Route::get('/specials', [AdminFototecaController::class, 'indexSpecials'])->name('specials');
-            Route::post('/specials/{photo}/toggle', [AdminFototecaController::class, 'toggleSpecial'])->name('specials.toggle');
+            // SubCategorías (Nivel 2)
+            Route::get('/subcategories', [AdminFototecaController::class, 'indexSubcategories'])->name('subcategories');
+            Route::get('/subcategories/create', [AdminFototecaController::class, 'createSubcategory'])->name('subcategories.create');
+            Route::post('/subcategories', [AdminFototecaController::class, 'storeSubcategory'])->name('subcategories.store');
+            Route::get('/subcategories/{category}/edit', [AdminFototecaController::class, 'editSubcategory'])->name('subcategories.edit');
+            Route::put('/subcategories/{category}', [AdminFototecaController::class, 'updateSubcategory'])->name('subcategories.update');
+            Route::delete('/subcategories/{category}', [AdminFototecaController::class, 'destroySubcategory'])->name('subcategories.destroy');
+
+            // SubNivel (Nivel 3)
+            Route::get('/sublevels', [AdminFototecaController::class, 'indexSublevels'])->name('sublevels');
+            Route::get('/sublevels/create', [AdminFototecaController::class, 'createSublevel'])->name('sublevels.create');
+            Route::post('/sublevels', [AdminFototecaController::class, 'storeSublevel'])->name('sublevels.store');
+            Route::get('/sublevels/{category}/edit', [AdminFototecaController::class, 'editSublevel'])->name('sublevels.edit');
+            Route::put('/sublevels/{category}', [AdminFototecaController::class, 'updateSublevel'])->name('sublevels.update');
+            Route::delete('/sublevels/{category}', [AdminFototecaController::class, 'destroySublevel'])->name('sublevels.destroy');
+
         });
 
         // Configurar Web (solo admin global)
@@ -144,6 +177,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/',         [WebConfigController::class, 'index'])->name('index');
             Route::get('/fondos',   [WebConfigController::class, 'fondos'])->name('fondos');
             Route::get('/contacto', [WebConfigController::class, 'contacto'])->name('contacto');
+            Route::get('/aportantes',  [WebConfigController::class, 'aportantes'])->name('aportantes');
+            Route::post('/aportantes', [WebConfigController::class, 'aportantesUpdate'])->name('aportantes.update');
             Route::post('/{key}',   [WebConfigController::class, 'update'])->name('update');
             Route::delete('/{key}', [WebConfigController::class, 'destroy'])->name('destroy');
             Route::post('/contact/update',    [WebConfigController::class, 'updateContact'])->name('contact.update');

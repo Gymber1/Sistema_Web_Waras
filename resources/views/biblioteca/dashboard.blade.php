@@ -28,6 +28,7 @@
             background: #f3f4f6;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
 
         :root {
@@ -299,7 +300,7 @@
         }
 
         /* Carruseles de inicio */
-        .inicio-carousel-section { padding: 3.5rem 0; overflow: hidden; }
+        .inicio-carousel-section { padding: 3.5rem 0; overflow: hidden; position: relative; }
         .inicio-carousel-section + .inicio-carousel-section { border-top: 1px solid #e5e7eb; }
         .inicio-carousel-header {
             max-width: 1400px; margin: 0 auto 2rem; padding: 0 2rem;
@@ -313,7 +314,8 @@
             font-size: .75rem; color: #9ca3af; font-weight: 500;
         }
         .inicio-carousel-track-wrap {
-            position: relative; width: 100%; overflow: hidden; padding: 1rem 0 1.5rem;
+            position: relative; overflow: hidden;
+            max-width: 1400px; margin: 0 auto; padding: 1rem 2rem 1.5rem;
         }
         .inicio-carousel-track {
             display: flex; align-items: stretch;
@@ -322,15 +324,15 @@
 
         /* Card de libro (carrusel) */
         .bib-carousel-card {
-            flex-shrink: 0; width: 180px; margin: 0 10px;
-            background: white; border-radius: 8px;
+            flex-shrink: 0; width: 240px; margin: 0 12px;
+            background: white; border-radius: 10px;
             border: 1px solid #e5e7eb;
             box-shadow: 0 2px 8px rgba(0,0,0,.06);
             cursor: pointer; overflow: hidden;
             transform: translateZ(0);
-            transition: border-color .25s, box-shadow .25s;
+            transition: border-color .25s, box-shadow .25s, transform .25s;
         }
-        .bib-carousel-card:hover { border-color: var(--accent); box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+        .bib-carousel-card:hover { border-color: var(--accent); box-shadow: 0 10px 28px rgba(0,0,0,.14); transform: translateY(-3px); }
         .bib-card-cover {
             width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block;
             background: #eee;
@@ -339,15 +341,15 @@
             width: 100%; aspect-ratio: 2/3;
             background: linear-gradient(135deg, var(--primary) 0%, #2d4a6e 100%);
             display: flex; align-items: center; justify-content: center;
-            color: rgba(255,255,255,.3); font-size: 2rem;
+            color: rgba(255,255,255,.3); font-size: 3rem;
         }
-        .bib-card-body { padding: .7rem .8rem; }
+        .bib-card-body { padding: .85rem 1rem; }
         .bib-card-title {
             font-family: 'Playfair Display', serif;
-            font-size: .8rem; color: #111; line-height: 1.35;
+            font-size: .9rem; color: #111; line-height: 1.35;
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
-        .bib-card-sub { font-size: .67rem; color: #9ca3af; margin-top: .3rem;
+        .bib-card-sub { font-size: .72rem; color: #9ca3af; margin-top: .35rem;
             display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
         }
 
@@ -384,6 +386,22 @@
         .inicio-carousel-controls {
             max-width: 1400px; margin: 1rem auto 0; padding: 0 2rem;
             display: flex; align-items: center; gap: 1rem;
+        }
+        .carousel-ver-mas {
+            max-width: 1400px; margin: 1.25rem auto 0; padding: 0 2rem;
+            display: flex; justify-content: center;
+        }
+        .carousel-ver-mas-btn {
+            display: inline-flex; align-items: center; gap: .5rem;
+            padding: .6rem 2rem; border-radius: 999px;
+            background: transparent; border: 1.5px solid var(--accent);
+            color: var(--accent); font-family: inherit; font-size: .82rem;
+            font-weight: 600; letter-spacing: .04em; cursor: pointer;
+            transition: background .2s, color .2s, transform .15s, box-shadow .2s;
+        }
+        .carousel-ver-mas-btn:hover {
+            background: var(--accent); color: #fff;
+            transform: translateY(-1px); box-shadow: 0 6px 18px rgba(197,160,89,.35);
         }
         .ico-btn {
             width: 36px; height: 36px; border-radius: 50%;
@@ -547,6 +565,141 @@
         .content-search-input::placeholder {
             color: #9ca3af;
         }
+
+        /* Descriptor chips */
+        .descriptor-chips-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            align-items: center;
+        }
+        .descriptor-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.3rem 0.8rem;
+            background: #f3f4f6;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .descriptor-chip:hover {
+            background: #1b2a47;
+            border-color: #1b2a47;
+            color: #fff;
+        }
+        .descriptor-chip.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        .descriptor-chip .chip-count {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+        /* Suggestion dropdown */
+        .descriptor-suggestion-item {
+            padding: 0.6rem 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            color: #374151;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.12s;
+        }
+        .descriptor-suggestion-item:last-child { border-bottom: none; }
+        .descriptor-suggestion-item:hover { background: #f9f8f6; }
+        .descriptor-suggestion-item .ds-count {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            background: #f3f4f6;
+            padding: 0.1rem 0.5rem;
+            border-radius: 999px;
+        }
+
+        /* Especiales gallery */
+        .specials-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+            padding: 0.5rem 0 1.5rem;
+        }
+        .special-card {
+            background: #fff;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            border: 1px solid #e5e7eb;
+            transition: transform 0.18s, box-shadow 0.18s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+        .special-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+        }
+        .special-card-cover {
+            height: 160px;
+            background: linear-gradient(135deg, #1b2a47, #2d4a6e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .special-card-cover img {
+            width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;
+        }
+        .special-card-type {
+            position: absolute;
+            top: 0.6rem; right: 0.6rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .special-card-body {
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .special-card-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #1b2a47;
+            line-height: 1.35;
+            margin-bottom: 0.4rem;
+        }
+        .special-card-count {
+            font-size: 0.78rem;
+            color: #6b7280;
+            margin-bottom: 0.75rem;
+        }
+        .special-card-btn {
+            margin-top: auto;
+            display: inline-block;
+            padding: 0.45rem 1rem;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 0.5rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-decoration: none;
+            text-align: center;
+            transition: background 0.15s;
+        }
+        .special-card-btn:hover { background: var(--accent); color: #fff; }
 
         /* Main Wrapper */
         .main-wrapper {
@@ -773,7 +926,7 @@
         .main-wrapper.no-sidebar .sidebar { display: none !important; }
         .main-wrapper.no-sidebar .sidebar-toggle-btn { display: none !important; }
         .main-wrapper.no-sidebar .content { padding: 2.5rem 4rem; max-width: 1400px; margin: 0 auto; width: 100%; }
-        .main-wrapper.no-sidebar .books-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 2rem; }
+        .main-wrapper.no-sidebar .books-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
         @media (max-width: 768px) {
             .main-wrapper.no-sidebar .content { padding: 1.5rem 1rem; }
             .main-wrapper.no-sidebar .books-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; }
@@ -866,7 +1019,7 @@
         /* Books Grid */
         .books-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 2rem;
             margin-bottom: 3rem;
         }
@@ -1382,14 +1535,14 @@
 
         @media (max-width: 1024px) {
             .hero-title { font-size: 2.5rem; }
-            .books-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+            .books-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
         }
 
         @media (max-width: 768px) {
             .hero-title { font-size: 1.875rem; }
             .search-wrapper { flex-direction: column; gap: 0.5rem; }
             .search-btn { width: 100%; }
-            .books-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+            .books-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
         }
     </style>
 </head>
@@ -1398,11 +1551,11 @@
     <div class="mobile-nav" id="mobileNav">
         <button class="mobile-nav-close" onclick="closeMobileNav()"><i class="fas fa-times"></i></button>
         <a href="{{ route('biblioteca.inicio') }}" class="mobile-nav-item">Inicio</a>
-        <a href="{{ route('biblioteca.libros.index') }}" class="mobile-nav-item">Libros</a>
+        <a href="{{ route('biblioteca.libros.index') }}" class="mobile-nav-item">Biblioteca Digital</a>
+        <a href="{{ route('biblioteca.editorial.index') }}" class="mobile-nav-item">Waras Editorial</a>
         <a href="{{ route('biblioteca.revistas.index') }}" class="mobile-nav-item">Revistas</a>
-        <a href="{{ route('biblioteca.editoriales.index') }}" class="mobile-nav-item">Editoriales</a>
-        <a href="{{ route('biblioteca.especiales.index') }}" class="mobile-nav-item">Especiales</a>
         <a href="{{ route('biblioteca.autores.index') }}" class="mobile-nav-item">Autores</a>
+        <a href="{{ route('biblioteca.especiales.index') }}" class="mobile-nav-item">Especiales</a>
         <a href="{{ route('home') }}" class="mobile-nav-item" style="font-size:1rem;opacity:0.6">Portal Principal</a>
     </div>
 
@@ -1421,12 +1574,11 @@
 
             <nav class="nav-menu" id="navMenu">
                 <a href="{{ route('biblioteca.inicio') }}" data-tab="Inicio" class="nav-item">Inicio</a>
-                <a href="{{ route('biblioteca.libros.index') }}" data-tab="Libros" class="nav-item">Libros</a>
+                <a href="{{ route('biblioteca.libros.index') }}" data-tab="Libros" class="nav-item">Biblioteca Digital</a>
+                <a href="{{ route('biblioteca.editorial.index') }}" data-tab="Waras Editorial" class="nav-item">Waras Editorial</a>
                 <a href="{{ route('biblioteca.revistas.index') }}" data-tab="Revistas" class="nav-item">Revistas</a>
-                <a href="{{ route('biblioteca.editoriales.index') }}" data-tab="Editoriales" class="nav-item">Editoriales</a>
-                <a href="{{ route('biblioteca.especiales.index') }}" data-tab="Especiales" class="nav-item">Especiales</a>
                 <a href="{{ route('biblioteca.autores.index') }}" data-tab="Autores" class="nav-item">Autores</a>
-                <a href="{{ route('biblioteca.aportantes.index') }}" data-tab="Aportantes" class="nav-item">Aportantes</a>
+                <a href="{{ route('biblioteca.especiales.index') }}" data-tab="Especiales" class="nav-item">Especiales</a>
             </nav>
             <div class="header-actions">
                 <a href="{{ route('home') }}" class="header-btn header-btn-outline">
@@ -1505,6 +1657,11 @@
                 <div class="ico-dots" id="dotsLibros"></div>
                 <button class="ico-btn" onclick="moveCarousel('libros',1)">›</button>
             </div>
+            <div class="carousel-ver-mas">
+                <button class="carousel-ver-mas-btn" onclick="showSection('Libros')">
+                    Ver más <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+                </button>
+            </div>
         </div>
 
         <!-- Carrusel: Autores -->
@@ -1521,6 +1678,11 @@
                 <div class="ico-dots" id="dotsAutores"></div>
                 <button class="ico-btn" onclick="moveCarousel('autores',1)">›</button>
             </div>
+            <div class="carousel-ver-mas">
+                <button class="carousel-ver-mas-btn" onclick="showSection('Autores')">
+                    Ver más <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+                </button>
+            </div>
         </div>
 
         <!-- Carrusel: Revistas -->
@@ -1536,6 +1698,11 @@
                 <button class="ico-btn" onclick="moveCarousel('revistas',-1)">‹</button>
                 <div class="ico-dots" id="dotsRevistas"></div>
                 <button class="ico-btn" onclick="moveCarousel('revistas',1)">›</button>
+            </div>
+            <div class="carousel-ver-mas">
+                <button class="carousel-ver-mas-btn" onclick="showSection('Revistas')">
+                    Ver más <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+                </button>
             </div>
         </div>
 
@@ -1573,10 +1740,14 @@
             </div>
 
             <!-- Search Box -->
-            <div class="content-search">
+            <div class="content-search" style="position:relative;">
                 <i class="fas fa-search content-search-icon"></i>
-                <input type="text" class="content-search-input" id="contentSearchInput" placeholder="Buscar libros, autores o temas en Historia Y Geografía...">
+                <input type="text" class="content-search-input" id="contentSearchInput" placeholder="Buscar libros, autores o temas en Historia Y Geografía..." autocomplete="off">
+                <div id="descriptorSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:200;background:#fff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);max-height:220px;overflow-y:auto;"></div>
             </div>
+
+            <!-- Descriptor chips (filtros rápidos) -->
+            <div id="descriptorChipsBar" style="display:none;margin:0.75rem 0 0.25rem;"></div>
 
             <div class="section-header">
                 <h2 class="section-title" id="sectionTitle">Historia Y Geografía</h2>
@@ -1592,6 +1763,8 @@
                         <option value="az">Ordenar A-Z</option>
                         <option value="recent">Más recientes</option>
                         <option value="old">Más antiguos</option>
+                        <option value="year_asc">Por año ↑</option>
+                        <option value="year_desc">Por año ↓</option>
                     </select>
                 </div>
             </div>
@@ -1684,181 +1857,150 @@
         </div><!-- end max-width wrapper -->
     </div>
 
-    <!-- ===== SECCIÓN NOSOTROS / APORTANTES ===== -->
-    <div id="aportantesSection" style="display:none;background:#f9f8f6;margin-top:72px;padding:0 0 4rem;">
+    <!-- ===== SECCIÓN NOSOTROS / APORTANTES (eliminada del nav) ===== -->
+    <div id="aportantesSection" style="display:none;background:#f1f5f9;margin-top:72px;padding:0 0 4rem;">
 
         <!-- Hero Banner -->
-        <div style="background:linear-gradient(135deg,var(--primary) 0%,#2d4a6e 100%);color:white;padding:5rem 2rem;text-align:center;position:relative;overflow:hidden;">
-            <div style="position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1920&q=30') center/cover;opacity:.07;"></div>
-            <div style="position:relative;max-width:800px;margin:0 auto;">
-                <div style="display:flex;justify-content:center;margin-bottom:1.5rem;gap:.3rem;">
-                    <div style="width:10px;height:28px;background:#60a5fa;border-radius:2px;"></div>
-                    <div style="width:10px;height:22px;background:#f87171;border-radius:2px;margin-top:6px;"></div>
-                    <div style="width:10px;height:16px;background:var(--accent);border-radius:2px;margin-top:12px;"></div>
+        <div style="background:var(--primary);color:white;padding:5rem 2rem;text-align:center;position:relative;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=2000&q=30') center/cover;opacity:.08;"></div>
+            <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(27,42,71,.8),rgba(27,42,71,1));"></div>
+            <div style="position:relative;z-index:1;max-width:800px;margin:0 auto;display:flex;flex-direction:column;align-items:center;">
+                <div style="display:flex;align-items:flex-end;gap:.35rem;margin-bottom:1.5rem;">
+                    <div style="width:8px;height:18px;background:#60a5fa;border-radius:2px;"></div>
+                    <div style="width:8px;height:24px;background:#f87171;border-radius:2px;"></div>
+                    <div style="width:8px;height:13px;background:var(--accent);border-radius:2px;"></div>
                 </div>
-                <h1 style="font-family:'Playfair Display',serif;font-size:2.75rem;font-weight:800;margin-bottom:1rem;letter-spacing:-.5px;">Asociación Waras</h1>
-                <p style="font-size:1rem;font-weight:300;color:rgba(255,255,255,.85);letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.5rem;">Ciencia y Cultura Ancashina</p>
-                <p style="font-size:1rem;color:rgba(255,255,255,.75);line-height:1.85;max-width:640px;margin:0 auto;">
-                    Un grupo de ciudadanos comprometidos con el desarrollo económico, social, científico y cultural del Departamento de Áncash.
+                <h1 style="font-family:'Playfair Display',serif;font-size:2.75rem;font-weight:800;margin-bottom:.75rem;">Aportantes y Aliados</h1>
+                <p style="font-size:.75rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:1.5rem;">Red de Colaboración Cultural</p>
+                <p style="font-size:1rem;font-weight:300;color:rgba(255,255,255,.8);line-height:1.85;max-width:620px;">
+                    Un grupo de ciudadanos, empresas e instituciones comprometidos con el desarrollo económico, social, científico y cultural, que hacen posible la preservación de nuestro legado.
                 </p>
             </div>
         </div>
 
-        <div style="max-width:1000px;margin:0 auto;padding:3rem 1.5rem;">
+        <!-- Contenido principal -->
+        <div style="max-width:1400px;margin:-2.5rem auto 0;padding:0 2rem 3rem;position:relative;z-index:10;">
+            <div style="background:white;border-radius:1rem;box-shadow:0 8px 30px rgba(0,0,0,.08);border:1px solid #e2e8f0;padding:2.5rem 3.5rem;">
 
-            <!-- Quiénes somos -->
-            <div style="background:white;border-radius:.75rem;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:2.5rem;margin-bottom:2rem;">
-                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #e5e1d8;">
-                    <div style="width:38px;height:38px;background:var(--primary);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fas fa-landmark" style="color:var(--accent);font-size:.9rem;"></i>
-                    </div>
-                    <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--primary);">Quiénes Somos</h2>
-                </div>
-                <p style="font-size:.95rem;color:#4b5563;line-height:1.9;margin-bottom:1rem;">
-                    La <strong style="color:var(--primary);">Asociación Waras: Ciencia y Cultura</strong> nació ante el vacío estructural e histórico del Estado en la protección de la identidad cultural. Un grupo de ciudadanos conscientes de que la protección del Medio Ambiente, la Educación, la Cultura y la Investigación son el germen para un sólido Desarrollo Económico y Social decidió aportar para viabilizar el progreso sostenido de Áncash.
-                </p>
-                <p style="font-size:.95rem;color:#4b5563;line-height:1.9;">
-                    Áncash es una región privilegiada, con una profunda tradición cultural que subsiste a través del tiempo y una diversidad de recursos naturales únicos. Esta biblioteca digital es uno de los espacios que construimos para sistematizar, preservar y difundir el conocimiento y la cultura ancashina.
-                </p>
-            </div>
+                <div style="display:grid;grid-template-columns:1fr minmax(0,380px);gap:3.5rem;align-items:start;">
 
-            <!-- Finalidad + Objetivos -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;">
-                <div style="background:white;border-radius:.75rem;border:1px solid #e2e8f0;padding:2rem;">
-                    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;">
-                        <div style="width:34px;height:34px;background:var(--primary);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i class="fas fa-bullseye" style="color:var(--accent);font-size:.8rem;"></i>
+                    <!-- Columna izquierda: aportantes -->
+                    <div>
+                        <!-- Título sección -->
+                        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid #e5e7eb;">
+                            <div style="background:var(--primary);padding:.5rem;border-radius:.4rem;line-height:0;">
+                                <svg width="22" height="22" fill="none" stroke="var(--accent)" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                            </div>
+                            <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--primary);">Nuestros Aportantes</h3>
                         </div>
-                        <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--primary);">Finalidad</h3>
-                    </div>
-                    <p style="font-size:.875rem;color:#4b5563;line-height:1.85;">
-                        Promover estudios, investigaciones, capacitaciones y espacios que aporten al desarrollo económico, social, ambiental, cultural y científico del Departamento de Áncash para la mejora de la calidad de vida de sus ciudadanos.
-                    </p>
-                </div>
-                <div style="background:var(--primary);border-radius:.75rem;padding:2rem;color:white;">
-                    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;">
-                        <div style="width:34px;height:34px;border:1px solid rgba(255,255,255,.25);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i class="fas fa-flag" style="color:var(--accent);font-size:.8rem;"></i>
+
+                        <!-- Categoría: Empresas Auspiciadoras -->
+                        <div style="margin-bottom:2.5rem;">
+                            <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.25rem;padding-bottom:.6rem;border-bottom:2px solid #f1f5f9;">
+                                <svg width="20" height="20" fill="none" stroke="var(--primary)" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                <h4 style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:#1e293b;">Empresas Auspiciadoras</h4>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:.875rem;">
+                                <div style="display:flex;gap:1.25rem;background:white;border:1px solid #e5e7eb;border-radius:.75rem;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.03);transition:box-shadow .2s;" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,.09)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,.03)'">
+                                    <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=200&q=80" alt="Minera Antamina" loading="lazy" style="width:112px;height:112px;object-fit:cover;border-radius:.5rem;flex-shrink:0;border:1px solid #e5e7eb;">
+                                    <div style="display:flex;flex-direction:column;justify-content:center;">
+                                        <h5 style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:.5rem;">Minera Antamina S.A.</h5>
+                                        <p style="font-size:.875rem;color:#475569;line-height:1.7;">Auspiciador Platino. Su apoyo financiero ha sido fundamental para mantener nuestra infraestructura tecnológica y adquirir los servidores principales de la plataforma.</p>
+                                    </div>
+                                </div>
+                                <div style="display:flex;gap:1.25rem;background:white;border:1px solid #e5e7eb;border-radius:.75rem;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.03);transition:box-shadow .2s;" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,.09)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,.03)'">
+                                    <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Constructora Andes" loading="lazy" style="width:112px;height:112px;object-fit:cover;border-radius:.5rem;flex-shrink:0;border:1px solid #e5e7eb;">
+                                    <div style="display:flex;flex-direction:column;justify-content:center;">
+                                        <h5 style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:.5rem;">Constructora Andes EIRL</h5>
+                                        <p style="font-size:.875rem;color:#475569;line-height:1.7;">Aportes directos para la viabilidad, contratación del equipo de digitalización inicial y adquisición de escáneres planetarios.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;">Objetivos Generales</h3>
-                    </div>
-                    <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.875rem;">
-                        <li style="display:flex;gap:.75rem;align-items:flex-start;font-size:.875rem;color:rgba(255,255,255,.85);line-height:1.65;">
-                            <i class="fas fa-chevron-right" style="color:var(--accent);margin-top:.2rem;flex-shrink:0;font-size:.65rem;"></i>
-                            Contribuir al Desarrollo Económico y Social del Departamento de Ancash.
-                        </li>
-                        <li style="display:flex;gap:.75rem;align-items:flex-start;font-size:.875rem;color:rgba(255,255,255,.85);line-height:1.65;">
-                            <i class="fas fa-chevron-right" style="color:var(--accent);margin-top:.2rem;flex-shrink:0;font-size:.65rem;"></i>
-                            Preservar y Difundir la Cultura Ancashina.
-                        </li>
-                    </ul>
-                </div>
-            </div>
 
-            <!-- Objetivos Específicos -->
-            <div style="background:white;border-radius:.75rem;border:1px solid #e2e8f0;padding:2.5rem;margin-bottom:2rem;">
-                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #e5e1d8;">
-                    <div style="width:38px;height:38px;background:var(--primary);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fas fa-list-check" style="color:var(--accent);font-size:.9rem;"></i>
-                    </div>
-                    <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--primary);">Objetivos Específicos</h2>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.875rem;">
-                    @foreach([
-                        'Promover e impulsar las ciencias, arte, identidad y cultura en Áncash.',
-                        'Fomentar la investigación y capacitación educativa, artística y cultural.',
-                        'Ejecutar proyectos que desarrollen capacidades científicas y tecnológicas.',
-                        'Desarrollar alianzas con instituciones públicas y privadas a todo nivel.',
-                        'Promover la ciudadanía activa y la participación cívica.',
-                        'Impulsar iniciativas que contribuyan al desarrollo sostenible de Áncash.',
-                        'Promover la educación comunitaria en toda la región.',
-                        'Desarrollar un portal para la difusión de la ciencia y cultura ancashina.',
-                    ] as $obj)
-                    <div style="display:flex;gap:.75rem;align-items:flex-start;padding:.875rem;background:#f9f8f6;border-radius:.375rem;border:1px solid #e5e1d8;">
-                        <i class="fas fa-check-circle" style="color:var(--accent);margin-top:.15rem;flex-shrink:0;"></i>
-                        <span style="font-size:.875rem;color:#374151;line-height:1.6;">{{ $obj }}</span>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- Valores -->
-            <div style="background:white;border-radius:.75rem;border:1px solid #e2e8f0;padding:2.5rem;margin-bottom:2rem;">
-                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.75rem;padding-bottom:1rem;border-bottom:2px solid #e5e1d8;">
-                    <div style="width:38px;height:38px;background:var(--primary);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fas fa-heart" style="color:var(--accent);font-size:.9rem;"></i>
-                    </div>
-                    <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--primary);">Nuestros Valores</h2>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;">
-                    @foreach([['fa-balance-scale','Equidad'],['fa-hands-helping','Fraternidad'],['fa-hand-holding-heart','Solidaridad'],['fa-leaf','Armonía'],['fa-dove','Libertad']] as [$icon,$valor])
-                    <div style="text-align:center;padding:1.5rem .75rem;border-radius:.5rem;border:1px solid #e5e1d8;transition:all .2s;cursor:default;"
-                         onmouseover="this.style.background='var(--primary)';this.style.color='white';this.style.borderColor='var(--primary)';this.querySelector('i').style.color='var(--accent)'"
-                         onmouseout="this.style.background='';this.style.color='';this.style.borderColor='#e5e1d8';this.querySelector('i').style.color='var(--primary)'">
-                        <i class="fas {{ $icon }}" style="font-size:1.75rem;color:var(--primary);margin-bottom:.75rem;display:block;transition:color .2s;"></i>
-                        <span style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:inherit;">{{ $valor }}</span>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- Beneficiarios -->
-            <div style="background:white;border-radius:.75rem;border:1px solid #e2e8f0;padding:2.5rem;margin-bottom:2rem;">
-                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #e5e1d8;">
-                    <div style="width:38px;height:38px;background:var(--primary);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fas fa-users" style="color:var(--accent);font-size:.9rem;"></i>
-                    </div>
-                    <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--primary);">Beneficiarios</h2>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.75rem;">
-                    @foreach(['Estudiantes de primaria y secundaria de Áncash','Estudiantes de nivel superior de Áncash','Docentes de nivel básico y superior','Autoridades, partidos políticos y sociedad civil','Empresarios e inversores regionales y nacionales','Turistas nacionales e internacionales','Población con interés en la ciencia y cultura ancashina'] as $ben)
-                    <div style="display:flex;gap:.75rem;align-items:flex-start;padding:.875rem;background:#f9f8f6;border-radius:.375rem;border:1px solid #e5e1d8;">
-                        <i class="fas fa-check-circle" style="color:var(--accent);margin-top:.15rem;flex-shrink:0;"></i>
-                        <span style="font-size:.875rem;color:#374151;line-height:1.5;">{{ $ben }}</span>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- Contacto -->
-            <div style="background:var(--primary);border-radius:.75rem;padding:2.5rem;color:white;">
-                <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.75rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.15);">
-                    <div style="width:38px;height:38px;border:1px solid rgba(255,255,255,.25);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="fas fa-envelope" style="color:var(--accent);font-size:.9rem;"></i>
-                    </div>
-                    <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;">Contáctanos</h2>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;">
-                    <div style="display:flex;gap:1rem;align-items:flex-start;">
-                        <div style="width:42px;height:42px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i class="fas fa-map-marker-alt" style="color:var(--accent);"></i>
+                        <!-- Categoría: Donantes de Colecciones -->
+                        <div style="margin-bottom:2.5rem;">
+                            <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.25rem;padding-bottom:.6rem;border-bottom:2px solid #f1f5f9;">
+                                <svg width="20" height="20" fill="none" stroke="var(--primary)" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                <h4 style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:#1e293b;">Donantes de Colecciones y Libros</h4>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:.875rem;">
+                                <div style="display:flex;gap:1.25rem;background:white;border:1px solid #e5e7eb;border-radius:.75rem;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.03);transition:box-shadow .2s;" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,.09)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,.03)'">
+                                    <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=200&q=80" alt="Familia Alba" loading="lazy" style="width:112px;height:112px;object-fit:cover;border-radius:.5rem;flex-shrink:0;border:1px solid #e5e7eb;">
+                                    <div style="display:flex;flex-direction:column;justify-content:center;">
+                                        <h5 style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:.5rem;">Familia Alba</h5>
+                                        <p style="font-size:.875rem;color:#475569;line-height:1.7;">Cedieron temporalmente su invaluable colección privada de Historia Ancashina, permitiendo la digitalización de más de 120 volúmenes únicos.</p>
+                                    </div>
+                                </div>
+                                <div style="display:flex;gap:1.25rem;background:white;border:1px solid #e5e7eb;border-radius:.75rem;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.03);transition:box-shadow .2s;" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,.09)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,.03)'">
+                                    <img src="https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=200&q=80" alt="Dr. Carlos Ramirez" loading="lazy" style="width:112px;height:112px;object-fit:cover;border-radius:.5rem;flex-shrink:0;border:1px solid #e5e7eb;">
+                                    <div style="display:flex;flex-direction:column;justify-content:center;">
+                                        <h5 style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:.5rem;">Dr. Carlos Ramirez</h5>
+                                        <p style="font-size:.875rem;color:#475569;line-height:1.7;">Aportó de forma desinteresada su hemeroteca completa de revistas literarias y recortes periodísticos publicados entre 1950 y 1980.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Categoría: Instituciones Aliadas -->
                         <div>
-                            <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:.25rem;">Ubicación</p>
-                            <p style="font-size:.9rem;color:rgba(255,255,255,.85);line-height:1.6;">Departamento de Áncash, Perú</p>
+                            <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.25rem;padding-bottom:.6rem;border-bottom:2px solid #f1f5f9;">
+                                <svg width="20" height="20" fill="none" stroke="var(--primary)" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+                                <h4 style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:#1e293b;">Instituciones Aliadas</h4>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:.875rem;">
+                                <div style="display:flex;gap:1.25rem;background:white;border:1px solid #e5e7eb;border-radius:.75rem;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.03);transition:box-shadow .2s;" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,.09)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,.03)'">
+                                    <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=200&q=80" alt="UNASAM" loading="lazy" style="width:112px;height:112px;object-fit:cover;border-radius:.5rem;flex-shrink:0;border:1px solid #e5e7eb;">
+                                    <div style="display:flex;flex-direction:column;justify-content:center;">
+                                        <h5 style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:.5rem;">Universidad Nacional Santiago Antúnez de Mayolo (UNASAM)</h5>
+                                        <p style="font-size:.875rem;color:#475569;line-height:1.7;">Brinda soporte académico, valida la veracidad de los documentos históricos y facilita la participación de estudiantes voluntarios.</p>
+                                    </div>
+                                </div>
+                                <div style="display:flex;gap:1.25rem;background:white;border:1px solid #e5e7eb;border-radius:.75rem;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.03);transition:box-shadow .2s;" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,.09)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,.03)'">
+                                    <img src="https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=200&q=80" alt="Biblioteca Pública Municipal de Huaraz" loading="lazy" style="width:112px;height:112px;object-fit:cover;border-radius:.5rem;flex-shrink:0;border:1px solid #e5e7eb;">
+                                    <div style="display:flex;flex-direction:column;justify-content:center;">
+                                        <h5 style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:.5rem;">Biblioteca Pública Municipal de Huaraz</h5>
+                                        <p style="font-size:.875rem;color:#475569;line-height:1.7;">Aliado estratégico en el rescate de la identidad. Fueron los primeros en acoger la idea de fortalecer el patrimonio digital ancashino.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div style="display:flex;gap:1rem;align-items:flex-start;">
-                        <div style="width:42px;height:42px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i class="fas fa-envelope" style="color:var(--accent);"></i>
+
+                    <!-- Columna derecha: Director -->
+                    <div>
+                        <!-- Título Director -->
+                        <div style="display:flex;align-items:center;margin-bottom:1.75rem;padding-top:.25rem;">
+                            <h4 style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:600;color:var(--primary);white-space:nowrap;">Director</h4>
+                            <div style="margin-left:1rem;height:1px;flex:1;background:#e2e8f0;position:relative;">
+                                <div style="position:absolute;left:0;top:0;height:100%;width:3rem;background:var(--accent);"></div>
+                            </div>
                         </div>
-                        <div>
-                            <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:.25rem;">Correo Electrónico</p>
-                            <p style="font-size:.9rem;color:rgba(255,255,255,.85);">asociacion@waras.pe</p>
+
+                        <!-- Tarjeta director -->
+                        <div style="background:#f8fafc;border-radius:.75rem;border:1px solid #e5e7eb;padding:2rem;display:flex;flex-direction:column;align-items:center;text-align:center;">
+                            <!-- Foto circular -->
+                            <div style="position:relative;width:160px;height:160px;margin-bottom:1.5rem;">
+                                <div style="position:absolute;inset:0;border-radius:50%;border:4px solid #e2e8f0;"></div>
+                                <div style="position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--accent);opacity:.5;"></div>
+                                <img src="/giber.png" alt="Giber Garcia Alamo" style="width:100%;height:100%;object-fit:cover;border-radius:50%;padding:4px;">
+                            </div>
+                            <!-- Datos -->
+                            <h5 style="font-size:.9rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem;">Giber Garcia Alamo</h5>
+                            <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:1rem;color:var(--accent);margin-bottom:1rem;">Bibliotecólogo</p>
+                            <p style="font-size:.82rem;color:#64748b;line-height:1.75;margin-bottom:1.5rem;">
+                                Promotor inicial de la recopilación histórica. Asumió la dirección para rescatar, catalogar y promover la Identidad Ancashina a través de esta plataforma digital.
+                            </p>
+                            <button style="padding:.55rem 1.5rem;background:white;border:1.5px solid var(--primary);color:var(--primary);font-size:.8rem;font-weight:700;border-radius:.375rem;cursor:pointer;transition:all .2s;font-family:inherit;"
+                                onmouseover="this.style.background='var(--primary)';this.style.color='white'"
+                                onmouseout="this.style.background='white';this.style.color='var(--primary)'">
+                                Ver Perfil Completo
+                            </button>
                         </div>
                     </div>
-                    <div style="display:flex;gap:1rem;align-items:flex-start;">
-                        <div style="width:42px;height:42px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i class="fas fa-quote-left" style="color:var(--accent);"></i>
-                        </div>
-                        <div>
-                            <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:.25rem;">Principios Incas</p>
-                            <p style="font-size:.875rem;color:rgba(255,255,255,.65);line-height:1.6;font-style:italic;">"Ama Llulla, Ama Quella, Ama Sua"</p>
-                        </div>
-                    </div>
+
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -1884,17 +2026,17 @@
         // categoriesBySection stores arrays of {id, name} objects
         // Books/Revistas use DB categories; others use label-only items (no filtering)
         const categoriesBySection = {
-            'Libros':      allDbCategories.length ? allDbCategories : [{ id: null, name: 'Todos' }],
-            'Revistas':    allDbCategories.length ? allDbCategories : [{ id: null, name: 'Todos' }],
-            'Editoriales': [{ id: null, name: 'Todos' }],
-            'Especiales':  [{ id: null, name: 'Todos' }],
-            'Autores':     [{ id: null, name: 'Todos' }],
-            'Aportantes':  [{ id: null, name: 'Todos' }],
+            'Libros':          allDbCategories.length ? allDbCategories : [{ id: null, name: 'Todos' }],
+            'Revistas':        allDbCategories.length ? allDbCategories : [{ id: null, name: 'Todos' }],
+            'Waras Editorial': allDbCategories.length ? allDbCategories : [{ id: null, name: 'Todos' }],
+            'Especiales':      [{ id: null, name: 'Todos' }],
+            'Autores':         [{ id: null, name: 'Todos' }],
         };
 
 
         // ========== DATOS DINÁMICOS DESDE LARAVEL ==========
         const booksDataFromServer = @json($booksData ?? []);
+        const topDescriptorsData  = @json($topDescriptors ?? []);
         
         // ========== DATOS POR SECCIÓN ==========
         const COVER_COLORS = ['#5c4033','#2d4a6e','#3a5a40','#6b3a2a','#1a3a5c','#4a3a6b'];
@@ -1919,7 +2061,9 @@
                 source_type:  book.source_type || 'none',
                 external_url: book.external_url || '',
                 pdf_path:     book.pdf_file_path || '',
-                categoryIds:  (book.categories || []).map(c => c.id),
+                categoryIds:    (book.categories  || []).map(c => c.id),
+                descriptorIds:  (book.descriptors || []).map(d => d.id),
+                descriptorNames:(book.descriptors || []).map(d => d.name),
                 detail_url:   book.document_type === 'Revista'
                                 ? '/biblioteca/revistas/' + book.id
                                 : '/biblioteca/libros/' + book.id,
@@ -1938,21 +2082,17 @@
             'Revistas': {
                 'default': (booksDataFromServer['Revistas'] || []).map((book, idx) => mapBook(book, idx))
             },
-            'Editoriales': {
-                'default': (booksDataFromServer['Editoriales'] || []).map(pub => ({
-                    id:          pub.id,
-                    name:        pub.name,
-                    description: pub.description || '',
-                    email:       pub.email || '',
-                    website:     pub.website || '',
-                    phone:       pub.phone || '',
-                    address:     pub.address || '',
-                    logo_url:    pub.logo_path ? '/storage/' + pub.logo_path : null,
-                    books_count: pub.books ? pub.books.length : 0,
-                    detail_url:  '/biblioteca/editoriales/' + pub.id,
+            'Especiales': {
+                'default': (booksDataFromServer['Especiales'] || []).map(s => ({
+                    id:          s.id,
+                    title:       s.title,
+                    type:        s.type,
+                    cover_url:   s.cover_image_path ? '/storage/' + s.cover_image_path : null,
+                    books_count: s.books_count ?? (s.books ? s.books.length : 0),
+                    slug:        s.slug || '',
                 }))
             },
-            'Especiales':  { 'default': (booksDataFromServer['Especiales'] || []).map((book, idx) => mapBook(book, idx)) },
+            'Waras Editorial': { 'default': (booksDataFromServer['Waras Editorial'] || []).map((book, idx) => mapBook(book, idx)) },
             'Autores': {
                 'default': (booksDataFromServer['Autores'] || []).map(author => ({
                     id:          author.id,
@@ -1962,10 +2102,11 @@
                     photo_url:   author.photo_path ? '/storage/' + author.photo_path : null,
                 }))
             },
-            'Aportantes': { 'default': [] }
         };
 
         const serverActiveSection = @json($activeSection ?? 'Inicio');
+
+        let activeDescriptorId = null;
 
         let state = {
             activeTab: 'Inicio',
@@ -1981,7 +2122,7 @@
             const allItems = dataBySectionAndCategory[tab]?.['default'] || [];
 
             // For Libros/Revistas filter by category id if one is selected
-            if ((tab === 'Libros' || tab === 'Revistas') && state.activeCategory && state.activeCategory.id !== null) {
+            if (['Libros', 'Revistas', 'Waras Editorial'].includes(tab) && state.activeCategory && state.activeCategory.id !== null) {
                 const catId = state.activeCategory.id;
                 return allItems.filter(item => item.categoryIds && item.categoryIds.includes(catId));
             }
@@ -2052,7 +2193,7 @@
 
         function renderCategories() {
             const list = document.getElementById('categoriesList');
-            const useAccordion = (state.activeTab === 'Libros' || state.activeTab === 'Revistas') && categoriesFromDatabase.length > 0;
+            const useAccordion = ['Libros', 'Revistas', 'Waras Editorial'].includes(state.activeTab) && categoriesFromDatabase.length > 0;
 
             if (useAccordion) {
                 const allActive = state.activeCategory && state.activeCategory.id === null;
@@ -2151,6 +2292,10 @@
                 arr.sort((a, b) => (parseInt(b.year) || 0) - (parseInt(a.year) || 0));
             } else if (sortVal === 'old') {
                 arr.sort((a, b) => (parseInt(a.year) || 9999) - (parseInt(b.year) || 9999));
+            } else if (sortVal === 'year_asc') {
+                arr.sort((a, b) => (parseInt(a.year) || 0) - (parseInt(b.year) || 0));
+            } else if (sortVal === 'year_desc') {
+                arr.sort((a, b) => (parseInt(b.year) || 0) - (parseInt(a.year) || 0));
             }
             return arr;
         }
@@ -2163,30 +2308,56 @@
             document.getElementById('resourceNumber').textContent = items.length;
 
             // Detectar tipo de sección
-            const isAuthorsSection    = state.activeTab === 'Autores';
-            const isEditorialesSection = state.activeTab === 'Editoriales';
+            const isAuthorsSection     = state.activeTab === 'Autores';
+            const isEditorialesSection = false;
+            const isEspecialesSection  = state.activeTab === 'Especiales';
 
-            if (isEditorialesSection) {
-                grid.innerHTML = items.length === 0
-                    ? `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af;"><i class="fas fa-building" style="font-size:2rem;margin-bottom:0.75rem;display:block;"></i>Sin editoriales registradas.</div>`
-                    : items.map(item => `
-                    <div class="book-card" style="cursor:pointer;" onclick="window.location.href='${item.detail_url}'">
-                        <div class="book-cover" style="aspect-ratio:unset;height:10rem;background:#f9f8f6;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;padding:1rem;">
-                            ${item.logo_url
-                                ? `<img src="${item.logo_url}" alt="${item.name}" style="max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;" onerror="this.style.display='none'">`
-                                : `<i class="fas fa-building" style="font-size:2.5rem;color:#9ca3af;"></i>`}
+            // Gestionar visibilidad de descriptor chips
+            const chipsBar = document.getElementById('descriptorChipsBar');
+            const hasDescriptors = ['Libros','Revistas','Waras Editorial'].includes(state.activeTab);
+            if (hasDescriptors && topDescriptorsData.length > 0) {
+                chipsBar.style.display = 'block';
+                renderDescriptorChips();
+            } else {
+                chipsBar.style.display = 'none';
+            }
+
+            // ESPECIALES → galería de colecciones
+            if (isEspecialesSection) {
+                document.getElementById('resourceNumber').textContent = items.length;
+                if (items.length === 0) {
+                    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af;"><i class="fas fa-star" style="font-size:2rem;margin-bottom:0.75rem;display:block;"></i>No hay colecciones especiales disponibles.</div>`;
+                    return;
+                }
+                // Reemplazar grid con layout de galería
+                grid.className = 'specials-gallery';
+                grid.innerHTML = items.map(s => {
+                    const isRev = s.type === 'revista';
+                    const label = isRev ? 'Revistas' : 'Libros';
+                    const count = s.books_count;
+                    const countLabel = count + ' ' + (isRev ? (count === 1 ? 'revista' : 'revistas') : (count === 1 ? 'libro' : 'libros'));
+                    const typeColor = isRev ? 'background:#2563eb;color:#fff' : 'background:#059669;color:#fff';
+                    const coverHtml = s.cover_url
+                        ? `<img src="${s.cover_url}" alt="${s.title}" onerror="this.style.display='none'">`
+                        : `<i class="fas fa-star" style="font-size:2.5rem;color:rgba(255,255,255,0.3);position:relative;z-index:1;"></i>`;
+                    return `
+                    <div class="special-card">
+                        <div class="special-card-cover">
+                            ${coverHtml}
+                            <span class="special-card-type" style="${typeColor}">${label}</span>
                         </div>
-                        <div class="book-info">
-                            <h3 class="book-title">${item.name}</h3>
-                            <p class="book-author" style="color:#888;font-size:0.875rem;">${item.books_count} publicación${item.books_count !== 1 ? 'es' : ''}</p>
-                            <p class="book-year" style="margin-top:0.4rem;color:#666;font-size:0.8rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${item.description || (item.email || item.website || '')}</p>
-                            <div class="book-footer">
-                                <a href="${item.detail_url}" class="book-read-link" onclick="event.stopPropagation()">Ver editorial →</a>
-                            </div>
+                        <div class="special-card-body">
+                            <div class="special-card-title">${s.title}</div>
+                            <div class="special-card-count"><i class="fas fa-book" style="margin-right:0.3rem;opacity:0.5;"></i>${countLabel} asignados</div>
+                            <a href="/biblioteca/especiales/${s.id}" class="special-card-btn">Ver colección →</a>
                         </div>
-                    </div>`).join('');
+                    </div>`;
+                }).join('');
                 return;
             }
+
+            // Restaurar grid normal si veníamos de especiales
+            grid.className = 'books-grid';
 
             if (isAuthorsSection) {
                 // Template para AUTORES
@@ -2194,7 +2365,7 @@
                     <div class="book-card">
                         <div class="book-cover" style="background:linear-gradient(135deg,#2d3436 0%,#636e72 100%);">
                             ${item.photo_url
-                                ? `<img src="${item.photo_url}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display='none'">`
+                                ? `<img src="${item.photo_url}" alt="${item.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display='none'">`
                                 : `<i class="fas fa-user" style="font-size:3rem;color:white;opacity:0.6;position:relative;z-index:1;"></i>`}
                         </div>
                         <div class="book-info">
@@ -2214,7 +2385,7 @@
                         <div class="book-cover" style="background:linear-gradient(135deg,${item.color} 0%,${item.color}cc 100%);">
                             <span class="book-badge">${item.type}</span>
                             ${item.cover_url
-                                ? `<img src="${item.cover_url}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
+                                ? `<img src="${item.cover_url}" alt="${item.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
                                 : `<span class="book-cover-icon">${item.icon}</span>`}
                             <div class="book-cover-overlay">
                                 <button class="book-detail-btn" data-item-id="book-${index}">
@@ -2253,7 +2424,6 @@
             document.getElementById('inicioSection').classList.add('hidden');
             document.getElementById('mainWrapper').classList.add('hidden');
             document.getElementById('detailView').classList.add('hidden');
-            document.getElementById('aportantesSection').style.display = 'none';
         }
 
         function showSection(tab) {
@@ -2263,15 +2433,7 @@
 
             hideAllSections();
 
-            if (tab === 'Aportantes') {
-                document.getElementById('aportantesSection').style.display = 'block';
-                updateNavigation();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                window.dispatchEvent(new Event('scroll'));
-                return;
-            }
-
-            const useAccordion = (tab === 'Libros' || tab === 'Revistas') && categoriesFromDatabase.length > 0;
+            const useAccordion = ['Libros', 'Revistas', 'Waras Editorial'].includes(tab) && categoriesFromDatabase.length > 0;
             if (useAccordion) {
                 state.activeCategory = { id: null, name: 'Todos' };
             } else {
@@ -2279,7 +2441,7 @@
                 state.activeCategory = firstCat;
             }
 
-            const TABS_NO_SIDEBAR = new Set(['Especiales', 'Editoriales', 'Autores']);
+            const TABS_NO_SIDEBAR = new Set(['Especiales', 'Autores']);
             const wrapper = document.getElementById('mainWrapper');
             wrapper.classList.remove('hidden');
             wrapper.classList.toggle('no-sidebar', TABS_NO_SIDEBAR.has(tab));
@@ -2313,13 +2475,12 @@
             });
             // Update browser URL without reload (history state)
             const tabUrlMap = {
-                'Inicio': '{{ route('biblioteca.dashboard') }}',
-                'Libros': '{{ route('biblioteca.libros.index') }}',
-                'Revistas': '{{ route('biblioteca.revistas.index') }}',
-                'Editoriales': '{{ route('biblioteca.editoriales.index') }}',
-                'Especiales': '{{ route('biblioteca.especiales.index') }}',
-                'Autores': '{{ route('biblioteca.autores.index') }}',
-                'Aportantes': '{{ route('biblioteca.aportantes.index') }}',
+                'Inicio':          '{{ route('biblioteca.dashboard') }}',
+                'Libros':          '{{ route('biblioteca.libros.index') }}',
+                'Revistas':        '{{ route('biblioteca.revistas.index') }}',
+                'Waras Editorial': '{{ route('biblioteca.editorial.index') }}',
+                'Especiales':      '{{ route('biblioteca.especiales.index') }}',
+                'Autores':         '{{ route('biblioteca.autores.index') }}',
             };
             if (tabUrlMap[state.activeTab]) {
                 history.replaceState(null, '', tabUrlMap[state.activeTab]);
@@ -2465,7 +2626,7 @@
         document.getElementById('contentSearchInput').placeholder = `Buscar libros, autores o temas en ${initCatName}...`;
 
         // Activar sección según la ruta visitada (definida por el servidor)
-        const validTabs = ['Inicio','Libros','Revistas','Editoriales','Especiales','Autores','Aportantes'];
+        const validTabs = ['Inicio','Libros','Revistas','Waras Editorial','Especiales','Autores'];
 
         // serverActiveSection tiene prioridad cuando la URL apunta a una sección concreta.
         // sessionStorage solo aplica cuando se llega al dashboard raíz (/biblioteca o /biblioteca/inicio).
@@ -2487,11 +2648,10 @@
 
         // Fuente de datos plana para búsqueda global
         function getAllSearchableItems() {
-            const books      = dataBySectionAndCategory['Libros']['default']      || [];
-            const mags       = dataBySectionAndCategory['Revistas']['default']    || [];
-            const authors    = dataBySectionAndCategory['Autores']['default']     || [];
-            const publishers = dataBySectionAndCategory['Editoriales']['default'] || [];
-            return { books, mags, authors, publishers };
+            const books   = dataBySectionAndCategory['Libros']['default']   || [];
+            const mags    = dataBySectionAndCategory['Revistas']['default'] || [];
+            const authors = dataBySectionAndCategory['Autores']['default']  || [];
+            return { books, mags, authors };
         }
 
         function normalizeStr(s) {
@@ -2506,7 +2666,7 @@
         function renderHeroDropdown(q) {
             if (!q) { heroDropdown.classList.remove('open'); return; }
             const nq = normalizeStr(q);
-            const { books, mags, authors, publishers } = getAllSearchableItems();
+            const { books, mags, authors } = getAllSearchableItems();
 
             const matchBooks = books.filter(b =>
                 normalizeStr(b.title).includes(nq) ||
@@ -2525,12 +2685,7 @@
                 normalizeStr(a.biography).includes(nq)
             ).slice(0, 3);
 
-            const matchPublishers = publishers.filter(p =>
-                normalizeStr(p.name).includes(nq) ||
-                normalizeStr(p.description).includes(nq)
-            ).slice(0, 2);
-
-            const total = matchBooks.length + matchMags.length + matchAuthors.length + matchPublishers.length;
+            const total = matchBooks.length + matchMags.length + matchAuthors.length;
 
             if (total === 0) {
                 heroDropdown.innerHTML = `<div class="hsd-empty">Sin resultados para "<strong>${q}</strong>"</div>`;
@@ -2582,21 +2737,6 @@
                             <div class="hsd-sub">${a.nationality}</div>
                         </div>
                         <span class="hsd-badge">Autor</span>
-                    </a>`).join('');
-            }
-
-            if (matchPublishers.length) {
-                html += `<div class="hsd-section-label">Editoriales</div>`;
-                html += matchPublishers.map(p => `
-                    <a class="hsd-item" href="/biblioteca/editoriales/${p.id}">
-                        <div class="hsd-thumb" style="background:linear-gradient(135deg,#1b2a47,#2d4a6e);">
-                            ${p.logo_url ? `<img src="${p.logo_url}" alt="" style="padding:4px;object-fit:contain;">` : '<i class="fas fa-building" style="color:rgba(255,255,255,0.6);font-size:1rem;"></i>'}
-                        </div>
-                        <div class="hsd-info">
-                            <div class="hsd-title">${p.name}</div>
-                            <div class="hsd-sub">${p.books_count} publicación${p.books_count !== 1 ? 'es' : ''}</div>
-                        </div>
-                        <span class="hsd-badge">Editorial</span>
                     </a>`).join('');
             }
 
@@ -2655,6 +2795,119 @@
         });
 
 
+        // ========== DESCRIPTOR CHIPS ==========
+
+        function renderDescriptorChips() {
+            const bar = document.getElementById('descriptorChipsBar');
+            const chips = topDescriptorsData.map(d => {
+                const isActive = activeDescriptorId === d.id;
+                return `<button class="descriptor-chip${isActive ? ' active' : ''}" data-id="${d.id}" data-name="${d.name}" onclick="toggleDescriptorChip(${d.id}, '${d.name.replace(/'/g,"\\'")}')">
+                    ${d.name} <span class="chip-count">${d.books_count}</span>
+                </button>`;
+            }).join('');
+            bar.innerHTML = `<div class="descriptor-chips-wrap">${chips}</div>`;
+        }
+
+        function toggleDescriptorChip(id, name) {
+            if (activeDescriptorId === id) {
+                activeDescriptorId = null;
+                document.getElementById('contentSearchInput').value = '';
+                renderBooks();
+            } else {
+                activeDescriptorId = id;
+                document.getElementById('contentSearchInput').value = name;
+                filterByDescriptor(id);
+            }
+            renderDescriptorChips();
+        }
+
+        function filterByDescriptor(descriptorId) {
+            const tab = state.activeTab;
+            const allItems = dataBySectionAndCategory[tab]?.['default'] || [];
+            // Filtrar usando el campo descriptorIds que agregaremos en mapBook
+            const filtered = allItems.filter(item =>
+                item.descriptorIds && item.descriptorIds.includes(descriptorId)
+            );
+            const grid = document.getElementById('booksGrid');
+            grid.className = 'books-grid';
+            document.getElementById('resourceNumber').textContent = filtered.length;
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af;">
+                    <i class="fas fa-tag" style="font-size:2rem;margin-bottom:0.75rem;display:block;"></i>
+                    Sin resultados para el descriptor "<strong style="color:#6b7280;">${document.getElementById('contentSearchInput').value}</strong>"
+                </div>`;
+                return;
+            }
+            // Reusar render de libros estándar
+            renderBookItems(grid, filtered);
+        }
+
+        function renderBookItems(grid, items) {
+            grid.innerHTML = items.map((item, index) => `
+                <div class="book-card">
+                    <div class="book-cover" style="background:linear-gradient(135deg,${item.color} 0%,${item.color}cc 100%);">
+                        <span class="book-badge">${item.type}</span>
+                        ${item.cover_url
+                            ? `<img src="${item.cover_url}" alt="${item.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
+                            : `<span class="book-cover-icon">${item.icon}</span>`}
+                        <div class="book-cover-overlay">
+                            <button class="book-detail-btn" data-item-idx="${index}">
+                                <i class="fas fa-eye"></i> Ver Detalles
+                            </button>
+                        </div>
+                    </div>
+                    <div class="book-info">
+                        <h3 class="book-title">${item.title}</h3>
+                        <p class="book-author">${item.author}</p>
+                        <p class="book-year">Publicación: ${item.year}</p>
+                        <div class="book-footer">
+                            <span style="font-size:0.75rem;color:#9ca3af;">${item.pages} págs.</span>
+                            ${item.read_url
+                                ? `<a href="${item.read_url}" target="_blank" rel="noopener" class="book-read-link">Leer →</a>`
+                                : `<span class="book-read-link" style="opacity:0.35;cursor:default;">Sin acceso</span>`}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            grid.querySelectorAll('.book-detail-btn').forEach((btn, idx) => {
+                btn.addEventListener('click', e => {
+                    e.preventDefault();
+                    closeMobileSidebar();
+                    showDetailView(items[parseInt(btn.dataset.itemIdx)]);
+                });
+            });
+        }
+
+        // ========== SUGERENCIAS DE DESCRIPTORES EN BUSCADOR ==========
+        const descriptorSuggestions = document.getElementById('descriptorSuggestions');
+
+        function showDescriptorSuggestions(q) {
+            if (!q || q.length < 2) { descriptorSuggestions.style.display = 'none'; return; }
+            const nq = q.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+            const matches = topDescriptorsData.filter(d =>
+                d.name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').includes(nq)
+            ).slice(0, 6);
+            if (!matches.length) { descriptorSuggestions.style.display = 'none'; return; }
+            descriptorSuggestions.innerHTML = matches.map(d => `
+                <div class="descriptor-suggestion-item" onclick="applyDescriptorSuggestion(${d.id}, '${d.name.replace(/'/g,"\\'")}')">
+                    <span><i class="fas fa-tag" style="margin-right:0.4rem;color:#c5a059;font-size:0.75rem;"></i>${d.name}</span>
+                    <span class="ds-count">${d.books_count} recursos</span>
+                </div>`).join('');
+            descriptorSuggestions.style.display = 'block';
+        }
+
+        function applyDescriptorSuggestion(id, name) {
+            descriptorSuggestions.style.display = 'none';
+            activeDescriptorId = id;
+            document.getElementById('contentSearchInput').value = name;
+            filterByDescriptor(id);
+            renderDescriptorChips();
+        }
+
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.content-search')) descriptorSuggestions.style.display = 'none';
+        });
+
         // ---- BÚSQUEDA EN CATÁLOGO (filtra tarjetas visibles) ----
         document.getElementById('sortSelect').addEventListener('change', function() {
             closeMobileSidebar();
@@ -2663,11 +2916,25 @@
 
         document.getElementById('contentSearchInput').addEventListener('input', function() {
             closeMobileSidebar();
-            const q = normalizeStr(this.value.trim());
-            const isAuthors      = state.activeTab === 'Autores';
-            const isEditoriales  = state.activeTab === 'Editoriales';
+            const rawQ = this.value.trim();
+            const q    = normalizeStr(rawQ);
+            const isAuthors = state.activeTab === 'Autores';
 
-            if (!q) { renderBooks(); return; }
+            // Mostrar sugerencias de descriptores
+            showDescriptorSuggestions(rawQ);
+
+            if (!q) {
+                activeDescriptorId = null;
+                renderDescriptorChips();
+                renderBooks();
+                return;
+            }
+
+            // Si no hay descriptor activo, limpiar selección de chip
+            if (activeDescriptorId !== null) {
+                activeDescriptorId = null;
+                renderDescriptorChips();
+            }
 
             const baseItems = getDataForSection();
 
@@ -2682,11 +2949,22 @@
                            normalizeStr(item.description).includes(q) ||
                            normalizeStr(item.address).includes(q);
                 }
-                return normalizeStr(item.title).includes(q) ||
-                       normalizeStr(item.author).includes(q) ||
-                       normalizeStr(item.description).includes(q) ||
-                       normalizeStr(item.publisher).includes(q) ||
-                       normalizeStr(String(item.year)).includes(q);
+                // Búsqueda normal + boost por descriptor (aparecen primero)
+                const matchDesc = item.descriptorNames &&
+                    item.descriptorNames.some(dn => normalizeStr(dn).includes(q));
+                const matchText = normalizeStr(item.title).includes(q) ||
+                    normalizeStr(item.author).includes(q) ||
+                    normalizeStr(item.description).includes(q) ||
+                    normalizeStr(item.publisher).includes(q) ||
+                    normalizeStr(String(item.year)).includes(q);
+                return matchDesc || matchText;
+            });
+
+            // Ordenar: matches de descriptor primero
+            filtered.sort((a, b) => {
+                const aD = a.descriptorNames && a.descriptorNames.some(dn => normalizeStr(dn).includes(q)) ? 0 : 1;
+                const bD = b.descriptorNames && b.descriptorNames.some(dn => normalizeStr(dn).includes(q)) ? 0 : 1;
+                return aD - bD;
             });
 
             // Renderizar resultados filtrados
@@ -2701,29 +2979,12 @@
                 return;
             }
 
-            if (isEditoriales) {
-                grid.innerHTML = filtered.map(item => `
-                    <div class="book-card" style="cursor:pointer;" onclick="window.location.href='${item.detail_url}'">
-                        <div class="book-cover" style="aspect-ratio:unset;height:10rem;background:#f9f8f6;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;padding:1rem;">
-                            ${item.logo_url
-                                ? `<img src="${item.logo_url}" alt="${item.name}" style="max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;" onerror="this.style.display='none'">`
-                                : `<i class="fas fa-building" style="font-size:2.5rem;color:#9ca3af;"></i>`}
-                        </div>
-                        <div class="book-info">
-                            <h3 class="book-title">${item.name}</h3>
-                            <p class="book-author" style="color:#888;font-size:0.875rem;">${item.books_count} publicación${item.books_count !== 1 ? 'es' : ''}</p>
-                            <p class="book-year" style="margin-top:0.4rem;color:#666;font-size:0.8rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${item.description || (item.email || item.website || '')}</p>
-                            <div class="book-footer">
-                                <a href="${item.detail_url}" class="book-read-link" onclick="event.stopPropagation()">Ver editorial →</a>
-                            </div>
-                        </div>
-                    </div>`).join('');
-            } else if (isAuthors) {
+            if (isAuthors) {
                 grid.innerHTML = filtered.map(item => `
                     <div class="book-card">
                         <div class="book-cover" style="background:linear-gradient(135deg,#2d3436 0%,#636e72 100%);">
                             ${item.photo_url
-                                ? `<img src="${item.photo_url}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display='none'">`
+                                ? `<img src="${item.photo_url}" alt="${item.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display='none'">`
                                 : `<i class="fas fa-user" style="font-size:3rem;color:white;opacity:0.6;position:relative;z-index:1;"></i>`}
                         </div>
                         <div class="book-info">
@@ -2741,7 +3002,7 @@
                         <div class="book-cover" style="background:linear-gradient(135deg,${item.color} 0%,${item.color}cc 100%);">
                             <span class="book-badge">${item.type}</span>
                             ${item.cover_url
-                                ? `<img src="${item.cover_url}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
+                                ? `<img src="${item.cover_url}" alt="${item.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
                                 : `<span class="book-cover-icon">${item.icon}</span>`}
                             <div class="book-cover-overlay">
                                 <button class="book-detail-btn" data-search-idx="${idx}">
@@ -2795,7 +3056,7 @@
 
         // ========== CARRUSELES DE INICIO ==========
         (function() {
-            const CARD_W_BOOK   = 180 + 20;   // width + margin*2
+            const CARD_W_BOOK   = 240 + 24;   // width + margin*2
             const CARD_W_AUTHOR = 150 + 20;
             const VISIBLE       = Math.floor(window.innerWidth / CARD_W_BOOK) + 2;
 

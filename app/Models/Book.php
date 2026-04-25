@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Descriptor;
 
 class Book extends Model
 {
@@ -18,12 +19,13 @@ class Book extends Model
         'title',
         'slug',
         'summary',
+        'imprint',
         'publication_date',
         'document_type',
+        'section',
         'isbn',
         'pages',
         'language',
-        'descriptors',
         'provider',
         'cover_image_path',
         'source_type',
@@ -70,6 +72,11 @@ class Book extends Model
             'book_id',
             'category_id'
         )->withTimestamps();
+    }
+
+    public function descriptors(): BelongsToMany
+    {
+        return $this->belongsToMany(Descriptor::class, 'book_descriptor');
     }
 
     /**

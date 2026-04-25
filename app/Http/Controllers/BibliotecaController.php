@@ -7,6 +7,8 @@ use App\Models\Book;
 use App\Models\Author;
 use App\Models\Category;
 use App\Models\Publisher;
+use App\Models\Special;
+use App\Models\Descriptor;
 use App\Models\SiteSetting;
 
 class BibliotecaController extends Controller
@@ -26,16 +28,19 @@ class BibliotecaController extends Controller
         $totalAuthors    = Author::count();
         $totalPublishers = Publisher::count();
         $totalCategories = Category::count();
-        $allBooks        = Book::with(['authors', 'publisher', 'categories'])->get();
+        $allBooks        = Book::with(['authors', 'publisher', 'categories', 'descriptors'])->get();
         $booksByType     = $allBooks->groupBy('document_type');
 
+        $specials = Special::withCount('books')->with('books.authors')->orderBy('order')->orderBy('title')->get();
+
         $booksData = [
-            'Libros'      => $booksByType->get('Libro', collect())->values()->toArray(),
-            'Revistas'    => $booksByType->get('Revista', collect())->values()->toArray(),
-            'Editoriales' => Publisher::with('books')->get()->toArray(),
-            'Especiales'  => Book::where('is_special', true)->with(['authors', 'publisher', 'categories'])->get()->toArray(),
-            'Autores'     => Author::all()->toArray(),
-            'Aportantes'  => [],
+            'Libros'          => $allBooks->where('section', 'Biblioteca Digital')->where('document_type', '!=', 'Revista')->values()->toArray(),
+            'Revistas'        => $booksByType->get('Revista', collect())->values()->toArray(),
+            'Editoriales'     => Publisher::with('books')->get()->toArray(),
+            'Especiales'      => $specials->toArray(),
+            'Autores'         => Author::all()->toArray(),
+            'Waras Editorial' => $allBooks->where('section', 'Waras Editorial')->values()->toArray(),
+            'Aportantes'      => [],
         ];
 
         $allCategories = Category::where('type', 'biblioteca')
@@ -52,6 +57,12 @@ class BibliotecaController extends Controller
             ])->toArray();
         };
 
+        $topDescriptors = Descriptor::withCount('books')
+            ->having('books_count', '>', 0)
+            ->orderByDesc('books_count')
+            ->limit(20)
+            ->get(['id', 'name', 'books_count']);
+
         return [
             'totalBooks'           => $totalBooks,
             'totalAuthors'         => $totalAuthors,
@@ -62,6 +73,7 @@ class BibliotecaController extends Controller
             'booksByCategory'      => Category::with('books')->get(),
             'categoriesForFilters' => $buildTree($allCategories),
             'activeSection'        => $activeSection,
+            'topDescriptors'       => $topDescriptors,
             'canEditPanel'         => auth()->check() && (auth()->user()->is_admin_global || auth()->user()->canAccessModule('biblioteca')),
             'heroBg'               => ($p = SiteSetting::get('bg_biblioteca')) ? asset('storage/' . $p) : null,
         ];
@@ -72,7 +84,14 @@ class BibliotecaController extends Controller
     public function indexEditoriales(){ return view('biblioteca.dashboard', $this->dashboardData('Editoriales')); }
     public function indexAutores()    { return view('biblioteca.dashboard', $this->dashboardData('Autores')); }
     public function indexEspeciales() { return view('biblioteca.dashboard', $this->dashboardData('Especiales')); }
+    public function indexEditorial()  { return view('biblioteca.dashboard', $this->dashboardData('Waras Editorial')); }
     public function indexAportantes() { return view('biblioteca.dashboard', $this->dashboardData('Aportantes')); }
+
+    public function showEspecial(Special $special)
+    {
+        $special->load(['books.authors', 'books.categories', 'books.descriptors']);
+        return view('biblioteca.especial', compact('special'));
+    }
 
     public function showAuthor(Author $author)
     {
@@ -112,10 +131,29 @@ class BibliotecaController extends Controller
     {
         $query = $request->get('q');
 
-        $books = Book::where('title', 'like', "%{$query}%")
+        // Sugerencias de descriptores para autocompletar
+        if ($request->get('type') === 'descriptors') {
+            $descriptors = Descriptor::where('name', 'like', "%{$query}%")
+                ->withCount('books')
+                ->orderByDesc('books_count')
+                ->limit(8)
+                ->get(['id', 'name', 'books_count']);
+            return response()->json($descriptors);
+        }
+
+        // Libros que coinciden por descriptor (prioridad alta)
+        $byDescriptor = Book::whereHas('descriptors', fn($q) => $q->where('name', 'like', "%{$query}%"))
+            ->with(['authors', 'publisher'])
+            ->get();
+
+        // Libros que coinciden por título/resumen
+        $byText = Book::where('title', 'like', "%{$query}%")
             ->orWhere('summary', 'like', "%{$query}%")
             ->with(['authors', 'publisher'])
-            ->paginate(20);
+            ->get();
+
+        // Prioridad: descriptor primero, luego texto (sin duplicados)
+        $books = $byDescriptor->merge($byText)->unique('id')->values();
 
         return response()->json($books);
     }

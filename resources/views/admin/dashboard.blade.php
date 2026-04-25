@@ -38,10 +38,6 @@
                     <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Autores</span>
                 </div>
                 <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
-                    <span class="text-2xl font-black text-emerald-800 mb-1">{{ $stats['biblioteca']['categories'] ?? 0 }}</span>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Categorías</span>
-                </div>
-                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
                     <span class="text-2xl font-black text-emerald-800 mb-1">{{ $stats['biblioteca']['publishers'] ?? 0 }}</span>
                     <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Editoriales</span>
                 </div>
@@ -52,6 +48,10 @@
                 <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
                     <span class="text-2xl font-black text-emerald-800 mb-1">{{ $stats['biblioteca']['specials'] ?? 0 }}</span>
                     <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Especiales</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-emerald-800 mb-1">{{ $stats['biblioteca']['descriptors'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Descriptores</span>
                 </div>
             </div>
 
@@ -99,12 +99,16 @@
                 </div>
                 <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
                     <span class="text-2xl font-black text-blue-800 mb-1">{{ $stats['fototeca']['subcategories'] ?? 0 }}</span>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Subcategorías</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">SubCategorías</span>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-100 flex flex-col items-center justify-center text-center shadow-sm">
+                    <span class="text-2xl font-black text-blue-800 mb-1">{{ $stats['fototeca']['sublevels'] ?? 0 }}</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">SubNiveles</span>
                 </div>
             </div>
 
             <div class="flex gap-3">
-                <a href="{{ route('admin.fototeca.index') }}" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-blue-200 text-center">
+                <a href="{{ route('admin.fototeca.photos') }}" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-blue-200 text-center">
                     Administrar Módulo →
                 </a>
                 <a href="{{ route('fototeca.dashboard') }}" target="_blank" class="py-3 px-4 rounded-xl text-sm font-bold transition-all border border-blue-300 text-blue-700 hover:bg-blue-50 bg-white shadow-sm whitespace-nowrap">
@@ -152,7 +156,7 @@
                 <p class="text-xs text-slate-500 font-medium mt-1">Tu Rol Actual</p>
             </div>
 
-            <a href="{{ route('admin.usuarios.index') }}" class="w-full py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white shadow-violet-200">
+            <a href="{{ route('admin.usuarios.index') }}" class="w-full py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white shadow-violet-200 text-center block">
                 Administrar Módulo →
             </a>
         </div>

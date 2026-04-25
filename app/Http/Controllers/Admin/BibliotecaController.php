@@ -7,6 +7,8 @@ use App\Models\Book;
 use App\Models\Author;
 use App\Models\Publisher;
 use App\Models\Category;
+use App\Models\Special;
+use App\Models\Descriptor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -46,10 +48,10 @@ class BibliotecaController extends Controller
 
     public function createBook()
     {
-        $authors    = Author::orderBy('name')->get();
-        $categories = Category::flatTree('biblioteca');
-        $publishers = Publisher::orderBy('name')->get();
-        return view('admin.biblioteca.books.create', compact('authors', 'categories', 'publishers'));
+        $authors     = Author::orderBy('name')->get();
+        $categories  = Category::where('type', 'biblioteca')->whereNull('parent_id')->with('subcategories')->orderBy('name')->get();
+        $descriptors = Descriptor::orderBy('name')->get();
+        return view('admin.biblioteca.books.create', compact('authors', 'categories', 'descriptors'));
     }
 
     public function storeBook(Request $request)
@@ -58,34 +60,35 @@ class BibliotecaController extends Controller
             'title'            => 'required|string|max:255',
             'authors'          => 'nullable|array',
             'authors.*'        => 'exists:authors,id',
-            'categories'       => 'nullable|array',
-            'categories.*'     => 'exists:categories,id',
-            'publisher_id'     => 'nullable|exists:publishers,id',
+            'document_type'    => 'required|in:Libro,Revista,Artículo,Tesis',
+            'section'          => 'required|in:Biblioteca Digital,Waras Editorial',
+            'category_id'      => 'nullable|exists:categories,id',
+            'subcategory_id'   => 'nullable|exists:categories,id',
             'publication_date' => 'nullable|date',
             'pages'            => 'nullable|integer|min:1',
             'summary'          => 'nullable|string',
+            'imprint'          => 'nullable|string|max:500',
+            'descriptors'      => 'nullable|array',
+            'descriptors.*'    => 'exists:descriptors,id',
+            'provider'         => 'nullable|string|max:500',
             'source_type'      => 'required|in:external,pdf,none',
             'external_url'     => 'nullable|url',
             'pdf_file'         => 'nullable|file|mimes:pdf|max:51200',
             'cover_image'      => 'nullable|image|max:5120',
-            'isbn'             => 'nullable|string|max:50',
-            'language'         => 'nullable|string|max:50',
         ]);
-
-        $slug = $this->uniqueSlug($request->title, Book::class);
 
         $data = [
             'title'            => $request->title,
-            'slug'             => $slug,
-            'document_type'    => 'Libro',
-            'publisher_id'     => $request->publisher_id,
+            'slug'             => $this->uniqueSlug($request->title, Book::class),
+            'document_type'    => $request->document_type,
+            'section'          => $request->section,
             'publication_date' => $request->publication_date,
             'pages'            => $request->pages,
             'summary'          => $request->summary,
+            'imprint'          => $request->imprint,
+            'provider'         => $request->provider,
             'source_type'      => $request->source_type,
             'external_url'     => $request->source_type === 'external' ? $request->external_url : null,
-            'isbn'             => $request->isbn,
-            'language'         => $request->language ?? 'Español',
         ];
 
         if ($request->hasFile('cover_image')) {
@@ -97,7 +100,9 @@ class BibliotecaController extends Controller
 
         $book = Book::create($data);
         $book->authors()->sync($this->withOrder($request->authors ?? []));
-        $book->categories()->sync($request->categories ?? []);
+        $book->descriptors()->sync($request->descriptors ?? []);
+        $catIds = array_filter([$request->category_id, $request->subcategory_id]);
+        $book->categories()->sync($catIds);
 
         return redirect()->route('admin.biblioteca.books')->with('success', 'Libro agregado correctamente.');
     }
@@ -108,30 +113,34 @@ class BibliotecaController extends Controller
             'title'            => 'required|string|max:255',
             'authors'          => 'nullable|array',
             'authors.*'        => 'exists:authors,id',
-            'categories'       => 'nullable|array',
-            'categories.*'     => 'exists:categories,id',
-            'publisher_id'     => 'nullable|exists:publishers,id',
+            'document_type'    => 'required|in:Libro,Revista,Artículo,Tesis',
+            'section'          => 'required|in:Biblioteca Digital,Waras Editorial',
+            'category_id'      => 'nullable|exists:categories,id',
+            'subcategory_id'   => 'nullable|exists:categories,id',
             'publication_date' => 'nullable|date',
             'pages'            => 'nullable|integer|min:1',
             'summary'          => 'nullable|string',
+            'imprint'          => 'nullable|string|max:500',
+            'descriptors'      => 'nullable|array',
+            'descriptors.*'    => 'exists:descriptors,id',
+            'provider'         => 'nullable|string|max:500',
             'source_type'      => 'required|in:external,pdf,none',
             'external_url'     => 'nullable|url',
             'pdf_file'         => 'nullable|file|mimes:pdf|max:51200',
             'cover_image'      => 'nullable|image|max:5120',
-            'isbn'             => 'nullable|string|max:50',
-            'language'         => 'nullable|string|max:50',
         ]);
 
         $data = [
             'title'            => $request->title,
-            'publisher_id'     => $request->publisher_id,
+            'document_type'    => $request->document_type,
+            'section'          => $request->section,
             'publication_date' => $request->publication_date,
             'pages'            => $request->pages,
             'summary'          => $request->summary,
+            'imprint'          => $request->imprint,
+            'provider'         => $request->provider,
             'source_type'      => $request->source_type,
             'external_url'     => $request->source_type === 'external' ? $request->external_url : null,
-            'isbn'             => $request->isbn,
-            'language'         => $request->language ?? 'Español',
         ];
 
         if ($request->hasFile('cover_image')) {
@@ -143,18 +152,20 @@ class BibliotecaController extends Controller
 
         $book->update($data);
         $book->authors()->sync($this->withOrder($request->authors ?? []));
-        $book->categories()->sync($request->categories ?? []);
+        $book->descriptors()->sync($request->descriptors ?? []);
+        $catIds = array_filter([$request->category_id, $request->subcategory_id]);
+        $book->categories()->sync($catIds);
 
         return redirect()->route('admin.biblioteca.books')->with('success', 'Libro actualizado correctamente.');
     }
 
     public function editBook(Book $book)
     {
-        $book->load(['authors', 'publisher', 'categories']);
-        $authors    = Author::orderBy('name')->get();
-        $categories = Category::flatTree('biblioteca');
-        $publishers = Publisher::orderBy('name')->get();
-        return view('admin.biblioteca.books.edit', compact('book', 'authors', 'categories', 'publishers'));
+        $book->load(['authors', 'categories', 'descriptors']);
+        $authors     = Author::orderBy('name')->get();
+        $categories  = Category::where('type', 'biblioteca')->whereNull('parent_id')->with('subcategories')->orderBy('name')->get();
+        $descriptors = Descriptor::orderBy('name')->get();
+        return view('admin.biblioteca.books.edit', compact('book', 'authors', 'categories', 'descriptors'));
     }
 
     public function destroyBook(Book $book)
@@ -339,30 +350,27 @@ class BibliotecaController extends Controller
 
     public function indexCategories()
     {
-        $allCategories = Category::flatTree('biblioteca');
+        $allCategories = Category::where('type', 'biblioteca')
+            ->whereNull('parent_id')
+            ->orderBy('name')
+            ->get();
         return view('admin.biblioteca.categories.index', compact('allCategories'));
     }
 
     public function createCategory()
     {
-        $allCategories = Category::flatTree('biblioteca');
-        return view('admin.biblioteca.categories.create', compact('allCategories'));
+        return view('admin.biblioteca.categories.create');
     }
 
     public function storeCategory(Request $request)
     {
-        $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'parent_id'   => 'nullable|exists:categories,id',
-        ]);
+        $request->validate(['name' => 'required|string|max:255']);
 
         Category::create([
-            'name'        => $request->name,
-            'slug'        => $this->uniqueSlug($request->name, Category::class),
-            'description' => $request->description,
-            'type'        => 'biblioteca',
-            'parent_id'   => $request->parent_id,
+            'name'      => $request->name,
+            'slug'      => $this->uniqueSlug($request->name, Category::class),
+            'type'      => 'biblioteca',
+            'parent_id' => null,
         ]);
 
         return redirect()->route('admin.biblioteca.categories')->with('success', 'Categoría agregada correctamente.');
@@ -370,31 +378,81 @@ class BibliotecaController extends Controller
 
     public function updateCategory(Request $request, Category $category)
     {
-        $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'parent_id'   => 'nullable|exists:categories,id',
-        ]);
+        $request->validate(['name' => 'required|string|max:255']);
 
-        $category->update([
-            'name'        => $request->name,
-            'description' => $request->description,
-            'parent_id'   => $request->parent_id,
-        ]);
+        $category->update(['name' => $request->name]);
 
         return redirect()->route('admin.biblioteca.categories')->with('success', 'Categoría actualizada correctamente.');
     }
 
     public function editCategory(Category $category)
     {
-        $allCategories = Category::flatTree('biblioteca');
-        return view('admin.biblioteca.categories.edit', compact('category', 'allCategories'));
+        return view('admin.biblioteca.categories.edit', compact('category'));
     }
 
     public function destroyCategory(Category $category)
     {
         $category->delete();
         return redirect()->route('admin.biblioteca.categories')->with('success', 'Categoría eliminada.');
+    }
+
+    // ============= SUBCATEGORÍAS =============
+
+    public function createSubcategory()
+    {
+        $parentCategories = Category::where('type', 'biblioteca')
+            ->whereNull('parent_id')
+            ->orderBy('name')
+            ->get();
+        return view('admin.biblioteca.subcategories.create', compact('parentCategories'));
+    }
+
+    public function storeSubcategory(Request $request)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'parent_id' => 'required|exists:categories,id',
+        ]);
+
+        Category::create([
+            'name'      => $request->name,
+            'slug'      => $this->uniqueSlug($request->name, Category::class),
+            'type'      => 'biblioteca',
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'Subcategoría agregada correctamente.');
+    }
+
+    public function editSubcategory(Category $category)
+    {
+        $parentCategories = Category::where('type', 'biblioteca')
+            ->whereNull('parent_id')
+            ->where('id', '!=', $category->id)
+            ->orderBy('name')
+            ->get();
+        return view('admin.biblioteca.subcategories.edit', compact('category', 'parentCategories'));
+    }
+
+    public function updateSubcategory(Request $request, Category $category)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'parent_id' => 'required|exists:categories,id',
+        ]);
+
+        $category->update([
+            'name'      => $request->name,
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'Subcategoría actualizada correctamente.');
+    }
+
+    public function destroySubcategory(Category $category)
+    {
+        $category->delete();
+        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'Subcategoría eliminada.');
     }
 
     // ============= REVISTAS =============
@@ -415,10 +473,10 @@ class BibliotecaController extends Controller
 
     public function createMagazine()
     {
-        $authors    = Author::orderBy('name')->get();
-        $categories = Category::flatTree('biblioteca');
-        $publishers = Publisher::orderBy('name')->get();
-        return view('admin.biblioteca.magazines.create', compact('authors', 'categories', 'publishers'));
+        $authors     = Author::orderBy('name')->get();
+        $categories  = Category::where('type', 'biblioteca')->whereNull('parent_id')->with('subcategories')->orderBy('name')->get();
+        $descriptors = Descriptor::orderBy('name')->get();
+        return view('admin.biblioteca.magazines.create', compact('authors', 'categories', 'descriptors'));
     }
 
     public function storeMagazine(Request $request)
@@ -427,12 +485,17 @@ class BibliotecaController extends Controller
             'title'            => 'required|string|max:255',
             'authors'          => 'nullable|array',
             'authors.*'        => 'exists:authors,id',
-            'categories'       => 'nullable|array',
-            'categories.*'     => 'exists:categories,id',
-            'publisher_id'     => 'nullable|exists:publishers,id',
+            'document_type'    => 'required|in:Libro,Revista,Artículo,Tesis',
+            'section'          => 'required|in:Biblioteca Digital,Waras Editorial',
+            'category_id'      => 'nullable|exists:categories,id',
+            'subcategory_id'   => 'nullable|exists:categories,id',
             'publication_date' => 'nullable|date',
             'pages'            => 'nullable|integer|min:1',
             'summary'          => 'nullable|string',
+            'imprint'          => 'nullable|string|max:500',
+            'descriptors'      => 'nullable|array',
+            'descriptors.*'    => 'exists:descriptors,id',
+            'provider'         => 'nullable|string|max:500',
             'source_type'      => 'required|in:external,pdf,none',
             'external_url'     => 'nullable|url',
             'pdf_file'         => 'nullable|file|mimes:pdf|max:51200',
@@ -442,11 +505,13 @@ class BibliotecaController extends Controller
         $data = [
             'title'            => $request->title,
             'slug'             => $this->uniqueSlug($request->title, Book::class),
-            'document_type'    => 'Revista',
-            'publisher_id'     => $request->publisher_id,
+            'document_type'    => $request->document_type,
+            'section'          => $request->section,
             'publication_date' => $request->publication_date,
             'pages'            => $request->pages,
             'summary'          => $request->summary,
+            'imprint'          => $request->imprint,
+            'provider'         => $request->provider,
             'source_type'      => $request->source_type,
             'external_url'     => $request->source_type === 'external' ? $request->external_url : null,
         ];
@@ -460,7 +525,9 @@ class BibliotecaController extends Controller
 
         $magazine = Book::create($data);
         $magazine->authors()->sync($this->withOrder($request->authors ?? []));
-        $magazine->categories()->sync($request->categories ?? []);
+        $magazine->descriptors()->sync($request->descriptors ?? []);
+        $catIds = array_filter([$request->category_id, $request->subcategory_id]);
+        $magazine->categories()->sync($catIds);
 
         return redirect()->route('admin.biblioteca.magazines')->with('success', 'Revista agregada correctamente.');
     }
@@ -471,12 +538,17 @@ class BibliotecaController extends Controller
             'title'            => 'required|string|max:255',
             'authors'          => 'nullable|array',
             'authors.*'        => 'exists:authors,id',
-            'categories'       => 'nullable|array',
-            'categories.*'     => 'exists:categories,id',
-            'publisher_id'     => 'nullable|exists:publishers,id',
+            'document_type'    => 'required|in:Libro,Revista,Artículo,Tesis',
+            'section'          => 'required|in:Biblioteca Digital,Waras Editorial',
+            'category_id'      => 'nullable|exists:categories,id',
+            'subcategory_id'   => 'nullable|exists:categories,id',
             'publication_date' => 'nullable|date',
             'pages'            => 'nullable|integer|min:1',
             'summary'          => 'nullable|string',
+            'imprint'          => 'nullable|string|max:500',
+            'descriptors'      => 'nullable|array',
+            'descriptors.*'    => 'exists:descriptors,id',
+            'provider'         => 'nullable|string|max:500',
             'source_type'      => 'required|in:external,pdf,none',
             'external_url'     => 'nullable|url',
             'pdf_file'         => 'nullable|file|mimes:pdf|max:51200',
@@ -485,10 +557,13 @@ class BibliotecaController extends Controller
 
         $data = [
             'title'            => $request->title,
-            'publisher_id'     => $request->publisher_id,
+            'document_type'    => $request->document_type,
+            'section'          => $request->section,
             'publication_date' => $request->publication_date,
             'pages'            => $request->pages,
             'summary'          => $request->summary,
+            'imprint'          => $request->imprint,
+            'provider'         => $request->provider,
             'source_type'      => $request->source_type,
             'external_url'     => $request->source_type === 'external' ? $request->external_url : null,
         ];
@@ -502,18 +577,20 @@ class BibliotecaController extends Controller
 
         $book->update($data);
         $book->authors()->sync($this->withOrder($request->authors ?? []));
-        $book->categories()->sync($request->categories ?? []);
+        $book->descriptors()->sync($request->descriptors ?? []);
+        $catIds = array_filter([$request->category_id, $request->subcategory_id]);
+        $book->categories()->sync($catIds);
 
         return redirect()->route('admin.biblioteca.magazines')->with('success', 'Revista actualizada correctamente.');
     }
 
     public function editMagazine(Book $book)
     {
-        $book->load(['authors', 'publisher', 'categories']);
-        $authors    = Author::orderBy('name')->get();
-        $categories = Category::flatTree('biblioteca');
-        $publishers = Publisher::orderBy('name')->get();
-        return view('admin.biblioteca.magazines.edit', compact('book', 'authors', 'categories', 'publishers'));
+        $book->load(['authors', 'categories', 'descriptors']);
+        $authors     = Author::orderBy('name')->get();
+        $categories  = Category::where('type', 'biblioteca')->whereNull('parent_id')->with('subcategories')->orderBy('name')->get();
+        $descriptors = Descriptor::orderBy('name')->get();
+        return view('admin.biblioteca.magazines.edit', compact('book', 'authors', 'categories', 'descriptors'));
     }
 
     public function destroyMagazine(Book $book)
@@ -522,19 +599,149 @@ class BibliotecaController extends Controller
         return redirect()->route('admin.biblioteca.magazines')->with('success', 'Revista eliminada.');
     }
 
+    // ============= DESCRIPTORES =============
+
+    public function indexDescriptors()
+    {
+        $descriptors = Descriptor::withCount('books')->orderBy('name')->get();
+        return view('admin.biblioteca.descriptors.index', compact('descriptors'));
+    }
+
+    public function storeDescriptor(Request $request)
+    {
+        $request->validate(['name' => 'required|string|max:100|unique:descriptors,name']);
+
+        Descriptor::create([
+            'name' => strtolower(trim($request->name)),
+            'slug' => $this->uniqueSlug($request->name, Descriptor::class),
+        ]);
+
+        return back()->with('success', 'Descriptor agregado correctamente.');
+    }
+
+    public function destroyDescriptor(Descriptor $descriptor)
+    {
+        $descriptor->delete();
+        return back()->with('success', 'Descriptor eliminado.');
+    }
+
+    // ============= SUBCATEGORÍAS =============
+
+    public function indexSubcategories()
+    {
+        $subcategories = Category::where('type', 'biblioteca')
+            ->whereNotNull('parent_id')
+            ->with('parent')
+            ->orderBy('parent_id')
+            ->orderBy('name')
+            ->get();
+        return view('admin.biblioteca.subcategories.index', compact('subcategories'));
+    }
+
     // ============= ESPECIALES =============
 
     public function indexSpecials()
     {
-        $books     = Book::where('document_type', '!=', 'Revista')->orderBy('title')->get(['id', 'title', 'document_type', 'is_special']);
-        $magazines = Book::where('document_type', 'Revista')->orderBy('title')->get(['id', 'title', 'document_type', 'is_special']);
-        return view('admin.biblioteca.specials.index', compact('books', 'magazines'));
+        $specials = Special::withCount('books')->orderBy('order')->orderBy('title')->get();
+        return view('admin.biblioteca.specials.index', compact('specials'));
     }
 
-    public function toggleSpecial(Request $request, Book $book)
+    public function createSpecial()
     {
-        $book->update(['is_special' => !$book->is_special]);
-        return back()->with('success', $book->is_special ? 'Marcado como especial.' : 'Desmarcado como especial.');
+        return view('admin.biblioteca.specials.create');
+    }
+
+    public function storeSpecial(Request $request)
+    {
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'type'        => 'required|in:libro,revista',
+            'cover_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = [
+            'title'     => $request->title,
+            'slug'      => $this->uniqueSlug($request->title, Special::class),
+            'type'      => $request->type,
+            'is_active' => true,
+        ];
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image_path'] = $request->file('cover_image')->store('specials', 'public');
+        }
+
+        Special::create($data);
+        return redirect()->route('admin.biblioteca.specials')->with('success', 'Colección especial creada correctamente.');
+    }
+
+    public function editSpecial(Special $special)
+    {
+        return view('admin.biblioteca.specials.edit', compact('special'));
+    }
+
+    public function updateSpecial(Request $request, Special $special)
+    {
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'type'        => 'required|in:libro,revista',
+            'cover_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = [
+            'title' => $request->title,
+            'type'  => $request->type,
+        ];
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image_path'] = $request->file('cover_image')->store('specials', 'public');
+        }
+
+        $special->update($data);
+        return redirect()->route('admin.biblioteca.specials')->with('success', 'Colección especial actualizada.');
+    }
+
+    public function destroySpecial(Special $special)
+    {
+        $special->delete();
+        return redirect()->route('admin.biblioteca.specials')->with('success', 'Colección eliminada.');
+    }
+
+    public function assignBooksIndex()
+    {
+        $specials = Special::withCount('books')->orderBy('order')->orderBy('title')->get();
+        return view('admin.biblioteca.specials.assign', compact('specials'));
+    }
+
+    public function manageSpecial(Special $special)
+    {
+        $special->load('books');
+        $isRevista    = $special->type === 'revista';
+        $assignedIds  = $special->books->pluck('id')->toArray();
+        $available    = $isRevista
+            ? Book::where('document_type', 'Revista')->whereNotIn('id', $assignedIds)->orderBy('title')->get(['id', 'title'])
+            : Book::where('document_type', '!=', 'Revista')->whereNotIn('id', $assignedIds)->orderBy('title')->get(['id', 'title']);
+        return view('admin.biblioteca.specials.manage', compact('special', 'available'));
+    }
+
+    public function assignBook(Request $request, Special $special)
+    {
+        $request->validate(['book_id' => 'required|exists:books,id']);
+        $maxOrder = $special->books()->max('book_special.order') ?? 0;
+        $special->books()->syncWithoutDetaching([$request->book_id => ['order' => $maxOrder + 1]]);
+
+        if ($request->expectsJson()) {
+            $book = Book::find($request->book_id);
+            return response()->json(['success' => true, 'title' => $book->title, 'book_id' => $book->id]);
+        }
+        return back()->with('success', 'Elemento agregado a la colección.');
+    }
+
+    public function unassignBook(Special $special, Book $book)
+    {
+        $special->books()->detach($book->id);
+
+        if (request()->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
+        return back()->with('success', 'Elemento quitado de la colección.');
     }
 
     // ============= HELPERS =============

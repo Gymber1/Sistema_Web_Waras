@@ -60,6 +60,26 @@
             </div>
         </div>
 
+        {{-- Tarjeta 3: Aportantes --}}
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
+            <div class="p-8 flex-1">
+                <div class="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mb-5">
+                    <svg class="w-7 h-7 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-black text-slate-800 mb-2">Editar Aportantes</h2>
+                <p class="text-slate-500 text-sm leading-relaxed">Gestiona los aportantes, aliados y el director que se muestran en la sección Aportantes del portal principal.</p>
+            </div>
+            <div class="px-8 pb-8">
+                <a href="{{ route('admin.web-config.aportantes') }}"
+                   class="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors shadow-sm">
+                    Ingresar
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+        </div>
+
     </div>
 </div>
 @endsection

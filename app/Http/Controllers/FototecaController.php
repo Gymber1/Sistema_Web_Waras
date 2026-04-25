@@ -51,24 +51,6 @@ class FototecaController extends Controller
             'photo_path'   => $p->photo_path ? '/storage/' . $p->photo_path : null,
         ])->values()->toArray();
 
-        $especialesData = Photo::where('is_special', true)
-            ->with(['photographers', 'categories'])
-            ->get()
-            ->map(fn($p) => [
-                'id'           => $p->id,
-                'title'        => $p->title,
-                'photographer' => $p->photographers->first()?->full_name ?? 'Desconocido',
-                'year'         => $p->year ?? 'S/F',
-                'source_type'  => $p->source_type ?? 'local',
-                'image_url'    => $p->thumbnail_url,
-                'description'  => $p->description ?? '',
-                'resolution'   => $p->resolution ?? 'N/A',
-                'location'     => $p->location ?? '',
-                'format'       => $p->format ?? '',
-                'external_url' => $p->external_url ?? '',
-                'detail_url'   => '/fototeca/galeria/' . $p->id,
-            ])->values()->toArray();
-
         $allCategories = Category::where('type', 'fototeca')
             ->whereNull('parent_id')
             ->with('subcategories')
@@ -89,7 +71,6 @@ class FototecaController extends Controller
             'totalCategories'      => $totalCategories,
             'photosByCategory'     => $photosByCategory,
             'photographersData'    => $photographersData,
-            'especialesData'       => $especialesData,
             'categoriesForFilters' => $buildTree($allCategories),
             'activeSection'        => $activeSection,
             'canEditPanel'         => auth()->check() && (auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca')),
@@ -104,7 +85,6 @@ class FototecaController extends Controller
 
     public function indexGaleria()    { return view('fototeca.dashboard', $this->dashboardData('Galería')); }
     public function indexFotografos() { return view('fototeca.dashboard', $this->dashboardData('Fotógrafos')); }
-    public function indexEspeciales() { return view('fototeca.dashboard', $this->dashboardData('Especiales')); }
     public function indexAportantes() { return view('fototeca.dashboard', $this->dashboardData('Aportantes')); }
 
     public function showPhoto(\App\Models\Photo $photo)
@@ -132,12 +112,6 @@ class FototecaController extends Controller
         }
 
         return view('fototeca.foto', compact('photo', 'related'));
-    }
-
-    public function showEspecial(\App\Models\Special $special)
-    {
-        $special->load(['photos.photographers', 'photos.categories']);
-        return view('fototeca.especial', compact('special'));
     }
 
     public function showPhotographer(\App\Models\Photographer $photographer)

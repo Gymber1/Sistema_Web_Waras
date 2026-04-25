@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
@@ -42,6 +42,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
         }
 
         /* ── GLOBAL NAV ─────────────────────────────────────────────── */
@@ -49,15 +50,20 @@
             background: rgba(0,0,0,0.85);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-line);
+            transition: background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
             padding: 0 2rem;
             height: var(--nav-h);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            position: sticky;
+            position: fixed;
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 200;
         }
+        /* Compensar el nav fixed en todas las secciones excepto el hero */
+        body { padding-top: var(--nav-h); }
         .global-nav-brand {
             display: flex;
             flex-direction: column;
@@ -183,10 +189,17 @@
         .global-nav-mobile a:hover, .global-nav-mobile a.active,
         .global-nav-mobile button:hover, .global-nav-mobile button.active { color: var(--gold); }
 
+        .global-nav.nav-transparent {
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(4px);
+            border-bottom-color: transparent;
+        }
+
         /* ── HERO ───────────────────────────────────────────────────── */
         .hero-section {
             position: relative;
             min-height: 100vh;
+            margin-top: calc(-1 * var(--nav-h));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -198,16 +211,16 @@
             inset: 0;
             background-size: cover;
             background-position: center;
-            filter: sepia(0.4) brightness(0.4) contrast(1.1);
+            filter: sepia(0.2) brightness(0.65) contrast(1.05);
         }
         .hero-overlay {
             position: absolute;
             inset: 0;
             background: linear-gradient(
                 to bottom,
-                rgba(10,7,4,0.3) 0%,
-                rgba(10,7,4,0.6) 60%,
-                rgba(10,7,4,0.85) 100%
+                rgba(10,7,4,0.1) 0%,
+                rgba(10,7,4,0.35) 60%,
+                rgba(10,7,4,0.65) 100%
             );
         }
         .hero-content {
@@ -386,7 +399,7 @@
             text-transform: uppercase; color: var(--text-muted); margin-top: .45rem; display: block;
         }
 
-        .inicio-carousel-section { padding: 3.5rem 0; overflow: hidden; }
+        .inicio-carousel-section { padding: 3.5rem 0; overflow: hidden; position: relative; }
         .inicio-carousel-section + .inicio-carousel-section { border-top: 1px solid var(--border-line); }
         .inicio-carousel-header {
             max-width: 1400px; margin: 0 auto 2rem; padding: 0 2rem;
@@ -400,7 +413,8 @@
             font-size: .75rem; color: var(--text-muted); font-weight: 500;
         }
         .inicio-carousel-track-wrap {
-            position: relative; width: 100%; overflow: hidden; padding: 1rem 0 1.5rem;
+            position: relative; overflow: hidden;
+            max-width: 1400px; margin: 0 auto; padding: 1rem 2rem 1.5rem;
         }
         .inicio-carousel-track {
             display: flex; align-items: stretch;
@@ -413,30 +427,30 @@
 
         /* Card de fotografía (carrusel) */
         .ftc-carousel-card {
-            flex-shrink: 0; width: 180px; margin: 0 10px;
-            background: var(--bg-card); border-radius: 6px;
+            flex-shrink: 0; width: 340px; margin: 0 14px;
+            background: var(--bg-card); border-radius: 10px;
             border: 1px solid var(--border-line);
             cursor: pointer; overflow: hidden;
             transform: translateZ(0);
-            transition: border-color .25s, box-shadow .25s;
+            transition: border-color .25s, box-shadow .25s, transform .25s;
         }
-        .ftc-carousel-card:hover { border-color: var(--gold); box-shadow: 0 6px 20px rgba(0,0,0,.4); }
+        .ftc-carousel-card:hover { border-color: var(--gold); box-shadow: 0 12px 32px rgba(0,0,0,.6); transform: translateY(-4px); }
         .ftc-card-cover {
-            width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block;
+            width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block;
             background: #111; filter: sepia(0.15);
         }
         .ftc-card-cover-placeholder {
-            width: 100%; aspect-ratio: 4/3;
+            width: 100%; aspect-ratio: 16/10;
             background: #1a1a1a;
             display: flex; align-items: center; justify-content: center;
-            color: var(--text-muted); font-size: 2rem;
+            color: var(--text-muted); font-size: 3.5rem;
         }
-        .ftc-card-body { padding: .6rem .8rem; }
+        .ftc-card-body { padding: .9rem 1.1rem; }
         .ftc-card-title {
-            font-size: .78rem; color: var(--text-primary); line-height: 1.35;
+            font-size: .95rem; color: var(--text-primary); line-height: 1.35;
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
-        .ftc-card-sub { font-size: .65rem; color: var(--text-muted); margin-top: .25rem;
+        .ftc-card-sub { font-size: .75rem; color: var(--text-muted); margin-top: .35rem;
             display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
         }
 
@@ -467,6 +481,24 @@
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
         .ftc-author-count { font-size: .65rem; color: var(--text-muted); margin-top: .2rem; }
+
+        /* Botón Ver más carrusel */
+        .carousel-ver-mas {
+            max-width: 1400px; margin: 1.25rem auto 0; padding: 0 2rem;
+            display: flex; justify-content: center;
+        }
+        .carousel-ver-mas-btn {
+            display: inline-flex; align-items: center; gap: .5rem;
+            padding: .6rem 2rem; border-radius: 999px;
+            background: transparent; border: 1.5px solid var(--gold);
+            color: var(--gold); font-family: inherit; font-size: .82rem;
+            font-weight: 600; letter-spacing: .04em; cursor: pointer;
+            transition: background .2s, color .2s, transform .15s, box-shadow .2s;
+        }
+        .carousel-ver-mas-btn:hover {
+            background: var(--gold); color: #000;
+            transform: translateY(-1px); box-shadow: 0 6px 18px rgba(197,166,109,.35);
+        }
 
         /* Controles carrusel */
         .ico-btn {
@@ -777,7 +809,7 @@
         /* ── PHOTO GRID ──────────────────────────────────────────────── */
         .photo-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 2rem;
             padding: 2rem;
         }
@@ -1082,7 +1114,7 @@
 
         /* ── RESPONSIVE ──────────────────────────────────────────────── */
         @media (max-width: 768px) {
-            .global-nav { position: relative; }
+            .global-nav { position: fixed; }
             .global-nav-links { display: none; }
             .global-nav-hamburger { display: flex; }
 
@@ -1155,7 +1187,6 @@
             <button class="nav-item-btn" data-tab="Inicio">Inicio</button>
             <button class="nav-item-btn" data-tab="Galería">Galería</button>
             <button class="nav-item-btn" data-tab="Fotógrafos">Fotógrafos</button>
-            <button class="nav-item-btn" data-tab="Especiales">Especiales</button>
             <button class="nav-item-btn" data-tab="Aportantes">Sobre Nosotros</button>
             <a href="{{ route('home') }}" class="nav-portal-btn">Portal Principal</a>
             @auth
@@ -1173,7 +1204,6 @@
             <button class="nav-item-btn" data-tab="Inicio">Inicio</button>
             <button class="nav-item-btn" data-tab="Galería">Galería</button>
             <button class="nav-item-btn" data-tab="Fotógrafos">Fotógrafos</button>
-            <button class="nav-item-btn" data-tab="Especiales">Especiales</button>
             <button class="nav-item-btn" data-tab="Aportantes">Sobre Nosotros</button>
             <a href="{{ route('home') }}" style="color:var(--text-muted)">Portal Principal</a>
             @auth
@@ -1218,10 +1248,6 @@
                 <span class="stat-num">{{ $totalPhotographers }}</span>
                 <span class="stat-label">Fotógrafos</span>
             </div>
-            <div class="stat-item">
-                <span class="stat-num">{{ count($especialesData) }}</span>
-                <span class="stat-label">Especiales</span>
-            </div>
         </div>
 
         <!-- Carrusel: Galería -->
@@ -1237,6 +1263,11 @@
                 <button class="ico-btn" onclick="moveFtcCarousel('galeria',-1)">‹</button>
                 <div class="ico-dots" id="dotsGaleria"></div>
                 <button class="ico-btn" onclick="moveFtcCarousel('galeria',1)">›</button>
+            </div>
+            <div class="carousel-ver-mas">
+                <button class="carousel-ver-mas-btn" onclick="showSection('Galería')">
+                    Ver más <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+                </button>
             </div>
         </div>
 
@@ -1254,23 +1285,13 @@
                 <div class="ico-dots" id="dotsFotografos"></div>
                 <button class="ico-btn" onclick="moveFtcCarousel('fotografos',1)">›</button>
             </div>
+            <div class="carousel-ver-mas">
+                <button class="carousel-ver-mas-btn" onclick="showSection('Fotógrafos')">
+                    Ver más <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+                </button>
+            </div>
         </div>
 
-        <!-- Carrusel: Especiales -->
-        <div class="inicio-carousel-section" style="padding-bottom:4rem;">
-            <div class="inicio-carousel-header">
-                <h2 class="inicio-carousel-title">Especiales</h2>
-                <span class="inicio-carousel-count">{{ count($especialesData) }} fotografías</span>
-            </div>
-            <div class="inicio-carousel-track-wrap">
-                <div class="inicio-carousel-track" id="trackEspeciales"></div>
-            </div>
-            <div class="inicio-carousel-controls">
-                <button class="ico-btn" onclick="moveFtcCarousel('especiales',-1)">‹</button>
-                <div class="ico-dots" id="dotsEspeciales"></div>
-                <button class="ico-btn" onclick="moveFtcCarousel('especiales',1)">›</button>
-            </div>
-        </div>
 
     </div>
 
@@ -1342,12 +1363,16 @@
                         <button class="sort-option active" data-value="az" role="option">A–Z</button>
                         <button class="sort-option" data-value="recent" role="option">Más recientes</button>
                         <button class="sort-option" data-value="old" role="option">Más antiguos</button>
+                        <button class="sort-option" data-value="year_asc" role="option">Por año ↑</button>
+                        <button class="sort-option" data-value="year_desc" role="option">Por año ↓</button>
                     </div>
                     <!-- hidden select for JS compatibility -->
                     <select id="sortSelect" style="display:none">
                         <option value="az">A-Z</option>
                         <option value="recent">Más recientes</option>
                         <option value="old">Más antiguos</option>
+                        <option value="year_asc">Por año ↑</option>
+                        <option value="year_desc">Por año ↓</option>
                     </select>
                 </div>
             </div>
@@ -1449,7 +1474,6 @@
         const photosByCategory  = @json($photosByCategory ?? []);
         const photographersData = @json($photographersData ?? []);
         const categoriesFromDB  = @json($categoriesForFilters ?? []);
-        const especialesData    = @json($especialesData ?? []);
 
         const allPhotosFlat = (() => {
             const seen = new Set(); const result = [];
@@ -1472,7 +1496,6 @@
         // ── FILTRADO ─────────────────────────────────────────────────
         function getCurrentPhotos() {
             if (state.activeTab === 'Fotógrafos') return photographersData;
-            if (state.activeTab === 'Especiales') return especialesData;
             let base = allPhotosFlat;
             if (state.activeCategory.id !== null) {
                 const catName = state.activeCategory.name;
@@ -1497,6 +1520,8 @@
             if (sortVal==='az') arr.sort((a,b)=>(a.title||a.full_name||'').localeCompare(b.title||b.full_name||'','es'));
             else if (sortVal==='recent') arr.sort((a,b)=>(parseInt(b.year)||0)-(parseInt(a.year)||0));
             else if (sortVal==='old') arr.sort((a,b)=>(parseInt(a.year)||9999)-(parseInt(b.year)||9999));
+            else if (sortVal==='year_asc') arr.sort((a,b)=>(parseInt(a.year)||0)-(parseInt(b.year)||0));
+            else if (sortVal==='year_desc') arr.sort((a,b)=>(parseInt(b.year)||0)-(parseInt(a.year)||0));
             return arr;
         }
 
@@ -1534,43 +1559,6 @@
                 return;
             }
 
-            if (state.activeTab === 'Especiales') {
-                grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(240px, 1fr))';
-                grid.style.maxWidth = ''; grid.style.margin = '';
-                if (items.length === 0) {
-                    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:4rem 0;color:var(--text-muted);">No hay fotografías especiales.</div>`;
-                    return;
-                }
-                grid.innerHTML = items.map((photo, i) => `
-                    <div class="photo-card" data-index="${i}" style="animation-delay:${i*0.04}s">
-                        <div class="photo-card-inner">
-                            <div class="photo-card-img-wrap">
-                                <div class="photo-corner photo-corner--tl"></div>
-                                <div class="photo-corner photo-corner--br"></div>
-                                ${photo.image_url ? `<img src="${photo.image_url}" alt="${photo.title}" class="photo-card-img" loading="lazy" onerror="this.style.display='none'">` : '<div class="photo-card-img" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:2rem;">📷</div>'}
-                                <div class="photo-card-overlay">
-                                    <div class="photo-card-overlay-content">
-                                        <p class="overlay-year">${photo.year||'S/F'}</p>
-                                        ${photo.location ? `<p class="overlay-location"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>${photo.location}</p>` : ''}
-                                    </div>
-                                </div>
-                                ${photo.format ? `<span class="photo-card-badge">${photo.format}</span>` : ''}
-                            </div>
-                            <div class="photo-card-info">
-                                <h3 class="photo-card-title">${photo.title}</h3>
-                                <div class="photo-card-meta">
-                                    <span class="meta-photographer">${photo.photographer}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`).join('');
-                document.querySelectorAll('#photosGrid .photo-card').forEach((card, i) => {
-                    card.addEventListener('click', () => {
-                        if (items[i].detail_url) { sessionStorage.setItem('fototeca_tab', 'Especiales'); window.location.href = items[i].detail_url; }
-                    });
-                });
-                return;
-            }
 
             grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(240px, 1fr))';
             grid.style.maxWidth = ''; grid.style.margin = '';
@@ -1598,7 +1586,7 @@
                                     ${photo.location ? `<p class="overlay-location"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>${photo.location}</p>` : ''}
                                 </div>
                             </div>
-                            ${photo.format ? `<span class="photo-card-badge">${photo.format}</span>` : ''}
+                            ${photo.year ? `<span class="photo-card-badge">${photo.year}</span>` : ''}
                         </div>
                         <div class="photo-card-info">
                             <h3 class="photo-card-title">${photo.title}</h3>
@@ -1725,7 +1713,7 @@
             document.getElementById('aportantesSection').style.display = 'none';
         }
 
-        const TABS_NO_SIDEBAR = new Set(['Especiales', 'Fotógrafos']);
+        const TABS_NO_SIDEBAR = new Set(['Fotógrafos']);
 
         function showSection(tab) {
             state.activeTab = tab;
@@ -1750,6 +1738,7 @@
             }
             updateNav();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (window._updateNavBg) window._updateNavBg();
         }
 
         function updateNav() {
@@ -1760,7 +1749,6 @@
                 'Inicio':     '{{ route('fototeca.dashboard') }}',
                 'Galería':    '{{ route('fototeca.galeria.index') }}',
                 'Fotógrafos': '{{ route('fototeca.fotografos.index') }}',
-                'Especiales': '{{ route('fototeca.especiales.index') }}',
                 'Aportantes': '{{ route('fototeca.aportantes.index') }}',
             };
             if (tabUrlMap[state.activeTab]) history.replaceState(null, '', tabUrlMap[state.activeTab]);
@@ -1861,7 +1849,7 @@
             const select   = document.getElementById('sortSelect');
             if (!btn) return;
 
-            const labels = { az: 'Ordenar: A–Z', recent: 'Ordenar: Recientes', old: 'Ordenar: Antiguos' };
+            const labels = { az: 'Ordenar: A–Z', recent: 'Ordenar: Recientes', old: 'Ordenar: Antiguos', year_asc: 'Ordenar: Año ↑', year_desc: 'Ordenar: Año ↓' };
 
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -1909,6 +1897,26 @@
         document.getElementById('sidebarClose')?.addEventListener('click', closeSidebar);
         document.getElementById('sidebarOverlay')?.addEventListener('click', closeSidebar);
 
+        // ── NAV TRANSPARENTE EN HERO ─────────────────────────────────
+        (function() {
+            const nav = document.getElementById('globalNav');
+
+            function updateNavBg() {
+                const isInicio = state.activeTab === 'Inicio';
+                if (isInicio && window.scrollY < 60) {
+                    nav.classList.add('nav-transparent');
+                } else {
+                    nav.classList.remove('nav-transparent');
+                }
+            }
+
+            window.addEventListener('scroll', updateNavBg, { passive: true });
+
+            // Exponer para que showSection lo llame al cambiar de tab
+            window._updateNavBg = updateNavBg;
+            updateNavBg();
+        })();
+
         // ── NAV MÓVIL ────────────────────────────────────────────────
         (function() {
             const btn  = document.getElementById('globalNavHamburger');
@@ -1952,13 +1960,11 @@
 
         // ========== CARRUSELES DE INICIO ==========
         (function() {
-            const CARD_W_PHOTO  = 180 + 20;
+            const CARD_W_PHOTO  = 340 + 28;
             const CARD_W_AUTHOR = 150 + 20;
 
             const rawGaleria    = Object.values(photosByCategory).flat().filter((p, i, a) => a.findIndex(x => x.id === p.id) === i);
             const rawFotografos = photographersData;
-            const rawEspeciales = especialesData;
-
             function photoCardHTML(photo) {
                 return `<div class="ftc-carousel-card" onclick="window.location.href='${photo.detail_url}'">
                     ${photo.image_url
@@ -1979,18 +1985,6 @@
                     <div class="ftc-author-body">
                         <p class="ftc-author-name">${p.full_name}</p>
                         <p class="ftc-author-count">${p.photos_count} foto${p.photos_count !== 1 ? 's' : ''}</p>
-                    </div>
-                </div>`;
-            }
-
-            function especialCardHTML(photo) {
-                return `<div class="ftc-carousel-card" onclick="window.location.href='${photo.detail_url}'">
-                    ${photo.image_url
-                        ? `<img class="ftc-card-cover" src="${photo.image_url}" alt="${photo.title}" loading="lazy" onerror="this.style.display='none'">`
-                        : `<div class="ftc-card-cover-placeholder">⭐</div>`}
-                    <div class="ftc-card-body">
-                        <p class="ftc-card-title">${photo.title}</p>
-                        <p class="ftc-card-sub">${photo.photographer}</p>
                     </div>
                 </div>`;
             }
@@ -2096,7 +2090,6 @@
             function initCarousels() {
                 ftcCarousels.galeria    = buildCarousel('trackGaleria',    'dotsGaleria',    rawGaleria,    photoCardHTML,    CARD_W_PHOTO);
                 ftcCarousels.fotografos = buildCarousel('trackFotografos', 'dotsFotografos', rawFotografos, fotografoCardHTML, CARD_W_AUTHOR);
-                ftcCarousels.especiales = buildCarousel('trackEspeciales', 'dotsEspeciales', rawEspeciales, especialCardHTML, CARD_W_PHOTO);
             }
 
             window.moveFtcCarousel = function(name, dir) {
@@ -2126,7 +2119,7 @@
         // ========== FIN CARRUSELES ==========
 
         // ── INICIO ───────────────────────────────────────────────────
-        const validTabs = ['Inicio','Galería','Fotógrafos','Especiales','Aportantes'];
+        const validTabs = ['Inicio','Galería','Fotógrafos','Aportantes'];
         const pendingTab = sessionStorage.getItem('fototeca_tab');
         if (pendingTab && validTabs.includes(pendingTab)) {
             sessionStorage.removeItem('fototeca_tab');

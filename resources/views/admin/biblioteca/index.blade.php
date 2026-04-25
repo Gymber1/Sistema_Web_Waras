@@ -114,27 +114,27 @@
                 <span class="text-2xl">🏷️</span>
                 <div>
                     <h3 class="font-black text-slate-800">Categorías</h3>
-                    <p class="text-xs text-slate-400">{{ $stats['categories'] }} registros</p>
+                    <p class="text-xs text-slate-400">Nivel superior de clasificación</p>
                 </div>
             </div>
-            <p class="text-sm text-slate-500 mb-4">Define la taxonomía jerárquica del catálogo: crea categorías padre y subcategorías para una navegación estructurada.</p>
+            <p class="text-sm text-slate-500 mb-4">Crea y edita las categorías principales del catálogo (nivel 1).</p>
             <a href="{{ route('admin.biblioteca.categories') }}" class="block w-full text-center py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
                 Administrar Categorías
             </a>
         </div>
 
-        {{-- Editoriales --}}
+        {{-- SubCategorías --}}
         <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all">
             <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">🏢</span>
+                <span class="text-2xl">🔖</span>
                 <div>
-                    <h3 class="font-black text-slate-800">Editoriales</h3>
-                    <p class="text-xs text-slate-400">{{ $stats['publishers'] }} registros</p>
+                    <h3 class="font-black text-slate-800">SubCategorías</h3>
+                    <p class="text-xs text-slate-400">Segundo nivel de clasificación</p>
                 </div>
             </div>
-            <p class="text-sm text-slate-500 mb-4">Administra los sellos editoriales: nombre, logo, descripción y el listado de títulos que han publicado.</p>
-            <a href="{{ route('admin.biblioteca.publishers') }}" class="block w-full text-center py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
-                Administrar Editoriales
+            <p class="text-sm text-slate-500 mb-4">Gestiona las subcategorías asociadas a cada categoría padre (nivel 2).</p>
+            <a href="{{ route('admin.biblioteca.subcategories') }}" class="block w-full text-center py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
+                Administrar SubCategorías
             </a>
         </div>
 
@@ -143,13 +143,28 @@
             <div class="flex items-center gap-3 mb-3">
                 <span class="text-2xl">⭐</span>
                 <div>
-                    <h3 class="font-black text-slate-800">Colecciones Especiales</h3>
-                    <p class="text-xs text-slate-400">{{ $stats['specials'] }} registros</p>
+                    <h3 class="font-black text-slate-800">Especiales</h3>
+                    <p class="text-xs text-slate-400">{{ $stats['specials'] }} colecciones</p>
                 </div>
             </div>
-            <p class="text-sm text-slate-500 mb-4">Gestiona selecciones curadas de documentos: compilaciones temáticas, colecciones de autor, y fondos especiales.</p>
+            <p class="text-sm text-slate-500 mb-4">Crea y edita los nombres y grupos de colecciones especiales curadas.</p>
             <a href="{{ route('admin.biblioteca.specials') }}" class="block w-full text-center py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
                 Administrar Especiales
+            </a>
+        </div>
+
+        {{-- Agregar libro a Especiales --}}
+        <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all">
+            <div class="flex items-center gap-3 mb-3">
+                <span class="text-2xl">📌</span>
+                <div>
+                    <h3 class="font-black text-slate-800">Agregar libro a Especiales</h3>
+                    <p class="text-xs text-slate-400">Vincular libros a colecciones</p>
+                </div>
+            </div>
+            <p class="text-sm text-slate-500 mb-4">Vincula libros existentes a los grupos de colecciones especiales creados previamente.</p>
+            <a href="{{ route('admin.biblioteca.specials.assign-books') }}" class="block w-full text-center py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
+                Asignar Libros
             </a>
         </div>
 

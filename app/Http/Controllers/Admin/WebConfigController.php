@@ -117,4 +117,103 @@ class WebConfigController extends Controller
 
         return back()->with('success', 'QR eliminado correctamente.');
     }
+
+    public function aportantes()
+    {
+        $raw = SiteSetting::get('aportantes_data');
+        $aportantes = $raw ? json_decode($raw, true) : $this->defaultAportantes();
+        return view('admin.web-config.config-aportantes', compact('aportantes'));
+    }
+
+    public function aportantesUpdate(Request $request)
+    {
+        $data = [
+            'director' => [
+                'nombre' => $request->input('director_nombre', ''),
+                'cargo'  => $request->input('director_cargo', ''),
+                'bio'    => $request->input('director_bio', ''),
+                'foto'   => $request->input('director_foto_actual', ''),
+            ],
+            'categorias' => [],
+        ];
+
+        if ($request->hasFile('director_foto')) {
+            $path = $request->file('director_foto')->store('aportantes', 'public');
+            $data['director']['foto'] = '/storage/' . $path;
+        }
+
+        foreach ($request->input('categorias', []) as $ci => $cat) {
+            // Icono: puede ser slug predeterminado o imagen subida
+            $icono = $cat['icono'] ?? 'building';
+            $iconoFileKey = "categorias.{$ci}.icono_file";
+            if ($request->hasFile($iconoFileKey)) {
+                $path = $request->file($iconoFileKey)->store('aportantes', 'public');
+                $icono = '/storage/' . $path;
+            } elseif ($icono === '__file__') {
+                $icono = 'building'; // fallback si marcó __file__ pero no subió nada
+            }
+
+            $items = [];
+            foreach ($cat['items'] ?? [] as $ii => $item) {
+                $foto = $item['foto'] ?? '';
+                $fotoFileKey = "categorias.{$ci}.items.{$ii}.foto_file";
+                if ($request->hasFile($fotoFileKey)) {
+                    $path = $request->file($fotoFileKey)->store('aportantes', 'public');
+                    $foto = '/storage/' . $path;
+                }
+                $items[] = [
+                    'nombre'      => $item['nombre']      ?? '',
+                    'descripcion' => $item['descripcion'] ?? '',
+                    'foto'        => $foto,
+                ];
+            }
+            $data['categorias'][] = [
+                'titulo' => $cat['titulo'] ?? '',
+                'icono'  => $icono,
+                'items'  => $items,
+            ];
+        }
+
+        SiteSetting::set('aportantes_data', json_encode($data, JSON_UNESCAPED_UNICODE));
+
+        return back()->with('success', 'Aportantes actualizados correctamente.');
+    }
+
+    private function defaultAportantes(): array
+    {
+        return [
+            'director' => [
+                'nombre' => 'Giber Garcia Alamo',
+                'cargo'  => 'Bibliotecólogo',
+                'bio'    => 'Promotor inicial de la recopilación histórica. Asumió la dirección para rescatar, catalogar y promover la Identidad Ancashina a través de esta plataforma digital.',
+                'foto'   => '/giber.png',
+            ],
+            'categorias' => [
+                [
+                    'titulo' => 'Empresas Auspiciadoras',
+                    'icono'  => 'building',
+                    'items'  => [
+                        ['nombre' => 'Minera Antamina S.A.',    'descripcion' => 'Auspiciador Platino. Su apoyo financiero ha sido fundamental para mantener nuestra infraestructura tecnológica y adquirir los servidores principales de la plataforma.', 'foto' => ''],
+                        ['nombre' => 'Constructora Andes EIRL', 'descripcion' => 'Aportes directos para la viabilidad, contratación del equipo de digitalización inicial y adquisición de escáneres planetarios.', 'foto' => ''],
+                    ],
+                ],
+                [
+                    'titulo' => 'Donantes de Colecciones y Libros',
+                    'icono'  => 'heart',
+                    'items'  => [
+                        ['nombre' => 'Familia Alba',       'descripcion' => 'Cedieron temporalmente su invaluable colección privada de Historia Ancashina, permitiendo la digitalización de más de 120 volúmenes únicos.', 'foto' => ''],
+                        ['nombre' => 'Dr. Carlos Ramirez', 'descripcion' => 'Aportó de forma desinteresada su hemeroteca completa de revistas literarias y recortes periodísticos publicados entre 1950 y 1980.', 'foto' => ''],
+                    ],
+                ],
+                [
+                    'titulo' => 'Instituciones Aliadas',
+                    'icono'  => 'landmark',
+                    'items'  => [
+                        ['nombre' => 'Universidad Nacional Santiago Antúnez de Mayolo (UNASAM)', 'descripcion' => 'Brinda soporte académico, valida la veracidad de los documentos históricos y facilita la participación de estudiantes voluntarios.', 'foto' => ''],
+                        ['nombre' => 'Biblioteca Pública Municipal de Huaraz',                  'descripcion' => 'Aliado estratégico en el rescate de la identidad. Fueron los primeros en acoger la idea de fortalecer el patrimonio digital ancashino.', 'foto' => ''],
+                    ],
+                ],
+            ],
+        ];
+    }
 }
