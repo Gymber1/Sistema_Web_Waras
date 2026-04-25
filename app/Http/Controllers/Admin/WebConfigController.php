@@ -179,6 +179,57 @@ class WebConfigController extends Controller
         return back()->with('success', 'Aportantes actualizados correctamente.');
     }
 
+    public function icono()
+    {
+        $icons = [
+            'nav_logo_portal'     => SiteSetting::get('nav_logo_portal'),
+            'nav_logo_biblioteca' => SiteSetting::get('nav_logo_biblioteca'),
+            'nav_logo_fototeca'   => SiteSetting::get('nav_logo_fototeca'),
+        ];
+        return view('admin.web-config.config-icono', compact('icons'));
+    }
+
+    private const LOGO_KEYS = ['nav_logo_portal', 'nav_logo_biblioteca', 'nav_logo_fototeca'];
+
+    public function iconoUpdate(Request $request)
+    {
+        $key = $request->input('key');
+        abort_unless(in_array($key, self::LOGO_KEYS), 422);
+
+        $request->validate([
+            'icono' => ['required', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:1024'],
+        ], [
+            'icono.required' => 'Debes seleccionar una imagen antes de guardar.',
+            'icono.image'    => 'El archivo debe ser una imagen.',
+            'icono.mimes'    => 'Solo se permiten archivos JPG, PNG, WEBP o SVG.',
+            'icono.max'      => 'La imagen no debe superar 1 MB.',
+        ]);
+
+        $old = SiteSetting::get($key);
+        if ($old && Storage::disk('public')->exists($old)) {
+            Storage::disk('public')->delete($old);
+        }
+
+        $path = $request->file('icono')->store('logos', 'public');
+        SiteSetting::set($key, $path);
+
+        return back()->with('success', 'Icono actualizado correctamente.');
+    }
+
+    public function iconoDestroy(Request $request)
+    {
+        $key = $request->input('key');
+        abort_unless(in_array($key, self::LOGO_KEYS), 422);
+
+        $old = SiteSetting::get($key);
+        if ($old && Storage::disk('public')->exists($old)) {
+            Storage::disk('public')->delete($old);
+        }
+        SiteSetting::set($key, null);
+
+        return back()->with('success', 'Icono eliminado.');
+    }
+
     private function defaultAportantes(): array
     {
         return [

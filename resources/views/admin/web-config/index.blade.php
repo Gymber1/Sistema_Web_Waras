@@ -60,7 +60,27 @@
             </div>
         </div>
 
-        {{-- Tarjeta 3: Aportantes --}}
+        {{-- Tarjeta 3: Icono Navbar --}}
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
+            <div class="p-8 flex-1">
+                <div class="w-14 h-14 bg-violet-50 rounded-2xl flex items-center justify-center mb-5">
+                    <svg class="w-7 h-7 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-black text-slate-800 mb-2">Editar Icono</h2>
+                <p class="text-slate-500 text-sm leading-relaxed">Sube el icono que aparece junto al nombre en el navbar del Portal Principal, Biblioteca y Fototeca.</p>
+            </div>
+            <div class="px-8 pb-8">
+                <a href="{{ route('admin.web-config.icono') }}"
+                   class="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors shadow-sm">
+                    Ingresar
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+        </div>
+
+        {{-- Tarjeta 4: Aportantes --}}
         <div class="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
             <div class="p-8 flex-1">
                 <div class="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mb-5">

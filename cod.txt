@@ -1,0 +1,19 @@
+Estoy trabajando en el encabezado (navbar) del portal Waras. He notado una inconsistencia visual: cuando el logo/texto cambia de "WARAS" a "WARAS EDITORIAL", la altura total del navbar aumenta, haciéndolo lucir más grueso.
+
+Objetivo:
+Mantener una altura de navbar fija y delgada, independientemente de si el texto es corto ("WARAS") o largo ("WARAS EDITORIAL"). El diseño debe permanecer compacto en ambos casos.
+
+Tareas técnicas para la IA:
+
+Altura Fija (Fixed Height): Define una altura específica para el contenedor del navbar (ej. height: 60px; o height: 80px;) para asegurar que no crezca dinámicamente.
+
+Manejo de Texto: Asegura que el elemento que contiene "WARAS EDITORIAL" no tenga un line-height excesivo que empuje los límites del contenedor.
+
+Flexbox Alignment: Si se usa Flexbox, utiliza align-items: center; para que el texto esté centrado verticalmente sin importar su longitud, sin alterar el padding del padre.
+
+Control de Padding: Verifica que no haya paddings verticales que se estén sumando de forma extraña cuando el texto es más largo.
+
+Whitespace: Asegura el uso de white-space: nowrap; si es necesario para evitar que el texto intente saltar de línea y ensanche el menú.
+
+Requerimiento:
+Proporcióname el código CSS necesario para normalizar la altura del navbar y asegurar que el cambio de texto no afecte el layout general del sitio.

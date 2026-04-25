@@ -179,10 +179,13 @@ Route::middleware('auth')->group(function () {
             Route::get('/contacto', [WebConfigController::class, 'contacto'])->name('contacto');
             Route::get('/aportantes',  [WebConfigController::class, 'aportantes'])->name('aportantes');
             Route::post('/aportantes', [WebConfigController::class, 'aportantesUpdate'])->name('aportantes.update');
-            Route::post('/{key}',   [WebConfigController::class, 'update'])->name('update');
-            Route::delete('/{key}', [WebConfigController::class, 'destroy'])->name('destroy');
             Route::post('/contact/update',    [WebConfigController::class, 'updateContact'])->name('contact.update');
             Route::delete('/contact/{key}',   [WebConfigController::class, 'destroyContact'])->name('contact.destroy');
+            Route::get('/icono',              [WebConfigController::class, 'icono'])->name('icono');
+            Route::post('/icono',             [WebConfigController::class, 'iconoUpdate'])->name('icono.update');
+            Route::delete('/icono',           [WebConfigController::class, 'iconoDestroy'])->name('icono.destroy');
+            Route::post('/{key}',   [WebConfigController::class, 'update'])->name('update');
+            Route::delete('/{key}', [WebConfigController::class, 'destroy'])->name('destroy');
         });
 
         // Usuarios Admin (solo admin global)

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -6,23 +6,7 @@
     <title>@yield('title', 'Panel Admin - WARAS')</title>
     <link rel="icon" type="image/png" href="/Logo-Panel-Waras.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-
-        /* Colores temáticos por módulo */
-        .theme-emerald { --theme-color: #10b981; }
-        .theme-blue { --theme-color: #3b82f6; }
-        .theme-violet { --theme-color: #a855f7; }
-
-        /* Sidebar mobile transitions */
-        #sidebar { transition: transform 0.25s ease; }
-        #sidebar-overlay { transition: opacity 0.25s ease; }
-    </style>
+    @vite('resources/css/admin.css')
 </head>
 <body class="bg-slate-100">
     <!-- Mobile sidebar overlay -->

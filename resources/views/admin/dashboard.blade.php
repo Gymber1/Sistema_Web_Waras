@@ -56,7 +56,7 @@
             </div>
 
             <div class="flex gap-3">
-                <a href="{{ route('admin.biblioteca.index') }}" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white shadow-emerald-200 text-center">
+                <a href="{{ route('admin.biblioteca.books') }}" class="flex-1 py-3 rounded-xl text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white shadow-emerald-200 text-center">
                     Administrar Módulo →
                 </a>
                 <a href="{{ route('biblioteca.dashboard') }}" target="_blank" class="py-3 px-4 rounded-xl text-sm font-bold transition-all border border-emerald-300 text-emerald-700 hover:bg-emerald-50 bg-white shadow-sm whitespace-nowrap">
