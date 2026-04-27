@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Photo;
+use App\Models\PhotoTag;
 use App\Models\Photographer;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -36,9 +37,16 @@ class FototecaController extends Controller
 
     public function createPhoto()
     {
-        $photographers = Photographer::orderBy('full_name')->get();
-        $categories = Category::flatTree('fototeca');
-        return view('admin.fototeca.photos.create', compact('photographers', 'categories'));
+        $photographers    = Photographer::orderBy('full_name')->get();
+        $categories       = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->get();
+        $subcategories    = Category::where('type', 'fototeca')->whereNotNull('parent_id')
+                                ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
+                                ->orderBy('name')->get();
+        $sublevels        = Category::where('type', 'fototeca')->whereNotNull('parent_id')
+                                ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id'))
+                                ->orderBy('name')->get();
+        $tags = PhotoTag::orderBy('name')->get();
+        return view('admin.fototeca.photos.create', compact('photographers', 'categories', 'subcategories', 'sublevels', 'tags'));
     }
 
     public function storePhoto(Request $request)
@@ -49,6 +57,7 @@ class FototecaController extends Controller
             'photographers.*' => 'exists:photographers,id',
             'categories'      => 'nullable|array',
             'categories.*'    => 'exists:categories,id',
+            'tag_id'          => 'nullable|exists:photo_tags,id',
             'year'            => 'nullable|integer|min:1800|max:' . date('Y'),
             'provider'        => 'nullable|string|max:255',
             'resolution'      => 'nullable|string|max:50',
@@ -69,6 +78,7 @@ class FototecaController extends Controller
             'resolution'   => $request->resolution,
             'location'     => $request->location,
             'format'       => $request->format,
+            'tag_id'       => $request->tag_id ?: null,
             'source_type'  => $request->source_type,
             'external_url' => $request->source_type === 'external' ? $request->external_url : null,
         ];
@@ -93,8 +103,25 @@ class FototecaController extends Controller
     {
         $photo->load(['photographers', 'categories']);
         $photographers = Photographer::orderBy('full_name')->get();
-        $categories = Category::flatTree('fototeca');
-        return view('admin.fototeca.photos.edit', compact('photo', 'photographers', 'categories'));
+        $categories    = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->get();
+        $subcategories = Category::where('type', 'fototeca')->whereNotNull('parent_id')
+                            ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
+                            ->orderBy('name')->get();
+        $sublevels     = Category::where('type', 'fototeca')->whereNotNull('parent_id')
+                            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id'))
+                            ->orderBy('name')->get();
+
+        // Determina qué categoría/subcategoría/subnivel tiene la foto actualmente
+        $photoCatIds = $photo->categories->pluck('id')->toArray();
+        $selCategory    = $photo->categories->first(fn($c) => $categories->contains('id', $c->id));
+        $selSubcategory = $photo->categories->first(fn($c) => $subcategories->contains('id', $c->id));
+        $selSublevel    = $photo->categories->first(fn($c) => $sublevels->contains('id', $c->id));
+
+        $tags = PhotoTag::orderBy('name')->get();
+        return view('admin.fototeca.photos.edit', compact(
+            'photo', 'photographers', 'categories', 'subcategories', 'sublevels',
+            'selCategory', 'selSubcategory', 'selSublevel', 'tags'
+        ));
     }
 
     public function updatePhoto(Request $request, Photo $photo)
@@ -105,6 +132,7 @@ class FototecaController extends Controller
             'photographers.*' => 'exists:photographers,id',
             'categories'      => 'nullable|array',
             'categories.*'    => 'exists:categories,id',
+            'tag_id'          => 'nullable|exists:photo_tags,id',
             'year'            => 'nullable|integer|min:1800|max:' . date('Y'),
             'provider'        => 'nullable|string|max:255',
             'resolution'      => 'nullable|string|max:50',
@@ -124,6 +152,7 @@ class FototecaController extends Controller
             'resolution'   => $request->resolution,
             'location'     => $request->location,
             'format'       => $request->format,
+            'tag_id'       => $request->tag_id ?: null,
             'source_type'  => $request->source_type,
             'external_url' => $request->source_type === 'external' ? $request->external_url : null,
         ];
@@ -428,6 +457,31 @@ class FototecaController extends Controller
     {
         $category->delete();
         return redirect()->route('admin.fototeca.sublevels')->with('success', 'SubNivel eliminado.');
+    }
+
+    // ============= ETIQUETAS =============
+
+    public function indexTags()
+    {
+        $tags = PhotoTag::withCount('photos')->orderBy('name')->get();
+        return view('admin.fototeca.tags.index', compact('tags'));
+    }
+
+    public function storeTag(Request $request)
+    {
+        $request->validate(['name' => 'required|string|max:100|unique:photo_tags,name']);
+        $name = mb_strtolower(trim($request->name));
+        PhotoTag::create([
+            'name' => $name,
+            'slug' => $this->uniqueSlug($name, PhotoTag::class),
+        ]);
+        return redirect()->route('admin.fototeca.tags')->with('success', 'Etiqueta agregada correctamente.');
+    }
+
+    public function destroyTag(PhotoTag $photoTag)
+    {
+        $photoTag->delete();
+        return redirect()->route('admin.fototeca.tags')->with('success', 'Etiqueta eliminada.');
     }
 
     // ============= HELPERS =============

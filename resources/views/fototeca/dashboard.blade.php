@@ -155,14 +155,6 @@
                 <button class="sidebar-close-btn" id="sidebarClose">✕</button>
             </div>
 
-            <!-- Buscador sidebar -->
-            <div style="padding:0.75rem 1rem; border-bottom:1px solid var(--border-subtle);">
-                <div class="content-search-inner" style="max-width:100%;">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                    <input type="text" class="content-search-input" id="contentSearchInput" placeholder="Buscar en esta sección…">
-                </div>
-            </div>
-
             <!-- Sección categorías -->
             <div class="sidebar-section">
                 <h4 class="sidebar-section-label">
@@ -218,16 +210,46 @@
                 </div>
             </div>
 
-            <div class="gallery-context-bar">
+            <!-- ── GALERÍA HEADER (buscador + tags + título) ── -->
+            <div class="gallery-header-area" id="galleryHeaderArea">
+
+                <!-- Fila: título + buscador -->
+                <div class="gallery-header-row">
+                    <div class="gallery-context-title-row">
+                        <div class="gallery-context-line"></div>
+                        <h2 class="gallery-context-title" id="sectionTitle">Galería</h2>
+                        <div class="gallery-context-line"></div>
+                    </div>
+                    <div class="gallery-search-wrap">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <input type="text" id="contentSearchInput" class="gallery-search-input" placeholder="Buscar fotografías, fotógrafos, etiquetas…" autocomplete="off">
+                    </div>
+                </div>
+
+                <!-- Fila: contador + tags -->
+                <div class="gallery-tags-row" id="tagsBar" style="display:none;">
+                    <span class="gallery-results-count"><span id="photoCount">0</span> resultado(s)</span>
+                    <div id="tagsBarInner" class="tags-bar-inner"></div>
+                </div>
+                <!-- Contador sin tags -->
+                <div class="gallery-results-only" id="galleryResultsOnly">
+                    <span class="gallery-results-count"><span id="photoCountAlt">0</span> resultado(s)</span>
+                </div>
+
+            </div>
+
+            <!-- Header para secciones sin sidebar (Fotógrafos) -->
+            <div class="nosidebar-context-bar" id="nosidebarContextBar" style="display:none;">
                 <div class="gallery-context-title-row">
                     <div class="gallery-context-line"></div>
-                    <h2 class="gallery-context-title" id="sectionTitle">Galería</h2>
+                    <h2 class="gallery-context-title" id="sectionTitleAlt">Fotógrafos</h2>
                     <div class="gallery-context-line"></div>
                 </div>
-                <div class="gallery-context-count"><span id="photoCount">0</span> resultado(s)</div>
+                <div class="gallery-results-count"><span id="photoCountNS">0</span> resultado(s)</div>
             </div>
 
             <div class="photo-grid" id="photosGrid"></div>
+            <div id="photosPagination"></div>
         </main>
     </div>
 
@@ -315,6 +337,7 @@
         const photosByCategory  = @json($photosByCategory ?? []);
         const photographersData = @json($photographersData ?? []);
         const categoriesFromDB  = @json($categoriesForFilters ?? []);
+        const tagsFromDB        = @json($tagsData ?? []);
 
         const allPhotosFlat = (() => {
             const seen = new Set(); const result = [];
@@ -326,10 +349,14 @@
 
         const serverActiveSection = @json($activeSection ?? 'Inicio');
 
+        const PHOTOS_PER_PAGE = 6; // 3 columnas × 2 filas
+
         // ── ESTADO ───────────────────────────────────────────────────
         let state = {
             activeTab:       'Inicio',
             activeCategory:  { id: null, name: 'Todas' },
+            activeTagId:     null,
+            currentPage:     1,
             openAccordions:  new Set(),
             closedAccordions: new Set()
         };
@@ -342,6 +369,9 @@
                 const catName = state.activeCategory.name;
                 base = photosByCategory[catName] || [];
             }
+            if (state.activeTagId !== null) {
+                base = base.filter(p => p.tag_id === state.activeTagId);
+            }
             const rawQ = document.getElementById('contentSearchInput')?.value?.trim();
             const q = rawQ ? rawQ.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'') : '';
             if (q) {
@@ -349,7 +379,8 @@
                 base = base.filter(p =>
                     norm(p.title).includes(q)||norm(p.photographer).includes(q)||
                     norm(p.description).includes(q)||norm(p.location).includes(q)||
-                    norm(String(p.year)).includes(q)
+                    norm(String(p.year)).includes(q)||
+                    norm(p.tag_name||'').includes(q)
                 );
             }
             return base;
@@ -366,27 +397,96 @@
             return arr;
         }
 
+        // ── RENDER TAGS BAR & SIDEBAR ────────────────────────────────
+        function renderTagsBar() {
+            const inner = document.getElementById('tagsBarInner');
+            if (!inner || !tagsFromDB || tagsFromDB.length === 0) return;
+            inner.innerHTML = tagsFromDB.map(tag => {
+                const active = state.activeTagId === tag.id;
+                return `<button onclick="filterByTag(${tag.id},'${tag.name.replace(/'/g,"\\'")}',this)"
+                    class="tag-pill${active ? ' tag-pill-active' : ''}"
+                    data-tag-id="${tag.id}">${tag.name}</button>`;
+            }).join('');
+        }
+
+        function renderSidebarTags() {
+            // etiquetas movidas al header principal; no-op
+        }
+
+        function filterByTag(tagId, tagName, el) {
+            state.activeTagId = state.activeTagId === tagId ? null : tagId;
+            state.currentPage = 1;
+            renderTagsBar();
+            renderSidebarTags();
+            renderPhotos();
+        }
+
+        // ── PAGINACIÓN ───────────────────────────────────────────────
+        function renderPagination(containerId, total, perPage, currentPage, onPageChange) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            const totalPages = Math.ceil(total / perPage);
+            if (totalPages <= 1) { el.innerHTML = ''; return; }
+
+            const range = (from, to) => Array.from({length: to - from + 1}, (_, i) => from + i);
+            let pages = [];
+            if (totalPages <= 7) {
+                pages = range(1, totalPages);
+            } else if (currentPage <= 4) {
+                pages = [...range(1, 5), '…', totalPages];
+            } else if (currentPage >= totalPages - 3) {
+                pages = [1, '…', ...range(totalPages - 4, totalPages)];
+            } else {
+                pages = [1, '…', currentPage - 1, currentPage, currentPage + 1, '…', totalPages];
+            }
+
+            el.innerHTML = pages.map(p => p === '…'
+                ? `<span class="foto-page-ellipsis">…</span>`
+                : `<button class="foto-page-btn${p === currentPage ? ' foto-page-active' : ''}" onclick="(${onPageChange.toString()})(${p})">${p}</button>`
+            ).join('');
+        }
+
         // ── RENDER GRILLA ────────────────────────────────────────────
         function renderPhotos() {
             const grid = document.getElementById('photosGrid');
-            const items = getSortedPhotos(getCurrentPhotos());
-            document.getElementById('photoCount').textContent = items.length;
+            const allItems = getSortedPhotos(getCurrentPhotos());
+            const hasTags = tagsFromDB && tagsFromDB.length > 0;
+            document.getElementById('photoCount').textContent = allItems.length;
+            const altCount = document.getElementById('photoCountAlt');
+            if (altCount) altCount.textContent = allItems.length;
+            const tagsBarEl = document.getElementById('tagsBar');
+            const resultsOnly = document.getElementById('galleryResultsOnly');
+            if (tagsBarEl) tagsBarEl.style.display = hasTags ? '' : 'none';
+            if (resultsOnly) resultsOnly.style.display = hasTags ? 'none' : '';
             document.getElementById('sidebarPhotoCount').textContent = allPhotosFlat.length + ' fotografías catalogadas';
 
-            if (state.activeTab === 'Fotógrafos') {
-                grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(240px, 1fr))';
-                grid.style.maxWidth = '1200px';
-                grid.style.margin = '0 auto';
-                grid.innerHTML = items.length === 0
+            // no-sidebar context bar (Fotógrafos)
+            const nsBar = document.getElementById('nosidebarContextBar');
+            const isFotografos = state.activeTab === 'Fotógrafos';
+            if (nsBar) nsBar.style.display = isFotografos ? '' : 'none';
+            const nsCount = document.getElementById('photoCountNS');
+            if (nsCount) nsCount.textContent = allItems.length;
+            const nsTitle = document.getElementById('sectionTitleAlt');
+            if (nsTitle) nsTitle.textContent = state.activeTab;
+
+            const totalPages = Math.ceil(allItems.length / PHOTOS_PER_PAGE);
+            if (state.currentPage > totalPages) state.currentPage = Math.max(1, totalPages);
+            const start = (state.currentPage - 1) * PHOTOS_PER_PAGE;
+            const items = allItems.slice(start, start + PHOTOS_PER_PAGE);
+
+            // ── Fotógrafos ──
+            if (isFotografos) {
+                grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+                grid.style.maxWidth = ''; grid.style.margin = '';
+                grid.innerHTML = allItems.length === 0
                     ? `<div style="grid-column:1/-1;text-align:center;padding:4rem 0;color:var(--text-muted);">No hay fotógrafos registrados.</div>`
                     : items.map((p, i) => `
                         <div class="photographer-card" onclick="window.location.href='/fototeca/fotografos/${p.id}';sessionStorage.setItem('fototeca_tab','Fotógrafos')" style="animation-delay:${i*0.06}s">
                             <div class="pg-img-wrap">
                                 <div class="pg-img-overlay"></div>
                                 ${p.photo_path
-                                    ? `<img src="${p.photo_path}" alt="${p.full_name}" class="pg-img" onerror="this.style.display='none'">`
+                                    ? `<img src="${p.photo_path}" alt="${p.full_name}" class="pg-img" loading="lazy" onerror="this.style.display='none'">`
                                     : `<div class="pg-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`}
-                                ${(() => { const yr = p.birth_year; const c = yr ? Math.ceil(yr/100) : null; const lbl = c ? 'Siglo '+({19:'XIX',20:'XX',21:'XXI'}[c]||c+'º') : null; return lbl ? `<span class="overlay-period-tag" style="position:absolute;top:0.75rem;right:0.75rem;">${lbl}</span>` : ''; })()}
                             </div>
                             <div class="pg-info">
                                 <h3 class="pg-name">${p.full_name}</h3>
@@ -397,23 +497,30 @@
                                 </div>
                             </div>
                         </div>`).join('');
+                renderPagination('photosPagination', allItems.length, PHOTOS_PER_PAGE, state.currentPage, (p) => {
+                    state.currentPage = p;
+                    renderPhotos();
+                    document.getElementById('photosGrid')?.scrollIntoView({behavior:'smooth', block:'start'});
+                });
                 return;
             }
 
-
-            grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(240px, 1fr))';
+            // ── Galería de fotos ──
+            grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
             grid.style.maxWidth = ''; grid.style.margin = '';
-            if (items.length === 0) {
+
+            if (allItems.length === 0) {
                 grid.innerHTML = `<div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;padding:5rem 2rem;gap:1rem;color:var(--text-muted);">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                     <p style="font-family:'Playfair Display',serif;font-size:1.2rem;">Sin resultados</p>
                     <p style="font-size:0.85rem;">No se encontraron fotografías con los filtros aplicados.</p>
                     </div>`;
+                document.getElementById('photosPagination').innerHTML = '';
                 return;
             }
 
             grid.innerHTML = items.map((photo, i) => `
-                <div class="photo-card" data-index="${i}" style="animation-delay:${i*0.04}s">
+                <div class="photo-card" data-index="${i}" style="animation-delay:${i*0.05}s" onclick="(function(){sessionStorage.setItem('fototeca_tab','${state.activeTab}');window.location.href='${'/fototeca/galeria/'}${photo.id}'})()">
                     <div class="photo-card-inner">
                         <div class="photo-card-img-wrap">
                             <div class="photo-corner photo-corner--tl"></div>
@@ -439,13 +546,10 @@
                     </div>
                 </div>`).join('');
 
-            document.querySelectorAll('#photosGrid .photo-card').forEach((card, i) => {
-                card.addEventListener('click', () => {
-                    if (items[i]?.detail_url) {
-                        sessionStorage.setItem('fototeca_tab', state.activeTab);
-                        window.location.href = items[i].detail_url;
-                    }
-                });
+            renderPagination('photosPagination', allItems.length, PHOTOS_PER_PAGE, state.currentPage, (p) => {
+                state.currentPage = p;
+                renderPhotos();
+                document.getElementById('photosGrid')?.scrollIntoView({behavior:'smooth', block:'start'});
             });
         }
 
@@ -508,10 +612,11 @@
 
             list.querySelector('#acc-todos')?.addEventListener('click', () => {
                 state.activeCategory = { id: null, name: 'Todas' };
+                state.activeTagId = null;
                 state.openAccordions.clear(); state.closedAccordions.clear();
                 document.getElementById('sectionTitle').textContent = state.activeTab;
                 document.getElementById('breadcrumbCurrent').textContent = state.activeTab;
-                renderSidebar(); renderPhotos(); closeSidebar();
+                renderSidebar(); renderPhotos(); renderTagsBar(); renderSidebarTags(); closeSidebar();
             });
 
             list.querySelectorAll('.accordion-btn[data-parent-id]').forEach(btn => {
@@ -529,9 +634,10 @@
                     const id   = parseInt(btn.getAttribute('data-cat-id'));
                     const name = btn.getAttribute('data-cat-name');
                     state.activeCategory = { id, name };
+                    state.activeTagId = null;
                     document.getElementById('sectionTitle').textContent = name;
                     document.getElementById('breadcrumbCurrent').textContent = name;
-                    renderSidebar(); renderPhotos(); closeSidebar();
+                    renderSidebar(); renderPhotos(); renderTagsBar(); renderSidebarTags(); closeSidebar();
                 });
             });
 
@@ -539,9 +645,10 @@
                 btn.addEventListener('click', () => {
                     const name = btn.getAttribute('data-cat-name');
                     state.activeCategory = { id: null, name };
+                    state.activeTagId = null;
                     document.getElementById('sectionTitle').textContent = name;
                     document.getElementById('breadcrumbCurrent').textContent = name;
-                    renderSidebar(); renderPhotos(); closeSidebar();
+                    renderSidebar(); renderPhotos(); renderTagsBar(); renderSidebarTags(); closeSidebar();
                 });
             });
         }
@@ -559,6 +666,7 @@
         function showSection(tab) {
             state.activeTab = tab;
             state.activeCategory = { id: null, name: 'Todas' };
+            state.activeTagId = null;
             state.openAccordions.clear(); state.closedAccordions.clear();
             hideAllSections();
 
@@ -575,7 +683,7 @@
                 document.getElementById('sectionTitle').textContent = tab;
                 document.getElementById('breadcrumbCurrent').textContent = tab;
                 document.getElementById('contentSearchInput').value = '';
-                renderSidebar(); renderPhotos();
+                renderSidebar(); renderPhotos(); renderTagsBar(); renderSidebarTags();
             }
             updateNav();
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -679,7 +787,7 @@
         document.addEventListener('click', e => { if (!e.target.closest('.hero-search-container')) heroDropdown.classList.remove('open'); });
 
         // ── EVENTOS ──────────────────────────────────────────────────
-        document.getElementById('contentSearchInput')?.addEventListener('input', renderPhotos);
+        document.getElementById('contentSearchInput')?.addEventListener('input', () => { state.currentPage = 1; renderPhotos(); });
         document.getElementById('logoBtn')?.addEventListener('click', () => showSection('Inicio'));
 
         // ── SORT DROPDOWN ─────────────────────────────────────────────
@@ -707,6 +815,7 @@
                     opt.classList.add('active');
                     btn.classList.remove('open');
                     dropdown.classList.remove('open');
+                    state.currentPage = 1;
                     renderPhotos();
                 });
             });

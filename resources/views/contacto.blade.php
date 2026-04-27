@@ -63,26 +63,32 @@
         <div class="info-cards">
             <!-- Dirección -->
             <div class="info-card">
-                <div class="info-card-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div class="info-card-icon">
+                    <img src="{{ $contact_icon_direccion ? asset('storage/' . $contact_icon_direccion) : '/Direccion.png' }}" alt="Dirección" style="width:30px;height:30px;object-fit:contain;">
+                </div>
                 <div>
                     <p class="info-card-label">Dirección</p>
-                    <p class="info-card-value">Esq. Av. Luzuriaga con Av. 28 de Julio<br>Huaraz, Áncash, Perú</p>
+                    <p class="info-card-value">{!! nl2br(e($contact_direccion)) !!}</p>
                 </div>
             </div>
             <!-- Teléfono + Email -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
                 <div class="info-card" style="grid-column:1">
-                    <div class="info-card-icon"><i class="fas fa-phone"></i></div>
+                    <div class="info-card-icon">
+                        <img src="{{ $contact_icon_telefono ? asset('storage/' . $contact_icon_telefono) : '/Telefono.png' }}" alt="Teléfonos" style="width:30px;height:30px;object-fit:contain;">
+                    </div>
                     <div>
                         <p class="info-card-label">Teléfonos</p>
-                        <p class="info-card-value">952 845 942</p>
+                        <p class="info-card-value">{{ $contact_telefono }}</p>
                     </div>
                 </div>
                 <div class="info-card" style="grid-column:2">
-                    <div class="info-card-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="info-card-icon">
+                        <img src="{{ $contact_icon_email ? asset('storage/' . $contact_icon_email) : '/Email.png' }}" alt="Email" style="width:30px;height:30px;object-fit:contain;">
+                    </div>
                     <div>
                         <p class="info-card-label">Email</p>
-                        <p class="info-card-value" style="word-break:break-all;">giber.garcia@pcca.org</p>
+                        <p class="info-card-value" style="word-break:break-all;">{{ $contact_email }}</p>
                     </div>
                 </div>
             </div>
@@ -110,8 +116,8 @@
                     <textarea id="mensaje" name="mensaje" required rows="4" placeholder="Escriba su consulta o comentario aquí..." class="form-input"></textarea>
                 </div>
                 <button type="submit" class="btn-submit">
-                    <span>Enviar Mensaje</span>
-                    <i class="fas fa-paper-plane"></i>
+                    <span>Enviar por WhatsApp</span>
+                    <i class="fab fa-whatsapp"></i>
                 </button>
             </form>
         </div>
@@ -125,13 +131,41 @@
 </div>
 
 <script>
+    const waNumber = '{{ $whatsapp_number ?? "" }}';
+
     document.getElementById('contactForm').addEventListener('submit', function(e) {
         e.preventDefault();
+
+        if (!waNumber) {
+            // Sin número configurado
+            const btn = this.querySelector('.btn-submit');
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-exclamation-circle"></i> <span>Por el momento no es posible contactar</span>';
+            btn.style.background = '#64748b';
+            btn.disabled = true;
+            setTimeout(() => {
+                btn.innerHTML = original;
+                btn.style.background = '';
+                btn.disabled = false;
+            }, 4000);
+            return;
+        }
+
+        const nombres  = document.getElementById('nombres').value.trim();
+        const email    = document.getElementById('email').value.trim();
+        const mensaje  = document.getElementById('mensaje').value.trim();
+
+        const texto = `Hola, le escribo desde el portal WARAS EDITORIAL.\n\n*Nombre:* ${nombres}\n*Correo:* ${email}\n\n*Mensaje:*\n${mensaje}`;
+        const url   = `https://wa.me/${waNumber}?text=${encodeURIComponent(texto)}`;
+
+        window.open(url, '_blank');
+
         const btn = this.querySelector('.btn-submit');
-        btn.innerHTML = '<i class="fas fa-check"></i> <span>¡Mensaje enviado!</span>';
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> <span>¡Redirigiendo a WhatsApp!</span>';
         btn.style.background = '#059669';
         setTimeout(() => {
-            btn.innerHTML = '<span>Enviar Mensaje</span><i class="fas fa-paper-plane"></i>';
+            btn.innerHTML = original;
             btn.style.background = '';
             this.reset();
         }, 3000);

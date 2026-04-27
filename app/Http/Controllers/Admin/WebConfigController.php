@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\FloatingButton;
 use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -34,12 +35,8 @@ class WebConfigController extends Controller
 
     public function contacto()
     {
-        $contact = [
-            'yape_qr'         => SiteSetting::get('yape_qr'),
-            'whatsapp_qr'     => SiteSetting::get('whatsapp_qr'),
-            'whatsapp_number' => SiteSetting::get('whatsapp_number'),
-        ];
-        return view('admin.web-config.config-flotantes', compact('contact'));
+        $buttons = FloatingButton::orderBy('orden')->get();
+        return view('admin.web-config.config-flotantes', compact('buttons'));
     }
 
     public function update(Request $request, string $key)
@@ -78,36 +75,233 @@ class WebConfigController extends Controller
     public function updateContact(Request $request)
     {
         $request->validate([
-            'yape_qr'         => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'whatsapp_qr'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'whatsapp_number' => ['nullable', 'string', 'digits_between:0,9'],
+            'buttons'                  => ['nullable', 'array'],
+            'buttons.*.nombre'         => ['required', 'string', 'max:80'],
+            'buttons.*.descripcion'    => ['nullable', 'string', 'max:300'],
+            'buttons.*.link'           => ['nullable', 'string', 'max:300'],
+            'buttons.*.glow_color'     => ['nullable', 'string'],
+            'buttons.*.logo'           => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
+            'buttons.*.imagen'         => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'whatsapp_number'       => ['nullable', 'string', 'digits_between:0,9'],
+            'new_nombre'            => ['nullable', 'string', 'max:80'],
+            'new_descripcion'       => ['nullable', 'string', 'max:300'],
+            'new_link'              => ['nullable', 'string', 'max:300'],
+            'new_logo'              => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
+            'new_imagen'            => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'new_glow_color'        => ['nullable', 'string'],
         ]);
 
-        foreach (self::CONTACT_IMAGES as $field) {
+        // Actualizar botones existentes
+        foreach ($request->input('buttons', []) as $id => $fields) {
+            $btn = FloatingButton::find($id);
+            if (!$btn) continue;
+
+            $btn->nombre      = $fields['nombre'];
+            $btn->descripcion = $fields['descripcion'] ?? null;
+            $btn->link        = $fields['link'] ?? null;
+            $btn->glow_color  = $fields['glow_color'] ?? 'indigo';
+
+            // WhatsApp: número especial
+            if ($btn->slug === 'whatsapp') {
+                $number = preg_replace('/\D/', '', $request->input('whatsapp_number', ''));
+                if ($number !== '') {
+                    if (!str_starts_with($number, '51')) $number = '51' . $number;
+                }
+                $btn->link        = $number ? 'https://wa.me/' . $number : $btn->link;
+                $btn->descripcion = $number ?: $btn->descripcion;
+                SiteSetting::set('whatsapp_number', $number ?: null);
+            }
+
+            // Logo del botón circular
+            if ($request->hasFile("buttons.{$id}.logo")) {
+                if ($btn->logo && Storage::disk('public')->exists($btn->logo)) {
+                    Storage::disk('public')->delete($btn->logo);
+                }
+                $btn->logo = $request->file("buttons.{$id}.logo")->store('floating', 'public');
+            }
+
+            // QR / imagen del popover
+            if ($request->hasFile("buttons.{$id}.imagen")) {
+                if ($btn->imagen && Storage::disk('public')->exists($btn->imagen)) {
+                    Storage::disk('public')->delete($btn->imagen);
+                }
+                $btn->imagen = $request->file("buttons.{$id}.imagen")->store('floating', 'public');
+                if ($btn->slug === 'yape')     SiteSetting::set('yape_qr',     $btn->imagen);
+                if ($btn->slug === 'whatsapp') SiteSetting::set('whatsapp_qr', $btn->imagen);
+            }
+
+            $btn->save();
+        }
+
+        // Nuevo botón extra
+        if ($request->filled('new_nombre')) {
+            $logoPath = null;
+            $imgPath  = null;
+            if ($request->hasFile('new_logo'))   $logoPath = $request->file('new_logo')->store('floating', 'public');
+            if ($request->hasFile('new_imagen'))  $imgPath  = $request->file('new_imagen')->store('floating', 'public');
+            $maxOrden = FloatingButton::max('orden') ?? 0;
+            FloatingButton::create([
+                'slug'        => 'extra_' . uniqid(),
+                'nombre'      => $request->input('new_nombre'),
+                'descripcion' => $request->input('new_descripcion'),
+                'link'        => $request->input('new_link'),
+                'logo'        => $logoPath,
+                'imagen'      => $imgPath,
+                'glow_color'  => $request->input('new_glow_color', 'indigo'),
+                'is_default'  => false,
+                'orden'       => $maxOrden + 1,
+            ]);
+        }
+
+        return back()->with('success', 'Botones flotantes actualizados correctamente.');
+    }
+
+    public function destroyContact(string $key)
+    {
+        // Legacy: eliminar QR de Yape/WA desde la tabla (solo la imagen)
+        $btn = FloatingButton::where('slug', $key === 'yape_qr' ? 'yape' : 'whatsapp')->first();
+        if ($btn && $btn->imagen && Storage::disk('public')->exists($btn->imagen)) {
+            Storage::disk('public')->delete($btn->imagen);
+            $btn->imagen = null;
+            $btn->save();
+        }
+        SiteSetting::set($key, null);
+        return back()->with('success', 'QR eliminado correctamente.');
+    }
+
+    public function updateFloatingButton(Request $request, FloatingButton $floatingButton)
+    {
+        $request->validate([
+            'nombre'      => ['required', 'string', 'max:80'],
+            'descripcion' => ['nullable', 'string', 'max:300'],
+            'link'        => ['nullable', 'string', 'max:300'],
+            'glow_color'  => ['nullable', 'string'],
+            'logo'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
+            'imagen'      => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
+
+        $floatingButton->nombre      = $request->input('nombre');
+        $floatingButton->descripcion = $request->input('descripcion');
+        $floatingButton->glow_color  = $request->input('glow_color', 'indigo');
+
+        if ($floatingButton->slug !== 'whatsapp') {
+            $floatingButton->link = $request->input('link');
+        }
+
+        if ($floatingButton->slug === 'whatsapp') {
+            $number = preg_replace('/\D/', '', $request->input('whatsapp_number', ''));
+            if ($number !== '') {
+                if (!str_starts_with($number, '51')) $number = '51' . $number;
+            }
+            $floatingButton->link        = $number ? 'https://wa.me/' . $number : $floatingButton->link;
+            $floatingButton->descripcion = $number ?: $floatingButton->descripcion;
+            SiteSetting::set('whatsapp_number', $number ?: null);
+        }
+
+        if ($request->hasFile('logo')) {
+            if ($floatingButton->logo && Storage::disk('public')->exists($floatingButton->logo)) {
+                Storage::disk('public')->delete($floatingButton->logo);
+            }
+            $floatingButton->logo = $request->file('logo')->store('floating', 'public');
+        }
+
+        if ($request->hasFile('imagen')) {
+            if ($floatingButton->imagen && Storage::disk('public')->exists($floatingButton->imagen)) {
+                Storage::disk('public')->delete($floatingButton->imagen);
+            }
+            $floatingButton->imagen = $request->file('imagen')->store('floating', 'public');
+            if ($floatingButton->slug === 'yape')     SiteSetting::set('yape_qr',     $floatingButton->imagen);
+            if ($floatingButton->slug === 'whatsapp') SiteSetting::set('whatsapp_qr', $floatingButton->imagen);
+        }
+
+        $floatingButton->save();
+        return back()->with('success', 'Botón "' . $floatingButton->nombre . '" guardado correctamente.');
+    }
+
+    public function destroyFloatingButton(FloatingButton $floatingButton)
+    {
+        abort_if($floatingButton->is_default, 403);
+        if ($floatingButton->imagen && Storage::disk('public')->exists($floatingButton->imagen)) {
+            Storage::disk('public')->delete($floatingButton->imagen);
+        }
+        if ($floatingButton->logo && Storage::disk('public')->exists($floatingButton->logo)) {
+            Storage::disk('public')->delete($floatingButton->logo);
+        }
+        $floatingButton->delete();
+        return back()->with('success', 'Botón eliminado correctamente.');
+    }
+
+    public function destroyFloatingButtonImagen(FloatingButton $floatingButton)
+    {
+        if ($floatingButton->imagen && Storage::disk('public')->exists($floatingButton->imagen)) {
+            Storage::disk('public')->delete($floatingButton->imagen);
+        }
+        $floatingButton->imagen = null;
+        $floatingButton->save();
+        if ($floatingButton->slug === 'yape')     SiteSetting::set('yape_qr', null);
+        if ($floatingButton->slug === 'whatsapp') SiteSetting::set('whatsapp_qr', null);
+        return back()->with('success', 'Imagen eliminada correctamente.');
+    }
+
+    public function destroyFloatingButtonLogo(FloatingButton $floatingButton)
+    {
+        if ($floatingButton->logo && Storage::disk('public')->exists($floatingButton->logo)) {
+            Storage::disk('public')->delete($floatingButton->logo);
+        }
+        $floatingButton->logo = null;
+        $floatingButton->save();
+        return back()->with('success', 'Logo eliminado. Se usará el logo por defecto.');
+    }
+
+    // ── Editar Contacto ──────────────────────────────────────────────────────
+
+    private const CONTACT_ICON_KEYS = ['contact_icon_direccion', 'contact_icon_telefono', 'contact_icon_email'];
+
+    public function editContacto()
+    {
+        $data = [
+            'contact_direccion'      => SiteSetting::get('contact_direccion', "Esq. Av. Luzuriaga con Av. 28 de Julio\nHuaraz, Áncash, Perú"),
+            'contact_telefono'       => SiteSetting::get('contact_telefono', '952 845 942'),
+            'contact_email'          => SiteSetting::get('contact_email', 'giber.garcia@pcca.org'),
+            'contact_icon_direccion' => SiteSetting::get('contact_icon_direccion'),
+            'contact_icon_telefono'  => SiteSetting::get('contact_icon_telefono'),
+            'contact_icon_email'     => SiteSetting::get('contact_icon_email'),
+        ];
+        return view('admin.web-config.config-contacto', compact('data'));
+    }
+
+    public function updateEditContacto(Request $request)
+    {
+        $request->validate([
+            'contact_direccion'      => ['required', 'string', 'max:300'],
+            'contact_telefono'       => ['required', 'string', 'max:100'],
+            'contact_email'          => ['required', 'string', 'max:150'],
+            'contact_icon_direccion' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
+            'contact_icon_telefono'  => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
+            'contact_icon_email'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
+        ]);
+
+        foreach (['contact_direccion', 'contact_telefono', 'contact_email'] as $key) {
+            SiteSetting::set($key, $request->input($key));
+        }
+
+        foreach (self::CONTACT_ICON_KEYS as $field) {
             if ($request->hasFile($field)) {
                 $old = SiteSetting::get($field);
                 if ($old && Storage::disk('public')->exists($old)) {
                     Storage::disk('public')->delete($old);
                 }
-                $path = $request->file($field)->store('contact', 'public');
+                $path = $request->file($field)->store('contact-icons', 'public');
                 SiteSetting::set($field, $path);
             }
         }
 
-        $number = preg_replace('/\D/', '', $request->input('whatsapp_number', ''));
-        if ($number !== '') {
-            if (!str_starts_with($number, '51')) {
-                $number = '51' . $number;
-            }
-        }
-        SiteSetting::set('whatsapp_number', $number ?: null);
-
         return back()->with('success', 'Información de contacto actualizada correctamente.');
     }
 
-    public function destroyContact(string $key)
+    public function destroyContactIcon(string $key)
     {
-        abort_unless(in_array($key, self::CONTACT_IMAGES), 404);
+        abort_unless(in_array($key, self::CONTACT_ICON_KEYS), 404);
 
         $old = SiteSetting::get($key);
         if ($old && Storage::disk('public')->exists($old)) {
@@ -115,7 +309,7 @@ class WebConfigController extends Controller
         }
         SiteSetting::set($key, null);
 
-        return back()->with('success', 'QR eliminado correctamente.');
+        return back()->with('success', 'Ícono eliminado. Se mostrará el ícono por defecto.');
     }
 
     public function aportantes()

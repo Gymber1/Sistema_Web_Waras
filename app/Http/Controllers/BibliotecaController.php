@@ -34,7 +34,7 @@ class BibliotecaController extends Controller
         $specials = Special::withCount('books')->with('books.authors')->orderBy('order')->orderBy('title')->get();
 
         $booksData = [
-            'Libros'          => $allBooks->where('section', 'Biblioteca Digital')->where('document_type', '!=', 'Revista')->values()->toArray(),
+            'Libros'          => $allBooks->where('document_type', '!=', 'Revista')->values()->toArray(),
             'Revistas'        => $booksByType->get('Revista', collect())->values()->toArray(),
             'Editoriales'     => Publisher::with('books')->get()->toArray(),
             'Especiales'      => $specials->toArray(),

@@ -195,7 +195,7 @@
                 <div class="contact-icon"><i class="fas fa-quote-left"></i></div>
                 <div>
                     <p class="contact-label">Principios Incas</p>
-                    <p class="contact-value" style="font-style:italic;font-size:.85rem;">"Ama Llulla, Ama Quella, Ama Sua"</p>
+                    <p class="contact-value" style="font-style:italic;font-size:.85rem;line-height:1.8;">"Ama Llulla"<br>"Ama Quella"<br>"Ama Sua"</p>
                 </div>
             </div>
         </div>

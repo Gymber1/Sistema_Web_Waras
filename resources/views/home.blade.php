@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WARAS - Portal Unificado</title>
+    <title>WARAS EDITORIAL</title>
     <link rel="icon" type="image/png" href="/Logo-Waras.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,7 +37,7 @@
                 @if($navLogo)
                     <img src="{{ asset('storage/' . $navLogo) }}" alt="Logo" class="logo-icon">
                 @endif
-                WARAS EDITORIAL
+                Portal Waras
             </a>
             <nav class="desktop-nav">
                 <a href="{{ route('home') }}" class="nav-link" onclick="showView('inicio');return false;">Inicio</a>
@@ -70,7 +70,7 @@
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <p class="hero-eyebrow">Asociación de Ciencia y Cultura</p>
-            <h1 class="hero-title">WARAS EDITORIAL</h1>
+            <h1 class="hero-title">Portal de la Ciencia y la Cultura AncashinaL</h1>
             <p class="hero-subtitle">"Descubre nuestras colecciones de libros, fotos, música, artes y eventos históricos que preservan la memoria de nuestra región."</p>
             <a href="#colecciones" class="hero-cta">Explorar Servicios</a>
         </div>
@@ -472,29 +472,29 @@
                         <div class="">
                             <img src="/Direccion.png" alt="Dirección" style="width:30px;height:30px;object-fit:contain;">
                         </div>
-                        <span>Esq. Av. Luzuriaga con Av. 28 de Julio<br>Huaraz, Áncash, Perú</span>
+                        <span>{!! nl2br(e($contact_direccion)) !!}</span>
                     </div>
                     <div class="footer-contact-item">
                         <div class="">
                             <img src="/Telefono.png" alt="Teléfonos" style="width:30px;height:30px;object-fit:contain;">
                         </div>
-                        <span>+51 952-845-942</span>
+                        <span>{{ $contact_telefono }}</span>
                     </div>
                     <div class="footer-contact-item">
                         <div class="">
                             <img src="/Email.png" alt="Correo Electrónico" style="width:30px;height:30px;object-fit:contain;">
                         </div>
-                        <span>giber.garcia@pcca.org</span>
+                        <span>{{ $contact_email }}</span>
                     </div>
                 </div>
                 <!-- Newsletter -->
                 <div>
                     <h4 class="footer-heading">Principios Incas</h4>
-                    <blockquote class="footer-quote">"Ama Llulla, Ama Quella, Ama Sua"</blockquote>
-                    <div class="newsletter-wrap">
-                        <input type="email" class="newsletter-input" placeholder="Suscríbete al boletín...">
-                        <button class="newsletter-btn">›</button>
-                    </div>
+                    <blockquote class="footer-quote">
+                        "Ama Llulla"<br>
+                        "Ama Quella"<br>
+                        "Ama Sua"
+                    </blockquote>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -519,30 +519,30 @@
                 <div class="modal-contact-cards">
                     <div class="modal-contact-card full">
                         <div class="modal-contact-icon-wrap">
-                            <img src="/Direccion.png" alt="Dirección" style="width:50px;height:50px;object-fit:contain;">
+                            <img src="{{ $contact_icon_direccion ? asset('storage/' . $contact_icon_direccion) : '/Direccion.png' }}" alt="Dirección" style="width:50px;height:50px;object-fit:contain;">
                         </div>
                         <div>
                             <p class="modal-contact-label">Dirección</p>
-                            <p class="modal-contact-value">Esq. Av. Luzuriaga con Av. 28 de Julio<br>Huaraz, Áncash, Perú</p>
+                            <p class="modal-contact-value">{!! nl2br(e($contact_direccion)) !!}</p>
                         </div>
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
                         <div class="modal-contact-card">
                             <div class="modal-contact-icon-wrap">
-                                <img src="/Telefono.png" alt="Teléfonos" style="width:50px;height:50px;object-fit:contain;">
+                                <img src="{{ $contact_icon_telefono ? asset('storage/' . $contact_icon_telefono) : '/Telefono.png' }}" alt="Teléfonos" style="width:50px;height:50px;object-fit:contain;">
                             </div>
                             <div>
                                 <p class="modal-contact-label">Teléfonos</p>
-                                <p class="modal-contact-value">952 845 942</p>
+                                <p class="modal-contact-value">{{ $contact_telefono }}</p>
                             </div>
                         </div>
                         <div class="modal-contact-card">
                             <div class="modal-contact-icon-wrap">
-                                <img src="/Email.png" alt="Email" style="width:50px;height:50px;object-fit:contain;">
+                                <img src="{{ $contact_icon_email ? asset('storage/' . $contact_icon_email) : '/Email.png' }}" alt="Email" style="width:50px;height:50px;object-fit:contain;">
                             </div>
                             <div>
                                 <p class="modal-contact-label">Email</p>
-                                <p class="modal-contact-value" style="word-break:break-all;">giber.garcia@pcca.org</p>
+                                <p class="modal-contact-value" style="word-break:break-all;">{{ $contact_email }}</p>
                             </div>
                         </div>
                     </div>
@@ -553,21 +553,21 @@
                 <div class="modal-form-wrap">
                     <h3 class="modal-form-title">Envíenos un mensaje</h3>
                     <p class="modal-form-sub">Responderemos lo más pronto posible.</p>
-                    <form action="mailto:giber.garcia@pcca.org" method="GET">
-
+                    <form id="modalContactForm">
+                        @csrf
                         <div class="form-group">
                             <label class="form-label">Nombres Completos</label>
-                            <input type="text" name="name" class="form-input" placeholder="Ej. Juan Pérez" required>
+                            <input type="text" id="modal-nombres" class="form-input" placeholder="Ej. Juan Pérez" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Correo Electrónico</label>
-                            <input type="email" name="email" class="form-input" placeholder="ejemplo@correo.com" required>
+                            <input type="email" id="modal-email" class="form-input" placeholder="ejemplo@correo.com" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Mensaje</label>
-                            <textarea name="message" class="form-textarea" rows="4" placeholder="Escriba su consulta o comentario aquí..." required></textarea>
+                            <textarea id="modal-mensaje" class="form-textarea" rows="4" placeholder="Escriba su consulta o comentario aquí..." required></textarea>
                         </div>
-                        <button type="submit" class="form-submit">Enviar Mensaje &#10148;</button>
+                        <button type="submit" class="form-submit">Enviar por WhatsApp &#10148;</button>
                     </form>
                 </div>
             </div>
@@ -616,6 +616,30 @@
         window.closeContactModal = closeContactModal;
         document.getElementById('contactModal').addEventListener('click', function(e) {
             if (e.target === this) closeContactModal();
+        });
+
+        // Modal contact form → WhatsApp
+        const _waNumber = '{{ $whatsapp_number ?? "" }}';
+        document.getElementById('modalContactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            if (!_waNumber) {
+                const orig = btn.innerHTML;
+                btn.innerHTML = '⚠ Por el momento no es posible contactar';
+                btn.style.opacity = '0.7';
+                btn.disabled = true;
+                setTimeout(() => { btn.innerHTML = orig; btn.style.opacity = ''; btn.disabled = false; }, 4000);
+                return;
+            }
+            const nombres = document.getElementById('modal-nombres').value.trim();
+            const email   = document.getElementById('modal-email').value.trim();
+            const mensaje = document.getElementById('modal-mensaje').value.trim();
+            const texto   = `Hola, le escribo desde el portal WARAS EDITORIAL.\n\n*Nombre:* ${nombres}\n*Correo:* ${email}\n\n*Mensaje:*\n${mensaje}`;
+            window.open(`https://wa.me/${_waNumber}?text=${encodeURIComponent(texto)}`, '_blank');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '✓ ¡Redirigiendo a WhatsApp!';
+            btn.style.background = '#059669';
+            setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; this.reset(); }, 3000);
         });
 
         // Smooth scroll for anchor links

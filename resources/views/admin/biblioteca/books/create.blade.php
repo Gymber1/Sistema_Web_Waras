@@ -75,6 +75,7 @@
                         <option value="Biblioteca Digital" @selected(old('section','Biblioteca Digital')==='Biblioteca Digital')>Biblioteca Digital</option>
                         <option value="Waras Editorial"    @selected(old('section')==='Waras Editorial')>Waras Editorial</option>
                     </select>
+                    <p class="text-xs text-slate-400 mt-1.5">Los libros de <strong>Waras Editorial</strong> también aparecen en Biblioteca Digital.</p>
                 </div>
 
                 {{-- Categoría --}}

@@ -100,6 +100,27 @@
             </div>
         </div>
 
+        {{-- Tarjeta 5: Editar Contacto --}}
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
+            <div class="p-8 flex-1">
+                <div class="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center mb-5">
+                    <svg class="w-7 h-7 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-black text-slate-800 mb-2">Editar Contacto</h2>
+                <p class="text-slate-500 text-sm leading-relaxed">Actualiza la dirección, teléfono, correo electrónico e íconos que aparecen en la página de contacto del portal.</p>
+            </div>
+            <div class="px-8 pb-8">
+                <a href="{{ route('admin.web-config.edit-contacto') }}"
+                   class="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors shadow-sm">
+                    Ingresar
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+        </div>
+
     </div>
 </div>
 @endsection

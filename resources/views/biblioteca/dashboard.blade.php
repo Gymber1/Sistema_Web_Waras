@@ -243,6 +243,7 @@
             </div>
 
             <div class="books-grid" id="booksGrid"></div>
+            <div id="booksPagination"></div>
         </main>
     </div>
 
@@ -516,11 +517,13 @@
         const ICONS = { 'Libro': '📚', 'Revista': '📰', 'Artículo': '📄', 'Tesis': '🎓' };
 
         function mapBook(book, idx) {
+            const authors = book.authors || [];
             return {
                 id:           book.id,
                 title:        book.title,
-                author:       book.authors && book.authors.length > 0 ? book.authors[0].name : 'Anónimo',
-                authorId:     book.authors && book.authors.length > 0 ? book.authors[0].id : null,
+                author:       authors.length > 0 ? authors[0].name : 'Anónimo',
+                authorId:     authors.length > 0 ? authors[0].id : null,
+                authorNames:  authors.map(a => a.name),
                 year:         book.publication_date ? book.publication_date.split('T')[0].split('-')[0] : 'S/F',
                 type:         book.document_type || 'Libro',
                 description:  book.summary || 'Sin descripción disponible',
@@ -580,10 +583,12 @@
         const serverActiveSection = @json($activeSection ?? 'Inicio');
 
         let activeDescriptorId = null;
+        const ITEMS_PER_PAGE = 12;
 
         let state = {
             activeTab: 'Inicio',
             activeCategory: null, // {id, name} or null
+            currentPage: 1,
             isScrolled: false,
             openAccordions:   new Set(),  // ids abiertos manualmente
             closedAccordions: new Set()   // ids cerrados manualmente (tienen prioridad sobre ancestro activo)
@@ -684,6 +689,7 @@
                 if (todosBtn) {
                     todosBtn.addEventListener('click', () => {
                         state.activeCategory = { id: null, name: 'Todos' };
+                        state.currentPage = 1;
                         state.openAccordions.clear();
                         state.closedAccordions.clear();
                         document.getElementById('sectionTitle').textContent = state.activeTab;
@@ -717,6 +723,7 @@
                         const id   = parseInt(btn.getAttribute('data-category-id'));
                         const name = btn.getAttribute('data-category-name');
                         state.activeCategory = { id, name };
+                        state.currentPage = 1;
                         document.getElementById('sectionTitle').textContent = name;
                         document.getElementById('breadcrumbCategory').textContent = name;
                         document.getElementById('contentSearchInput').placeholder = `Buscar libros, autores o temas en ${name}...`;
@@ -744,6 +751,7 @@
                         const id = btn.getAttribute('data-category-id');
                         const name = btn.getAttribute('data-category-name');
                         state.activeCategory = { id: id ? parseInt(id) : null, name };
+                        state.currentPage = 1;
                         document.getElementById('sectionTitle').textContent = name;
                         document.getElementById('breadcrumbCategory').textContent = name;
                         document.getElementById('contentSearchInput').placeholder = `Buscar libros, autores o temas en ${name}...`;
@@ -773,12 +781,47 @@
             return arr;
         }
 
+        function renderPagination(containerId, totalItems, currentPage, onPageChange) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+            if (totalPages <= 1) { container.innerHTML = ''; return; }
+
+            const maxVisible = 7;
+            let pages = [];
+            if (totalPages <= maxVisible) {
+                pages = Array.from({length: totalPages}, (_, i) => i + 1);
+            } else {
+                pages = [1];
+                let start = Math.max(2, currentPage - 2);
+                let end   = Math.min(totalPages - 1, currentPage + 2);
+                if (start > 2)              pages.push('…');
+                for (let i = start; i <= end; i++) pages.push(i);
+                if (end < totalPages - 1)   pages.push('…');
+                pages.push(totalPages);
+            }
+
+            container.innerHTML = `
+            <nav class="bib-pagination" aria-label="Paginación">
+                <button class="bib-page-btn bib-page-prev" ${currentPage === 1 ? 'disabled' : ''} onclick="(${onPageChange})(${currentPage - 1})">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                ${pages.map(p => p === '…'
+                    ? `<span class="bib-page-ellipsis">…</span>`
+                    : `<button class="bib-page-btn ${p === currentPage ? 'bib-page-active' : ''}" onclick="(${onPageChange})(${p})">${p}</button>`
+                ).join('')}
+                <button class="bib-page-btn bib-page-next" ${currentPage === totalPages ? 'disabled' : ''} onclick="(${onPageChange})(${currentPage + 1})">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </nav>`;
+        }
+
         function renderBooks() {
             const grid = document.getElementById('booksGrid');
-            const items = getSortedItems(getDataForSection());
+            const allItems = getSortedItems(getDataForSection());
 
             // Actualizar contador de recursos
-            document.getElementById('resourceNumber').textContent = items.length;
+            document.getElementById('resourceNumber').textContent = allItems.length;
 
             // Detectar tipo de sección
             const isAuthorsSection     = state.activeTab === 'Autores';
@@ -795,16 +838,17 @@
                 chipsBar.style.display = 'none';
             }
 
-            // ESPECIALES → galería de colecciones
+            // ESPECIALES → galería de colecciones (sin paginación)
             if (isEspecialesSection) {
-                document.getElementById('resourceNumber').textContent = items.length;
-                if (items.length === 0) {
+                document.getElementById('resourceNumber').textContent = allItems.length;
+                document.getElementById('booksPagination').innerHTML = '';
+                if (allItems.length === 0) {
                     grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af;"><i class="fas fa-star" style="font-size:2rem;margin-bottom:0.75rem;display:block;"></i>No hay colecciones especiales disponibles.</div>`;
                     return;
                 }
                 // Reemplazar grid con layout de galería
                 grid.className = 'specials-gallery';
-                grid.innerHTML = items.map(s => {
+                grid.innerHTML = allItems.map(s => {
                     const isRev = s.type === 'revista';
                     const label = isRev ? 'Revistas' : 'Libros';
                     const count = s.books_count;
@@ -828,6 +872,13 @@
                 }).join('');
                 return;
             }
+
+            // Paginación
+            const totalItems = allItems.length;
+            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
+            if (state.currentPage > totalPages) state.currentPage = totalPages;
+            const start = (state.currentPage - 1) * ITEMS_PER_PAGE;
+            const items = allItems.slice(start, start + ITEMS_PER_PAGE);
 
             // Restaurar grid normal si veníamos de especiales
             grid.className = 'books-grid';
@@ -881,6 +932,12 @@
                 `).join('');
             }
 
+            renderPagination('booksPagination', totalItems, state.currentPage, function(page) {
+                state.currentPage = page;
+                renderBooks();
+                document.getElementById('booksGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+
             // Agregar event listeners a los botones
             document.querySelectorAll('.book-detail-btn').forEach((btn, index) => {
                 btn.addEventListener('click', (e) => {
@@ -901,6 +958,7 @@
 
         function showSection(tab) {
             state.activeTab = tab;
+            state.currentPage = 1;
             state.openAccordions.clear();
             state.closedAccordions.clear();
 
@@ -1143,7 +1201,8 @@
 
             const matchBooks = books.filter(b =>
                 normalizeStr(b.title).includes(nq) ||
-                normalizeStr(b.author).includes(nq) ||
+                (b.authorNames || []).some(n => normalizeStr(n).includes(nq)) ||
+                (b.descriptorNames || []).some(d => normalizeStr(d).includes(nq)) ||
                 normalizeStr(b.description).includes(nq)
             ).slice(0, 4);
 
@@ -1297,22 +1356,30 @@
         function filterByDescriptor(descriptorId) {
             const tab = state.activeTab;
             const allItems = dataBySectionAndCategory[tab]?.['default'] || [];
-            // Filtrar usando el campo descriptorIds que agregaremos en mapBook
             const filtered = allItems.filter(item =>
                 item.descriptorIds && item.descriptorIds.includes(descriptorId)
             );
+            searchFilteredItems = filtered;
+            state.currentPage = 1;
             const grid = document.getElementById('booksGrid');
             grid.className = 'books-grid';
             document.getElementById('resourceNumber').textContent = filtered.length;
             if (filtered.length === 0) {
+                document.getElementById('booksPagination').innerHTML = '';
                 grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af;">
                     <i class="fas fa-tag" style="font-size:2rem;margin-bottom:0.75rem;display:block;"></i>
                     Sin resultados para el descriptor "<strong style="color:#6b7280;">${document.getElementById('contentSearchInput').value}</strong>"
                 </div>`;
                 return;
             }
-            // Reusar render de libros estándar
-            renderBookItems(grid, filtered);
+            function renderDescPage(p) {
+                state.currentPage = p;
+                const start = (p - 1) * ITEMS_PER_PAGE;
+                renderBookItems(grid, filtered.slice(start, start + ITEMS_PER_PAGE));
+                renderPagination('booksPagination', filtered.length, p, renderDescPage);
+                if (p > 1) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            renderDescPage(1);
         }
 
         function renderBookItems(grid, items) {
@@ -1384,8 +1451,13 @@
         // ---- BÚSQUEDA EN CATÁLOGO (filtra tarjetas visibles) ----
         document.getElementById('sortSelect').addEventListener('change', function() {
             closeMobileSidebar();
+            state.currentPage = 1;
+            searchFilteredItems = null;
+            document.getElementById('contentSearchInput').value = '';
             renderBooks();
         });
+
+        let searchFilteredItems = null; // null = not in search mode
 
         document.getElementById('contentSearchInput').addEventListener('input', function() {
             closeMobileSidebar();
@@ -1398,6 +1470,8 @@
 
             if (!q) {
                 activeDescriptorId = null;
+                searchFilteredItems = null;
+                state.currentPage = 1;
                 renderDescriptorChips();
                 renderBooks();
                 return;
@@ -1417,43 +1491,52 @@
                            normalizeStr(item.nationality).includes(q) ||
                            normalizeStr(item.biography).includes(q);
                 }
-                if (isEditoriales) {
-                    return normalizeStr(item.name).includes(q) ||
-                           normalizeStr(item.description).includes(q) ||
-                           normalizeStr(item.address).includes(q);
-                }
-                // Búsqueda normal + boost por descriptor (aparecen primero)
-                const matchDesc = item.descriptorNames &&
-                    item.descriptorNames.some(dn => normalizeStr(dn).includes(q));
-                const matchText = normalizeStr(item.title).includes(q) ||
-                    normalizeStr(item.author).includes(q) ||
-                    normalizeStr(item.description).includes(q) ||
-                    normalizeStr(item.publisher).includes(q) ||
-                    normalizeStr(String(item.year)).includes(q);
-                return matchDesc || matchText;
+                // Búsqueda OR: título + todos los autores + todos los descriptores/tags
+                const matchTitle  = normalizeStr(item.title).includes(q);
+                const matchAuthor = (item.authorNames || []).some(n => normalizeStr(n).includes(q));
+                const matchDesc   = (item.descriptorNames || []).some(dn => normalizeStr(dn).includes(q));
+                const matchExtra  = normalizeStr(item.description).includes(q) ||
+                                    normalizeStr(item.publisher).includes(q) ||
+                                    normalizeStr(String(item.year)).includes(q);
+                return matchTitle || matchAuthor || matchDesc || matchExtra;
             });
 
-            // Ordenar: matches de descriptor primero
+            // Boost: descriptor matches first, then title matches, then rest
             filtered.sort((a, b) => {
-                const aD = a.descriptorNames && a.descriptorNames.some(dn => normalizeStr(dn).includes(q)) ? 0 : 1;
-                const bD = b.descriptorNames && b.descriptorNames.some(dn => normalizeStr(dn).includes(q)) ? 0 : 1;
-                return aD - bD;
+                const aD = (a.descriptorNames || []).some(dn => normalizeStr(dn).includes(q)) ? 0 : 1;
+                const bD = (b.descriptorNames || []).some(dn => normalizeStr(dn).includes(q)) ? 0 : 1;
+                if (aD !== bD) return aD - bD;
+                const aT = normalizeStr(a.title || a.name || '').includes(q) ? 0 : 1;
+                const bT = normalizeStr(b.title || b.name || '').includes(q) ? 0 : 1;
+                return aT - bT;
             });
 
-            // Renderizar resultados filtrados
+            searchFilteredItems = filtered;
+            state.currentPage = 1;
+            renderSearchResults(filtered, rawQ, isAuthors);
+        });
+
+        function renderSearchResults(filtered, rawQ, isAuthors) {
             const grid = document.getElementById('booksGrid');
+            grid.className = 'books-grid';
             document.getElementById('resourceNumber').textContent = filtered.length;
 
             if (filtered.length === 0) {
+                document.getElementById('booksPagination').innerHTML = '';
                 grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af;">
                     <i class="fas fa-search" style="font-size:2rem;margin-bottom:0.75rem;display:block;"></i>
-                    Sin resultados para "<strong style="color:#6b7280;">${this.value.trim()}</strong>"
+                    Sin resultados para "<strong style="color:#6b7280;">${rawQ}</strong>"
                 </div>`;
                 return;
             }
 
+            const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
+            if (state.currentPage > totalPages) state.currentPage = totalPages;
+            const start = (state.currentPage - 1) * ITEMS_PER_PAGE;
+            const page  = filtered.slice(start, start + ITEMS_PER_PAGE);
+
             if (isAuthors) {
-                grid.innerHTML = filtered.map(item => `
+                grid.innerHTML = page.map(item => `
                     <div class="book-card">
                         <div class="book-cover" style="background:linear-gradient(135deg,#2d3436 0%,#636e72 100%);">
                             ${item.photo_url
@@ -1470,7 +1553,7 @@
                         </div>
                     </div>`).join('');
             } else {
-                grid.innerHTML = filtered.map((item, idx) => `
+                grid.innerHTML = page.map((item, idx) => `
                     <div class="book-card">
                         <div class="book-cover" style="background:linear-gradient(135deg,${item.color} 0%,${item.color}cc 100%);">
                             <span class="book-badge">${item.type}</span>
@@ -1489,7 +1572,9 @@
                             <p class="book-year">Publicación: ${item.year}</p>
                             <div class="book-footer">
                                 <span style="font-size:0.75rem;color:#9ca3af;">${item.pages} págs.</span>
-                                <a href="#" class="book-read-link">Leer →</a>
+                                ${item.read_url
+                                    ? `<a href="${item.read_url}" target="_blank" rel="noopener" class="book-read-link">Leer →</a>`
+                                    : `<span class="book-read-link" style="opacity:0.35;cursor:default;">Sin acceso</span>`}
                             </div>
                         </div>
                     </div>`).join('');
@@ -1498,12 +1583,18 @@
                     btn.addEventListener('click', e => {
                         e.preventDefault();
                         closeMobileSidebar();
-                        const item = filtered[parseInt(btn.dataset.searchIdx)];
+                        const item = page[parseInt(btn.dataset.searchIdx)];
                         if (item) showDetailView(item);
                     });
                 });
             }
-        });
+
+            renderPagination('booksPagination', filtered.length, state.currentPage, function(p) {
+                state.currentPage = p;
+                renderSearchResults(filtered, rawQ, isAuthors);
+                document.getElementById('booksGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        }
 
         // ========== MOBILE NAV ==========
         function openMobileNav()  { document.getElementById('mobileNav').classList.add('open'); document.body.style.overflow = 'hidden'; }

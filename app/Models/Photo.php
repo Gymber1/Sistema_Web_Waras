@@ -23,6 +23,7 @@ class Photo extends Model
         'resolution',
         'format',
         'descriptors',
+        'tag_id',
         'thumbnail_path',
         'full_image_path',
         'source_type',
@@ -80,5 +81,10 @@ class Photo extends Model
             'photo_id',
             'special_id'
         )->withPivot('order')->withTimestamps();
+    }
+
+    public function tag(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(PhotoTag::class, 'tag_id');
     }
 }

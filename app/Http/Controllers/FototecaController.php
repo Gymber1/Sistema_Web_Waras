@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Photo;
+use App\Models\PhotoTag;
 use App\Models\Photographer;
 use App\Models\Category;
 use App\Models\SiteSetting;
@@ -16,7 +17,7 @@ class FototecaController extends Controller
         $totalPhotographers = Photographer::count();
         $totalCategories    = Category::where('type', 'fototeca')->count();
 
-        $allPhotos = Photo::with(['photographers', 'categories'])->get();
+        $allPhotos = Photo::with(['photographers', 'categories', 'tag'])->get();
 
         $photosByCategory = [];
         foreach ($allPhotos as $photo) {
@@ -34,6 +35,9 @@ class FototecaController extends Controller
                 'format'       => $photo->format ?? '',
                 'external_url' => $photo->external_url ?? '',
                 'detail_url'   => '/fototeca/galeria/' . $photo->id,
+                'tag_id'       => $photo->tag_id,
+                'tag_name'     => $photo->tag?->name ?? '',
+                'categories'   => $photo->categories->pluck('name')->toArray(),
             ];
             foreach ($photo->categories as $cat) {
                 $photosByCategory[$cat->name][] = $photoData;
@@ -65,6 +69,11 @@ class FototecaController extends Controller
             ])->toArray();
         };
 
+        $tagsData = PhotoTag::withCount('photos')
+            ->orderBy('name')
+            ->get(['id', 'name', 'slug', 'photos_count'])
+            ->toArray();
+
         return [
             'totalPhotos'          => $totalPhotos,
             'totalPhotographers'   => $totalPhotographers,
@@ -72,6 +81,7 @@ class FototecaController extends Controller
             'photosByCategory'     => $photosByCategory,
             'photographersData'    => $photographersData,
             'categoriesForFilters' => $buildTree($allCategories),
+            'tagsData'             => $tagsData,
             'activeSection'        => $activeSection,
             'canEditPanel'         => auth()->check() && (auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca')),
             'heroBg'               => ($p = SiteSetting::get('bg_fototeca')) ? asset('storage/' . $p) : null,
@@ -124,19 +134,33 @@ class FototecaController extends Controller
     {
         $photos = Photo::whereHas('categories', function ($query) use ($categoryId) {
             $query->where('categories.id', $categoryId);
-        })->with(['photographers', 'categories'])->paginate(20);
+        })->with(['photographers', 'categories', 'tag'])->paginate(20);
+
+        return response()->json($photos);
+    }
+
+    public function getPhotosByTag(\App\Models\PhotoTag $photoTag)
+    {
+        $photos = $photoTag->photos()
+            ->with(['photographers', 'categories', 'tag'])
+            ->paginate(20);
 
         return response()->json($photos);
     }
 
     public function search(Request $request)
     {
-        $query = $request->get('q');
+        $q = trim($request->get('q', ''));
 
-        $photos = Photo::where('title', 'like', "%{$query}%")
-            ->orWhere('description', 'like', "%{$query}%")
-            ->with(['photographers', 'categories'])
-            ->paginate(20);
+        $photos = Photo::where(function ($query) use ($q) {
+            $query->where('title', 'like', "%{$q}%")
+                  ->orWhere('description', 'like', "%{$q}%")
+                  ->orWhere('location', 'like', "%{$q}%")
+                  ->orWhereHas('photographers', fn($pq) => $pq->where('full_name', 'like', "%{$q}%"))
+                  ->orWhereHas('tag', fn($tq) => $tq->where('name', 'like', "%{$q}%"));
+        })
+        ->with(['photographers', 'categories', 'tag'])
+        ->paginate(20);
 
         return response()->json($photos);
     }

@@ -43,6 +43,7 @@ Route::prefix('fototeca')->name('fototeca.')->group(function () {
     Route::get('/nosotros', [FototecaController::class, 'indexAportantes'])->name('aportantes.index');
     Route::get('/search', [FototecaController::class, 'search'])->name('search');
     Route::get('/category/{category}', [FototecaController::class, 'getPhotosByCategory'])->name('category');
+    Route::get('/tag/{photoTag}', [FototecaController::class, 'getPhotosByTag'])->name('tag');
     Route::get('/fotografos/{photographer}', [FototecaController::class, 'showPhotographer'])->name('fotografos.show');
     Route::get('/galeria/{photo}', [FototecaController::class, 'showPhoto'])->name('galeria.show');
 });
@@ -170,6 +171,11 @@ Route::middleware('auth')->group(function () {
             Route::put('/sublevels/{category}', [AdminFototecaController::class, 'updateSublevel'])->name('sublevels.update');
             Route::delete('/sublevels/{category}', [AdminFototecaController::class, 'destroySublevel'])->name('sublevels.destroy');
 
+            // Etiquetas
+            Route::get('/tags', [AdminFototecaController::class, 'indexTags'])->name('tags');
+            Route::post('/tags', [AdminFototecaController::class, 'storeTag'])->name('tags.store');
+            Route::delete('/tags/{photoTag}', [AdminFototecaController::class, 'destroyTag'])->name('tags.destroy');
+
         });
 
         // Configurar Web (solo admin global)
@@ -179,8 +185,15 @@ Route::middleware('auth')->group(function () {
             Route::get('/contacto', [WebConfigController::class, 'contacto'])->name('contacto');
             Route::get('/aportantes',  [WebConfigController::class, 'aportantes'])->name('aportantes');
             Route::post('/aportantes', [WebConfigController::class, 'aportantesUpdate'])->name('aportantes.update');
-            Route::post('/contact/update',    [WebConfigController::class, 'updateContact'])->name('contact.update');
-            Route::delete('/contact/{key}',   [WebConfigController::class, 'destroyContact'])->name('contact.destroy');
+            Route::post('/contact/update',                  [WebConfigController::class, 'updateContact'])->name('contact.update');
+            Route::delete('/contact/{key}',               [WebConfigController::class, 'destroyContact'])->name('contact.destroy');
+            Route::post('/floating-btn/{floatingButton}',            [WebConfigController::class, 'updateFloatingButton'])->name('floating-btn.update');
+            Route::delete('/floating-btn/{floatingButton}',          [WebConfigController::class, 'destroyFloatingButton'])->name('floating-btn.destroy');
+            Route::delete('/floating-btn/{floatingButton}/imagen',   [WebConfigController::class, 'destroyFloatingButtonImagen'])->name('floating-btn.imagen.destroy');
+            Route::delete('/floating-btn/{floatingButton}/logo',     [WebConfigController::class, 'destroyFloatingButtonLogo'])->name('floating-btn.logo.destroy');
+            Route::get('/edit-contacto',              [WebConfigController::class, 'editContacto'])->name('edit-contacto');
+            Route::post('/edit-contacto',             [WebConfigController::class, 'updateEditContacto'])->name('edit-contacto.update');
+            Route::delete('/edit-contacto/{key}',     [WebConfigController::class, 'destroyContactIcon'])->name('edit-contacto.icon-destroy');
             Route::get('/icono',              [WebConfigController::class, 'icono'])->name('icono');
             Route::post('/icono',             [WebConfigController::class, 'iconoUpdate'])->name('icono.update');
             Route::delete('/icono',           [WebConfigController::class, 'iconoDestroy'])->name('icono.destroy');

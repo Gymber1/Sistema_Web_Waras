@@ -11,7 +11,11 @@
       "Bash(php -r \"require 'c:/Users/NITRO/Documents/Proyectos/Waras/vendor/autoload.php';\")",
       "Bash(grep -n \"^        renderBooks\\\\|^        renderCategories\\\\|renderBooks\\(\\);\\\\s*$\" resources/views/biblioteca/dashboard.blade.php)",
       "Bash(npm run *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(php -l app/Http/Controllers/Admin/WebConfigController.php)",
+      "Bash(php -l app/Http/Controllers/HomeController.php)",
+      "Bash(powershell -Command \"Get-Content storage/logs/laravel.log | Select-Object -Last 80\")",
+      "Bash(powershell -Command \"Get-Content storage/logs/laravel.log | Select-String -Pattern 'local\\\\.\\(ERROR|WARNING\\)' | Select-Object -Last 10\")"
     ]
   }
 }

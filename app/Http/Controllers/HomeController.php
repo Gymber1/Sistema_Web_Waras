@@ -62,6 +62,13 @@ class HomeController extends Controller
             'heroBgBiblioteca' => $bgBiblioteca ? asset('storage/' . $bgBiblioteca) : 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=900&q=80',
             'heroBgFototeca'   => $bgFototeca   ? asset('storage/' . $bgFototeca)   : 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?auto=format&fit=crop&w=900&q=80',
             'aportantes'       => $aportantes,
+            'contact_direccion'      => SiteSetting::get('contact_direccion', "Esq. Av. Luzuriaga con Av. 28 de Julio\nHuaraz, Áncash, Perú"),
+            'contact_telefono'       => SiteSetting::get('contact_telefono', '952 845 942'),
+            'contact_email'          => SiteSetting::get('contact_email', 'giber.garcia@pcca.org'),
+            'contact_icon_direccion' => SiteSetting::get('contact_icon_direccion'),
+            'contact_icon_telefono'  => SiteSetting::get('contact_icon_telefono'),
+            'contact_icon_email'     => SiteSetting::get('contact_icon_email'),
+            'whatsapp_number'        => SiteSetting::get('whatsapp_number'),
         ]);
     }
 
@@ -78,10 +85,17 @@ class HomeController extends Controller
     public function contacto()
     {
         return view('contacto', [
-            'showAdminPanel' => auth()->check() && (
+            'showAdminPanel'         => auth()->check() && (
                 auth()->user()->is_admin_global ||
                 auth()->user()->modules()->exists()
             ),
+            'contact_direccion'      => SiteSetting::get('contact_direccion', "Esq. Av. Luzuriaga con Av. 28 de Julio\nHuaraz, Áncash, Perú"),
+            'contact_telefono'       => SiteSetting::get('contact_telefono', '952 845 942'),
+            'contact_email'          => SiteSetting::get('contact_email', 'giber.garcia@pcca.org'),
+            'contact_icon_direccion' => SiteSetting::get('contact_icon_direccion'),
+            'contact_icon_telefono'  => SiteSetting::get('contact_icon_telefono'),
+            'contact_icon_email'     => SiteSetting::get('contact_icon_email'),
+            'whatsapp_number'        => SiteSetting::get('whatsapp_number'),
         ]);
     }
 }

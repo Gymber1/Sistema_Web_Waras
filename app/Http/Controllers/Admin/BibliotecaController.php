@@ -81,7 +81,7 @@ class BibliotecaController extends Controller
             'title'            => $request->title,
             'slug'             => $this->uniqueSlug($request->title, Book::class),
             'document_type'    => $request->document_type,
-            'section'          => $request->section,
+            'section'          => $request->input('section', 'Biblioteca Digital'),
             'publication_date' => $request->publication_date,
             'pages'            => $request->pages,
             'summary'          => $request->summary,

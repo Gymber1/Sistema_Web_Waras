@@ -51,10 +51,10 @@
                     class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                 {{-- Fotógrafos --}}
-                <div class="md:col-span-2">
+                <div class="md:col-span-3">
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Fotógrafos</label>
                     <div id="chips-photographers" class="flex flex-wrap gap-2 p-3 border border-slate-300 rounded-xl bg-white min-h-[48px]">
                         @foreach($photo->photographers as $ph)
@@ -79,33 +79,64 @@
                     </div>
                 </div>
 
-                {{-- Categorías --}}
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Categorías</label>
-                    <div id="chips-categories" class="flex flex-wrap gap-2 p-3 border border-slate-300 rounded-xl bg-white min-h-[48px]">
-                        @foreach($photo->categories as $cat)
-                        <span class="chip flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-700 text-sm font-semibold rounded-full">
-                            {{ $cat->name }}
-                            <button type="button" onclick="removeChip(this)" class="hover:text-red-600 font-bold text-base leading-none">×</button>
-                            <input type="hidden" name="categories[]" value="{{ $cat->id }}">
-                        </span>
+                {{-- Categoría --}}
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Categoría</label>
+                    <select id="sel-category" onchange="cascadeSubcategory()"
+                        class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                        <option value="">— Seleccionar —</option>
+                        @foreach($categories as $cat)
+                        <option value="{{ $cat->id }}" data-name="{{ $cat->name }}"
+                            {{ optional($selCategory)->id == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                         @endforeach
-                    </div>
-                    <div class="relative mt-2">
-                        <input type="text" id="search-categories" placeholder="Buscar y agregar categoría..."
-                            oninput="filterDropdown(this,'dropdown-categories')" onfocus="showDropdown('dropdown-categories')"
-                            class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50">
-                        <div id="dropdown-categories" class="tag-dropdown hidden absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-52 overflow-y-auto">
-                            @foreach($categories as $cat)
-                            <button type="button" data-id="{{ $cat->id }}" data-name="{{ $cat->name }}"
-                                onclick="addChip(this,'chips-categories','categories')"
-                                class="w-full text-left px-4 py-2.5 hover:bg-blue-50 text-sm border-b border-slate-50 last:border-0"
-                                style="padding-left: {{ 16 + $cat->depth * 16 }}px">
-                                {{ $cat->depth > 0 ? str_repeat('— ', $cat->depth) : '' }}{{ $cat->name }}
-                            </button>
-                            @endforeach
-                        </div>
-                    </div>
+                    </select>
+                    <input type="hidden" name="categories[]" id="hid-category" value="{{ optional($selCategory)->id }}">
+                </div>
+
+                {{-- Subcategoría --}}
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Subcategoría</label>
+                    <select id="sel-subcategory" onchange="cascadeSublevel()"
+                        {{ $selCategory ? '' : 'disabled' }}
+                        class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white disabled:bg-slate-100 disabled:text-slate-400">
+                        <option value="">— Seleccionar —</option>
+                        @foreach($subcategories as $sub)
+                        @if(!$selCategory || $sub->parent_id == optional($selCategory)->id)
+                        <option value="{{ $sub->id }}" data-parent="{{ $sub->parent_id }}"
+                            {{ optional($selSubcategory)->id == $sub->id ? 'selected' : '' }}>{{ $sub->name }}</option>
+                        @endif
+                        @endforeach
+                    </select>
+                    <input type="hidden" name="categories[]" id="hid-subcategory" value="{{ optional($selSubcategory)->id }}">
+                </div>
+
+                {{-- SubNivel --}}
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">SubNivel</label>
+                    <select id="sel-sublevel"
+                        {{ $selSubcategory ? '' : 'disabled' }}
+                        class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white disabled:bg-slate-100 disabled:text-slate-400">
+                        <option value="">— Seleccionar —</option>
+                        @foreach($sublevels as $lvl)
+                        @if(!$selSubcategory || $lvl->parent_id == optional($selSubcategory)->id)
+                        <option value="{{ $lvl->id }}" data-parent="{{ $lvl->parent_id }}"
+                            {{ optional($selSublevel)->id == $lvl->id ? 'selected' : '' }}>{{ $lvl->name }}</option>
+                        @endif
+                        @endforeach
+                    </select>
+                    <input type="hidden" name="categories[]" id="hid-sublevel" value="{{ optional($selSublevel)->id }}">
+                </div>
+
+                {{-- Etiqueta --}}
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Etiqueta</label>
+                    <select name="tag_id"
+                        class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                        <option value="">— Sin etiqueta —</option>
+                        @foreach($tags as $tag)
+                        <option value="{{ $tag->id }}" {{ old('tag_id', $photo->tag_id) == $tag->id ? 'selected' : '' }}>{{ $tag->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 {{-- Año --}}
@@ -123,7 +154,7 @@
                 </div>
 
                 {{-- Proveedor --}}
-                <div class="md:col-span-2">
+                <div class="md:col-span-3">
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Archivo o proveedor de la foto</label>
                     <input type="text" name="provider" value="{{ old('provider', $photo->provider) }}" placeholder="Institución o persona que provee la fotografía"
                         class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
@@ -139,8 +170,13 @@
                 {{-- Formato --}}
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Formato</label>
-                    <input type="text" name="format" value="{{ old('format', $photo->format) }}" placeholder="Ej. JPG, PNG, RAW"
-                        class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    <select name="format"
+                        class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                        <option value="">— Sin especificar —</option>
+                        @foreach(['JPG','PNG','RAW','TIFF','WEBP','BMP','GIF','HEIC','SVG'] as $fmt)
+                        <option value="{{ $fmt }}" @selected(old('format', $photo->format) === $fmt)>{{ $fmt }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 {{-- Tipo de acceso --}}
@@ -162,14 +198,14 @@
                 </div>
 
                 {{-- Descripción --}}
-                <div class="md:col-span-2">
+                <div class="md:col-span-3">
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Descripción</label>
                     <textarea name="description" rows="3" placeholder="Lugar, persona o acontecimiento que muestra la fotografía..."
                         class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-y">{{ old('description', $photo->description) }}</textarea>
                 </div>
 
                 {{-- Imagen --}}
-                <div class="md:col-span-2" id="field-image" style="display:none">
+                <div class="md:col-span-3" id="field-image" style="display:none">
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">Imagen</label>
                     @if($photo->full_image_path)
                     <div class="flex items-center gap-2 mb-3 p-3 bg-blue-50 border border-blue-200 rounded-xl">
@@ -194,6 +230,7 @@
 </div>
 
 <script>
+// ── Fotógrafos chip search ──
 function removeChip(btn) { btn.closest('.chip').remove(); }
 function showDropdown(id) { document.getElementById(id).classList.remove('hidden'); }
 function filterDropdown(input, dropdownId) {
@@ -201,7 +238,6 @@ function filterDropdown(input, dropdownId) {
     const dropdown = document.getElementById(dropdownId);
     dropdown.classList.toggle('hidden', q.length === 0);
     dropdown.querySelectorAll('button').forEach(btn => { btn.style.display = btn.dataset.name?.toLowerCase().includes(q) ? '' : 'none'; });
-    dropdown.querySelectorAll('div').forEach(div => { div.style.display = ''; });
 }
 function addChip(btn, chipsId, field) {
     const id = btn.dataset.id, name = btn.dataset.name;
@@ -214,14 +250,71 @@ function addChip(btn, chipsId, field) {
     const s = document.getElementById('search-' + field); if (s) s.value = '';
     document.getElementById('dropdown-' + field).classList.add('hidden');
 }
-function toggleSourceFields() {
-    const val = document.getElementById('source_type').value;
-    document.getElementById('field-external').style.display = val === 'external' ? '' : 'none';
-    document.getElementById('field-image').style.display = val === 'local' ? '' : 'none';
-}
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.relative')) document.querySelectorAll('.tag-dropdown').forEach(d => d.classList.add('hidden'));
 });
+
+// ── Cascada Categoría → Subcategoría → SubNivel ──
+function cascadeSubcategory() {
+    const catId  = document.getElementById('sel-category').value;
+    const selSub = document.getElementById('sel-subcategory');
+    const selLvl = document.getElementById('sel-sublevel');
+
+    document.getElementById('hid-category').value    = catId;
+    document.getElementById('hid-subcategory').value = '';
+    document.getElementById('hid-sublevel').value    = '';
+
+    selSub.innerHTML = '<option value="">— Seleccionar —</option>';
+    selSub.disabled  = !catId;
+    selLvl.innerHTML = '<option value="">— Primero elige subcategoría —</option>';
+    selLvl.disabled  = true;
+
+    if (!catId) return;
+    document.querySelectorAll('#sel-subcategory-all option').forEach(opt => {
+        if (opt.dataset.parent == catId) selSub.appendChild(opt.cloneNode(true));
+    });
+    if (selSub.options.length <= 1) { selSub.innerHTML = '<option value="">— Sin subcategorías —</option>'; selSub.disabled = true; }
+}
+
+function cascadeSublevel() {
+    const subId  = document.getElementById('sel-subcategory').value;
+    const selLvl = document.getElementById('sel-sublevel');
+
+    document.getElementById('hid-subcategory').value = subId;
+    document.getElementById('hid-sublevel').value    = '';
+
+    selLvl.innerHTML = '<option value="">— Seleccionar —</option>';
+    selLvl.disabled  = !subId;
+
+    if (!subId) return;
+    document.querySelectorAll('#sel-sublevel-all option').forEach(opt => {
+        if (opt.dataset.parent == subId) selLvl.appendChild(opt.cloneNode(true));
+    });
+    if (selLvl.options.length <= 1) { selLvl.innerHTML = '<option value="">— Sin subniveles —</option>'; selLvl.disabled = true; }
+}
+
+document.getElementById('sel-sublevel').addEventListener('change', function() {
+    document.getElementById('hid-sublevel').value = this.value;
+});
+
+// ── Tipo de acceso ──
+function toggleSourceFields() {
+    const val = document.getElementById('source_type').value;
+    document.getElementById('field-external').style.display = val === 'external' ? '' : 'none';
+    document.getElementById('field-image').style.display    = val === 'local'    ? '' : 'none';
+}
 toggleSourceFields();
 </script>
+
+{{-- Reservorios ocultos para la cascada --}}
+<select id="sel-subcategory-all" class="hidden">
+    @foreach($subcategories as $sub)
+    <option value="{{ $sub->id }}" data-parent="{{ $sub->parent_id }}">{{ $sub->name }}</option>
+    @endforeach
+</select>
+<select id="sel-sublevel-all" class="hidden">
+    @foreach($sublevels as $lvl)
+    <option value="{{ $lvl->id }}" data-parent="{{ $lvl->parent_id }}">{{ $lvl->name }}</option>
+    @endforeach
+</select>
 @endsection
