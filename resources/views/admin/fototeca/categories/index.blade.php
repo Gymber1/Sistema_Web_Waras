@@ -1,71 +1,85 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
-@section('section', 'Fototeca > Categoría')
+@section('section', 'Fototeca > Categorías')
 
 @section('content')
-<div class="p-6 md:p-10 max-w-[1200px] mx-auto">
+<div class="max-w-[900px] mx-auto">
 
     @if(session('success'))
-    <div class="mb-6 px-5 py-3 bg-blue-50 border border-blue-200 text-blue-700 rounded-xl font-semibold text-sm">
+    <div class="mb-5 flex items-center gap-3 px-5 py-3.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-xl text-sm font-medium">
+        <i data-lucide="check-circle" class="w-4 h-4 shrink-0"></i>
         {{ session('success') }}
     </div>
     @endif
 
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Categorías</h1>
-            <p class="text-slate-500 mt-1">Primer nivel de clasificación. Son las categorías principales de la Fototeca.</p>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Categorías</h2>
+            <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mt-1">
+                <span>Fototeca</span>
+                <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                <span class="text-slate-700 dark:text-slate-200">Categorías</span>
+            </div>
         </div>
         <a href="{{ route('admin.fototeca.categories.create') }}"
-            class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all whitespace-nowrap">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            class="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-brand-500/30">
+            <i data-lucide="plus" class="w-4 h-4"></i>
             Agregar Categoría
         </a>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border-t-4 border-blue-500">
-        <div class="p-5 border-b border-slate-100">
-            <span class="text-sm font-bold bg-blue-50 text-blue-700 px-4 py-2 rounded-lg">{{ $categories->count() }} categorías</span>
+    <div class="bulk-wrapper bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border overflow-hidden">
+        <div class="bulk-bar"></div>
+        <div class="p-5 border-b border-slate-100 dark:border-dark-border">
+            <span class="text-sm text-slate-500 dark:text-slate-400">{{ $categories->total() }} categorías</span>
         </div>
-
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-slate-50/80 border-b border-slate-200">
-                        <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Nombre</th>
-                        <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Descripción</th>
-                        <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Acciones</th>
+            <table id="table-foto-categories" class="w-full text-left text-sm">
+                <thead class="bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-200 dark:border-dark-border">
+                    <tr>
+                        <th class="px-4 py-4 w-10"><input type="checkbox" class="row-check check-all"></th>
+                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nombre</th>
+                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Descripción</th>
+                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Acciones</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-slate-100 dark:divide-dark-border">
                     @forelse($categories as $cat)
-                    <tr class="hover:bg-slate-50 group transition-colors">
-                        <td class="py-3 px-6">
-                            <span class="text-sm font-bold text-slate-900">{{ $cat->name }}</span>
-                        </td>
-                        <td class="py-3 px-6 text-sm text-slate-500">{{ $cat->description ?? '—' }}</td>
-                        <td class="py-3 px-6 text-right">
-                            <div class="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100">
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group">
+                        <td class="px-4 py-4"><input type="checkbox" class="row-check" value="{{ $cat->id }}"></td>
+                        <td class="px-6 py-4 font-semibold text-slate-800 dark:text-white">{{ $cat->name }}</td>
+                        <td class="px-6 py-4 text-slate-500 dark:text-slate-400">{{ $cat->description ?? '—' }}</td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-1">
                                 <a href="{{ route('admin.fototeca.categories.edit', $cat) }}"
-                                    class="p-2 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg bg-white border border-slate-100" title="Editar">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    class="p-2 text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg transition-colors" title="Editar">
+                                    <i data-lucide="edit" class="w-4 h-4"></i>
                                 </a>
-                                <form action="{{ route('admin.fototeca.categories.destroy', $cat) }}" method="POST"
-                                    onsubmit="return confirm('¿Eliminar «{{ addslashes($cat->name) }}» y todas sus subcategorías?')">
+                                <form action="{{ route('admin.fototeca.categories.destroy', $cat) }}" method="POST">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg bg-white border border-slate-100">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    <button type="submit"
+                                        onclick="confirmDelete(this.closest('form'), '¿Eliminar «{{ addslashes($cat->name) }}» y todas sus subcategorías?'); return false;"
+                                        class="p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors" title="Eliminar">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
                                     </button>
                                 </form>
                             </div>
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="3" class="py-16 text-center text-slate-400">No hay categorías registradas.</td></tr>
+                    <tr>
+                        <td colspan="4" class="px-6 py-16 text-center">
+                            <div class="flex flex-col items-center gap-3 text-slate-400 dark:text-slate-500">
+                                <i data-lucide="tag" class="w-8 h-8 opacity-30"></i>
+                                <p class="text-sm font-medium">No hay categorías registradas</p>
+                            </div>
+                        </td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
+        <x-admin-pagination :paginator="$categories" />
     </div>
 </div>
 @endsection

@@ -3,66 +3,75 @@
 @section('section', 'Fototeca > Especiales')
 
 @section('content')
-<div class="p-6 md:p-10 max-w-[1400px] mx-auto">
+<div class="max-w-[1400px] mx-auto">
 
-    <div id="toast" class="hidden mb-4 px-5 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl font-semibold text-sm"></div>
-
-    <div class="mb-8">
-        <h1 class="text-3xl font-black text-slate-900 tracking-tight">Gestión de Especiales</h1>
-        <p class="text-slate-500 mt-1">Marca fotografías para destacarlas como "especiales" en el portal público de la Fototeca.</p>
+    {{-- Toast --}}
+    <div id="toast" class="hidden fixed top-5 right-5 z-50 flex items-center gap-3 px-5 py-3.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-xl text-sm font-medium shadow-lg">
+        <i data-lucide="check-circle" class="w-4 h-4 shrink-0"></i>
+        <span id="toast-msg"></span>
     </div>
 
-    {{-- Tabs (preparado para futuros tipos) --}}
-    <div class="flex gap-2 mb-6 border-b border-slate-200">
-        <button id="tab-fotografias"
-            class="px-5 py-2.5 text-sm font-bold rounded-t-xl border-b-2 border-blue-500 text-blue-700 bg-white -mb-px">
-            Fotografías
-            <span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">{{ $photos->where('is_special', true)->count() }} especiales</span>
-        </button>
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Gestión de Especiales</h2>
+            <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mt-1">
+                <span>Fototeca</span>
+                <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                <span class="text-slate-700 dark:text-slate-200">Especiales</span>
+            </div>
+        </div>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 border border-brand-100 dark:border-brand-500/20">
+            <i data-lucide="star" class="w-3.5 h-3.5"></i>
+            {{ $photos->where('is_special', true)->count() }} especiales
+        </span>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border-t-4 border-blue-500">
-        <div class="p-5 border-b border-slate-100 flex justify-between items-center">
-            <span class="text-sm font-bold bg-blue-50 text-blue-700 px-4 py-2 rounded-lg">{{ $photos->count() }} fotografías</span>
-            <input type="text" id="searchInput" placeholder="Buscar fotografía..."
-                oninput="filterTable(this.value)"
-                class="px-4 py-2 text-sm border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-400 w-72">
+    <div class="bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border overflow-hidden">
+        <div class="p-5 border-b border-slate-100 dark:border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <span class="text-sm text-slate-500 dark:text-slate-400">{{ $photos->count() }} fotografías</span>
+            <div class="relative w-full sm:w-80">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="search-input" placeholder="Buscar fotografía..."
+                    class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-slate-800 dark:text-white transition-all">
+            </div>
         </div>
 
         <div class="overflow-x-auto">
-            <table id="photosTable" class="w-full text-left">
-                <thead>
-                    <tr class="bg-slate-50/80 border-b border-slate-200">
-                        <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Miniatura</th>
-                        <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Título</th>
-                        <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Fotógrafo</th>
-                        <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Categoría</th>
-                        <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Especial</th>
+            <table class="w-full text-left text-sm">
+                <thead class="bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-200 dark:border-dark-border">
+                    <tr>
+                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Miniatura</th>
+                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Título</th>
+                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Fotógrafo</th>
+                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Categoría</th>
+                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Especial</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-slate-100 dark:divide-dark-border">
                     @forelse($photos as $photo)
-                    <tr class="hover:bg-slate-50 transition-colors" data-name="{{ strtolower($photo->title) }}">
-                        {{-- Miniatura horizontal --}}
-                        <td class="py-3 px-6">
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors photo-row" data-name="{{ strtolower($photo->title) }}">
+                        <td class="px-6 py-3">
                             @if($photo->thumbnail_url)
-                                <img src="{{ $photo->thumbnail_url }}"
-                                     alt="{{ $photo->title }}"
-                                     class="w-24 h-16 object-cover rounded-lg border border-slate-100">
+                                <img src="{{ $photo->thumbnail_url }}" alt="{{ $photo->title }}"
+                                    class="w-20 h-14 object-cover rounded-lg border border-slate-100 dark:border-slate-700">
                             @else
-                                <div class="w-24 h-16 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 text-xl border border-slate-200">📷</div>
+                                <div class="w-20 h-14 bg-slate-100 dark:bg-slate-700/50 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-600">
+                                    <i data-lucide="image" class="w-5 h-5"></i>
+                                </div>
                             @endif
                         </td>
-                        <td class="py-3 px-6 text-sm font-semibold text-slate-800 max-w-[200px] truncate">{{ $photo->title }}</td>
-                        <td class="py-3 px-6 text-sm text-slate-600">
+                        <td class="px-6 py-3 max-w-[200px]">
+                            <span class="font-semibold text-slate-800 dark:text-white truncate block photo-title">{{ $photo->title }}</span>
+                        </td>
+                        <td class="px-6 py-3 text-slate-600 dark:text-slate-300">
                             {{ $photo->photographers->first()?->full_name ?? '—' }}
                         </td>
-                        <td class="py-3 px-6 text-sm text-slate-600">
+                        <td class="px-6 py-3 text-slate-600 dark:text-slate-300">
                             {{ $photo->categories->first()?->name ?? '—' }}
                         </td>
-                        <td class="py-3 px-6 text-center">
+                        <td class="px-6 py-3 text-center">
                             <button type="button"
-                                class="toggle-btn relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none {{ $photo->is_special ? 'bg-blue-500' : 'bg-slate-200' }}"
+                                class="toggle-btn relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/50 {{ $photo->is_special ? 'bg-brand-500' : 'bg-slate-200 dark:bg-slate-600' }}"
                                 data-id="{{ $photo->id }}"
                                 data-state="{{ $photo->is_special ? '1' : '0' }}"
                                 data-url="{{ route('admin.fototeca.specials.toggle', $photo) }}"
@@ -72,7 +81,14 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="5" class="py-16 text-center text-slate-400">No hay fotografías registradas.</td></tr>
+                    <tr>
+                        <td colspan="5" class="px-6 py-16 text-center">
+                            <div class="flex flex-col items-center gap-3 text-slate-400 dark:text-slate-500">
+                                <i data-lucide="camera" class="w-10 h-10 opacity-30"></i>
+                                <p class="text-sm font-medium">No hay fotografías registradas</p>
+                            </div>
+                        </td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>
@@ -81,24 +97,25 @@
 </div>
 
 <script>
-function filterTable(q) {
-    document.querySelectorAll('#photosTable tbody tr[data-name]').forEach(row => {
-        row.style.display = row.dataset.name.includes(q.toLowerCase()) ? '' : 'none';
+document.getElementById('search-input').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.photo-row').forEach(row => {
+        row.style.display = row.querySelector('.photo-title').textContent.toLowerCase().includes(q) ? '' : 'none';
     });
-}
+});
 
 const csrfToken = '{{ csrf_token() }}';
 
 document.querySelectorAll('.toggle-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-        const url   = this.dataset.url;
-        const knob  = this.querySelector('.toggle-knob');
-        const isOn  = this.dataset.state === '1';
+        const url  = this.dataset.url;
+        const knob = this.querySelector('.toggle-knob');
+        const isOn = this.dataset.state === '1';
 
-        // Optimistic update
         this.dataset.state = isOn ? '0' : '1';
-        this.classList.toggle('bg-blue-500', !isOn);
+        this.classList.toggle('bg-brand-500', !isOn);
         this.classList.toggle('bg-slate-200', isOn);
+        this.classList.toggle('dark:bg-slate-600', isOn);
         knob.classList.toggle('translate-x-6', !isOn);
         knob.classList.toggle('translate-x-1', isOn);
 
@@ -113,16 +130,17 @@ document.querySelectorAll('.toggle-btn').forEach(btn => {
         .then(r => r.json())
         .then(data => {
             const toast = document.getElementById('toast');
-            toast.textContent = data.is_special ? '✓ Marcada como especial' : '✓ Desmarcada como especial';
+            const msg   = document.getElementById('toast-msg');
+            msg.textContent = data.is_special ? 'Marcada como especial' : 'Desmarcada como especial';
             toast.classList.remove('hidden');
             clearTimeout(window._toastTimer);
             window._toastTimer = setTimeout(() => toast.classList.add('hidden'), 2500);
         })
         .catch(() => {
-            // Revert on error
             this.dataset.state = isOn ? '1' : '0';
-            this.classList.toggle('bg-blue-500', isOn);
+            this.classList.toggle('bg-brand-500', isOn);
             this.classList.toggle('bg-slate-200', !isOn);
+            this.classList.toggle('dark:bg-slate-600', !isOn);
             knob.classList.toggle('translate-x-6', isOn);
             knob.classList.toggle('translate-x-1', !isOn);
         });

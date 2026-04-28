@@ -4,183 +4,107 @@
 @section('section', 'Biblioteca Digital')
 
 @section('content')
-<div class="p-6 md:p-10 max-w-7xl mx-auto">
+<div class="max-w-[1400px] mx-auto">
 
-    {{-- Encabezado del módulo --}}
-    <div class="bg-white rounded-2xl border border-emerald-200 p-8 mb-8 shadow-sm relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-emerald-50 to-transparent -z-0 rounded-2xl"></div>
-        <div class="relative z-10">
-            <div class="flex items-start gap-5 mb-6">
-                <div class="p-4 rounded-2xl bg-emerald-100 shadow-inner shrink-0">
-                    <span class="text-4xl">📚</span>
-                </div>
-                <div>
-                    <div class="flex items-center gap-3 mb-1">
-                        <h1 class="text-3xl font-black text-slate-900">Biblioteca Digital</h1>
-                        <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">✓ Operativo</span>
-                    </div>
-                    <p class="text-slate-500 text-sm font-medium">Centro de Control del Módulo · WARAS Admin Panel</p>
-                </div>
-            </div>
-
-            <div class="prose prose-sm max-w-none text-slate-600 leading-relaxed space-y-3">
-                <p>
-                    La <strong class="text-slate-800">Biblioteca Digital WARAS</strong> es el repositorio central de documentos bibliográficos de la región Ancash.
-                    Su misión es preservar, organizar y democratizar el acceso al patrimonio cultural escrito — libros, revistas, publicaciones especiales —
-                    de autores ancashinos y obras relacionadas con la región.
-                </p>
-                <p>
-                    Desde este panel puedes gestionar el catálogo completo: registrar nuevos títulos con sus metadatos, administrar autores y editoriales,
-                    organizar el árbol de categorías y subcategorías, y publicar ediciones especiales. Todos los cambios se reflejan en tiempo real
-                    en el sitio público de la Biblioteca.
-                </p>
-            </div>
+    {{-- Header --}}
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Biblioteca Digital</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Centro de control del módulo · WARAS Admin Panel</p>
         </div>
+        <a href="{{ route('biblioteca.dashboard') }}" target="_blank"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+            <i data-lucide="external-link" class="w-4 h-4"></i>
+            Ver sitio público
+        </a>
     </div>
 
     {{-- Métricas rápidas --}}
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
         @php
         $metrics = [
-            ['label' => 'Libros', 'value' => $stats['books'], 'color' => 'emerald', 'icon' => '📖'],
-            ['label' => 'Revistas', 'value' => $stats['magazines'], 'color' => 'teal', 'icon' => '📰'],
-            ['label' => 'Autores', 'value' => $stats['authors'], 'color' => 'green', 'icon' => '✍️'],
-            ['label' => 'Categorías', 'value' => $stats['categories'], 'color' => 'emerald', 'icon' => '🏷️'],
-            ['label' => 'Editoriales', 'value' => $stats['publishers'], 'color' => 'teal', 'icon' => '🏢'],
-            ['label' => 'Especiales', 'value' => $stats['specials'], 'color' => 'green', 'icon' => '⭐'],
+            ['label' => 'Libros',       'value' => $stats['books'],      'icon' => 'book-open',  'color' => 'indigo'],
+            ['label' => 'Revistas',     'value' => $stats['magazines'],  'icon' => 'newspaper',  'color' => 'sky'],
+            ['label' => 'Autores',      'value' => $stats['authors'],    'icon' => 'users',      'color' => 'emerald'],
+            ['label' => 'Categorías',   'value' => $stats['categories'], 'icon' => 'tag',        'color' => 'violet'],
+            ['label' => 'Editoriales',  'value' => $stats['publishers'], 'icon' => 'building-2', 'color' => 'amber'],
+            ['label' => 'Especiales',   'value' => $stats['specials'],   'icon' => 'star',       'color' => 'rose'],
+        ];
+        $colorMap = [
+            'indigo'  => ['bg' => 'bg-indigo-50 dark:bg-indigo-500/10',  'text' => 'text-indigo-500 dark:text-indigo-400'],
+            'sky'     => ['bg' => 'bg-sky-50 dark:bg-sky-500/10',        'text' => 'text-sky-500 dark:text-sky-400'],
+            'emerald' => ['bg' => 'bg-emerald-50 dark:bg-emerald-500/10','text' => 'text-emerald-500 dark:text-emerald-400'],
+            'violet'  => ['bg' => 'bg-violet-50 dark:bg-violet-500/10',  'text' => 'text-violet-500 dark:text-violet-400'],
+            'amber'   => ['bg' => 'bg-amber-50 dark:bg-amber-500/10',    'text' => 'text-amber-500 dark:text-amber-400'],
+            'rose'    => ['bg' => 'bg-rose-50 dark:bg-rose-500/10',      'text' => 'text-rose-500 dark:text-rose-400'],
         ];
         @endphp
         @foreach($metrics as $m)
-        <div class="bg-white rounded-xl border border-slate-100 p-4 flex flex-col items-center text-center shadow-sm">
-            <span class="text-2xl mb-1">{{ $m['icon'] }}</span>
-            <span class="text-2xl font-black text-slate-800">{{ $m['value'] }}</span>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{{ $m['label'] }}</span>
+        @php $c = $colorMap[$m['color']]; @endphp
+        <div class="bg-white dark:bg-dark-surface rounded-xl p-4 shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border flex flex-col items-center text-center gap-2">
+            <div class="w-9 h-9 rounded-lg {{ $c['bg'] }} flex items-center justify-center {{ $c['text'] }}">
+                <i data-lucide="{{ $m['icon'] }}" class="w-4.5 h-4.5"></i>
+            </div>
+            <span class="text-2xl font-bold text-slate-800 dark:text-white">{{ $m['value'] }}</span>
+            <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{{ $m['label'] }}</span>
         </div>
         @endforeach
     </div>
 
     {{-- Acciones de gestión --}}
-    <h2 class="text-lg font-black text-slate-700 uppercase tracking-widest mb-4 px-1">Gestión del Módulo</h2>
+    <div class="mb-4">
+        <h3 class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Gestión del módulo</h3>
+    </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
-        {{-- Libros --}}
-        <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all">
-            <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">📖</span>
-                <div>
-                    <h3 class="font-black text-slate-800">Libros</h3>
-                    <p class="text-xs text-slate-400">{{ $stats['books'] }} registros</p>
-                </div>
-            </div>
-            <p class="text-sm text-slate-500 mb-4">Gestiona el catálogo principal de libros: títulos, portadas, PDFs, ISBNs, autores y categorías asociadas.</p>
-            <a href="{{ route('admin.biblioteca.books') }}" class="block w-full text-center py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
-                Administrar Libros
-            </a>
-        </div>
+        @php
+        $sections = [
+            ['title' => 'Libros',               'desc' => 'Gestiona el catálogo principal: títulos, portadas, PDFs, ISBNs, autores y categorías.',    'icon' => 'book-open',   'color' => 'indigo',  'route' => 'admin.biblioteca.books',          'count' => $stats['books'],      'label' => 'Administrar Libros'],
+            ['title' => 'Revistas',             'desc' => 'Administra publicaciones periódicas: números, volúmenes y archivos digitales.',             'icon' => 'newspaper',   'color' => 'sky',     'route' => 'admin.biblioteca.magazines',      'count' => $stats['magazines'],  'label' => 'Administrar Revistas'],
+            ['title' => 'Autores',              'desc' => 'Registra y edita perfiles de autores: biografías, fotografías y libros vinculados.',        'icon' => 'users',       'color' => 'emerald', 'route' => 'admin.biblioteca.authors',        'count' => $stats['authors'],    'label' => 'Administrar Autores'],
+            ['title' => 'Categorías',           'desc' => 'Crea y edita las categorías principales del catálogo (nivel 1).',                          'icon' => 'tag',         'color' => 'violet',  'route' => 'admin.biblioteca.categories',     'count' => null,                 'label' => 'Administrar Categorías'],
+            ['title' => 'SubCategorías',        'desc' => 'Gestiona las subcategorías asociadas a cada categoría padre (nivel 2).',                   'icon' => 'tags',        'color' => 'purple',  'route' => 'admin.biblioteca.subcategories',  'count' => null,                 'label' => 'Administrar SubCategorías'],
+            ['title' => 'Editoriales',          'desc' => 'Registra las editoriales con datos de contacto y logotipos.',                              'icon' => 'building-2',  'color' => 'amber',   'route' => 'admin.biblioteca.publishers',     'count' => $stats['publishers'], 'label' => 'Administrar Editoriales'],
+            ['title' => 'Colecciones Especiales','desc' => 'Crea y edita los nombres de colecciones especiales curadas.',                             'icon' => 'star',        'color' => 'rose',    'route' => 'admin.biblioteca.specials',       'count' => $stats['specials'],   'label' => 'Administrar Especiales'],
+            ['title' => 'Asignar a Especiales', 'desc' => 'Vincula libros o revistas existentes a las colecciones especiales.',                       'icon' => 'link',        'color' => 'slate',   'route' => 'admin.biblioteca.specials.assign-books', 'count' => null,        'label' => 'Asignar Contenido'],
+        ];
+        $sectionColorMap = [
+            'indigo'  => ['icon_bg' => 'bg-indigo-50 dark:bg-indigo-500/10',   'icon_text' => 'text-indigo-500 dark:text-indigo-400',  'btn' => 'bg-brand-500 hover:bg-brand-600 shadow-brand-500/30'],
+            'sky'     => ['icon_bg' => 'bg-sky-50 dark:bg-sky-500/10',         'icon_text' => 'text-sky-500 dark:text-sky-400',        'btn' => 'bg-sky-500 hover:bg-sky-600 shadow-sky-500/30'],
+            'emerald' => ['icon_bg' => 'bg-emerald-50 dark:bg-emerald-500/10', 'icon_text' => 'text-emerald-500 dark:text-emerald-400','btn' => 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/30'],
+            'violet'  => ['icon_bg' => 'bg-violet-50 dark:bg-violet-500/10',   'icon_text' => 'text-violet-500 dark:text-violet-400',  'btn' => 'bg-violet-500 hover:bg-violet-600 shadow-violet-500/30'],
+            'purple'  => ['icon_bg' => 'bg-purple-50 dark:bg-purple-500/10',   'icon_text' => 'text-purple-500 dark:text-purple-400',  'btn' => 'bg-purple-500 hover:bg-purple-600 shadow-purple-500/30'],
+            'amber'   => ['icon_bg' => 'bg-amber-50 dark:bg-amber-500/10',     'icon_text' => 'text-amber-500 dark:text-amber-400',    'btn' => 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/30'],
+            'rose'    => ['icon_bg' => 'bg-rose-50 dark:bg-rose-500/10',       'icon_text' => 'text-rose-500 dark:text-rose-400',      'btn' => 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/30'],
+            'slate'   => ['icon_bg' => 'bg-slate-100 dark:bg-slate-700/40',    'icon_text' => 'text-slate-500 dark:text-slate-400',    'btn' => 'bg-slate-600 hover:bg-slate-700 shadow-slate-500/20'],
+        ];
+        @endphp
 
-        {{-- Revistas --}}
-        <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all">
-            <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">📰</span>
-                <div>
-                    <h3 class="font-black text-slate-800">Revistas</h3>
-                    <p class="text-xs text-slate-400">{{ $stats['magazines'] }} registros</p>
+        @foreach($sections as $sec)
+        @php $sc = $sectionColorMap[$sec['color']]; @endphp
+        <div class="bg-white dark:bg-dark-surface rounded-xl p-6 shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border flex flex-col gap-4">
+            <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-lg {{ $sc['icon_bg'] }} flex items-center justify-center {{ $sc['icon_text'] }} flex-shrink-0">
+                    <i data-lucide="{{ $sec['icon'] }}" class="w-5 h-5"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                        <h3 class="font-semibold text-slate-800 dark:text-white text-sm">{{ $sec['title'] }}</h3>
+                        @if($sec['count'] !== null)
+                        <span class="text-xs text-slate-400 dark:text-slate-500">{{ $sec['count'] }} registros</span>
+                        @endif
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{{ $sec['desc'] }}</p>
                 </div>
             </div>
-            <p class="text-sm text-slate-500 mb-4">Administra publicaciones periódicas: números, volúmenes, fechas de edición y archivos digitales asociados.</p>
-            <a href="{{ route('admin.biblioteca.magazines') }}" class="block w-full text-center py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
-                Administrar Revistas
+            <a href="{{ route($sec['route']) }}"
+                class="mt-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white shadow-lg {{ $sc['btn'] }} transition-colors">
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                {{ $sec['label'] }}
             </a>
         </div>
-
-        {{-- Autores --}}
-        <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all">
-            <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">✍️</span>
-                <div>
-                    <h3 class="font-black text-slate-800">Autores</h3>
-                    <p class="text-xs text-slate-400">{{ $stats['authors'] }} registros</p>
-                </div>
-            </div>
-            <p class="text-sm text-slate-500 mb-4">Registra y edita los perfiles de autores: biografías, fotografías y su vínculo con los títulos del catálogo.</p>
-            <a href="{{ route('admin.biblioteca.authors') }}" class="block w-full text-center py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
-                Administrar Autores
-            </a>
-        </div>
-
-        {{-- Categorías --}}
-        <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all">
-            <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">🏷️</span>
-                <div>
-                    <h3 class="font-black text-slate-800">Categorías</h3>
-                    <p class="text-xs text-slate-400">Nivel superior de clasificación</p>
-                </div>
-            </div>
-            <p class="text-sm text-slate-500 mb-4">Crea y edita las categorías principales del catálogo (nivel 1).</p>
-            <a href="{{ route('admin.biblioteca.categories') }}" class="block w-full text-center py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
-                Administrar Categorías
-            </a>
-        </div>
-
-        {{-- SubCategorías --}}
-        <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all">
-            <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">🔖</span>
-                <div>
-                    <h3 class="font-black text-slate-800">SubCategorías</h3>
-                    <p class="text-xs text-slate-400">Segundo nivel de clasificación</p>
-                </div>
-            </div>
-            <p class="text-sm text-slate-500 mb-4">Gestiona las subcategorías asociadas a cada categoría padre (nivel 2).</p>
-            <a href="{{ route('admin.biblioteca.subcategories') }}" class="block w-full text-center py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
-                Administrar SubCategorías
-            </a>
-        </div>
-
-        {{-- Especiales --}}
-        <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all">
-            <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">⭐</span>
-                <div>
-                    <h3 class="font-black text-slate-800">Especiales</h3>
-                    <p class="text-xs text-slate-400">{{ $stats['specials'] }} colecciones</p>
-                </div>
-            </div>
-            <p class="text-sm text-slate-500 mb-4">Crea y edita los nombres y grupos de colecciones especiales curadas.</p>
-            <a href="{{ route('admin.biblioteca.specials') }}" class="block w-full text-center py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
-                Administrar Especiales
-            </a>
-        </div>
-
-        {{-- Agregar libro a Especiales --}}
-        <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all">
-            <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">📌</span>
-                <div>
-                    <h3 class="font-black text-slate-800">Agregar libro a Especiales</h3>
-                    <p class="text-xs text-slate-400">Vincular libros a colecciones</p>
-                </div>
-            </div>
-            <p class="text-sm text-slate-500 mb-4">Vincula libros existentes a los grupos de colecciones especiales creados previamente.</p>
-            <a href="{{ route('admin.biblioteca.specials.assign-books') }}" class="block w-full text-center py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
-                Asignar Libros
-            </a>
-        </div>
+        @endforeach
 
     </div>
-
-    {{-- Enlace al sitio público --}}
-    <div class="mt-8 p-5 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between">
-        <div>
-            <p class="text-sm font-bold text-slate-700">Vista del sitio público</p>
-            <p class="text-xs text-slate-400 mt-0.5">Verifica cómo se ve la Biblioteca para los visitantes</p>
-        </div>
-        <a href="{{ route('biblioteca.dashboard') }}" target="_blank"
-           class="text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-5 py-2.5 rounded-xl hover:bg-emerald-100 transition-colors">
-            Ver Biblioteca Pública →
-        </a>
-    </div>
-
 </div>
 @endsection

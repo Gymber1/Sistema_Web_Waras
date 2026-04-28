@@ -6,21 +6,20 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // Ejecutar en orden correcto para evitar problemas de integridad referencial
         $this->call([
-            ModuleSeeder::class,          // 1. Crear módulos primero
-            UserSeeder::class,            // 2. Crear usuarios (admin, moderadores)
-            CategorySeeder::class,        // 3. Crear categorías (reutilizables en todos los módulos)
-            PublisherSeeder::class,       // 4. Crear editoriales para libros
-            AuthorSeeder::class,          // 5. Crear autores
-            BookSeeder::class,            // 6. Crear libros con relaciones
-            PhotographerSeeder::class,    // 7. Crear fotógrafos
-            PhotoSeeder::class,           // 8. Crear fotos con relaciones
+            ModuleSeeder::class,       // 1. Módulos del sistema
+            UserSeeder::class,         // 2. Admin global + moderadores
+            CategorySeeder::class,     // 3. Categorías reales de Biblioteca y Fototeca
+            PhotoTagSeeder::class,     // 4. Etiquetas de la Fototeca
+            SpecialSeeder::class,      // 5. Colecciones especiales
+            PublisherSeeder::class,    // 6. Editoriales
+            AuthorSeeder::class,       // 7. Autores
+            BookSeeder::class,         // 8. Libros con relaciones
+            PhotographerSeeder::class, // 9. Fotógrafos
+            PhotoSeeder::class,        // 10. Fotografías con relaciones
+            SiteSettingSeeder::class,  // 11. Configuración inicial del sitio
         ]);
     }
 }

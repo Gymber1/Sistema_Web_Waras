@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 
 class BibliotecaController extends Controller
 {
-    // ============= DASHBOARD DEL MÓDULO =============
+    // ============= DASHBOARD DEL MÃ“DULO =============
 
     public function adminIndex()
     {
@@ -36,7 +36,7 @@ class BibliotecaController extends Controller
     {
         $books = Book::where('document_type', '!=', 'Revista')
             ->with(['authors', 'publisher', 'categories'])
-            ->get();
+            ->paginate(10);
         $authors    = Author::orderBy('name')->get();
         $categories = Category::where('type', 'biblioteca')
             ->whereNull('parent_id')
@@ -60,7 +60,7 @@ class BibliotecaController extends Controller
             'title'            => 'required|string|max:255',
             'authors'          => 'nullable|array',
             'authors.*'        => 'exists:authors,id',
-            'document_type'    => 'required|in:Libro,Revista,Artículo,Tesis',
+            'document_type'    => 'required|in:Libro,Revista,ArtÃ­culo,Tesis',
             'section'          => 'required|in:Biblioteca Digital,Waras Editorial',
             'category_id'      => 'nullable|exists:categories,id',
             'subcategory_id'   => 'nullable|exists:categories,id',
@@ -113,7 +113,7 @@ class BibliotecaController extends Controller
             'title'            => 'required|string|max:255',
             'authors'          => 'nullable|array',
             'authors.*'        => 'exists:authors,id',
-            'document_type'    => 'required|in:Libro,Revista,Artículo,Tesis',
+            'document_type'    => 'required|in:Libro,Revista,ArtÃ­culo,Tesis',
             'section'          => 'required|in:Biblioteca Digital,Waras Editorial',
             'category_id'      => 'nullable|exists:categories,id',
             'subcategory_id'   => 'nullable|exists:categories,id',
@@ -178,7 +178,7 @@ class BibliotecaController extends Controller
 
     public function indexAuthors()
     {
-        $authors    = Author::withCount('books')->get();
+        $authors    = Author::withCount('books')->paginate(10);
         $books      = Book::orderBy('title')->get(['id', 'title', 'document_type']);
         $categories = Category::where('type', 'biblioteca')->whereNull('parent_id')->get();
         return view('admin.biblioteca.authors.index', compact('authors', 'books', 'categories'));
@@ -268,7 +268,7 @@ class BibliotecaController extends Controller
 
     public function indexPublishers()
     {
-        $publishers = Publisher::withCount('books')->get();
+        $publishers = Publisher::withCount('books')->paginate(10);
         $books      = Book::orderBy('title')->get(['id', 'title', 'document_type']);
         return view('admin.biblioteca.publishers.index', compact('publishers', 'books'));
     }
@@ -346,14 +346,14 @@ class BibliotecaController extends Controller
         return redirect()->route('admin.biblioteca.publishers')->with('success', 'Editorial eliminada.');
     }
 
-    // ============= CATEGORÍAS =============
+    // ============= CATEGORÃAS =============
 
     public function indexCategories()
     {
         $allCategories = Category::where('type', 'biblioteca')
             ->whereNull('parent_id')
             ->orderBy('name')
-            ->get();
+            ->paginate(10);
         return view('admin.biblioteca.categories.index', compact('allCategories'));
     }
 
@@ -373,7 +373,7 @@ class BibliotecaController extends Controller
             'parent_id' => null,
         ]);
 
-        return redirect()->route('admin.biblioteca.categories')->with('success', 'Categoría agregada correctamente.');
+        return redirect()->route('admin.biblioteca.categories')->with('success', 'CategorÃ­a agregada correctamente.');
     }
 
     public function updateCategory(Request $request, Category $category)
@@ -382,7 +382,7 @@ class BibliotecaController extends Controller
 
         $category->update(['name' => $request->name]);
 
-        return redirect()->route('admin.biblioteca.categories')->with('success', 'Categoría actualizada correctamente.');
+        return redirect()->route('admin.biblioteca.categories')->with('success', 'CategorÃ­a actualizada correctamente.');
     }
 
     public function editCategory(Category $category)
@@ -393,10 +393,10 @@ class BibliotecaController extends Controller
     public function destroyCategory(Category $category)
     {
         $category->delete();
-        return redirect()->route('admin.biblioteca.categories')->with('success', 'Categoría eliminada.');
+        return redirect()->route('admin.biblioteca.categories')->with('success', 'CategorÃ­a eliminada.');
     }
 
-    // ============= SUBCATEGORÍAS =============
+    // ============= SUBCATEGORÃAS =============
 
     public function createSubcategory()
     {
@@ -421,7 +421,7 @@ class BibliotecaController extends Controller
             'parent_id' => $request->parent_id,
         ]);
 
-        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'Subcategoría agregada correctamente.');
+        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'SubcategorÃ­a agregada correctamente.');
     }
 
     public function editSubcategory(Category $category)
@@ -446,13 +446,13 @@ class BibliotecaController extends Controller
             'parent_id' => $request->parent_id,
         ]);
 
-        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'Subcategoría actualizada correctamente.');
+        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'SubcategorÃ­a actualizada correctamente.');
     }
 
     public function destroySubcategory(Category $category)
     {
         $category->delete();
-        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'Subcategoría eliminada.');
+        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'SubcategorÃ­a eliminada.');
     }
 
     // ============= REVISTAS =============
@@ -461,7 +461,7 @@ class BibliotecaController extends Controller
     {
         $magazines  = Book::where('document_type', 'Revista')
             ->with(['authors', 'publisher', 'categories'])
-            ->get();
+            ->paginate(10);
         $authors    = Author::orderBy('name')->get();
         $categories = Category::where('type', 'biblioteca')
             ->whereNull('parent_id')
@@ -485,8 +485,7 @@ class BibliotecaController extends Controller
             'title'            => 'required|string|max:255',
             'authors'          => 'nullable|array',
             'authors.*'        => 'exists:authors,id',
-            'document_type'    => 'required|in:Libro,Revista,Artículo,Tesis',
-            'section'          => 'required|in:Biblioteca Digital,Waras Editorial',
+            'document_type'    => 'required|in:Libro,Revista,ArtÃ­culo,Tesis',
             'category_id'      => 'nullable|exists:categories,id',
             'subcategory_id'   => 'nullable|exists:categories,id',
             'publication_date' => 'nullable|date',
@@ -506,7 +505,7 @@ class BibliotecaController extends Controller
             'title'            => $request->title,
             'slug'             => $this->uniqueSlug($request->title, Book::class),
             'document_type'    => $request->document_type,
-            'section'          => $request->section,
+            'section'          => 'Revistas',
             'publication_date' => $request->publication_date,
             'pages'            => $request->pages,
             'summary'          => $request->summary,
@@ -538,7 +537,7 @@ class BibliotecaController extends Controller
             'title'            => 'required|string|max:255',
             'authors'          => 'nullable|array',
             'authors.*'        => 'exists:authors,id',
-            'document_type'    => 'required|in:Libro,Revista,Artículo,Tesis',
+            'document_type'    => 'required|in:Libro,Revista,ArtÃ­culo,Tesis',
             'section'          => 'required|in:Biblioteca Digital,Waras Editorial',
             'category_id'      => 'nullable|exists:categories,id',
             'subcategory_id'   => 'nullable|exists:categories,id',
@@ -558,7 +557,7 @@ class BibliotecaController extends Controller
         $data = [
             'title'            => $request->title,
             'document_type'    => $request->document_type,
-            'section'          => $request->section,
+            'section'          => 'Revistas',
             'publication_date' => $request->publication_date,
             'pages'            => $request->pages,
             'summary'          => $request->summary,
@@ -603,7 +602,7 @@ class BibliotecaController extends Controller
 
     public function indexDescriptors()
     {
-        $descriptors = Descriptor::withCount('books')->orderBy('name')->get();
+        $descriptors = Descriptor::withCount('books')->orderBy('name')->paginate(10);
         return view('admin.biblioteca.descriptors.index', compact('descriptors'));
     }
 
@@ -625,7 +624,7 @@ class BibliotecaController extends Controller
         return back()->with('success', 'Descriptor eliminado.');
     }
 
-    // ============= SUBCATEGORÍAS =============
+    // ============= SUBCATEGORÃAS =============
 
     public function indexSubcategories()
     {
@@ -634,7 +633,7 @@ class BibliotecaController extends Controller
             ->with('parent')
             ->orderBy('parent_id')
             ->orderBy('name')
-            ->get();
+            ->paginate(10);
         return view('admin.biblioteca.subcategories.index', compact('subcategories'));
     }
 
@@ -642,7 +641,7 @@ class BibliotecaController extends Controller
 
     public function indexSpecials()
     {
-        $specials = Special::withCount('books')->orderBy('order')->orderBy('title')->get();
+        $specials = Special::withCount('books')->orderBy('order')->orderBy('title')->paginate(10);
         return view('admin.biblioteca.specials.index', compact('specials'));
     }
 
@@ -670,7 +669,7 @@ class BibliotecaController extends Controller
         }
 
         Special::create($data);
-        return redirect()->route('admin.biblioteca.specials')->with('success', 'Colección especial creada correctamente.');
+        return redirect()->route('admin.biblioteca.specials')->with('success', 'ColecciÃ³n especial creada correctamente.');
     }
 
     public function editSpecial(Special $special)
@@ -695,13 +694,13 @@ class BibliotecaController extends Controller
         }
 
         $special->update($data);
-        return redirect()->route('admin.biblioteca.specials')->with('success', 'Colección especial actualizada.');
+        return redirect()->route('admin.biblioteca.specials')->with('success', 'ColecciÃ³n especial actualizada.');
     }
 
     public function destroySpecial(Special $special)
     {
         $special->delete();
-        return redirect()->route('admin.biblioteca.specials')->with('success', 'Colección eliminada.');
+        return redirect()->route('admin.biblioteca.specials')->with('success', 'ColecciÃ³n eliminada.');
     }
 
     public function assignBooksIndex()
@@ -731,7 +730,7 @@ class BibliotecaController extends Controller
             $book = Book::find($request->book_id);
             return response()->json(['success' => true, 'title' => $book->title, 'book_id' => $book->id]);
         }
-        return back()->with('success', 'Elemento agregado a la colección.');
+        return back()->with('success', 'Elemento agregado a la colecciÃ³n.');
     }
 
     public function unassignBook(Special $special, Book $book)
@@ -741,7 +740,110 @@ class BibliotecaController extends Controller
         if (request()->expectsJson()) {
             return response()->json(['success' => true]);
         }
-        return back()->with('success', 'Elemento quitado de la colección.');
+        return back()->with('success', 'Elemento quitado de la colecciÃ³n.');
+    }
+
+    public function clearSpecial(Special $special)
+    {
+        $special->books()->detach();
+        return redirect()->route('admin.biblioteca.specials.edit', $special)
+            ->with('success', 'Todos los elementos han sido quitados de la colecciÃ³n.');
+    }
+
+    public function destroySpecialCover(Special $special)
+    {
+        if ($special->cover_image_path) {
+            \Storage::disk('public')->delete($special->cover_image_path);
+            $special->update(['cover_image_path' => null]);
+        }
+        return redirect()->route('admin.biblioteca.specials.edit', $special)
+            ->with('success', 'Imagen de portada eliminada.');
+    }
+
+    // ============= BULK DELETE =============
+
+    public function bulkDestroyBooks(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Book::whereIn('id', $ids)->where('type', 'libro')->each(function($b) {
+            if ($b->cover_image_path) \Storage::disk('public')->delete($b->cover_image_path);
+            $b->delete();
+        });
+        return back()->with('success', count($ids) . ' libro(s) eliminado(s).');
+    }
+
+    public function bulkDestroyMagazines(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Book::whereIn('id', $ids)->where('type', 'revista')->each(function($b) {
+            if ($b->cover_image_path) \Storage::disk('public')->delete($b->cover_image_path);
+            $b->delete();
+        });
+        return back()->with('success', count($ids) . ' revista(s) eliminada(s).');
+    }
+
+    public function bulkDestroyAuthors(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Author::whereIn('id', $ids)->each(function($a) {
+            if ($a->photo_path) \Storage::disk('public')->delete($a->photo_path);
+            $a->delete();
+        });
+        return back()->with('success', count($ids) . ' autor(es) eliminado(s).');
+    }
+
+    public function bulkDestroyPublishers(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Publisher::whereIn('id', $ids)->each(function($p) {
+            if ($p->logo_path) \Storage::disk('public')->delete($p->logo_path);
+            $p->delete();
+        });
+        return back()->with('success', count($ids) . ' editorial(es) eliminada(s).');
+    }
+
+    public function bulkDestroyCategories(Request $request)
+    {
+        $ids     = array_filter(explode(',', $request->input('ids', '')));
+        $cascade = $request->boolean('cascade');
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        foreach ($ids as $id) {
+            $cat = Category::where('type', 'biblioteca')->whereNull('parent_id')->find($id);
+            if (!$cat) continue;
+            if ($cascade) {
+                // delete all subcategories (level 2) and their children (level 3)
+                foreach ($cat->subcategories as $sub) {
+                    Category::where('parent_id', $sub->id)->delete();
+                    $sub->delete();
+                }
+            }
+            $cat->delete();
+        }
+        return back()->with('success', count($ids) . ' categorÃ­a(s) eliminada(s).');
+    }
+
+    public function bulkDestroySubcategories(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Category::whereIn('id', $ids)->where('type', 'biblioteca')->whereNotNull('parent_id')->delete();
+        return back()->with('success', count($ids) . ' subcategorÃ­a(s) eliminada(s).');
+    }
+
+    public function bulkDestroySpecials(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Special::whereIn('id', $ids)->each(function($s) {
+            if ($s->cover_image_path) \Storage::disk('public')->delete($s->cover_image_path);
+            $s->books()->detach();
+            $s->delete();
+        });
+        return back()->with('success', count($ids) . ' colecciÃ³n(es) eliminada(s).');
     }
 
     // ============= HELPERS =============

@@ -34,22 +34,24 @@ html,body{font-family:'Poppins',sans-serif;color:#333;line-height:1.6;background
 .breadcrumb-current{color:var(--accent);font-weight:600}
 
 /* Hero */
-.hero-card{background:white;border-radius:1rem;border:1px solid #e2e8f0;overflow:hidden;margin-bottom:2.5rem;display:flex;gap:0}
-.hero-cover-wrap{flex-shrink:0;width:240px;min-height:220px;background:linear-gradient(135deg,var(--primary),#2d4a6e);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.hero-card{background:white;border-radius:1.25rem;border:1px solid #e2e8f0;overflow:hidden;margin-bottom:2.5rem;display:flex;flex-direction:row;align-items:stretch;text-align:left}
+.hero-cover-wrap{flex-shrink:0;width:260px;aspect-ratio:1/1;background:linear-gradient(135deg,var(--primary),#2d4a6e);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .hero-cover-wrap img{width:100%;height:100%;object-fit:cover;display:block}
-.hero-cover-placeholder{font-size:4rem;color:rgba(255,255,255,.25)}
-.hero-body{padding:2rem;flex:1}
-.special-badge{display:inline-block;font-size:.7rem;font-weight:800;padding:.25rem .75rem;border-radius:.25rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem}
-.badge-libro{background:#d1fae5;color:#065f46}
-.badge-revista{background:#dbeafe;color:#1e40af}
-.special-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--primary);margin-bottom:.75rem}
-.special-meta{display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:1rem}
-.special-meta-item{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:#6b7280}
-.special-meta-item i{color:var(--accent)}
+.hero-cover-placeholder{font-size:5rem;color:rgba(255,255,255,.2)}
+.hero-body{padding:2rem 2.5rem;flex:1;display:flex;flex-direction:column;justify-content:center}
 @media(max-width:640px){
     .hero-card{flex-direction:column}
-    .hero-cover-wrap{width:100%;height:180px}
+    .hero-cover-wrap{width:100%;aspect-ratio:4/3}
+    .hero-body{text-align:center}
+    .special-meta{justify-content:center}
 }
+.special-badge{display:inline-block;align-self:flex-start;font-size:.7rem;font-weight:800;padding:.3rem .9rem;border-radius:.35rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem}
+.badge-libro{background:#d1fae5;color:#065f46}
+.badge-revista{background:#dbeafe;color:#1e40af}
+.special-title{font-family:'Playfair Display',serif;font-size:2.25rem;font-weight:700;color:var(--primary);margin-bottom:.75rem}
+.special-meta{display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:.75rem}
+.special-meta-item{display:flex;align-items:center;gap:.4rem;font-size:.9rem;color:#6b7280}
+.special-meta-item i{color:var(--accent)}
 
 /* Search bar */
 .search-bar{display:flex;align-items:center;gap:.75rem;background:white;border:2px solid var(--accent);border-radius:.5rem;padding:.6rem 1.25rem;margin-bottom:1.5rem}

@@ -13,7 +13,7 @@ class UserAdminController extends Controller
 {
     public function index()
     {
-        $users = User::with('modules')->get();
+        $users = User::with('modules')->paginate(10);
         $modules = Module::orderBy('name')->get();
         return view('admin.users.index', compact('users', 'modules'));
     }
@@ -106,5 +106,21 @@ class UserAdminController extends Controller
 
         return redirect()->route('admin.usuarios.index')
             ->with('success', 'Contraseña actualizada correctamente.');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        $deleted = 0;
+        foreach ($ids as $id) {
+            $user = User::find($id);
+            if ($user && $user->is_deletable) {
+                $user->modules()->detach();
+                $user->delete();
+                $deleted++;
+            }
+        }
+        return back()->with('success', $deleted . ' usuario(s) eliminado(s).');
     }
 }

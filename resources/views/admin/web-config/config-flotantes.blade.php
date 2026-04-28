@@ -4,80 +4,75 @@
 @section('section', 'Configurar Web')
 
 @section('content')
-<div class="p-8 max-w-4xl mx-auto">
+<div class="max-w-[960px] mx-auto">
 
-    <a href="{{ route('admin.web-config.index') }}"
-       class="inline-flex items-center gap-2 text-slate-500 hover:text-slate-800 text-sm font-medium mb-8 transition-colors">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        Volver a Configuraciones
-    </a>
-
-    <div class="mb-8">
-        <h1 class="text-2xl font-black text-slate-800 tracking-tight">Iconos Flotantes de Contacto</h1>
-        <p class="text-slate-500 text-sm mt-1">Edita los botones flotantes del portal. Yape y WhatsApp son fijos y no se pueden eliminar.</p>
+    <div class="mb-6 flex items-start gap-4">
+        <a href="{{ route('admin.web-config.index') }}"
+            class="mt-0.5 p-2 rounded-lg bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-500 dark:text-slate-400 transition-colors shadow-premium dark:shadow-premium-dark">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        </a>
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Iconos Flotantes de Contacto</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Edita los botones flotantes del portal. Yape y WhatsApp son fijos y no se pueden eliminar.</p>
+        </div>
     </div>
 
     @if(session('success'))
-    <div class="mb-6 flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 px-5 py-4 rounded-xl text-sm font-medium">
-        <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+    <div class="mb-5 flex items-center gap-3 px-5 py-3.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-xl text-sm font-medium">
+        <i data-lucide="check-circle" class="w-4 h-4 shrink-0"></i>
         {{ session('success') }}
     </div>
     @endif
 
     @if($errors->any())
-    <div class="mb-6 bg-red-50 border border-red-200 text-red-800 px-5 py-4 rounded-xl text-sm">
-        <ul class="list-disc list-inside space-y-1">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+    <div class="mb-5 flex items-start gap-3 px-5 py-3.5 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 rounded-xl text-sm">
+        <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i>
+        <ul class="space-y-1">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
     </div>
     @endif
 
-    {{-- ── Botones existentes (cada uno con su propio form) ── --}}
-    <div class="space-y-6 mb-8">
+    {{-- ── Botones existentes ── --}}
+    <div class="space-y-5 mb-6">
     @foreach($buttons as $btn)
     @php
         $isWa   = $btn->slug === 'whatsapp';
         $isYape = $btn->slug === 'yape';
         $waNum  = $isWa ? preg_replace('/^51/', '', $btn->descripcion ?? '') : '';
-
-        $logoSrc = $btn->logo
-            ? asset('storage/' . $btn->logo)
-            : ($isYape ? asset('Yape.png') : ($isWa ? asset('Whatsapp.png') : null));
-
-        $qrSrc = $btn->imagen ? asset('storage/' . $btn->imagen) : null;
-
+        $logoSrc = $btn->logo ? asset('storage/' . $btn->logo) : ($isYape ? asset('Yape.png') : ($isWa ? asset('Whatsapp.png') : null));
+        $qrSrc  = $btn->imagen ? asset('storage/' . $btn->imagen) : null;
         $glowColors  = ['morado'=>'#742364','verde'=>'#128C7E','indigo'=>'#4f46e5','azul'=>'#2563eb','rojo'=>'#dc2626','naranja'=>'#ea580c','amarillo'=>'#ca8a04','rosa'=>'#db2777','cian'=>'#0891b2','blanco'=>'#64748b'];
         $selectedGlow = old("glow_color", $btn->glow_color ?? 'indigo');
     @endphp
 
     <form method="POST" action="{{ route('admin.web-config.floating-btn.update', $btn) }}" enctype="multipart/form-data">
         @csrf
-        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border overflow-hidden">
 
-            {{-- Header --}}
-            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-dark-border bg-slate-50/50 dark:bg-slate-800/20 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     @if($logoSrc)
-                        <img src="{{ $logoSrc }}" alt="{{ $btn->nombre }}" class="w-9 h-9 rounded-full object-cover border border-slate-200">
+                        <img src="{{ $logoSrc }}" alt="{{ $btn->nombre }}" class="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-slate-700">
                     @else
-                        <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-sm font-bold">{{ substr($btn->nombre,0,1) }}</div>
+                        <div class="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 text-sm font-bold">{{ substr($btn->nombre,0,1) }}</div>
                     @endif
                     <div>
-                        <span class="font-bold text-slate-800">{{ $btn->nombre }}</span>
+                        <span class="font-semibold text-slate-800 dark:text-white text-sm">{{ $btn->nombre }}</span>
                         @if($btn->is_default)
-                            <span class="ml-2 text-[10px] font-bold uppercase tracking-wider bg-slate-200 text-slate-500 px-2 py-0.5 rounded-full">Por defecto</span>
+                            <span class="ml-2 text-[10px] font-medium uppercase tracking-wider bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-md">Por defecto</span>
                         @endif
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
                     @if(!$btn->is_default)
                     <button type="button" onclick="deleteFb('del-fb-{{ $btn->id }}')"
-                            class="text-xs text-red-500 hover:text-red-700 font-medium flex items-center gap-1 transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        Eliminar botón
+                            class="inline-flex items-center gap-1.5 text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition-colors">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        Eliminar
                     </button>
                     @endif
                     <button type="submit"
-                            class="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            class="inline-flex items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white font-medium text-xs px-4 py-2 rounded-lg transition-colors shadow-sm shadow-brand-500/30">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
                         Guardar
                     </button>
                 </div>
@@ -85,107 +80,104 @@
 
             <div class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                {{-- ① Logo del botón circular --}}
+                {{-- Logo --}}
                 <div class="flex flex-col gap-2">
                     <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Logo del botón</p>
-                        <p class="text-xs text-slate-400 mt-0.5">Imagen circular que flota en el portal.</p>
+                        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Logo del botón</p>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Imagen circular que flota en el portal.</p>
                     </div>
-                    <div class="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-indigo-400 transition-colors cursor-pointer"
+                    <div class="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-brand-400 dark:hover:border-brand-500 transition-colors cursor-pointer"
                          onclick="document.getElementById('logo-{{ $btn->id }}').click()">
                         <img id="prev-logo-{{ $btn->id }}" src="{{ $logoSrc ?? '' }}"
-                             class="w-20 h-20 object-contain rounded-full border border-slate-200 {{ $logoSrc ? '' : 'hidden' }}">
-                        <div id="logo-ph-{{ $btn->id }}" class="{{ $logoSrc ? 'hidden' : '' }} text-slate-400 text-xs text-center">
-                            <svg class="w-8 h-8 mx-auto mb-1 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                             class="w-20 h-20 object-contain rounded-full border border-slate-200 dark:border-slate-700 {{ $logoSrc ? '' : 'hidden' }}">
+                        <div id="logo-ph-{{ $btn->id }}" class="{{ $logoSrc ? 'hidden' : '' }} text-slate-400 dark:text-slate-500 text-xs text-center">
+                            <i data-lucide="image" class="w-8 h-8 mx-auto mb-1 opacity-40"></i>
                             Sin logo
                         </div>
-                        <span class="text-xs text-slate-400">Clic para cambiar</span>
+                        <span class="text-xs text-slate-400 dark:text-slate-500">Clic para cambiar</span>
                     </div>
                     <input id="logo-{{ $btn->id }}" type="file" name="logo" accept="image/*" class="hidden"
                            onchange="previewFb(this,'prev-logo-{{ $btn->id }}','logo-ph-{{ $btn->id }}')">
-                    {{-- Botón borrar logo (solo si tiene logo personalizado en storage) --}}
                     @if($btn->logo)
                     <button type="button" onclick="deleteImg('del-logo-{{ $btn->id }}')"
-                            class="text-xs text-red-400 hover:text-red-600 font-medium flex items-center justify-center gap-1 mt-1 transition-colors">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            class="text-xs text-red-400 dark:text-red-500 hover:text-red-600 dark:hover:text-red-400 font-medium flex items-center justify-center gap-1 mt-1 transition-colors">
+                        <i data-lucide="x" class="w-3 h-3"></i>
                         Quitar logo personalizado
                     </button>
                     @endif
                 </div>
 
-                {{-- ② QR / imagen del popover --}}
+                {{-- QR/imagen --}}
                 <div class="flex flex-col gap-2">
                     <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                             {{ ($isYape || $isWa) ? 'QR del popover' : 'Imagen del popover' }}
                         </p>
-                        <p class="text-xs text-slate-400 mt-0.5">
+                        <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                             {{ ($isYape || $isWa) ? 'Se muestra al hacer clic en el botón.' : 'Imagen que aparece en el globo de información.' }}
                         </p>
                     </div>
-                    <div class="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-indigo-400 transition-colors cursor-pointer"
+                    <div class="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-brand-400 dark:hover:border-brand-500 transition-colors cursor-pointer"
                          onclick="document.getElementById('qr-{{ $btn->id }}').click()">
                         <img id="prev-qr-{{ $btn->id }}" src="{{ $qrSrc ?? '' }}"
                              class="w-24 h-24 object-contain rounded-lg {{ $qrSrc ? '' : 'hidden' }}">
-                        <div id="qr-ph-{{ $btn->id }}" class="{{ $qrSrc ? 'hidden' : '' }} text-slate-400 text-xs text-center">
-                            <svg class="w-8 h-8 mx-auto mb-1 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                        <div id="qr-ph-{{ $btn->id }}" class="{{ $qrSrc ? 'hidden' : '' }} text-slate-400 dark:text-slate-500 text-xs text-center">
+                            <i data-lucide="qr-code" class="w-8 h-8 mx-auto mb-1 opacity-40"></i>
                             Sin imagen
                         </div>
-                        <span class="text-xs text-slate-400">Clic para cambiar</span>
+                        <span class="text-xs text-slate-400 dark:text-slate-500">Clic para cambiar</span>
                     </div>
                     <input id="qr-{{ $btn->id }}" type="file" name="imagen" accept="image/*" class="hidden"
                            onchange="previewFb(this,'prev-qr-{{ $btn->id }}','qr-ph-{{ $btn->id }}')">
-                    {{-- Botón borrar imagen/QR --}}
                     @if($btn->imagen)
                     <button type="button" onclick="deleteImg('del-img-{{ $btn->id }}')"
-                            class="text-xs text-red-400 hover:text-red-600 font-medium flex items-center justify-center gap-1 mt-1 transition-colors">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            class="text-xs text-red-400 dark:text-red-500 hover:text-red-600 dark:hover:text-red-400 font-medium flex items-center justify-center gap-1 mt-1 transition-colors">
+                        <i data-lucide="x" class="w-3 h-3"></i>
                         Quitar {{ ($isYape || $isWa) ? 'QR' : 'imagen' }}
                     </button>
                     @endif
                 </div>
 
-                {{-- ③ Campos de texto --}}
+                {{-- Campos texto --}}
                 <div class="flex flex-col gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nombre</label>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Nombre</label>
                         <input type="text" name="nombre" value="{{ old('nombre', $btn->nombre) }}"
-                               class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                               class="w-full bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg px-4 py-2.5 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all">
                     </div>
 
                     @if($isWa)
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Número de WhatsApp</label>
-                        <div class="flex items-center border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-green-400">
-                            <span class="px-3 py-2.5 bg-slate-100 text-slate-500 text-sm font-mono border-r border-slate-200 select-none">+51</span>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Número de WhatsApp</label>
+                        <div class="flex items-center border border-slate-300 dark:border-slate-600 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-brand-500/50">
+                            <span class="px-3 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-sm font-mono border-r border-slate-300 dark:border-slate-600 select-none">+51</span>
                             <input type="text" name="whatsapp_number" value="{{ $waNum }}"
                                    placeholder="987654321" maxlength="9" inputmode="numeric"
                                    oninput="this.value=this.value.replace(/\D/g,'')"
-                                   class="flex-1 px-3 py-2.5 text-sm font-mono outline-none bg-white">
+                                   class="flex-1 px-3 py-2.5 text-sm font-mono outline-none bg-white dark:bg-slate-800/50 text-slate-800 dark:text-white">
                         </div>
-                        <p class="text-xs text-slate-400 mt-1">9 dígitos. Se guarda como <code class="bg-slate-100 px-1 rounded">51xxxxxxxxx</code></p>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">9 dígitos. Se guarda como <code class="bg-slate-100 dark:bg-slate-700 px-1 rounded text-slate-600 dark:text-slate-300">51xxxxxxxxx</code></p>
                     </div>
                     @else
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Descripción del popover</label>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Descripción del popover</label>
                         <textarea name="descripcion" rows="3"
-                            class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
+                            class="w-full bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg px-4 py-2.5 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 resize-none transition-all"
                         >{{ old('descripcion', $btn->descripcion) }}</textarea>
                     </div>
                     @endif
 
                     @if(!$isWa && !$isYape)
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Enlace (URL)</label>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Enlace (URL)</label>
                         <input type="text" name="link" value="{{ old('link', $btn->link) }}"
                                placeholder="https://..."
-                               class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                               class="w-full bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg px-4 py-2.5 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all">
                     </div>
                     @endif
 
-                    {{-- Color de brillo --}}
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Color de brillo</label>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Color de brillo</label>
                         <input type="hidden" name="glow_color" id="glow-val-{{ $btn->id }}" value="{{ $selectedGlow }}">
                         <div class="flex flex-wrap gap-2" id="glow-swatches-{{ $btn->id }}">
                             @foreach($glowColors as $colorKey => $colorHex)
@@ -209,84 +201,71 @@
     {{-- ── Agregar nuevo botón ── --}}
     <form method="POST" action="{{ route('admin.web-config.contact.update') }}" enctype="multipart/form-data">
         @csrf
-        <div class="bg-white border-2 border-dashed border-slate-300 rounded-2xl overflow-hidden mb-6">
-            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+        <div class="bg-white dark:bg-dark-surface rounded-xl border-2 border-dashed border-slate-200 dark:border-dark-border overflow-hidden mb-5">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-dark-border bg-slate-50/50 dark:bg-slate-800/20 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
+                    <div class="w-8 h-8 bg-brand-50 dark:bg-brand-500/10 rounded-lg flex items-center justify-center">
+                        <i data-lucide="plus" class="w-4 h-4 text-brand-500"></i>
                     </div>
-                    <h2 class="font-bold text-slate-700">Agregar nuevo botón flotante</h2>
+                    <h3 class="font-semibold text-slate-700 dark:text-slate-200 text-sm">Agregar nuevo botón flotante</h3>
                 </div>
                 <button type="submit"
-                        class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        class="inline-flex items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white font-medium text-xs px-4 py-2 rounded-lg transition-colors shadow-sm shadow-brand-500/30">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                     Agregar botón
                 </button>
             </div>
             <div class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                {{-- Logo nuevo --}}
                 <div class="flex flex-col gap-2">
-                    <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Logo del botón</p>
-                        <p class="text-xs text-slate-400 mt-0.5">Imagen circular que flotará en el portal.</p>
-                    </div>
-                    <div class="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-indigo-400 transition-colors cursor-pointer"
+                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Logo del botón</p>
+                    <div class="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-brand-400 transition-colors cursor-pointer"
                          onclick="document.getElementById('new-logo').click()">
-                        <img id="prev-new-logo" src="" class="w-20 h-20 object-contain rounded-full border border-slate-200 hidden">
-                        <div id="new-logo-ph" class="text-slate-400 text-xs text-center">
-                            <svg class="w-8 h-8 mx-auto mb-1 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <img id="prev-new-logo" src="" class="w-20 h-20 object-contain rounded-full border border-slate-200 dark:border-slate-700 hidden">
+                        <div id="new-logo-ph" class="text-slate-400 dark:text-slate-500 text-xs text-center">
+                            <i data-lucide="image" class="w-8 h-8 mx-auto mb-1 opacity-40"></i>
                             Sin logo
                         </div>
-                        <span class="text-xs text-slate-400">Clic para subir</span>
+                        <span class="text-xs text-slate-400 dark:text-slate-500">Clic para subir</span>
                     </div>
                     <input id="new-logo" type="file" name="new_logo" accept="image/*" class="hidden"
                            onchange="previewFb(this,'prev-new-logo','new-logo-ph')">
                 </div>
 
-                {{-- QR/imagen nuevo --}}
                 <div class="flex flex-col gap-2">
-                    <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Imagen del popover</p>
-                        <p class="text-xs text-slate-400 mt-0.5">Imagen que aparece al hacer clic en el botón.</p>
-                    </div>
-                    <div class="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-indigo-400 transition-colors cursor-pointer"
+                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Imagen del popover</p>
+                    <div class="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-brand-400 transition-colors cursor-pointer"
                          onclick="document.getElementById('new-img').click()">
                         <img id="prev-new-img" src="" class="w-24 h-24 object-contain rounded-lg hidden">
-                        <div id="new-img-ph" class="text-slate-400 text-xs text-center">
-                            <svg class="w-8 h-8 mx-auto mb-1 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                        <div id="new-img-ph" class="text-slate-400 dark:text-slate-500 text-xs text-center">
+                            <i data-lucide="qr-code" class="w-8 h-8 mx-auto mb-1 opacity-40"></i>
                             Sin imagen
                         </div>
-                        <span class="text-xs text-slate-400">Clic para subir</span>
+                        <span class="text-xs text-slate-400 dark:text-slate-500">Clic para subir</span>
                     </div>
                     <input id="new-img" type="file" name="new_imagen" accept="image/*" class="hidden"
                            onchange="previewFb(this,'prev-new-img','new-img-ph')">
                 </div>
 
-                {{-- Campos texto nuevo --}}
                 <div class="flex flex-col gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nombre</label>
-                        <input type="text" name="new_nombre" value="{{ old('new_nombre') }}"
-                               placeholder="Ej. Facebook"
-                               class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Nombre</label>
+                        <input type="text" name="new_nombre" value="{{ old('new_nombre') }}" placeholder="Ej. Facebook"
+                               class="w-full bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg px-4 py-2.5 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Descripción</label>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Descripción</label>
                         <textarea name="new_descripcion" rows="2" placeholder="Texto del popover..."
-                            class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
+                            class="w-full bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg px-4 py-2.5 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 resize-none transition-all"
                         >{{ old('new_descripcion') }}</textarea>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Enlace (URL)</label>
-                        <input type="text" name="new_link" value="{{ old('new_link') }}"
-                               placeholder="https://..."
-                               class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Enlace (URL)</label>
+                        <input type="text" name="new_link" value="{{ old('new_link') }}" placeholder="https://..."
+                               class="w-full bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg px-4 py-2.5 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Color de brillo</label>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Color de brillo</label>
                         @php $newGlowColors = ['morado'=>'#742364','verde'=>'#128C7E','indigo'=>'#4f46e5','azul'=>'#2563eb','rojo'=>'#dc2626','naranja'=>'#ea580c','amarillo'=>'#ca8a04','rosa'=>'#db2777','cian'=>'#0891b2','blanco'=>'#64748b']; @endphp
                         <input type="hidden" name="new_glow_color" id="glow-val-new" value="{{ old('new_glow_color', 'indigo') }}">
                         <div class="flex flex-wrap gap-2" id="glow-swatches-new">
@@ -304,37 +283,23 @@
             </div>
         </div>
     </form>
-
-    <div class="mt-2">
-        <a href="{{ route('admin.web-config.index') }}"
-           class="inline-flex items-center gap-2 text-slate-500 hover:text-slate-800 text-sm font-medium transition-colors border border-slate-200 bg-white px-5 py-3 rounded-xl hover:bg-slate-50 shadow-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            Volver a Configuraciones
-        </a>
-    </div>
 </div>
 
-{{-- Forms ocultos para eliminar botón completo --}}
+{{-- Forms ocultos eliminar botón --}}
 @foreach($buttons as $btn)
 @if(!$btn->is_default)
-<form id="del-fb-{{ $btn->id }}" method="POST"
-      action="{{ route('admin.web-config.floating-btn.destroy', $btn) }}"
-      style="display:none;">
+<form id="del-fb-{{ $btn->id }}" method="POST" action="{{ route('admin.web-config.floating-btn.destroy', $btn) }}" style="display:none;">
     @csrf @method('DELETE')
 </form>
 @endif
 @endforeach
 
-{{-- Forms ocultos para borrar imagen y logo --}}
+{{-- Forms ocultos eliminar imagen/logo --}}
 @foreach($buttons as $btn)
-<form id="del-img-{{ $btn->id }}" method="POST"
-      action="{{ route('admin.web-config.floating-btn.imagen.destroy', $btn) }}"
-      style="display:none;">
+<form id="del-img-{{ $btn->id }}" method="POST" action="{{ route('admin.web-config.floating-btn.imagen.destroy', $btn) }}" style="display:none;">
     @csrf @method('DELETE')
 </form>
-<form id="del-logo-{{ $btn->id }}" method="POST"
-      action="{{ route('admin.web-config.floating-btn.logo.destroy', $btn) }}"
-      style="display:none;">
+<form id="del-logo-{{ $btn->id }}" method="POST" action="{{ route('admin.web-config.floating-btn.logo.destroy', $btn) }}" style="display:none;">
     @csrf @method('DELETE')
 </form>
 @endforeach
@@ -344,23 +309,19 @@ function deleteFb(formId) {
     if (!confirm('¿Eliminar este botón flotante?')) return;
     document.getElementById(formId).submit();
 }
-
 function deleteImg(formId) {
     if (!confirm('¿Eliminar esta imagen?')) return;
     document.getElementById(formId).submit();
 }
-
 function selectGlow(btnId, colorKey, el) {
     document.getElementById('glow-val-' + btnId).value = colorKey;
-    const swatches = document.getElementById('glow-swatches-' + btnId);
-    swatches.querySelectorAll('div[data-color]').forEach(function(s) {
+    document.getElementById('glow-swatches-' + btnId).querySelectorAll('div[data-color]').forEach(s => {
         s.style.boxShadow = '';
         s.style.transform = '';
     });
     el.style.boxShadow = '0 0 0 2px #fff, 0 0 0 4px #1e293b';
     el.style.transform = 'scale(1.15)';
 }
-
 function previewFb(input, previewId, placeholderId) {
     if (!input.files || !input.files[0]) return;
     const reader = new FileReader();
@@ -368,10 +329,8 @@ function previewFb(input, previewId, placeholderId) {
         const img = document.getElementById(previewId);
         img.src = e.target.result;
         img.classList.remove('hidden');
-        if (placeholderId) {
-            const ph = document.getElementById(placeholderId);
-            if (ph) ph.classList.add('hidden');
-        }
+        const ph = document.getElementById(placeholderId);
+        if (ph) ph.classList.add('hidden');
     };
     reader.readAsDataURL(input.files[0]);
 }

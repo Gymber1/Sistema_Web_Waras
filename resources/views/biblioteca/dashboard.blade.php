@@ -840,15 +840,25 @@
 
             // ESPECIALES → galería de colecciones (sin paginación)
             if (isEspecialesSection) {
+                const SPECIALS_PER_PAGE = 6;
+                if (!state._specialsPage) state._specialsPage = 1;
+
                 document.getElementById('resourceNumber').textContent = allItems.length;
-                document.getElementById('booksPagination').innerHTML = '';
+
                 if (allItems.length === 0) {
+                    grid.className = 'specials-gallery';
                     grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af;"><i class="fas fa-star" style="font-size:2rem;margin-bottom:0.75rem;display:block;"></i>No hay colecciones especiales disponibles.</div>`;
+                    document.getElementById('booksPagination').innerHTML = '';
                     return;
                 }
-                // Reemplazar grid con layout de galería
+
+                const totalSpecialsPages = Math.ceil(allItems.length / SPECIALS_PER_PAGE);
+                if (state._specialsPage > totalSpecialsPages) state._specialsPage = totalSpecialsPages;
+                const sStart = (state._specialsPage - 1) * SPECIALS_PER_PAGE;
+                const pageItems = allItems.slice(sStart, sStart + SPECIALS_PER_PAGE);
+
                 grid.className = 'specials-gallery';
-                grid.innerHTML = allItems.map(s => {
+                grid.innerHTML = pageItems.map(s => {
                     const isRev = s.type === 'revista';
                     const label = isRev ? 'Revistas' : 'Libros';
                     const count = s.books_count;
@@ -870,6 +880,21 @@
                         </div>
                     </div>`;
                 }).join('');
+
+                // Paginación numérica
+                const pag = document.getElementById('booksPagination');
+                if (totalSpecialsPages <= 1) {
+                    pag.innerHTML = '';
+                } else {
+                    let pagHtml = '<div class="specials-pagination">';
+                    pagHtml += `<button ${state._specialsPage === 1 ? 'disabled' : ''} onclick="goSpecialsPage(${state._specialsPage - 1})"><i class="fas fa-chevron-left"></i></button>`;
+                    for (let p = 1; p <= totalSpecialsPages; p++) {
+                        pagHtml += `<button class="${p === state._specialsPage ? 'active' : ''}" onclick="goSpecialsPage(${p})">${p}</button>`;
+                    }
+                    pagHtml += `<button ${state._specialsPage === totalSpecialsPages ? 'disabled' : ''} onclick="goSpecialsPage(${state._specialsPage + 1})"><i class="fas fa-chevron-right"></i></button>`;
+                    pagHtml += '</div>';
+                    pag.innerHTML = pagHtml;
+                }
                 return;
             }
 
@@ -959,6 +984,7 @@
         function showSection(tab) {
             state.activeTab = tab;
             state.currentPage = 1;
+            state._specialsPage = 1;
             state.openAccordions.clear();
             state.closedAccordions.clear();
 
@@ -1463,7 +1489,8 @@
             closeMobileSidebar();
             const rawQ = this.value.trim();
             const q    = normalizeStr(rawQ);
-            const isAuthors = state.activeTab === 'Autores';
+            const isAuthors    = state.activeTab === 'Autores';
+            const isEspeciales = state.activeTab === 'Especiales';
 
             // Mostrar sugerencias de descriptores
             showDescriptorSuggestions(rawQ);
@@ -1472,8 +1499,45 @@
                 activeDescriptorId = null;
                 searchFilteredItems = null;
                 state.currentPage = 1;
+                state._specialsPage = 1;
                 renderDescriptorChips();
                 renderBooks();
+                return;
+            }
+
+            // Búsqueda dentro de Especiales: filtrar colecciones por nombre
+            if (isEspeciales) {
+                const allSpecials = getDataForSection();
+                const filtered = allSpecials.filter(s => normalizeStr(s.title).includes(q));
+                const grid = document.getElementById('booksGrid');
+                grid.className = 'specials-gallery';
+                document.getElementById('resourceNumber').textContent = filtered.length;
+                document.getElementById('booksPagination').innerHTML = '';
+                if (filtered.length === 0) {
+                    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af;">
+                        <i class="fas fa-search" style="font-size:2rem;margin-bottom:0.75rem;display:block;"></i>
+                        Sin resultados para "<strong style="color:#6b7280;">${rawQ}</strong>"
+                    </div>`;
+                } else {
+                    grid.innerHTML = filtered.map(s => {
+                        const isRev = s.type === 'revista';
+                        const label = isRev ? 'Revistas' : 'Libros';
+                        const count = s.books_count;
+                        const countLabel = count + ' ' + (isRev ? (count === 1 ? 'revista' : 'revistas') : (count === 1 ? 'libro' : 'libros'));
+                        const typeColor = isRev ? 'background:#2563eb;color:#fff' : 'background:#059669;color:#fff';
+                        const coverHtml = s.cover_url
+                            ? `<img src="${s.cover_url}" alt="${s.title}" onerror="this.style.display='none'">`
+                            : `<i class="fas fa-star" style="font-size:2.5rem;color:rgba(255,255,255,0.3);position:relative;z-index:1;"></i>`;
+                        return `<div class="special-card">
+                            <div class="special-card-cover">${coverHtml}<span class="special-card-type" style="${typeColor}">${label}</span></div>
+                            <div class="special-card-body">
+                                <div class="special-card-title">${s.title}</div>
+                                <div class="special-card-count"><i class="fas fa-book" style="margin-right:0.3rem;opacity:0.5;"></i>${countLabel} asignados</div>
+                                <a href="/biblioteca/especiales/${s.id}" class="special-card-btn">Ver colección →</a>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
                 return;
             }
 
@@ -1617,6 +1681,12 @@
         }
         window.openMobileSidebar  = openMobileSidebar;
         window.closeMobileSidebar = closeMobileSidebar;
+
+        window.goSpecialsPage = function(page) {
+            state._specialsPage = page;
+            renderGrid();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
 
         // ========== CARRUSELES DE INICIO ==========
         (function() {

@@ -2,145 +2,191 @@
 
 namespace Database\Seeders;
 
-use App\Models\Book;
 use App\Models\Author;
-use App\Models\Publisher;
+use App\Models\Book;
 use App\Models\Category;
+use App\Models\Descriptor;
+use App\Models\Publisher;
 use Illuminate\Database\Seeder;
-use Faker\Factory as Faker;
+use Illuminate\Support\Str;
 
 class BookSeeder extends Seeder
 {
-    /**
-     * Crear al menos 5 libros con todas las relaciones (autores, categorías).
-     * Demuestra la escalabilidad del sistema.
-     */
     public function run(): void
     {
-        $faker = Faker::create('es_ES');
-
-        $books_data = [
+        $booksData = [
             [
-                'title' => 'La Poesía de Ancash: Voces Regionales',
-                'document_type' => 'Libro',
-                'isbn' => '978-9972-1234-56-1',
-                'pages' => 289,
-                'language' => 'Español',
+                'title'            => 'La Poesía de Ancash: Voces Regionales',
+                'document_type'    => 'Libro',
+                'section'          => 'Biblioteca Digital',
+                'isbn'             => '978-9972-1234-56-1',
+                'pages'            => 289,
+                'language'         => 'Español',
                 'publication_date' => '2015-03-15',
-                'authors' => ['Manuel Robles Alarcón'],
-                'categories' => ['Literatura', 'Poesía'],
-                'publisher' => 'Fondo Editorial Ancash',
+                'imprint'          => 'Huaraz: Fondo Editorial Ancash, 2015',
+                'summary'          => 'Recopilación de voces poéticas de la región Ancash que refleja la identidad cultural y la diversidad lingüística del territorio ancashino.',
+                'authors'          => ['Manuel Robles Alarcón'],
+                'categories'       => ['Literatura', 'Poesía Ancashina'],
+                'publisher'        => 'Fondo Editorial Ancash',
             ],
             [
-                'title' => 'Historia del Callejón de Huaylas',
-                'document_type' => 'Libro',
-                'isbn' => '978-9972-5678-90-2',
-                'pages' => 412,
-                'language' => 'Español',
+                'title'            => 'Historia del Callejón de Huaylas',
+                'document_type'    => 'Libro',
+                'section'          => 'Biblioteca Digital',
+                'isbn'             => '978-9972-5678-90-2',
+                'pages'            => 412,
+                'language'         => 'Español',
                 'publication_date' => '2018-07-20',
-                'authors' => ['Dr. Julio Cortés Huamán'],
-                'categories' => ['Historia Y Geografía', 'Historia'],
-                'publisher' => 'Editorial Huaraz',
+                'imprint'          => 'Huaraz: Editorial Huaraz, 2018',
+                'summary'          => 'Estudio histórico exhaustivo del Callejón de Huaylas, desde sus orígenes prehispánicos hasta la reconstrucción posterior al terremoto de 1970.',
+                'authors'          => ['Dr. Julio Cortés Huamán'],
+                'categories'       => ['Historia Y Geografía', 'Historia Ancashina'],
+                'publisher'        => 'Editorial Huaraz',
             ],
             [
-                'title' => 'Chavín de Huántar: Arqueología y Misterio',
-                'document_type' => 'Libro',
-                'isbn' => '978-9972-9876-54-3',
-                'pages' => 356,
-                'language' => 'Español',
+                'title'            => 'Chavín de Huántar: Arqueología y Misterio',
+                'document_type'    => 'Libro',
+                'section'          => 'Biblioteca Digital',
+                'isbn'             => '978-9972-9876-54-3',
+                'pages'            => 356,
+                'language'         => 'Español',
                 'publication_date' => '2016-11-05',
-                'authors' => ['Dra. Rosario Vidal García', 'Prof. Carlos Mendoza Silva'],
-                'categories' => ['Ciencia y Tecnología', 'Arqueología'],
-                'publisher' => 'Editorial Científica Peruana',
+                'imprint'          => 'Lima: Editorial Científica Peruana, 2016',
+                'summary'          => 'Investigación arqueológica sobre el complejo ceremonial de Chavín de Huántar, sus galerías subterráneas, iconografía y su rol en los Andes centrales.',
+                'authors'          => ['Dra. Rosario Vidal García', 'Prof. Carlos Mendoza Silva'],
+                'categories'       => ['Ciencias Naturales Y Matemáticas', 'Historia Y Geografía'],
+                'publisher'        => 'Editorial Científica Peruana',
             ],
             [
-                'title' => 'Las Leyendas del Huascarán',
-                'document_type' => 'Libro',
-                'isbn' => '978-9972-1111-22-4',
-                'pages' => 234,
-                'language' => 'Español',
+                'title'            => 'Mitos y Leyendas del Huascarán',
+                'document_type'    => 'Libro',
+                'section'          => 'Biblioteca Digital',
+                'isbn'             => '978-9972-1111-22-4',
+                'pages'            => 234,
+                'language'         => 'Español',
                 'publication_date' => '2019-02-10',
-                'authors' => ['Isabel Flores Morales'],
-                'categories' => ['Literatura', 'Cuento'],
-                'publisher' => 'Ediciones Ancashinas',
+                'imprint'          => 'Huaraz: Ediciones Ancashinas, 2019',
+                'summary'          => 'Compilación de mitos y leyendas transmitidas oralmente en las comunidades andinas de Ancash, relacionadas con el nevado Huascarán y las fuerzas de la naturaleza.',
+                'authors'          => ['Isabel Flores Morales'],
+                'categories'       => ['Literatura', 'Mitos y Leyendas'],
+                'publisher'        => 'Ediciones Ancashinas',
             ],
             [
-                'title' => 'Terremoto de 1970: Testimonios de la Tragedia',
-                'document_type' => 'Libro',
-                'isbn' => '978-9972-3333-44-5',
-                'pages' => 501,
-                'language' => 'Español',
+                'title'            => 'Terremoto de 1970: Testimonios de la Tragedia',
+                'document_type'    => 'Libro',
+                'section'          => 'Biblioteca Digital',
+                'isbn'             => '978-9972-3333-44-5',
+                'pages'            => 501,
+                'language'         => 'Español',
                 'publication_date' => '2020-05-22',
-                'authors' => ['Prof. Enrique Beltrán Cruz', 'Ing. Miguel Fernández López'],
-                'categories' => ['Historia Y Geografía', 'Desastres'],
-                'publisher' => 'Ministerio de Cultura Perú',
+                'imprint'          => 'Lima: Ministerio de Cultura Perú, 2020',
+                'summary'          => 'Testimonios directos de sobrevivientes del terremoto del 31 de mayo de 1970, junto con un análisis histórico y social de su impacto en la región Ancash.',
+                'authors'          => ['Prof. Enrique Beltrán Cruz', 'Ing. Miguel Fernández López'],
+                'categories'       => ['Historia Y Geografía', 'Historia Ancashina'],
+                'publisher'        => 'Ministerio de Cultura Perú',
             ],
             [
-                'title' => 'Técnicas Agrícolas Tradicionales de Ancash',
-                'document_type' => 'Artículo',
-                'isbn' => null,
-                'pages' => 128,
-                'language' => 'Español',
+                'title'            => 'Técnicas Agrícolas Tradicionales de Ancash',
+                'document_type'    => 'Artículo',
+                'section'          => 'Biblioteca Digital',
+                'isbn'             => null,
+                'pages'            => 128,
+                'language'         => 'Español',
                 'publication_date' => '2021-01-15',
-                'authors' => ['Ing. Agr. Roberto Puma Delgado'],
-                'categories' => ['Ciencia y Tecnología', 'Agricultura'],
-                'publisher' => 'Revista Desarrollo Rural',
+                'imprint'          => 'Huaraz: Revista Desarrollo Rural, 2021',
+                'summary'          => 'Análisis de las técnicas agrícolas ancestrales usadas en los valles interandinos de Ancash, incluyendo sistemas de andenería y manejo del agua.',
+                'authors'          => ['Ing. Agr. Roberto Puma Delgado'],
+                'categories'       => ['Ciencias Aplicadas (Tecnología)', 'Agricultura'],
+                'publisher'        => 'Revista Desarrollo Rural',
             ],
             [
-                'title' => 'Confecciones Textiles de Ancash: Arte y Tradición',
-                'document_type' => 'Revista',
-                'isbn' => null,
-                'pages' => 64,
-                'language' => 'Español',
-                'publication_date' => '2022-06-01',
-                'authors' => ['Colectivo de Artesanos Ancashinos'],
-                'categories' => ['Ciencia y Tecnología', 'Artesanía'],
-                'publisher' => 'Instituto Intercultural Andino',
+                'title'            => 'Geografía Física de Ancash',
+                'document_type'    => 'Libro',
+                'section'          => 'Biblioteca Digital',
+                'isbn'             => '978-9972-7777-88-7',
+                'pages'            => 320,
+                'language'         => 'Español',
+                'publication_date' => '2014-08-12',
+                'imprint'          => 'Lima: Instituto Geográfico Nacional, 2014',
+                'summary'          => 'Descripción detallada de la geografía física de Ancash: cordilleras, valles, ríos, clima y los recursos naturales del departamento.',
+                'authors'          => ['Dr. Alfredo Ramírez Quispe'],
+                'categories'       => ['Historia Y Geografía', 'Geografía Ancashina'],
+                'publisher'        => 'Instituto Geográfico Nacional',
             ],
             [
-                'title' => 'La Cordillera Blanca: Flora y Fauna Endémica',
-                'document_type' => 'Libro',
-                'isbn' => '978-9972-5555-66-6',
-                'pages' => 378,
-                'language' => 'Español',
-                'publication_date' => '2017-09-08',
-                'authors' => ['Dr. Alfredo Ramírez Quispe'],
-                'categories' => ['Ciencia y Tecnología', 'Biodiversidad'],
-                'publisher' => 'Servicio Nacional de Áreas Protegidas',
+                'title'            => 'Costumbres y Folklore Ancashino',
+                'document_type'    => 'Libro',
+                'section'          => 'Biblioteca Digital',
+                'isbn'             => '978-9972-2222-33-8',
+                'pages'            => 275,
+                'language'         => 'Español',
+                'publication_date' => '2017-04-18',
+                'imprint'          => 'Huaraz: Fondo Editorial Ancash, 2017',
+                'summary'          => 'Documentación etnográfica de las festividades, danzas, música y costumbres de las provincias de Ancash, con especial énfasis en las tradiciones de Huaraz.',
+                'authors'          => ['Lic. Carmen Sánchez Villanueva'],
+                'categories'       => ['Ciencias Sociales', 'Costumbres Y Folklore'],
+                'publisher'        => 'Fondo Editorial Ancash',
+            ],
+            [
+                'title'            => 'Quechua Ancashino: Gramática y Vocabulario',
+                'document_type'    => 'Libro',
+                'section'          => 'Biblioteca Digital',
+                'isbn'             => '978-9972-4444-55-9',
+                'pages'            => 198,
+                'language'         => 'Español / Quechua',
+                'publication_date' => '2013-10-30',
+                'imprint'          => 'Lima: Ministerio de Educación, 2013',
+                'summary'          => 'Guía gramatical y léxica del quechua ancashino, variante regional del quechua con características propias del norte chico andino.',
+                'authors'          => ['Prof. Teófilo Laime Huanca'],
+                'categories'       => ['Lenguas', 'Quechua Ancashino'],
+                'publisher'        => 'Ministerio de Educación',
+            ],
+            [
+                'title'            => 'Biografías Ancashinas: Héroes y Pensadores',
+                'document_type'    => 'Libro',
+                'section'          => 'Waras Editorial',
+                'isbn'             => '978-9972-6666-77-0',
+                'pages'            => 340,
+                'language'         => 'Español',
+                'publication_date' => '2022-03-05',
+                'imprint'          => 'Huaraz: Ediciones Ancashinas, 2022',
+                'summary'          => 'Semblanzas biográficas de personajes ilustres nacidos en Ancash: intelectuales, políticos, artistas y científicos que han marcado la historia del Perú.',
+                'authors'          => ['Dr. Julio Cortés Huamán', 'Lic. Carmen Sánchez Villanueva'],
+                'categories'       => ['Historia Y Geografía', 'Biografías Ancashinas'],
+                'publisher'        => 'Ediciones Ancashinas',
             ],
         ];
 
-        foreach ($books_data as $data) {
+        foreach ($booksData as $data) {
             $book = Book::create([
-                'title' => $data['title'],
-                'slug' => str_replace(' ', '-', strtolower($data['title'])),
-                'summary' => $faker->paragraph(5),
+                'title'            => $data['title'],
+                'slug'             => Str::slug($data['title']),
+                'summary'          => $data['summary'],
+                'imprint'          => $data['imprint'],
                 'publication_date' => $data['publication_date'],
-                'document_type' => $data['document_type'],
-                'isbn' => $data['isbn'],
-                'pages' => $data['pages'],
-                'language' => $data['language'],
-                'descriptors' => implode(', ', $faker->words(5)),
-                'provider' => 'Fototeca WARAS',
+                'document_type'    => $data['document_type'],
+                'section'          => $data['section'],
+                'isbn'             => $data['isbn'],
+                'pages'            => $data['pages'],
+                'language'         => $data['language'],
+                'provider'         => 'Biblioteca WARAS',
                 'cover_image_path' => null,
-                'source_type' => 'none',
-                'external_url' => null,
-                'pdf_file_path' => null,
-                'publisher_id' => Publisher::where('name', $data['publisher'])->first()?->id,
+                'source_type'      => 'none',
+                'external_url'     => null,
+                'pdf_file_path'    => null,
+                'publisher_id'     => Publisher::where('name', $data['publisher'])->first()?->id,
             ]);
 
-            // Asociar autores
             foreach ($data['authors'] as $authorName) {
                 $author = Author::firstOrCreate(
                     ['name' => $authorName],
-                    ['slug' => str_replace(' ', '-', strtolower($authorName))]
+                    ['slug' => Str::slug($authorName)]
                 );
                 $book->authors()->attach($author->id, ['order' => 1]);
             }
 
-            // Asociar categorías
             foreach ($data['categories'] as $categoryName) {
-                $category = Category::where('name', $categoryName)->first();
+                $category = Category::where('name', $categoryName)->where('type', 'biblioteca')->first();
                 if ($category) {
                     $book->categories()->attach($category->id);
                 }

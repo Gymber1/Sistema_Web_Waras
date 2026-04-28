@@ -90,7 +90,7 @@
             @endif
             <div class="special-meta">
                 <span class="special-meta-item">
-                    <i class="fas fa-book"></i>
+                    <i class="fas fa-{{ $special->type === 'revista' ? 'newspaper' : 'book' }}"></i>
                     {{ $special->books->count() }}
                     {{ $special->type === 'revista' ? ($special->books->count() === 1 ? 'revista' : 'revistas') : ($special->books->count() === 1 ? 'libro' : 'libros') }}
                     en esta colección
@@ -100,7 +100,7 @@
     </div>
 
     {{-- Buscador --}}
-    @if($special->books->count() > 4)
+    @if($special->books->count() > 0)
     <div class="search-bar">
         <i class="fas fa-search"></i>
         <input type="text" id="searchInput" placeholder="Buscar en esta colección..." oninput="filterItems(this.value)">

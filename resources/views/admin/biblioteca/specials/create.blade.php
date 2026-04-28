@@ -3,68 +3,69 @@
 @section('section', 'Biblioteca > Especiales > Nueva')
 
 @section('content')
-<div class="p-6 md:p-10 max-w-[720px] mx-auto">
+<div class="max-w-[720px] mx-auto">
 
-    <div class="flex items-start gap-4 mb-8">
+    <div class="mb-6 flex items-start gap-4">
         <a href="{{ route('admin.biblioteca.specials') }}"
-            class="mt-1 p-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors shadow-sm">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            class="mt-0.5 p-2 rounded-lg bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-500 dark:text-slate-400 transition-colors shadow-premium dark:shadow-premium-dark">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
         </a>
         <div>
             <div class="flex items-center gap-3 flex-wrap">
-                <h1 class="text-2xl font-black text-slate-900">Nueva colección especial</h1>
-                <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider">ESPECIAL</span>
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Nueva colección especial</h2>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 border border-brand-100 dark:border-brand-500/20">ESPECIAL</span>
             </div>
-            <p class="text-slate-500 text-sm mt-1">Define el nombre del grupo. Después vincula libros desde "Agregar a Especiales".</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Define el nombre del grupo. Después vincula contenido desde "Agregar a Especiales".</p>
         </div>
     </div>
 
     @if($errors->any())
-    <div class="mb-6 px-5 py-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
-        <ul class="list-disc list-inside space-y-1">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+    <div class="mb-5 flex items-start gap-3 px-5 py-3.5 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 rounded-xl text-sm">
+        <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i>
+        <ul class="space-y-1">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
     </div>
     @endif
 
     <form action="{{ route('admin.biblioteca.specials.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 space-y-6">
+        <div class="bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border p-6 md:p-8 space-y-6">
 
             <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1.5">Nombre de la colección <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nombre de la colección <span class="text-red-500">*</span></label>
                 <input type="text" name="title" value="{{ old('title') }}" required autofocus
                     placeholder="Ej. Mariscal Toribio de Luzuriaga"
-                    class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-slate-700 mb-3">Tipo <span class="text-red-500">*</span></label>
-                <div class="flex gap-4">
-                    <label class="flex items-center gap-3 px-5 py-3.5 border-2 rounded-xl cursor-pointer transition-all {{ old('type','libro') === 'libro' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-emerald-300' }}">
-                        <input type="radio" name="type" value="libro" {{ old('type','libro') === 'libro' ? 'checked' : '' }} class="accent-emerald-600 w-4 h-4">
-                        <span class="text-sm font-bold text-slate-800">Libros</span>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Tipo <span class="text-red-500">*</span></label>
+                <div class="flex gap-3">
+                    <label class="flex items-center gap-3 px-5 py-3.5 border-2 rounded-xl cursor-pointer transition-all flex-1 {{ old('type','libro') === 'libro' ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-brand-300' }}">
+                        <input type="radio" name="type" value="libro" {{ old('type','libro') === 'libro' ? 'checked' : '' }} class="accent-indigo-600 w-4 h-4">
+                        <span class="text-sm font-semibold text-slate-800 dark:text-white">Libros</span>
                     </label>
-                    <label class="flex items-center gap-3 px-5 py-3.5 border-2 rounded-xl cursor-pointer transition-all {{ old('type') === 'revista' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-blue-300' }}">
+                    <label class="flex items-center gap-3 px-5 py-3.5 border-2 rounded-xl cursor-pointer transition-all flex-1 {{ old('type') === 'revista' ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-blue-300' }}">
                         <input type="radio" name="type" value="revista" {{ old('type') === 'revista' ? 'checked' : '' }} class="accent-blue-600 w-4 h-4">
-                        <span class="text-sm font-bold text-slate-800">Revistas</span>
+                        <span class="text-sm font-semibold text-slate-800 dark:text-white">Revistas</span>
                     </label>
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1.5">Imagen de portada</label>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Imagen de portada</label>
                 <input type="file" name="cover_image" accept="image/*"
-                    class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-emerald-100 file:text-emerald-700 file:font-semibold hover:file:bg-emerald-200">
-                <p class="text-xs text-slate-400 mt-1.5">Imagen representativa de la colección (ej. retrato del personaje).</p>
+                    class="w-full px-3 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-xs text-slate-600 dark:text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-brand-50 file:text-brand-700 dark:file:bg-brand-500/10 dark:file:text-brand-400 file:font-semibold hover:file:bg-brand-100">
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1.5">Imagen representativa de la colección (ej. retrato del personaje).</p>
             </div>
 
         </div>
 
-        <div class="mt-6 flex gap-3 justify-end">
+        <div class="mt-5 flex gap-3 justify-end">
             <a href="{{ route('admin.biblioteca.specials') }}"
-                class="px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-50 transition-colors">Cancelar</a>
+                class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors">Cancelar</a>
             <button type="submit"
-                class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-lg shadow-emerald-200 transition-all">Guardar colección</button>
+                class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium shadow-lg shadow-emerald-500/20 transition-all">Guardar colección</button>
         </div>
     </form>
 </div>

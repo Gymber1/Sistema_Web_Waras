@@ -69,6 +69,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/books/{book}/edit', [AdminBibliotecaController::class, 'editBook'])->name('books.edit');
             Route::put('/books/{book}', [AdminBibliotecaController::class, 'updateBook'])->name('books.update');
             Route::delete('/books/{book}', [AdminBibliotecaController::class, 'destroyBook'])->name('books.destroy');
+            Route::delete('/books', [AdminBibliotecaController::class, 'bulkDestroyBooks'])->name('books.bulk-destroy');
 
             // Autores
             Route::get('/authors', [AdminBibliotecaController::class, 'indexAuthors'])->name('authors');
@@ -77,6 +78,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/authors/{author}/edit', [AdminBibliotecaController::class, 'editAuthor'])->name('authors.edit');
             Route::put('/authors/{author}', [AdminBibliotecaController::class, 'updateAuthor'])->name('authors.update');
             Route::delete('/authors/{author}', [AdminBibliotecaController::class, 'destroyAuthor'])->name('authors.destroy');
+            Route::delete('/authors', [AdminBibliotecaController::class, 'bulkDestroyAuthors'])->name('authors.bulk-destroy');
 
             // Editoriales
             Route::get('/publishers', [AdminBibliotecaController::class, 'indexPublishers'])->name('publishers');
@@ -85,6 +87,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/publishers/{publisher}/edit', [AdminBibliotecaController::class, 'editPublisher'])->name('publishers.edit');
             Route::put('/publishers/{publisher}', [AdminBibliotecaController::class, 'updatePublisher'])->name('publishers.update');
             Route::delete('/publishers/{publisher}', [AdminBibliotecaController::class, 'destroyPublisher'])->name('publishers.destroy');
+            Route::delete('/publishers', [AdminBibliotecaController::class, 'bulkDestroyPublishers'])->name('publishers.bulk-destroy');
 
             // Categorías (incluye subcategorías vía parent_id)
             Route::get('/categories', [AdminBibliotecaController::class, 'indexCategories'])->name('categories');
@@ -93,6 +96,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/categories/{category}/edit', [AdminBibliotecaController::class, 'editCategory'])->name('categories.edit');
             Route::put('/categories/{category}', [AdminBibliotecaController::class, 'updateCategory'])->name('categories.update');
             Route::delete('/categories/{category}', [AdminBibliotecaController::class, 'destroyCategory'])->name('categories.destroy');
+            Route::delete('/categories', [AdminBibliotecaController::class, 'bulkDestroyCategories'])->name('categories.bulk-destroy');
 
             // Revistas
             Route::get('/magazines', [AdminBibliotecaController::class, 'indexMagazines'])->name('magazines');
@@ -101,6 +105,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/magazines/{book}/edit', [AdminBibliotecaController::class, 'editMagazine'])->name('magazines.edit');
             Route::put('/magazines/{book}', [AdminBibliotecaController::class, 'updateMagazine'])->name('magazines.update');
             Route::delete('/magazines/{book}', [AdminBibliotecaController::class, 'destroyMagazine'])->name('magazines.destroy');
+            Route::delete('/magazines', [AdminBibliotecaController::class, 'bulkDestroyMagazines'])->name('magazines.bulk-destroy');
 
             // Descriptores
             Route::get('/descriptors', [AdminBibliotecaController::class, 'indexDescriptors'])->name('descriptors');
@@ -114,6 +119,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/subcategories/{category}/edit', [AdminBibliotecaController::class, 'editSubcategory'])->name('subcategories.edit');
             Route::put('/subcategories/{category}', [AdminBibliotecaController::class, 'updateSubcategory'])->name('subcategories.update');
             Route::delete('/subcategories/{category}', [AdminBibliotecaController::class, 'destroySubcategory'])->name('subcategories.destroy');
+            Route::delete('/subcategories', [AdminBibliotecaController::class, 'bulkDestroySubcategories'])->name('subcategories.bulk-destroy');
 
             // Especiales (grupos/colecciones)
             Route::get('/specials', [AdminBibliotecaController::class, 'indexSpecials'])->name('specials');
@@ -126,6 +132,9 @@ Route::middleware('auth')->group(function () {
             Route::delete('/specials/{special}', [AdminBibliotecaController::class, 'destroySpecial'])->name('specials.destroy');
             Route::post('/specials/{special}/assign', [AdminBibliotecaController::class, 'assignBook'])->name('specials.assign');
             Route::delete('/specials/{special}/books/{book}', [AdminBibliotecaController::class, 'unassignBook'])->name('specials.unassign');
+            Route::delete('/specials/{special}/clear', [AdminBibliotecaController::class, 'clearSpecial'])->name('specials.clear');
+            Route::delete('/specials/{special}/cover', [AdminBibliotecaController::class, 'destroySpecialCover'])->name('specials.cover.destroy');
+            Route::delete('/specials', [AdminBibliotecaController::class, 'bulkDestroySpecials'])->name('specials.bulk-destroy');
         });
 
         // Fototeca Admin
@@ -138,6 +147,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/photos/{photo}/edit', [AdminFototecaController::class, 'editPhoto'])->name('photos.edit');
             Route::put('/photos/{photo}', [AdminFototecaController::class, 'updatePhoto'])->name('photos.update');
             Route::delete('/photos/{photo}', [AdminFototecaController::class, 'destroyPhoto'])->name('photos.destroy');
+            Route::delete('/photos', [AdminFototecaController::class, 'bulkDestroyPhotos'])->name('photos.bulk-destroy');
 
             // Fotógrafos
             Route::get('/photographers', [AdminFototecaController::class, 'indexPhotographers'])->name('photographers');
@@ -146,6 +156,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/photographers/{photographer}/edit', [AdminFototecaController::class, 'editPhotographer'])->name('photographers.edit');
             Route::put('/photographers/{photographer}', [AdminFototecaController::class, 'updatePhotographer'])->name('photographers.update');
             Route::delete('/photographers/{photographer}', [AdminFototecaController::class, 'destroyPhotographer'])->name('photographers.destroy');
+            Route::delete('/photographers', [AdminFototecaController::class, 'bulkDestroyPhotographers'])->name('photographers.bulk-destroy');
 
             // Categorías (Nivel 1)
             Route::get('/categories', [AdminFototecaController::class, 'indexCategories'])->name('categories');
@@ -154,6 +165,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/categories/{category}/edit', [AdminFototecaController::class, 'editCategory'])->name('categories.edit');
             Route::put('/categories/{category}', [AdminFototecaController::class, 'updateCategory'])->name('categories.update');
             Route::delete('/categories/{category}', [AdminFototecaController::class, 'destroyCategory'])->name('categories.destroy');
+            Route::delete('/categories', [AdminFototecaController::class, 'bulkDestroyCategories'])->name('categories.bulk-destroy');
 
             // SubCategorías (Nivel 2)
             Route::get('/subcategories', [AdminFototecaController::class, 'indexSubcategories'])->name('subcategories');
@@ -162,6 +174,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/subcategories/{category}/edit', [AdminFototecaController::class, 'editSubcategory'])->name('subcategories.edit');
             Route::put('/subcategories/{category}', [AdminFototecaController::class, 'updateSubcategory'])->name('subcategories.update');
             Route::delete('/subcategories/{category}', [AdminFototecaController::class, 'destroySubcategory'])->name('subcategories.destroy');
+            Route::delete('/subcategories', [AdminFototecaController::class, 'bulkDestroySubcategories'])->name('subcategories.bulk-destroy');
 
             // SubNivel (Nivel 3)
             Route::get('/sublevels', [AdminFototecaController::class, 'indexSublevels'])->name('sublevels');
@@ -170,6 +183,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/sublevels/{category}/edit', [AdminFototecaController::class, 'editSublevel'])->name('sublevels.edit');
             Route::put('/sublevels/{category}', [AdminFototecaController::class, 'updateSublevel'])->name('sublevels.update');
             Route::delete('/sublevels/{category}', [AdminFototecaController::class, 'destroySublevel'])->name('sublevels.destroy');
+            Route::delete('/sublevels', [AdminFototecaController::class, 'bulkDestroySublevels'])->name('sublevels.bulk-destroy');
 
             // Etiquetas
             Route::get('/tags', [AdminFototecaController::class, 'indexTags'])->name('tags');
@@ -209,6 +223,7 @@ Route::middleware('auth')->group(function () {
             Route::put('/{user}', [UserAdminController::class, 'update'])->name('update');
             Route::delete('/{user}', [UserAdminController::class, 'destroy'])->name('destroy');
             Route::post('/{user}/reset-password', [UserAdminController::class, 'resetPassword'])->name('reset-password');
+            Route::delete('/', [UserAdminController::class, 'bulkDestroy'])->name('bulk-destroy');
         });
     });
 });

@@ -7,104 +7,80 @@ use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Crear categorías jerárquicas de prueba.
-     * Estas categorías se pueden reutilizar entre módulos (Biblioteca y Fototeca).
-     */
     public function run(): void
     {
-        // Categorías principales para BIBLIOTECA
-        $ficcion = Category::create([
-            'name' => 'Ficción',
-            'slug' => 'ficcion',
-            'type' => 'biblioteca',
-            'description' => 'Libros de ficción y narrativa',
-        ]);
+        // ==========================================
+        // BIBLIOTECA (2 niveles: categoría → subcategoría)
+        // ==========================================
+        $bibliotecaData = [
+            'Generalidades'                     => ['Bibliotecas', 'Libros', 'Lectura', 'Organizaciones y Museología', 'Periodismo', 'Sistemas'],
+            'Filosofía Y Psicología'             => [],
+            'Religión'                           => [],
+            'Ciencias Sociales'                  => ['Economía', 'Derecho', 'Administración Pública', 'Educación', 'Transporte', 'Costumbres Y Folklore', 'Sociología y Antropología'],
+            'Lenguas'                            => ['Quechua Ancashino'],
+            'Ciencias Naturales Y Matemáticas'   => ['Biología (Ecología)', 'Plantas', 'Animales', 'Física'],
+            'Ciencias Aplicadas (Tecnología)'    => ['Ciencias Médicas', 'Ingeniería', 'Agricultura', 'Manufacturas', 'Construcciones'],
+            'Arte'                               => [],
+            'Literatura'                         => ['Poesía Ancashina', 'Narrativa Ancashina', 'Mitos y Leyendas', 'Antologías (varios géneros)', 'Ensayos Ancashinos'],
+            'Historia Y Geografía'               => ['Historia Ancashina', 'Geografía Ancashina', 'Biografías Ancashinas', 'Geografía y Viajes'],
+        ];
 
-        Category::create([
-            'name' => 'Novela',
-            'slug' => 'novela',
-            'type' => 'biblioteca',
-            'description' => 'Novelas de diversos géneros',
-            'parent_id' => $ficcion->id,
-        ]);
+        foreach ($bibliotecaData as $parentName => $children) {
+            $parent = Category::firstOrCreate(
+                ['name' => $parentName, 'type' => 'biblioteca', 'parent_id' => null],
+            );
 
-        Category::create([
-            'name' => 'Cuento',
-            'slug' => 'cuento',
-            'type' => 'biblioteca',
-            'description' => 'Cuentos y relatos breves',
-            'parent_id' => $ficcion->id,
-        ]);
+            foreach ($children as $childName) {
+                Category::firstOrCreate(
+                    ['name' => $childName, 'type' => 'biblioteca', 'parent_id' => $parent->id],
+                );
+            }
+        }
 
-        $noficcion = Category::create([
-            'name' => 'No Ficción',
-            'slug' => 'no-ficcion',
-            'type' => 'biblioteca',
-            'description' => 'Libros informativos y de no ficción',
-        ]);
+        // ==========================================
+        // FOTOTECA (multi-nivel recursivo)
+        // ==========================================
+        $fototecaData = [
+            'Por Provincias' => [
+                'Por Distritos' => [],
+                'Por Ciudades'  => [
+                    'Panorámica'           => [],
+                    'Plaza de Armas y Catedral' => [],
+                    'Por Barrios'          => ['Belén', 'San Francisco', 'La Soledad', 'Huarupampa', 'Centenario', 'Nicrupampa'],
+                    'Puentes'              => [],
+                    'Calles'               => [],
+                    'Casas y Edificios'    => [],
+                    'Sociedad y cultura'   => ['Instituciones Sociales', 'Instituciones Culturales', 'Instituciones Educativas', 'Deportes', 'Familias'],
+                ],
+            ],
+            'Especiales' => [
+                'Desastres en Ancash'                 => ['Aluvión de Huaraz de 1941', 'Aluvión de Chavín de 1945', 'Aluvión de Ranrahirca de 1962', 'Terremoto del 31 de mayo de 1970', 'Aluvión del 31 de mayo de 1970'],
+                'Tradiciones y Costumbres de Huaraz'  => ['Fiesta del Señor de Mayo', 'Semana Santa Huaracina', 'Fiesta de Cruces y Carnavales'],
+                'Patrimonio Arqueológico Ancashino'   => ['Sechín', 'Chavín', 'Wicahuain', 'Yaino', 'Tumshukaiko'],
+                'Parque Nacional Huascarán'           => [
+                    'Nevados y Lagunas' => ['Huascarán', 'Alpamayo', 'Artesonraju', 'Cayesh'],
+                    'Circuitos'         => [],
+                ],
+            ],
+        ];
 
-        Category::create([
-            'name' => 'Historia',
-            'slug' => 'historia',
-            'type' => 'biblioteca',
-            'description' => 'Libros de historia y arqueología',
-            'parent_id' => $noficcion->id,
-        ]);
+        $this->createFototecaCategories($fototecaData, null);
+    }
 
-        Category::create([
-            'name' => 'Ciencia',
-            'slug' => 'ciencia',
-            'type' => 'biblioteca',
-            'description' => 'Libros de ciencia y tecnología',
-            'parent_id' => $noficcion->id,
-        ]);
+    private function createFototecaCategories(array $categories, ?int $parentId): void
+    {
+        foreach ($categories as $key => $value) {
+            $name = is_string($key) ? $key : $value;
 
-        // Categorías principales para FOTOTECA
-        $naturaleza = Category::create([
-            'name' => 'Naturaleza',
-            'slug' => 'naturaleza',
-            'type' => 'fototeca',
-            'description' => 'Fotografías de paisajes y naturaleza',
-        ]);
+            $category = Category::firstOrCreate([
+                'name'      => $name,
+                'type'      => 'fototeca',
+                'parent_id' => $parentId,
+            ]);
 
-        Category::create([
-            'name' => 'Fauna',
-            'slug' => 'fauna',
-            'type' => 'fototeca',
-            'description' => 'Fotografías de animales',
-            'parent_id' => $naturaleza->id,
-        ]);
-
-        Category::create([
-            'name' => 'Flora',
-            'slug' => 'flora',
-            'type' => 'fototeca',
-            'description' => 'Fotografías de plantas y flores',
-            'parent_id' => $naturaleza->id,
-        ]);
-
-        $urbana = Category::create([
-            'name' => 'Urbana',
-            'slug' => 'urbana',
-            'type' => 'fototeca',
-            'description' => 'Fotografía urbana y arquitectura',
-        ]);
-
-        Category::create([
-            'name' => 'Arquitectura',
-            'slug' => 'arquitectura',
-            'type' => 'fototeca',
-            'description' => 'Fotografías de edificios y estructuras',
-            'parent_id' => $urbana->id,
-        ]);
-
-        Category::create([
-            'name' => 'Callejera',
-            'slug' => 'callejera',
-            'type' => 'fototeca',
-            'description' => 'Fotografía callejera y vida urbana',
-            'parent_id' => $urbana->id,
-        ]);
+            if (is_array($value) && count($value) > 0) {
+                $this->createFototecaCategories($value, $category->id);
+            }
+        }
     }
 }

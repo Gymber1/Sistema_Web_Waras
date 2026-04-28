@@ -19,7 +19,10 @@ class FototecaController extends Controller
         $stats = [
             'photos'        => Photo::count(),
             'photographers' => Photographer::count(),
-            'categories'    => Category::where('type', 'fototeca')->count(),
+            'categories'    => Category::where('type', 'fototeca')->whereNull('parent_id')->count(),
+            'subcategories' => Category::where('type', 'fototeca')->whereNotNull('parent_id')->whereHas('parent', fn($q) => $q->whereNull('parent_id'))->count(),
+            'sublevels'     => Category::where('type', 'fototeca')->whereNotNull('parent_id')->whereHas('parent', fn($q) => $q->whereNotNull('parent_id'))->count(),
+            'tags'          => PhotoTag::count(),
         ];
 
         return view('admin.fototeca.index', compact('stats'));
@@ -29,7 +32,7 @@ class FototecaController extends Controller
 
     public function indexPhotos()
     {
-        $photos = Photo::with(['photographers', 'categories'])->get();
+        $photos = Photo::with(['photographers', 'categories'])->paginate(10);
         $photographers = Photographer::orderBy('full_name')->get();
         $categories = Category::flatTree('fototeca');
         return view('admin.fototeca.photos.index', compact('photos', 'photographers', 'categories'));
@@ -183,7 +186,7 @@ class FototecaController extends Controller
 
     public function indexPhotographers()
     {
-        $photographers = Photographer::withCount('photos as photos_count')->get();
+        $photographers = Photographer::withCount('photos as photos_count')->paginate(10);
         return view('admin.fototeca.photographers.index', compact('photographers'));
     }
 
@@ -268,7 +271,7 @@ class FototecaController extends Controller
 
     public function indexCategories()
     {
-        $categories = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->get();
+        $categories = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->paginate(10);
         return view('admin.fototeca.categories.index', compact('categories'));
     }
 
@@ -329,7 +332,7 @@ class FototecaController extends Controller
             ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
             ->with('parent')
             ->orderBy('name')
-            ->get();
+            ->paginate(10);
         $parentCategories = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->get();
         return view('admin.fototeca.subcategories.index', compact('subcategories', 'parentCategories'));
     }
@@ -392,7 +395,7 @@ class FototecaController extends Controller
             ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id'))
             ->with(['parent', 'parent.parent'])
             ->orderBy('name')
-            ->get();
+            ->paginate(10);
         $parentCategories = Category::where('type', 'fototeca')
             ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
             ->with('parent')
@@ -463,7 +466,7 @@ class FototecaController extends Controller
 
     public function indexTags()
     {
-        $tags = PhotoTag::withCount('photos')->orderBy('name')->get();
+        $tags = PhotoTag::withCount('photos')->orderBy('name')->paginate(10);
         return view('admin.fototeca.tags.index', compact('tags'));
     }
 
@@ -482,6 +485,73 @@ class FototecaController extends Controller
     {
         $photoTag->delete();
         return redirect()->route('admin.fototeca.tags')->with('success', 'Etiqueta eliminada.');
+    }
+
+    // ============= BULK DELETE =============
+
+    public function bulkDestroyPhotos(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Photo::whereIn('id', $ids)->delete();
+        return back()->with('success', count($ids) . ' fotografía(s) eliminada(s).');
+    }
+
+    public function bulkDestroyPhotographers(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Photographer::whereIn('id', $ids)->each(function($p) {
+            if ($p->photo_path) \Storage::disk('public')->delete($p->photo_path);
+            $p->delete();
+        });
+        return back()->with('success', count($ids) . ' fotógrafo(s) eliminado(s).');
+    }
+
+    public function bulkDestroyCategories(Request $request)
+    {
+        $ids     = array_filter(explode(',', $request->input('ids', '')));
+        $cascade = $request->boolean('cascade');
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        foreach ($ids as $id) {
+            $cat = Category::where('type', 'fototeca')->whereNull('parent_id')->find($id);
+            if (!$cat) continue;
+            if ($cascade) {
+                foreach ($cat->subcategories as $sub) {
+                    // delete sublevels (level 3)
+                    Category::where('parent_id', $sub->id)->delete();
+                    $sub->delete();
+                }
+            }
+            $cat->delete();
+        }
+        return back()->with('success', count($ids) . ' categoría(s) eliminada(s).');
+    }
+
+    public function bulkDestroySubcategories(Request $request)
+    {
+        $ids     = array_filter(explode(',', $request->input('ids', '')));
+        $cascade = $request->boolean('cascade');
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        foreach ($ids as $id) {
+            $sub = Category::where('type', 'fototeca')->whereNotNull('parent_id')
+                ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
+                ->find($id);
+            if (!$sub) continue;
+            if ($cascade) {
+                Category::where('parent_id', $sub->id)->delete();
+            }
+            $sub->delete();
+        }
+        return back()->with('success', count($ids) . ' subcategoría(s) eliminada(s).');
+    }
+
+    public function bulkDestroySublevels(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Category::whereIn('id', $ids)->where('type', 'fototeca')->delete();
+        return back()->with('success', count($ids) . ' subnivel(es) eliminado(s).');
     }
 
     // ============= HELPERS =============

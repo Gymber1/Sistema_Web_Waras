@@ -1,15 +1,245 @@
-.custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+/* ── Base ─────────────────────────────────────────────────── */
+body {
+    font-family: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
 
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+/* ── Scrollbar ─────────────────────────────────────────────── */
+* { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+.dark * { scrollbar-color: #475569 transparent; }
 
-/* Colores temáticos por módulo */
-.theme-emerald { --theme-color: #10b981; }
-.theme-blue { --theme-color: #3b82f6; }
-.theme-violet { --theme-color: #a855f7; }
+/* ── Sidebar mobile slide (Tailwind no genera transition-transform inline) */
+#sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
-/* Sidebar mobile transitions */
-#sidebar { transition: transform 0.25s ease; }
-#sidebar-overlay { transition: opacity 0.25s ease; }
+/* ── Accordion nav ──────────────────────────────────────────── */
+.nav-submenu { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+.nav-submenu.open { max-height: 600px; }
+.nav-chevron { transition: transform 0.25s ease; }
+.nav-chevron.open { transform: rotate(180deg); }
+
+/* ── Animación contenido ────────────────────────────────────── */
+.admin-content-wrap {
+    animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Lucide icon size helpers (w-4.5 / h-4.5) ──────────────── */
+.w-4\.5 { width: 1.125rem; }
+.h-4\.5 { height: 1.125rem; }
+
+/* ── Badge de categoría (reutilizable) ──────────────────────── */
+.cat-badge-brand {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.65rem;
+    border-radius: 0.375rem;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    background: #eef2ff;
+    color: #4f46e5;
+    border: 1px solid #e0e7ff;
+}
+.dark .cat-badge-brand {
+    background: rgba(99,102,241,0.12);
+    color: #a5b4fc;
+    border-color: rgba(99,102,241,0.25);
+}
+
+/* ── Toolbar search (usado en vistas con layout propio) ─────── */
+.toolbar-search {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.875rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.toolbar-search:focus-within {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+    background: #fff;
+}
+.dark .toolbar-search {
+    background: rgba(15,23,42,0.5);
+    border-color: #334155;
+}
+.dark .toolbar-search:focus-within {
+    border-color: #818cf8;
+    background: rgba(30,41,59,0.8);
+}
+.toolbar-search input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 0.875rem;
+    width: 100%;
+    color: #1e293b;
+}
+.dark .toolbar-search input { color: #e2e8f0; }
+.toolbar-search input::placeholder { color: #94a3b8; }
+
+/* ── Card premium (usada en vistas que no tienen tabla) ─────── */
+.card-premium {
+    background: #ffffff;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(226,232,240,0.7);
+    box-shadow: 0 2px 6px 0 rgba(67,89,113,0.12);
+}
+.dark .card-premium {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 2px 6px 0 rgba(0,0,0,0.25);
+}
+
+/* ── Row checkboxes (premium-checkbox style) ─────────────────── */
+.row-check {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid #cbd5e1;
+    border-radius: 0.375rem;
+    background-color: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+.dark .row-check {
+    background-color: #1e293b;
+    border-color: #475569;
+}
+.row-check:hover {
+    border-color: #818cf8;
+    background-color: #fff;
+}
+.dark .row-check:hover {
+    border-color: #6366f1;
+    background-color: #334155;
+}
+.row-check:checked {
+    background-color: #6366f1;
+    border-color: #6366f1;
+}
+.row-check:checked::after {
+    content: '';
+    position: absolute;
+    width: 0.35rem;
+    height: 0.6rem;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    margin-top: -0.15rem;
+}
+.row-check:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
+}
+
+/* ── Bulk toolbar ─────────────────────────────────────────── */
+.bulk-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(248,250,252,0.3);
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.8125rem;
+}
+.dark .bulk-bar {
+    background: rgba(30,41,59,0.5);
+    border-color: #334155;
+}
+
+/* Counter pill: white box with border */
+.bulk-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+    white-space: nowrap;
+}
+.dark .bulk-counter {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+.bulk-counter > span:first-child {
+    color: #6366f1;
+    display: inline-flex;
+    align-items: center;
+}
+.dark .bulk-counter > span:first-child {
+    color: #818cf8;
+}
+.bulk-count {
+    color: #6366f1;
+}
+.dark .bulk-count {
+    color: #818cf8;
+}
+
+/* Actions group: dims when nothing selected */
+.bulk-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: opacity 0.2s;
+}
+.bulk-actions.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.bulk-sep {
+    width: 1px;
+    height: 1.5rem;
+    background: #e2e8f0;
+    flex-shrink: 0;
+}
+.dark .bulk-sep { background: #334155; }
+
+.bulk-delete-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #dc2626;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+.bulk-delete-btn:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+}
+.dark .bulk-delete-btn {
+    color: #f87171;
+    background: rgba(220,38,38,0.1);
+    border-color: rgba(220,38,38,0.25);
+}
+.dark .bulk-delete-btn:hover {
+    background: rgba(220,38,38,0.18);
+    border-color: rgba(220,38,38,0.4);
+}

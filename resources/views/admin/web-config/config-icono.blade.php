@@ -4,66 +4,66 @@
 @section('section', 'Configurar Web')
 
 @section('content')
-<div class="p-8 max-w-3xl mx-auto">
+<div class="max-w-[720px] mx-auto">
 
-    <a href="{{ route('admin.web-config.index') }}"
-       class="inline-flex items-center gap-2 text-slate-500 hover:text-slate-800 text-sm font-medium mb-8 transition-colors">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        Volver a Configuraciones
-    </a>
+    <div class="mb-6 flex items-start gap-4">
+        <a href="{{ route('admin.web-config.index') }}"
+            class="mt-0.5 p-2 rounded-lg bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-500 dark:text-slate-400 transition-colors shadow-premium dark:shadow-premium-dark">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        </a>
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Iconos del Navbar</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Configura un icono diferente para cada módulo. Aparece a la izquierda del nombre en el navbar.</p>
+        </div>
+    </div>
 
     @if(session('success'))
-    <div class="mb-6 flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 px-5 py-4 rounded-xl text-sm font-medium">
-        <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+    <div class="mb-5 flex items-center gap-3 px-5 py-3.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-xl text-sm font-medium">
+        <i data-lucide="check-circle" class="w-4 h-4 shrink-0"></i>
         {{ session('success') }}
     </div>
     @endif
 
-    <div class="mb-6">
-        <h1 class="text-2xl font-black text-slate-800">Iconos del Navbar</h1>
-        <p class="text-slate-500 text-sm mt-1">Configura un icono diferente para cada módulo. Aparece a la izquierda del nombre en el navbar.</p>
-    </div>
-
     @php
     $modules = [
-        'portal'    => ['label' => 'Portal Principal', 'color' => 'amber',  'key' => 'nav_logo_portal'],
-        'biblioteca'=> ['label' => 'Biblioteca',        'color' => 'emerald','key' => 'nav_logo_biblioteca'],
-        'fototeca'  => ['label' => 'Fototeca',          'color' => 'blue',   'key' => 'nav_logo_fototeca'],
+        'nav_logo_portal'     => ['label' => 'Portal Principal', 'key' => 'nav_logo_portal',     'icon' => 'home',   'color' => 'amber'],
+        'nav_logo_biblioteca' => ['label' => 'Biblioteca',        'key' => 'nav_logo_biblioteca', 'icon' => 'book',   'color' => 'emerald'],
+        'nav_logo_fototeca'   => ['label' => 'Fototeca',          'key' => 'nav_logo_fototeca',   'icon' => 'camera', 'color' => 'blue'],
     ];
-    $colors = [
-        'amber'   => ['bg'=>'bg-amber-50',   'icon'=>'text-amber-500',   'btn'=>'bg-amber-500 hover:bg-amber-600',   'border'=>'hover:border-amber-400',   'text'=>'group-hover:text-amber-600'],
-        'emerald' => ['bg'=>'bg-emerald-50', 'icon'=>'text-emerald-500', 'btn'=>'bg-emerald-600 hover:bg-emerald-700','border'=>'hover:border-emerald-400', 'text'=>'group-hover:text-emerald-600'],
-        'blue'    => ['bg'=>'bg-blue-50',    'icon'=>'text-blue-500',    'btn'=>'bg-blue-600 hover:bg-blue-700',     'border'=>'hover:border-blue-400',    'text'=>'group-hover:text-blue-600'],
+    $colorMap = [
+        'amber'   => ['bg' => 'bg-amber-50 dark:bg-amber-500/10',   'icon' => 'text-amber-500',   'hover_border' => 'hover:border-amber-400 dark:hover:border-amber-500', 'btn' => 'bg-amber-500 hover:bg-amber-600'],
+        'emerald' => ['bg' => 'bg-emerald-50 dark:bg-emerald-500/10','icon' => 'text-emerald-500', 'hover_border' => 'hover:border-emerald-400 dark:hover:border-emerald-500','btn' => 'bg-emerald-600 hover:bg-emerald-700'],
+        'blue'    => ['bg' => 'bg-blue-50 dark:bg-blue-500/10',     'icon' => 'text-blue-500',    'hover_border' => 'hover:border-blue-400 dark:hover:border-blue-500',   'btn' => 'bg-blue-600 hover:bg-blue-700'],
     ];
     @endphp
 
-    <div class="flex flex-col gap-6">
+    <div class="space-y-5">
     @foreach($modules as $slug => $mod)
-    @php $c = $colors[$mod['color']]; $current = $icons[$mod['key']] ?? null; @endphp
+    @php $c = $colorMap[$mod['color']]; $current = $icons[$mod['key']] ?? null; @endphp
 
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        <div class="px-8 py-5 border-b border-slate-100 flex items-center gap-4">
-            <div class="w-10 h-10 {{ $c['bg'] }} rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 {{ $c['icon'] }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-            </div>
-            <div>
-                <h2 class="text-base font-black text-slate-800">{{ $mod['label'] }}</h2>
-                <p class="text-xs text-slate-400">Clave: <code class="bg-slate-100 px-1 rounded">{{ $mod['key'] }}</code></p>
+    <div class="bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-dark-border flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/20">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 {{ $c['bg'] }} rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="{{ $mod['icon'] }}" class="w-5 h-5 {{ $c['icon'] }}"></i>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-slate-800 dark:text-white text-sm">{{ $mod['label'] }}</h3>
+                    <p class="text-xs text-slate-400 dark:text-slate-500">Clave: <code class="bg-slate-100 dark:bg-slate-700 px-1 rounded text-slate-600 dark:text-slate-300">{{ $mod['key'] }}</code></p>
+                </div>
             </div>
             @if($current)
-            <div class="ml-auto flex items-center gap-3">
-                <div class="w-12 h-12 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden">
-                    <img src="{{ asset('storage/' . $current) }}" alt="Icono actual" class="w-9 h-9 object-contain">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
+                    <img src="{{ asset('storage/' . $current) }}" alt="Icono actual" class="w-8 h-8 object-contain">
                 </div>
-                <form action="{{ route('admin.web-config.icono.destroy') }}" method="POST"
-                      onsubmit="return confirm('¿Eliminar el icono de {{ $mod['label'] }}?')">
+                <form action="{{ route('admin.web-config.icono.destroy') }}" method="POST">
                     @csrf @method('DELETE')
                     <input type="hidden" name="key" value="{{ $mod['key'] }}">
                     <button type="submit"
-                            class="inline-flex items-center gap-1.5 text-red-600 hover:text-red-700 border border-red-200 hover:border-red-300 bg-red-50 hover:bg-red-100 text-xs font-semibold px-3 py-2 rounded-xl transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            onclick="confirmDelete(this.closest('form'), '¿Eliminar el icono de {{ $mod['label'] }}?'); return false;"
+                            class="inline-flex items-center gap-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-xs font-medium px-3 py-2 rounded-lg transition-colors">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                         Eliminar
                     </button>
                 </form>
@@ -76,28 +76,26 @@
                 @csrf
                 <input type="hidden" name="key" value="{{ $mod['key'] }}">
 
-                <label class="block w-full cursor-pointer border-2 border-dashed border-slate-200 {{ $c['border'] }} rounded-2xl px-6 py-5 transition-colors group" id="dropzone-{{ $slug }}">
+                <label class="block w-full cursor-pointer border-2 border-dashed border-slate-200 dark:border-slate-700 {{ $c['hover_border'] }} rounded-xl px-6 py-5 transition-colors group" id="dropzone-{{ $slug }}">
                     <input type="file" name="icono" accept="image/*" class="hidden" onchange="previewIcon(this, '{{ $slug }}')">
                     <div id="preview-{{ $slug }}" class="hidden mb-3 flex justify-center">
-                        <img id="preview-img-{{ $slug }}" src="" alt="Preview" class="w-14 h-14 object-contain rounded-xl border border-slate-200">
+                        <img id="preview-img-{{ $slug }}" src="" alt="Preview" class="w-14 h-14 object-contain rounded-xl border border-slate-200 dark:border-slate-700">
                     </div>
                     <div class="flex items-center gap-4">
-                        <svg class="w-8 h-8 text-slate-300 {{ $c['text'] }} transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                        </svg>
+                        <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-300 dark:text-slate-600 group-hover:{{ $c['icon'] }} transition-colors flex-shrink-0"></i>
                         <div>
-                            <p class="text-sm font-semibold text-slate-500 {{ $c['text'] }} transition-colors">{{ $current ? 'Haz clic para reemplazar' : 'Haz clic para subir un icono' }}</p>
-                            <p class="text-xs text-slate-400 mt-0.5">PNG, JPG, WEBP o SVG · Máx. 1 MB · Recomendado: 64×64 px</p>
+                            <p class="text-sm font-medium text-slate-500 dark:text-slate-400 transition-colors">{{ $current ? 'Haz clic para reemplazar el icono' : 'Haz clic para subir un icono' }}</p>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">PNG, JPG, WEBP o SVG · Máx. 1 MB · Recomendado: 64×64 px</p>
                         </div>
                     </div>
                 </label>
 
                 @error('icono')
-                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
 
                 <button type="submit"
-                        class="mt-4 px-6 py-2.5 {{ $c['btn'] }} text-white font-bold text-sm rounded-xl transition-colors shadow-sm">
+                        class="mt-4 px-5 py-2.5 {{ $c['btn'] }} text-white font-medium text-sm rounded-lg transition-colors shadow-sm">
                     Guardar Icono
                 </button>
             </form>

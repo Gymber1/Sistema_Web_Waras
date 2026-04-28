@@ -15,7 +15,18 @@
       "Bash(php -l app/Http/Controllers/Admin/WebConfigController.php)",
       "Bash(php -l app/Http/Controllers/HomeController.php)",
       "Bash(powershell -Command \"Get-Content storage/logs/laravel.log | Select-Object -Last 80\")",
-      "Bash(powershell -Command \"Get-Content storage/logs/laravel.log | Select-String -Pattern 'local\\\\.\\(ERROR|WARNING\\)' | Select-Object -Last 10\")"
+      "Bash(powershell -Command \"Get-Content storage/logs/laravel.log | Select-String -Pattern 'local\\\\.\\(ERROR|WARNING\\)' | Select-Object -Last 10\")",
+      "Bash(grep -rn '$authors->count\\(\\)\\\\|$books->count\\(\\)\\\\|$magazines->count\\(\\)\\\\|$publishers->count\\(\\)\\\\|$specials->count\\(\\)\\\\|$photos->count\\(\\)' c:/Users/NITRO/Documents/Proyectos/Waras/resources/views/admin/)",
+      "Bash(php -l c:/Users/NITRO/Documents/Proyectos/Waras/app/Http/Controllers/Admin/BibliotecaController.php)",
+      "Bash(php -l c:/Users/NITRO/Documents/Proyectos/Waras/app/Http/Controllers/Admin/FototecaController.php)",
+      "Bash(php -l c:/Users/NITRO/Documents/Proyectos/Waras/app/Http/Controllers/Admin/UserAdminController.php)",
+      "Bash(python3 -c ' *)",
+      "Bash(xxd)",
+      "Bash(php -l database/seeders/CategorySeeder.php)",
+      "Bash(php -l database/seeders/PhotoTagSeeder.php)",
+      "Bash(php -l database/seeders/SpecialSeeder.php)",
+      "Bash(php -l database/seeders/BookSeeder.php)",
+      "Bash(php -l database/seeders/PhotoSeeder.php)"
     ]
   }
 }
