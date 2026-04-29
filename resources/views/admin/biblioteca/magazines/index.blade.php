@@ -49,7 +49,6 @@
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Título</th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Autores</th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Categorías</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Editorial</th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Año</th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Acciones</th>
                     </tr>
@@ -77,7 +76,6 @@
                         </td>
                         <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $mag->authors->pluck('name')->join(', ') ?: '—' }}</td>
                         <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $mag->categories->pluck('name')->join(', ') ?: '—' }}</td>
-                        <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $mag->publisher->name ?? '—' }}</td>
                         <td class="px-6 py-4 text-center text-slate-600 dark:text-slate-300">
                             {{ $mag->publication_date ? $mag->publication_date->format('Y') : '—' }}
                         </td>
@@ -100,7 +98,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="px-6 py-20 text-center">
+                        <td colspan="7" class="px-6 py-20 text-center">
                             <div class="flex flex-col items-center gap-3 text-slate-400 dark:text-slate-500">
                                 <i data-lucide="newspaper" class="w-10 h-10 opacity-30"></i>
                                 <p class="text-sm font-medium">No hay revistas registradas</p>

@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 
 class BibliotecaController extends Controller
 {
-    // ============= DASHBOARD DEL MÃ“DULO =============
+    // ============= DASHBOARD DEL MÓDULO =============
 
     public function adminIndex()
     {
@@ -60,7 +60,7 @@ class BibliotecaController extends Controller
             'title'            => 'required|string|max:255',
             'authors'          => 'nullable|array',
             'authors.*'        => 'exists:authors,id',
-            'document_type'    => 'required|in:Libro,Revista,ArtÃ­culo,Tesis',
+            'document_type'    => 'required|in:Libro,Revista,Artículo,Tesis',
             'section'          => 'required|in:Biblioteca Digital,Waras Editorial',
             'category_id'      => 'nullable|exists:categories,id',
             'subcategory_id'   => 'nullable|exists:categories,id',
@@ -113,7 +113,7 @@ class BibliotecaController extends Controller
             'title'            => 'required|string|max:255',
             'authors'          => 'nullable|array',
             'authors.*'        => 'exists:authors,id',
-            'document_type'    => 'required|in:Libro,Revista,ArtÃ­culo,Tesis',
+            'document_type'    => 'required|in:Libro,Revista,Artículo,Tesis',
             'section'          => 'required|in:Biblioteca Digital,Waras Editorial',
             'category_id'      => 'nullable|exists:categories,id',
             'subcategory_id'   => 'nullable|exists:categories,id',
@@ -346,7 +346,7 @@ class BibliotecaController extends Controller
         return redirect()->route('admin.biblioteca.publishers')->with('success', 'Editorial eliminada.');
     }
 
-    // ============= CATEGORÃAS =============
+    // ============= CATEGORÍAS =============
 
     public function indexCategories()
     {
@@ -373,7 +373,7 @@ class BibliotecaController extends Controller
             'parent_id' => null,
         ]);
 
-        return redirect()->route('admin.biblioteca.categories')->with('success', 'CategorÃ­a agregada correctamente.');
+        return redirect()->route('admin.biblioteca.categories')->with('success', 'Categoría agregada correctamente.');
     }
 
     public function updateCategory(Request $request, Category $category)
@@ -382,7 +382,7 @@ class BibliotecaController extends Controller
 
         $category->update(['name' => $request->name]);
 
-        return redirect()->route('admin.biblioteca.categories')->with('success', 'CategorÃ­a actualizada correctamente.');
+        return redirect()->route('admin.biblioteca.categories')->with('success', 'Categoría actualizada correctamente.');
     }
 
     public function editCategory(Category $category)
@@ -393,10 +393,10 @@ class BibliotecaController extends Controller
     public function destroyCategory(Category $category)
     {
         $category->delete();
-        return redirect()->route('admin.biblioteca.categories')->with('success', 'CategorÃ­a eliminada.');
+        return redirect()->route('admin.biblioteca.categories')->with('success', 'Categoría eliminada.');
     }
 
-    // ============= SUBCATEGORÃAS =============
+    // ============= SUBCATEGORÍAS =============
 
     public function createSubcategory()
     {
@@ -421,7 +421,7 @@ class BibliotecaController extends Controller
             'parent_id' => $request->parent_id,
         ]);
 
-        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'SubcategorÃ­a agregada correctamente.');
+        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'Subcategoría agregada correctamente.');
     }
 
     public function editSubcategory(Category $category)
@@ -446,13 +446,13 @@ class BibliotecaController extends Controller
             'parent_id' => $request->parent_id,
         ]);
 
-        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'SubcategorÃ­a actualizada correctamente.');
+        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'Subcategoría actualizada correctamente.');
     }
 
     public function destroySubcategory(Category $category)
     {
         $category->delete();
-        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'SubcategorÃ­a eliminada.');
+        return redirect()->route('admin.biblioteca.subcategories')->with('success', 'Subcategoría eliminada.');
     }
 
     // ============= REVISTAS =============
@@ -485,7 +485,7 @@ class BibliotecaController extends Controller
             'title'            => 'required|string|max:255',
             'authors'          => 'nullable|array',
             'authors.*'        => 'exists:authors,id',
-            'document_type'    => 'required|in:Libro,Revista,ArtÃ­culo,Tesis',
+            'document_type'    => 'required|in:Libro,Revista,Artículo,Tesis',
             'category_id'      => 'nullable|exists:categories,id',
             'subcategory_id'   => 'nullable|exists:categories,id',
             'publication_date' => 'nullable|date',
@@ -505,7 +505,7 @@ class BibliotecaController extends Controller
             'title'            => $request->title,
             'slug'             => $this->uniqueSlug($request->title, Book::class),
             'document_type'    => $request->document_type,
-            'section'          => 'Revistas',
+            'section'          => 'Biblioteca Digital',
             'publication_date' => $request->publication_date,
             'pages'            => $request->pages,
             'summary'          => $request->summary,
@@ -537,8 +537,7 @@ class BibliotecaController extends Controller
             'title'            => 'required|string|max:255',
             'authors'          => 'nullable|array',
             'authors.*'        => 'exists:authors,id',
-            'document_type'    => 'required|in:Libro,Revista,ArtÃ­culo,Tesis',
-            'section'          => 'required|in:Biblioteca Digital,Waras Editorial',
+            'document_type'    => 'required|in:Libro,Revista,Artículo,Tesis',
             'category_id'      => 'nullable|exists:categories,id',
             'subcategory_id'   => 'nullable|exists:categories,id',
             'publication_date' => 'nullable|date',
@@ -557,7 +556,7 @@ class BibliotecaController extends Controller
         $data = [
             'title'            => $request->title,
             'document_type'    => $request->document_type,
-            'section'          => 'Revistas',
+            'section'          => 'Biblioteca Digital',
             'publication_date' => $request->publication_date,
             'pages'            => $request->pages,
             'summary'          => $request->summary,
@@ -624,7 +623,7 @@ class BibliotecaController extends Controller
         return back()->with('success', 'Descriptor eliminado.');
     }
 
-    // ============= SUBCATEGORÃAS =============
+    // ============= SUBCATEGORÍAS =============
 
     public function indexSubcategories()
     {
@@ -669,7 +668,7 @@ class BibliotecaController extends Controller
         }
 
         Special::create($data);
-        return redirect()->route('admin.biblioteca.specials')->with('success', 'ColecciÃ³n especial creada correctamente.');
+        return redirect()->route('admin.biblioteca.specials')->with('success', 'Colección especial creada correctamente.');
     }
 
     public function editSpecial(Special $special)
@@ -694,13 +693,13 @@ class BibliotecaController extends Controller
         }
 
         $special->update($data);
-        return redirect()->route('admin.biblioteca.specials')->with('success', 'ColecciÃ³n especial actualizada.');
+        return redirect()->route('admin.biblioteca.specials')->with('success', 'Colección especial actualizada.');
     }
 
     public function destroySpecial(Special $special)
     {
         $special->delete();
-        return redirect()->route('admin.biblioteca.specials')->with('success', 'ColecciÃ³n eliminada.');
+        return redirect()->route('admin.biblioteca.specials')->with('success', 'Colección eliminada.');
     }
 
     public function assignBooksIndex()
@@ -730,7 +729,7 @@ class BibliotecaController extends Controller
             $book = Book::find($request->book_id);
             return response()->json(['success' => true, 'title' => $book->title, 'book_id' => $book->id]);
         }
-        return back()->with('success', 'Elemento agregado a la colecciÃ³n.');
+        return back()->with('success', 'Elemento agregado a la colección.');
     }
 
     public function unassignBook(Special $special, Book $book)
@@ -740,14 +739,14 @@ class BibliotecaController extends Controller
         if (request()->expectsJson()) {
             return response()->json(['success' => true]);
         }
-        return back()->with('success', 'Elemento quitado de la colecciÃ³n.');
+        return back()->with('success', 'Elemento quitado de la colección.');
     }
 
     public function clearSpecial(Special $special)
     {
         $special->books()->detach();
         return redirect()->route('admin.biblioteca.specials.edit', $special)
-            ->with('success', 'Todos los elementos han sido quitados de la colecciÃ³n.');
+            ->with('success', 'Todos los elementos han sido quitados de la colección.');
     }
 
     public function destroySpecialCover(Special $special)
@@ -823,7 +822,7 @@ class BibliotecaController extends Controller
             }
             $cat->delete();
         }
-        return back()->with('success', count($ids) . ' categorÃ­a(s) eliminada(s).');
+        return back()->with('success', count($ids) . ' categoría(s) eliminada(s).');
     }
 
     public function bulkDestroySubcategories(Request $request)
@@ -831,7 +830,7 @@ class BibliotecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Category::whereIn('id', $ids)->where('type', 'biblioteca')->whereNotNull('parent_id')->delete();
-        return back()->with('success', count($ids) . ' subcategorÃ­a(s) eliminada(s).');
+        return back()->with('success', count($ids) . ' subcategoría(s) eliminada(s).');
     }
 
     public function bulkDestroySpecials(Request $request)
@@ -843,7 +842,7 @@ class BibliotecaController extends Controller
             $s->books()->detach();
             $s->delete();
         });
-        return back()->with('success', count($ids) . ' colecciÃ³n(es) eliminada(s).');
+        return back()->with('success', count($ids) . ' colección(es) eliminada(s).');
     }
 
     // ============= HELPERS =============

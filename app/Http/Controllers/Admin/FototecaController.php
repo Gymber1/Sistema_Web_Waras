@@ -32,10 +32,10 @@ class FototecaController extends Controller
 
     public function indexPhotos()
     {
-        $photos = Photo::with(['photographers', 'categories'])->paginate(10);
-        $photographers = Photographer::orderBy('full_name')->get();
-        $categories = Category::flatTree('fototeca');
-        return view('admin.fototeca.photos.index', compact('photos', 'photographers', 'categories'));
+        $photos = Photo::with(['photographers:id,full_name', 'tag:id,name'])
+            ->select('id', 'title', 'slug', 'thumbnail_path', 'full_image_path', 'source_type', 'external_url', 'tag_id', 'location', 'year')
+            ->paginate(10);
+        return view('admin.fototeca.photos.index', compact('photos'));
     }
 
     public function createPhoto()
@@ -54,12 +54,17 @@ class FototecaController extends Controller
 
     public function storePhoto(Request $request)
     {
+        // Filtrar valores vacíos de categories[] antes de validar
+        $request->merge([
+            'categories' => array_values(array_filter($request->input('categories', []))),
+        ]);
+
         $request->validate([
             'title'           => 'required|string|max:255',
             'photographers'   => 'nullable|array',
             'photographers.*' => 'exists:photographers,id',
             'categories'      => 'nullable|array',
-            'categories.*'    => 'exists:categories,id',
+            'categories.*'    => 'integer|exists:categories,id',
             'tag_id'          => 'nullable|exists:photo_tags,id',
             'year'            => 'nullable|integer|min:1800|max:' . date('Y'),
             'provider'        => 'nullable|string|max:255',
@@ -129,12 +134,17 @@ class FototecaController extends Controller
 
     public function updatePhoto(Request $request, Photo $photo)
     {
+        // Filtrar valores vacíos de categories[] antes de validar
+        $request->merge([
+            'categories' => array_values(array_filter($request->input('categories', []))),
+        ]);
+
         $request->validate([
             'title'           => 'required|string|max:255',
             'photographers'   => 'nullable|array',
             'photographers.*' => 'exists:photographers,id',
             'categories'      => 'nullable|array',
-            'categories.*'    => 'exists:categories,id',
+            'categories.*'    => 'integer|exists:categories,id',
             'tag_id'          => 'nullable|exists:photo_tags,id',
             'year'            => 'nullable|integer|min:1800|max:' . date('Y'),
             'provider'        => 'nullable|string|max:255',

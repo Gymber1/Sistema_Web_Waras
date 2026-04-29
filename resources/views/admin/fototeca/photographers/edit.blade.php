@@ -97,8 +97,8 @@
                 </div>
 
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Estudios o crítica a su obra</label>
-                    <textarea name="studies_critique" rows="3" placeholder="Análisis, publicaciones o crítica académica sobre su obra..."
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Crítica a sus fotografias</label>
+                    <textarea name="studies_critique" rows="3" placeholder="Análisis, publicaciones o crítica académica sobre su fotografias..."
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all resize-y">{{ old('studies_critique', $photographer->studies_critique) }}</textarea>
                 </div>
 

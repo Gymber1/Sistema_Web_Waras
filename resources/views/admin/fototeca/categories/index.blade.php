@@ -39,7 +39,6 @@
                     <tr>
                         <th class="px-4 py-4 w-10"><input type="checkbox" class="row-check check-all"></th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nombre</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Descripción</th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Acciones</th>
                     </tr>
                 </thead>
@@ -48,7 +47,6 @@
                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group">
                         <td class="px-4 py-4"><input type="checkbox" class="row-check" value="{{ $cat->id }}"></td>
                         <td class="px-6 py-4 font-semibold text-slate-800 dark:text-white">{{ $cat->name }}</td>
-                        <td class="px-6 py-4 text-slate-500 dark:text-slate-400">{{ $cat->description ?? '—' }}</td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center justify-end gap-1">
                                 <a href="{{ route('admin.fototeca.categories.edit', $cat) }}"
@@ -68,7 +66,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="px-6 py-16 text-center">
+                        <td colspan="3" class="px-6 py-16 text-center">
                             <div class="flex flex-col items-center gap-3 text-slate-400 dark:text-slate-500">
                                 <i data-lucide="tag" class="w-8 h-8 opacity-30"></i>
                                 <p class="text-sm font-medium">No hay categorías registradas</p>

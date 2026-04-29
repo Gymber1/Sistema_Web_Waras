@@ -68,15 +68,19 @@
                         {{-- Thumbnail --}}
                         <td class="px-6 py-4">
                             @if($photo->thumbnail_url)
-                                <div class="w-16 h-11 rounded-lg shadow-sm overflow-hidden ring-1 ring-slate-200 dark:ring-slate-700">
+                                <div class="photo-thumb-wrap w-16 h-11 rounded-lg shadow-sm overflow-hidden ring-1 ring-slate-200 dark:ring-slate-700 relative">
+                                    {{-- Skeleton shimmer --}}
+                                    <div class="photo-skeleton absolute inset-0 bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
                                     <img src="{{ $photo->thumbnail_url }}" alt="{{ $photo->title }}"
-                                        class="w-full h-full object-cover cursor-zoom-in hover:opacity-90 transition-opacity"
+                                        loading="lazy"
+                                        class="photo-img w-full h-full object-cover cursor-zoom-in hover:opacity-90 transition-all duration-300 opacity-0 relative z-10"
                                         onclick="openLightbox('{{ $photo->image_url }}', '{{ addslashes($photo->title) }}')"
-                                        onerror="this.style.display='none'">
+                                        onload="this.classList.remove('opacity-0'); this.previousElementSibling.style.display='none';"
+                                        onerror="this.closest('.photo-thumb-wrap').innerHTML='<div class=\'w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center\'><svg class=\'w-4 h-4 text-slate-400\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z\'/></svg></div>';">
                                 </div>
                             @else
-                                <div class="w-16 h-11 rounded-lg bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center ring-1 ring-slate-200 dark:ring-slate-700">
-                                    <i data-lucide="image" class="w-4 h-4 text-brand-400"></i>
+                                <div class="w-16 h-11 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center ring-1 ring-slate-200 dark:ring-slate-700">
+                                    <i data-lucide="image" class="w-4 h-4 text-slate-400"></i>
                                 </div>
                             @endif
                         </td>
@@ -107,7 +111,7 @@
 
                         {{-- Fecha --}}
                         <td class="px-6 py-4 text-center text-slate-600 dark:text-slate-300">
-                            {{ $photo->capture_date ? $photo->capture_date->format('Y') : '—' }}
+                            {{ $photo->year ?? '—' }}
                         </td>
 
                         {{-- Acciones --}}

@@ -70,7 +70,7 @@
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <p class="hero-eyebrow">Asociación de Ciencia y Cultura</p>
-            <h1 class="hero-title">Portal de la Ciencia y la Cultura AncashinaL</h1>
+            <h1 class="hero-title">Portal de la Ciencia y la Cultura Ancashina</h1>
             <p class="hero-subtitle">"Descubre nuestras colecciones de libros, fotos, música, artes y eventos históricos que preservan la memoria de nuestra región."</p>
             <a href="#colecciones" class="hero-cta">Explorar Servicios</a>
         </div>
