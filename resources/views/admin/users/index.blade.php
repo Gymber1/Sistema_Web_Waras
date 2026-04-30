@@ -149,17 +149,23 @@
             </button>
         </div>
         <div class="p-8 overflow-y-auto">
+            @if($errors->any())
+            <div class="mb-5 flex items-start gap-3 px-4 py-3.5 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 rounded-xl text-sm">
+                <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                <ul class="space-y-1">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+            </div>
+            @endif
             <form action="{{ route('admin.usuarios.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 @csrf
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nombre Completo <span class="text-red-500">*</span></label>
-                    <input type="text" name="name" required
+                    <input type="text" name="name" value="{{ old('name') }}" required
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all"
                         placeholder="Ingrese el nombre">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Email <span class="text-red-500">*</span></label>
-                    <input type="email" name="email" required
+                    <input type="email" name="email" value="{{ old('email') }}" required
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all"
                         placeholder="correo@ejemplo.com">
                 </div>
@@ -173,8 +179,8 @@
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Rol <span class="text-red-500">*</span></label>
                     <select name="role" required
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
-                        <option value="moderator">Moderador</option>
-                        <option value="admin">Admin Global</option>
+                        <option value="moderator" {{ old('role') === 'admin' ? '' : 'selected' }}>Moderador</option>
+                        <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin Global</option>
                     </select>
                 </div>
                 <div class="md:col-span-2">
@@ -183,6 +189,7 @@
                         @foreach($modules as $module)
                         <label class="flex items-center gap-3 cursor-pointer">
                             <input type="checkbox" name="modules[]" value="{{ $module->id }}"
+                                {{ in_array($module->id, old('modules', [])) ? 'checked' : '' }}
                                 class="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-brand-500 focus:ring-brand-500/50">
                             <span class="text-sm text-slate-700 dark:text-slate-300">{{ $module->name }}</span>
                         </label>
@@ -258,6 +265,10 @@ function openResetModal(userId, userName) {
     document.getElementById('resetForm').action = `/admin/usuarios/${userId}/reset-password`;
     openModal('modal-reset');
 }
+
+@if($errors->any())
+    openModal('modal-create');
+@endif
 
 document.getElementById('searchUsers').addEventListener('input', function() {
     const q = this.value.toLowerCase();
