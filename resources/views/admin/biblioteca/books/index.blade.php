@@ -110,7 +110,7 @@
 
                         {{-- Año --}}
                         <td class="px-6 py-4 text-center text-slate-600 dark:text-slate-300">
-                            {{ $book->publication_date ? $book->publication_date->format('Y') : '—' }}
+                            {{ $book->publication_year ?? ($book->publication_date ? \Carbon\Carbon::parse($book->publication_date)->format('Y') : '—') }}
                         </td>
 
                         {{-- Acciones --}}

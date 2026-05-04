@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\PhotoTag;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class PhotoTagSeeder extends Seeder
 {
@@ -17,7 +18,10 @@ class PhotoTagSeeder extends Seeder
         ];
 
         foreach ($tags as $tag) {
-            PhotoTag::firstOrCreate(['name' => $tag]);
+            PhotoTag::firstOrCreate(
+                ['name' => $tag],
+                ['slug' => Str::slug($tag)],
+            );
         }
     }
 }

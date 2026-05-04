@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('section', 'Biblioteca > Revistas > Editar')
 
@@ -52,7 +52,7 @@
                     </div>
                     <div class="relative mt-2">
                         <input type="text" id="search-authors" placeholder="Buscar y agregar autor..."
-                            oninput="filterDropdown(this,'dropdown-authors')" onfocus="showDropdown('dropdown-authors')"
+                            oninput="filterDropdown(this,'dropdown-authors')" onclick="showDropdown('dropdown-authors')"
                             class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
                         <div id="dropdown-authors" class="tag-dropdown hidden absolute z-50 w-full mt-1 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-lg shadow-lg max-h-52 overflow-y-auto">
                             @foreach($authors as $author)
@@ -143,7 +143,7 @@
                     </div>
                     <div class="relative mt-2">
                         <input type="text" id="search-descriptors" placeholder="Buscar y agregar descriptor..."
-                            oninput="filterDropdown(this,'dropdown-descriptors')" onfocus="showDropdown('dropdown-descriptors')"
+                            oninput="filterDropdown(this,'dropdown-descriptors')" onclick="showDropdown('dropdown-descriptors')"
                             class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
                         <div id="dropdown-descriptors" class="tag-dropdown hidden absolute z-50 w-full mt-1 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-lg shadow-lg max-h-52 overflow-y-auto">
                             @foreach($descriptors as $descriptor)
@@ -250,13 +250,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function removeChip(btn) { btn.closest('.chip').remove(); }
-function showDropdown(id) { document.getElementById(id).classList.remove('hidden'); }
-function filterDropdown(input, dropdownId) {
+function showDropdown(id) { const dd = document.getElementById(id); const hasItems = dd.querySelectorAll('button:not([style*="none"])').length > 0; if (hasItems) dd.classList.remove('hidden'); }
+function filterDropdown(input, dropdownId) { // replaced below
     const q = input.value.toLowerCase();
     const dropdown = document.getElementById(dropdownId);
     dropdown.classList.toggle('hidden', q.length === 0);
     dropdown.querySelectorAll('button').forEach(btn => { btn.style.display = btn.dataset.name?.toLowerCase().includes(q) ? '' : 'none'; });
-}
 function addChip(btn, chipsId, field) {
     const id = btn.dataset.id, name = btn.dataset.name;
     const chips = document.getElementById(chipsId);
@@ -273,8 +272,8 @@ function toggleSourceFields() {
     document.getElementById('field-external').style.display = val === 'external' ? '' : 'none';
     document.getElementById('field-pdf').style.display = val === 'pdf' ? '' : 'none';
 }
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.relative')) document.querySelectorAll('.tag-dropdown').forEach(d => d.classList.add('hidden'));
+document.addEventListener('mousedown', function(e) {
+    if (!e.target.closest('.tag-dropdown') && !e.target.closest('[id^="search-"]')) document.querySelectorAll('.tag-dropdown').forEach(d => d.classList.add('hidden'));
 });
 toggleSourceFields();
 </script>

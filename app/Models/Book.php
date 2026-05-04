@@ -19,6 +19,9 @@ class Book extends Model
         'title',
         'slug',
         'summary',
+        'city',
+        'editorial_name',
+        'publication_year',
         'imprint',
         'publication_date',
         'document_type',
@@ -36,8 +39,7 @@ class Book extends Model
     ];
 
     protected $casts = [
-        'publication_date' => 'date',
-        'is_special'       => 'boolean',
+        'is_special' => 'boolean',
     ];
 
     /**

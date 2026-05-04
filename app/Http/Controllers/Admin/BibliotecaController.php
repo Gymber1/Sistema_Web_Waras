@@ -64,10 +64,11 @@ class BibliotecaController extends Controller
             'section'          => 'required|in:Biblioteca Digital,Waras Editorial',
             'category_id'      => 'nullable|exists:categories,id',
             'subcategory_id'   => 'nullable|exists:categories,id',
-            'publication_date' => 'nullable|date',
+            'publication_year' => 'nullable|integer|min:1800|max:2100',
             'pages'            => 'nullable|integer|min:1',
             'summary'          => 'nullable|string',
-            'imprint'          => 'nullable|string|max:500',
+            'city'             => 'nullable|string|max:150',
+            'editorial_name'   => 'nullable|string|max:255',
             'descriptors'      => 'nullable|array',
             'descriptors.*'    => 'exists:descriptors,id',
             'provider'         => 'nullable|string|max:500',
@@ -82,10 +83,11 @@ class BibliotecaController extends Controller
             'slug'             => $this->uniqueSlug($request->title, Book::class),
             'document_type'    => $request->document_type,
             'section'          => $request->input('section', 'Biblioteca Digital'),
-            'publication_date' => $request->publication_date,
+            'publication_year' => $request->publication_year,
             'pages'            => $request->pages,
             'summary'          => $request->summary,
-            'imprint'          => $request->imprint,
+            'city'             => $request->city,
+            'editorial_name'   => $request->editorial_name,
             'provider'         => $request->provider,
             'source_type'      => $request->source_type,
             'external_url'     => $request->source_type === 'external' ? $request->external_url : null,
@@ -117,10 +119,11 @@ class BibliotecaController extends Controller
             'section'          => 'required|in:Biblioteca Digital,Waras Editorial',
             'category_id'      => 'nullable|exists:categories,id',
             'subcategory_id'   => 'nullable|exists:categories,id',
-            'publication_date' => 'nullable|date',
+            'publication_year' => 'nullable|integer|min:1800|max:2100',
             'pages'            => 'nullable|integer|min:1',
             'summary'          => 'nullable|string',
-            'imprint'          => 'nullable|string|max:500',
+            'city'             => 'nullable|string|max:150',
+            'editorial_name'   => 'nullable|string|max:255',
             'descriptors'      => 'nullable|array',
             'descriptors.*'    => 'exists:descriptors,id',
             'provider'         => 'nullable|string|max:500',
@@ -134,10 +137,11 @@ class BibliotecaController extends Controller
             'title'            => $request->title,
             'document_type'    => $request->document_type,
             'section'          => $request->section,
-            'publication_date' => $request->publication_date,
+            'publication_year' => $request->publication_year,
             'pages'            => $request->pages,
             'summary'          => $request->summary,
-            'imprint'          => $request->imprint,
+            'city'             => $request->city,
+            'editorial_name'   => $request->editorial_name,
             'provider'         => $request->provider,
             'source_type'      => $request->source_type,
             'external_url'     => $request->source_type === 'external' ? $request->external_url : null,
@@ -186,9 +190,10 @@ class BibliotecaController extends Controller
 
     public function createAuthor()
     {
-        $books      = Book::orderBy('title')->get(['id', 'title', 'document_type']);
-        $categories = Category::where('type', 'biblioteca')->whereNull('parent_id')->get();
-        return view('admin.biblioteca.authors.create', compact('books', 'categories'));
+        $books          = Book::orderBy('title')->get(['id', 'title', 'document_type']);
+        $categories     = Category::where('type', 'biblioteca')->whereNull('parent_id')->orderBy('name')->get();
+        $subcategories  = Category::where('type', 'biblioteca')->whereNotNull('parent_id')->orderBy('name')->get();
+        return view('admin.biblioteca.authors.create', compact('books', 'categories', 'subcategories'));
     }
 
     public function storeAuthor(Request $request)
@@ -253,9 +258,10 @@ class BibliotecaController extends Controller
     public function editAuthor(Author $author)
     {
         $author->load(['books', 'categories']);
-        $books      = Book::orderBy('title')->get(['id', 'title', 'document_type']);
-        $categories = Category::where('type', 'biblioteca')->whereNull('parent_id')->get();
-        return view('admin.biblioteca.authors.edit', compact('author', 'books', 'categories'));
+        $books         = Book::orderBy('title')->get(['id', 'title', 'document_type']);
+        $categories    = Category::where('type', 'biblioteca')->whereNull('parent_id')->orderBy('name')->get();
+        $subcategories = Category::where('type', 'biblioteca')->whereNotNull('parent_id')->orderBy('name')->get();
+        return view('admin.biblioteca.authors.edit', compact('author', 'books', 'categories', 'subcategories'));
     }
 
     public function destroyAuthor(Author $author)
@@ -488,10 +494,11 @@ class BibliotecaController extends Controller
             'document_type'    => 'required|in:Libro,Revista,Artículo,Tesis',
             'category_id'      => 'nullable|exists:categories,id',
             'subcategory_id'   => 'nullable|exists:categories,id',
-            'publication_date' => 'nullable|date',
+            'publication_year' => 'nullable|integer|min:1800|max:2100',
             'pages'            => 'nullable|integer|min:1',
             'summary'          => 'nullable|string',
-            'imprint'          => 'nullable|string|max:500',
+            'city'             => 'nullable|string|max:150',
+            'editorial_name'   => 'nullable|string|max:255',
             'descriptors'      => 'nullable|array',
             'descriptors.*'    => 'exists:descriptors,id',
             'provider'         => 'nullable|string|max:500',
@@ -506,10 +513,11 @@ class BibliotecaController extends Controller
             'slug'             => $this->uniqueSlug($request->title, Book::class),
             'document_type'    => $request->document_type,
             'section'          => 'Biblioteca Digital',
-            'publication_date' => $request->publication_date,
+            'publication_year' => $request->publication_year,
             'pages'            => $request->pages,
             'summary'          => $request->summary,
-            'imprint'          => $request->imprint,
+            'city'             => $request->city,
+            'editorial_name'   => $request->editorial_name,
             'provider'         => $request->provider,
             'source_type'      => $request->source_type,
             'external_url'     => $request->source_type === 'external' ? $request->external_url : null,
@@ -540,10 +548,11 @@ class BibliotecaController extends Controller
             'document_type'    => 'required|in:Libro,Revista,Artículo,Tesis',
             'category_id'      => 'nullable|exists:categories,id',
             'subcategory_id'   => 'nullable|exists:categories,id',
-            'publication_date' => 'nullable|date',
+            'publication_year' => 'nullable|integer|min:1800|max:2100',
             'pages'            => 'nullable|integer|min:1',
             'summary'          => 'nullable|string',
-            'imprint'          => 'nullable|string|max:500',
+            'city'             => 'nullable|string|max:150',
+            'editorial_name'   => 'nullable|string|max:255',
             'descriptors'      => 'nullable|array',
             'descriptors.*'    => 'exists:descriptors,id',
             'provider'         => 'nullable|string|max:500',
@@ -557,10 +566,11 @@ class BibliotecaController extends Controller
             'title'            => $request->title,
             'document_type'    => $request->document_type,
             'section'          => 'Biblioteca Digital',
-            'publication_date' => $request->publication_date,
+            'publication_year' => $request->publication_year,
             'pages'            => $request->pages,
             'summary'          => $request->summary,
-            'imprint'          => $request->imprint,
+            'city'             => $request->city,
+            'editorial_name'   => $request->editorial_name,
             'provider'         => $request->provider,
             'source_type'      => $request->source_type,
             'external_url'     => $request->source_type === 'external' ? $request->external_url : null,
@@ -615,6 +625,18 @@ class BibliotecaController extends Controller
         ]);
 
         return back()->with('success', 'Descriptor agregado correctamente.');
+    }
+
+    public function updateDescriptor(Request $request, Descriptor $descriptor)
+    {
+        $request->validate(['name' => 'required|string|max:100|unique:descriptors,name,' . $descriptor->id]);
+
+        $descriptor->update([
+            'name' => strtolower(trim($request->name)),
+            'slug' => $this->uniqueSlug($request->name, Descriptor::class, $descriptor->id),
+        ]);
+
+        return back()->with('success', 'Descriptor actualizado correctamente.');
     }
 
     public function destroyDescriptor(Descriptor $descriptor)
@@ -847,12 +869,12 @@ class BibliotecaController extends Controller
 
     // ============= HELPERS =============
 
-    private function uniqueSlug(string $name, string $model): string
+    private function uniqueSlug(string $name, string $model, ?int $excludeId = null): string
     {
         $base = Str::slug($name);
         $slug = $base;
         $i    = 1;
-        while ($model::where('slug', $slug)->exists()) {
+        while ($model::where('slug', $slug)->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))->exists()) {
             $slug = $base . '-' . $i++;
         }
         return $slug;

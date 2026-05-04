@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('section', 'Biblioteca > Libros > Editar')
 
@@ -55,7 +55,7 @@
                     </div>
                     <div class="relative mt-2">
                         <input type="text" id="search-authors" placeholder="Buscar y agregar autor..."
-                            oninput="filterDropdown(this,'dropdown-authors')" onfocus="showDropdown('dropdown-authors')"
+                            oninput="filterDropdown(this,'dropdown-authors')" onclick="showDropdown('dropdown-authors')"
                             class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
                         <div id="dropdown-authors" class="tag-dropdown hidden absolute z-50 w-full mt-1 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-xl shadow-lg max-h-52 overflow-y-auto">
                             @foreach($authors as $author)
@@ -123,10 +123,24 @@
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all resize-y">{{ old('summary', $book->summary) }}</textarea>
                 </div>
 
-                {{-- Pie de Imprenta --}}
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Pie de Imprenta <span class="text-slate-400 dark:text-slate-500 font-normal">(Lugar, editorial, año)</span></label>
-                    <input type="text" name="imprint" value="{{ old('imprint', $book->imprint) }}" placeholder="Ej. Huaraz: UNASAM, 2020"
+                {{-- Ciudad --}}
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Ciudad</label>
+                    <input type="text" name="city" value="{{ old('city', $book->city) }}" placeholder="Ej. Huaraz"
+                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                </div>
+
+                {{-- Editorial --}}
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Editorial</label>
+                    <input type="text" name="editorial_name" value="{{ old('editorial_name', $book->editorial_name) }}" placeholder="Ej. UNASAM"
+                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                </div>
+
+                {{-- Año de publicación --}}
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Año de publicación</label>
+                    <input type="number" name="publication_year" value="{{ old('publication_year', $book->publication_year) }}" min="1800" max="2100" placeholder="Ej. 2020"
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
                 </div>
 
@@ -134,13 +148,6 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">N° Páginas</label>
                     <input type="number" name="pages" value="{{ old('pages', $book->pages) }}" min="1"
-                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
-                </div>
-
-                {{-- Fecha de publicación --}}
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Fecha de publicación</label>
-                    <input type="date" name="publication_date" value="{{ old('publication_date', $book->publication_date?->format('Y-m-d')) }}"
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
                 </div>
 
@@ -158,7 +165,7 @@
                     </div>
                     <div class="relative mt-2">
                         <input type="text" id="search-descriptors" placeholder="Buscar y agregar descriptor..."
-                            oninput="filterDropdown(this,'dropdown-descriptors')" onfocus="showDropdown('dropdown-descriptors')"
+                            oninput="filterDropdown(this,'dropdown-descriptors')" onclick="showDropdown('dropdown-descriptors')"
                             class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
                         <div id="dropdown-descriptors" class="tag-dropdown hidden absolute z-50 w-full mt-1 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-xl shadow-lg max-h-52 overflow-y-auto">
                             @foreach($descriptors as $descriptor)
@@ -264,13 +271,24 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function removeChip(btn) { btn.closest('.chip').remove(); }
-function showDropdown(id) { document.getElementById(id).classList.remove('hidden'); }
+
+function showDropdown(id) {
+    document.querySelectorAll('.tag-dropdown').forEach(d => d.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+}
+
 function filterDropdown(input, dropdownId) {
     const q = input.value.toLowerCase();
-    const dropdown = document.getElementById(dropdownId);
-    dropdown.classList.toggle('hidden', q.length === 0);
-    dropdown.querySelectorAll('button').forEach(btn => { btn.style.display = btn.dataset.name?.toLowerCase().includes(q) ? '' : 'none'; });
+    const dd = document.getElementById(dropdownId);
+    let visible = 0;
+    dd.querySelectorAll('button').forEach(btn => {
+        const match = !q || btn.dataset.name?.toLowerCase().includes(q);
+        btn.style.display = match ? '' : 'none';
+        if (match) visible++;
+    });
+    dd.classList.toggle('hidden', visible === 0);
 }
+
 function addChip(btn, chipsId, field) {
     const id = btn.dataset.id, name = btn.dataset.name;
     const chips = document.getElementById(chipsId);
@@ -282,14 +300,20 @@ function addChip(btn, chipsId, field) {
     const s = document.getElementById('search-' + field); if (s) s.value = '';
     document.getElementById('dropdown-' + field).classList.add('hidden');
 }
+
+document.addEventListener('mousedown', function(e) {
+    const inDropdown = e.target.closest('.tag-dropdown');
+    const inSearchInput = e.target.tagName === 'INPUT' && e.target.id && e.target.id.startsWith('search-');
+    if (!inDropdown && !inSearchInput) {
+        document.querySelectorAll('.tag-dropdown').forEach(d => d.classList.add('hidden'));
+    }
+});
+
 function toggleSourceFields() {
     const val = document.getElementById('source_type').value;
     document.getElementById('field-external').style.display = val === 'external' ? '' : 'none';
     document.getElementById('field-pdf').style.display = val === 'pdf' ? '' : 'none';
 }
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.relative')) document.querySelectorAll('.tag-dropdown').forEach(d => d.classList.add('hidden'));
-});
 toggleSourceFields();
 </script>
 @endsection

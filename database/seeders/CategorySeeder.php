@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
@@ -28,11 +29,13 @@ class CategorySeeder extends Seeder
         foreach ($bibliotecaData as $parentName => $children) {
             $parent = Category::firstOrCreate(
                 ['name' => $parentName, 'type' => 'biblioteca', 'parent_id' => null],
+                ['slug' => $this->uniqueSlug($parentName)],
             );
 
             foreach ($children as $childName) {
                 Category::firstOrCreate(
                     ['name' => $childName, 'type' => 'biblioteca', 'parent_id' => $parent->id],
+                    ['slug' => $this->uniqueSlug($childName)],
                 );
             }
         }
@@ -67,16 +70,26 @@ class CategorySeeder extends Seeder
         $this->createFototecaCategories($fototecaData, null);
     }
 
+    private function uniqueSlug(string $name): string
+    {
+        $base = Str::slug($name);
+        $slug = $base;
+        $i = 2;
+        while (Category::where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $i++;
+        }
+        return $slug;
+    }
+
     private function createFototecaCategories(array $categories, ?int $parentId): void
     {
         foreach ($categories as $key => $value) {
             $name = is_string($key) ? $key : $value;
 
-            $category = Category::firstOrCreate([
-                'name'      => $name,
-                'type'      => 'fototeca',
-                'parent_id' => $parentId,
-            ]);
+            $category = Category::firstOrCreate(
+                ['name' => $name, 'type' => 'fototeca', 'parent_id' => $parentId],
+                ['slug' => $this->uniqueSlug($name)],
+            );
 
             if (is_array($value) && count($value) > 0) {
                 $this->createFototecaCategories($value, $category->id);

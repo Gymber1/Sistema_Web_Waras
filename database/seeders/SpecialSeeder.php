@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Special;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class SpecialSeeder extends Seeder
 {
@@ -20,7 +21,10 @@ class SpecialSeeder extends Seeder
         ];
 
         foreach ($colecciones as $coleccion) {
-            Special::firstOrCreate(['name' => $coleccion]);
+            Special::firstOrCreate(
+                ['slug' => Str::slug($coleccion)],
+                ['title' => $coleccion],
+            );
         }
     }
 }

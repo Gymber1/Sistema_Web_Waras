@@ -130,7 +130,7 @@
                     : route('biblioteca.libros.show', $book);
                 $colors = ['#5c4033','#2d4a6e','#3a5a40','#6b3a2a','#1a3a5c','#4a3a6b'];
                 $color  = $colors[$loop->index % count($colors)];
-                $year   = $book->publication_date ? $book->publication_date->format('Y') : 'S/F';
+                $year   = $book->publication_year ?? ($book->publication_date ? \Carbon\Carbon::parse($book->publication_date)->format('Y') : 'S/F');
                 $author = $book->authors->first()?->name ?? 'Anónimo';
             @endphp
             <div class="book-card" data-title="{{ strtolower($book->title) }} {{ strtolower($author) }}"

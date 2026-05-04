@@ -110,6 +110,7 @@ Route::middleware('auth')->group(function () {
             // Descriptores
             Route::get('/descriptors', [AdminBibliotecaController::class, 'indexDescriptors'])->name('descriptors');
             Route::post('/descriptors', [AdminBibliotecaController::class, 'storeDescriptor'])->name('descriptors.store');
+            Route::put('/descriptors/{descriptor}', [AdminBibliotecaController::class, 'updateDescriptor'])->name('descriptors.update');
             Route::delete('/descriptors/{descriptor}', [AdminBibliotecaController::class, 'destroyDescriptor'])->name('descriptors.destroy');
 
             // SubCategorías
@@ -188,6 +189,7 @@ Route::middleware('auth')->group(function () {
             // Etiquetas
             Route::get('/tags', [AdminFototecaController::class, 'indexTags'])->name('tags');
             Route::post('/tags', [AdminFototecaController::class, 'storeTag'])->name('tags.store');
+            Route::put('/tags/{photoTag}', [AdminFototecaController::class, 'updateTag'])->name('tags.update');
             Route::delete('/tags/{photoTag}', [AdminFototecaController::class, 'destroyTag'])->name('tags.destroy');
 
         });

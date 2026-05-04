@@ -133,7 +133,7 @@
                     </div>
                     <div class="book-info">
                         <h3 class="book-title">{{ $book->title }}</h3>
-                        <p class="book-year">{{ $book->publication_date ? $book->publication_date->format('Y') : 'S/F' }}</p>
+                        <p class="book-year">{{ $book->publication_year ?? ($book->publication_date ? \Carbon\Carbon::parse($book->publication_date)->format('Y') : 'S/F') }}</p>
                         @if($book->publisher)
                             <p class="book-publisher">{{ $book->publisher->name }}</p>
                         @endif

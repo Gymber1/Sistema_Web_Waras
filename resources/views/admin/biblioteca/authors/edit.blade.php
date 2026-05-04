@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('section', 'Biblioteca > Autores > Editar')
 
@@ -93,7 +93,7 @@
                     </div>
                     <div class="relative mt-2">
                         <input type="text" id="search-books" placeholder="Buscar y agregar libro..."
-                            oninput="filterDropdown(this, 'dropdown-books')" onfocus="showDropdown('dropdown-books')"
+                            oninput="filterDropdown(this, 'dropdown-books')" onclick="showDropdown('dropdown-books')"
                             class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
                         <div id="dropdown-books" class="tag-dropdown hidden absolute z-50 w-full mt-1 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-xl shadow-lg max-h-52 overflow-y-auto">
                             @foreach($books as $book)
@@ -110,7 +110,7 @@
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Categorías</label>
                     <div id="chips-categories" class="flex flex-wrap gap-2 p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800/50 min-h-[48px]">
-                        @foreach($author->categories as $cat)
+                        @foreach($author->categories->filter(fn($c) => is_null($c->parent_id)) as $cat)
                         <span class="chip inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-full">
                             {{ $cat->name }}
                             <button type="button" onclick="removeChip(this)" class="hover:text-red-600 font-bold text-sm leading-none">×</button>
@@ -120,13 +120,38 @@
                     </div>
                     <div class="relative mt-2">
                         <input type="text" id="search-categories" placeholder="Buscar y agregar categoría..."
-                            oninput="filterDropdown(this, 'dropdown-categories')" onfocus="showDropdown('dropdown-categories')"
+                            oninput="filterDropdown(this, 'dropdown-categories')" onclick="showDropdown('dropdown-categories')"
                             class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
                         <div id="dropdown-categories" class="tag-dropdown hidden absolute z-50 w-full mt-1 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-xl shadow-lg max-h-52 overflow-y-auto">
                             @foreach($categories as $cat)
                             <button type="button" data-id="{{ $cat->id }}" data-name="{{ $cat->name }}"
                                 onclick="addChip(this, 'chips-categories', 'categories')"
                                 class="w-full text-left px-4 py-2.5 hover:bg-brand-50 dark:hover:bg-brand-500/10 text-sm text-slate-700 dark:text-slate-300 border-b border-slate-50 dark:border-dark-border last:border-0">{{ $cat->name }}</button>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">SubCategorías</label>
+                    <div id="chips-subcategories" class="flex flex-wrap gap-2 p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800/50 min-h-[48px]">
+                        @foreach($author->categories->filter(fn($c) => !is_null($c->parent_id)) as $sub)
+                        <span class="chip inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-full">
+                            {{ $sub->name }}
+                            <button type="button" onclick="removeChip(this)" class="hover:text-red-600 font-bold text-sm leading-none">×</button>
+                            <input type="hidden" name="categories[]" value="{{ $sub->id }}">
+                        </span>
+                        @endforeach
+                    </div>
+                    <div class="relative mt-2">
+                        <input type="text" id="search-subcategories" placeholder="Buscar y agregar subcategoría..."
+                            oninput="filterDropdown(this, 'dropdown-subcategories')" onclick="showDropdown('dropdown-subcategories')"
+                            class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                        <div id="dropdown-subcategories" class="tag-dropdown hidden absolute z-50 w-full mt-1 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-xl shadow-lg max-h-52 overflow-y-auto">
+                            @foreach($subcategories as $sub)
+                            <button type="button" data-id="{{ $sub->id }}" data-name="{{ $sub->name }}"
+                                onclick="addChip(this, 'chips-subcategories', 'categories')"
+                                class="w-full text-left px-4 py-2.5 hover:bg-brand-50 dark:hover:bg-brand-500/10 text-sm text-slate-700 dark:text-slate-300 border-b border-slate-50 dark:border-dark-border last:border-0">{{ $sub->name }}</button>
                             @endforeach
                         </div>
                     </div>
@@ -145,13 +170,24 @@
 </div>
 <script>
 function removeChip(btn) { btn.closest('.chip').remove(); }
-function showDropdown(id) { document.getElementById(id).classList.remove('hidden'); }
+
+function showDropdown(id) {
+    document.querySelectorAll('.tag-dropdown').forEach(d => d.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+}
+
 function filterDropdown(input, dropdownId) {
     const q = input.value.toLowerCase();
-    const dropdown = document.getElementById(dropdownId);
-    dropdown.classList.toggle('hidden', q.length === 0);
-    dropdown.querySelectorAll('button').forEach(btn => { btn.style.display = btn.dataset.name?.toLowerCase().includes(q) ? '' : 'none'; });
+    const dd = document.getElementById(dropdownId);
+    let visible = 0;
+    dd.querySelectorAll('button').forEach(btn => {
+        const match = !q || btn.dataset.name?.toLowerCase().includes(q);
+        btn.style.display = match ? '' : 'none';
+        if (match) visible++;
+    });
+    dd.classList.toggle('hidden', visible === 0);
 }
+
 function addChip(btn, chipsId, field) {
     const id = btn.dataset.id, name = btn.dataset.name;
     const chips = document.getElementById(chipsId);
@@ -163,8 +199,13 @@ function addChip(btn, chipsId, field) {
     const s = document.getElementById('search-' + field); if (s) s.value = '';
     document.getElementById('dropdown-' + field).classList.add('hidden');
 }
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.relative')) document.querySelectorAll('.tag-dropdown').forEach(d => d.classList.add('hidden'));
+
+document.addEventListener('mousedown', function(e) {
+    const inDropdown = e.target.closest('.tag-dropdown');
+    const inSearchInput = e.target.tagName === 'INPUT' && e.target.id && e.target.id.startsWith('search-');
+    if (!inDropdown && !inSearchInput) {
+        document.querySelectorAll('.tag-dropdown').forEach(d => d.classList.add('hidden'));
+    }
 });
 </script>
 @endsection

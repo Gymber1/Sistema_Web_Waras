@@ -491,6 +491,17 @@ class FototecaController extends Controller
         return redirect()->route('admin.fototeca.tags')->with('success', 'Etiqueta agregada correctamente.');
     }
 
+    public function updateTag(Request $request, PhotoTag $photoTag)
+    {
+        $request->validate(['name' => 'required|string|max:100|unique:photo_tags,name,' . $photoTag->id]);
+        $name = mb_strtolower(trim($request->name));
+        $photoTag->update([
+            'name' => $name,
+            'slug' => $this->uniqueSlug($name, PhotoTag::class, $photoTag->id),
+        ]);
+        return back()->with('success', 'Etiqueta actualizada correctamente.');
+    }
+
     public function destroyTag(PhotoTag $photoTag)
     {
         $photoTag->delete();
@@ -566,12 +577,12 @@ class FototecaController extends Controller
 
     // ============= HELPERS =============
 
-    private function uniqueSlug(string $name, string $model): string
+    private function uniqueSlug(string $name, string $model, ?int $excludeId = null): string
     {
         $base = Str::slug($name);
         $slug = $base;
         $i    = 1;
-        while ($model::where('slug', $slug)->exists()) {
+        while ($model::where('slug', $slug)->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))->exists()) {
             $slug = $base . '-' . $i++;
         }
         return $slug;

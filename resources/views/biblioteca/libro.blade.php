@@ -96,8 +96,14 @@
             @endif
 
             <div class="meta-row">
-                @if($book->publication_date)
-                <span class="meta-item"><i class="fas fa-calendar-alt"></i> {{ $book->publication_date->format('Y') }}</span>
+                @if($book->city)
+                <span class="meta-item"><i class="fas fa-map-marker-alt"></i> {{ $book->city }}</span>
+                @endif
+                @if($book->editorial_name)
+                <span class="meta-item"><i class="fas fa-building"></i> {{ $book->editorial_name }}</span>
+                @endif
+                @if($book->publication_year)
+                <span class="meta-item"><i class="fas fa-calendar-alt"></i> {{ $book->publication_year }}</span>
                 @endif
                 @if($book->pages)
                 <span class="meta-item"><i class="fas fa-file-alt"></i> {{ $book->pages }} páginas</span>
@@ -116,7 +122,7 @@
             @endif
 
             @if($book->publisher)
-            <p class="section-label">Editorial</p>
+            <p class="section-label">Editorial (catálogo)</p>
             <p class="section-text">
                 <a href="{{ route('biblioteca.editoriales.show', $book->publisher) }}" style="color:var(--accent);text-decoration:none;font-weight:600">
                     {{ $book->publisher->name }}
