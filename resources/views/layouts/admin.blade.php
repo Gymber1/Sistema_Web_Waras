@@ -195,7 +195,8 @@
                                 ['route'=>'admin.fototeca.photographers','pattern'=>'admin.fototeca.photographers*','label'=>'Fotógrafos'],
                                 ['route'=>'admin.fototeca.categories',   'pattern'=>'admin.fototeca.categories*',   'label'=>'Categorías'],
                                 ['route'=>'admin.fototeca.subcategories','pattern'=>'admin.fototeca.subcategories*','label'=>'SubCategorías'],
-                                ['route'=>'admin.fototeca.sublevels',    'pattern'=>'admin.fototeca.sublevels*',    'label'=>'SubNiveles'],
+                                ['route'=>'admin.fototeca.sublevels',    'pattern'=>'admin.fototeca.sublevels*',    'label'=>'1er Nivel'],
+                                ['route'=>'admin.fototeca.secondlevels', 'pattern'=>'admin.fototeca.secondlevels*','label'=>'2do Nivel'],
                                 ['route'=>'admin.fototeca.tags',         'pattern'=>'admin.fototeca.tags*',         'label'=>'Etiquetas'],
                             ]; @endphp
                             @foreach($fotoLinks as $l)
@@ -691,6 +692,7 @@
                 'table-photos':          '{{ route("admin.fototeca.photos.bulk-destroy") }}',
                 'table-photographers':   '{{ route("admin.fototeca.photographers.bulk-destroy") }}',
                 'table-sublevels':       '{{ route("admin.fototeca.sublevels.bulk-destroy") }}',
+                'table-secondlevels':    '{{ route("admin.fototeca.secondlevels.bulk-destroy") }}',
                 'table-users':           '{{ route("admin.usuarios.bulk-destroy") }}',
             };
             const actionUrl = routeMap[tableId];
@@ -698,7 +700,7 @@
                 'table-books': 'libro(s)', 'table-magazines': 'revista(s)', 'table-authors': 'autor(es)',
                 'table-publishers': 'editorial(es)', 'table-specials': 'colección(es)',
                 'table-photos': 'fotografía(s)', 'table-photographers': 'fotógrafo(s)',
-                'table-sublevels': 'subnivel(es)', 'table-users': 'usuario(s)',
+                'table-sublevels': 'subnivel(es)', 'table-secondlevels': '2do nivel(es)', 'table-users': 'usuario(s)',
             };
             const item = labelMap[tableId] ?? 'elemento(s)';
             title.textContent = `Eliminar ${count} ${item}`;

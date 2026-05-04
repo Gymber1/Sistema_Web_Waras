@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('section', 'Fototeca > Subniveles > Nuevo')
+@section('section', 'Fototeca > 1er Nivel > Nuevo')
 
 @section('content')
 <div class="max-w-[600px] mx-auto">
@@ -12,7 +12,7 @@
         </a>
         <div>
             <div class="flex items-center gap-3 flex-wrap">
-                <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Agregar Subnivel</h2>
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Agregar 1er Nivel</h2>
                 <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 border border-brand-100 dark:border-brand-500/20">NIVEL 3</span>
             </div>
             <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Elige la subcategoría a la que pertenece este subnivel.</p>
@@ -51,7 +51,7 @@
             <a href="{{ route('admin.fototeca.sublevels') }}"
                 class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors">Cancelar</a>
             <button type="submit"
-                class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium shadow-lg shadow-emerald-500/20 transition-all">Guardar subnivel</button>
+                class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium shadow-lg shadow-emerald-500/20 transition-all">Guardar 1er nivel</button>
         </div>
     </form>
 </div>

@@ -186,6 +186,15 @@ Route::middleware('auth')->group(function () {
             Route::delete('/sublevels/{category}', [AdminFototecaController::class, 'destroySublevel'])->name('sublevels.destroy');
             Route::delete('/sublevels', [AdminFototecaController::class, 'bulkDestroySublevels'])->name('sublevels.bulk-destroy');
 
+            // 2do Nivel (Nivel 4)
+            Route::get('/secondlevels', [AdminFototecaController::class, 'indexSecondlevels'])->name('secondlevels');
+            Route::get('/secondlevels/create', [AdminFototecaController::class, 'createSecondlevel'])->name('secondlevels.create');
+            Route::post('/secondlevels', [AdminFototecaController::class, 'storeSecondlevel'])->name('secondlevels.store');
+            Route::get('/secondlevels/{category}/edit', [AdminFototecaController::class, 'editSecondlevel'])->name('secondlevels.edit');
+            Route::put('/secondlevels/{category}', [AdminFototecaController::class, 'updateSecondlevel'])->name('secondlevels.update');
+            Route::delete('/secondlevels/{category}', [AdminFototecaController::class, 'destroySecondlevel'])->name('secondlevels.destroy');
+            Route::delete('/secondlevels', [AdminFototecaController::class, 'bulkDestroySecondlevels'])->name('secondlevels.bulk-destroy');
+
             // Etiquetas
             Route::get('/tags', [AdminFototecaController::class, 'indexTags'])->name('tags');
             Route::post('/tags', [AdminFototecaController::class, 'storeTag'])->name('tags.store');

@@ -1,21 +1,21 @@
 @extends('layouts.admin')
 
-@section('section', 'Fototeca > 1er Nivel > Editar')
+@section('section', 'Fototeca > 2do Nivel > Editar')
 
 @section('content')
 <div class="max-w-[600px] mx-auto">
 
     <div class="mb-6 flex items-start gap-4">
-        <a href="{{ route('admin.fototeca.sublevels') }}"
+        <a href="{{ route('admin.fototeca.secondlevels') }}"
             class="mt-0.5 p-2 rounded-lg bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-500 dark:text-slate-400 transition-colors shadow-premium dark:shadow-premium-dark">
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
         </a>
         <div>
             <div class="flex items-center gap-3 flex-wrap">
-                <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Editar 1er Nivel</h2>
-                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 border border-brand-100 dark:border-brand-500/20">NIVEL 3</span>
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Editar 2do Nivel</h2>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 border border-brand-100 dark:border-brand-500/20">NIVEL 4</span>
             </div>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Modifica el nombre o la subcategoría padre y guarda los cambios.</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Modifica el nombre o el 1er nivel padre y guarda los cambios.</p>
         </div>
     </div>
 
@@ -26,7 +26,7 @@
     </div>
     @endif
 
-    <form action="{{ route('admin.fototeca.sublevels.update', $category) }}" method="POST">
+    <form action="{{ route('admin.fototeca.secondlevels.update', $category) }}" method="POST">
         @csrf @method('PUT')
         <div class="bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border p-6 md:p-8 space-y-6">
             <div>
@@ -35,20 +35,20 @@
                     class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Subcategoría padre <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">1er Nivel padre <span class="text-red-500">*</span></label>
                 <select name="parent_id" required
                     class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
-                    <option value="">— Seleccionar subcategoría —</option>
+                    <option value="">— Seleccionar 1er nivel —</option>
                     @foreach($parentCategories as $cat)
                     <option value="{{ $cat->id }}" @selected(old('parent_id', $category->parent_id) == $cat->id)>
-                        {{ $cat->parent?->name ? $cat->parent->name . ' › ' : '' }}{{ $cat->name }}
+                        {{ $cat->parent?->parent?->name ? $cat->parent->parent->name . ' › ' : '' }}{{ $cat->parent?->name ? $cat->parent->name . ' › ' : '' }}{{ $cat->name }}
                     </option>
                     @endforeach
                 </select>
             </div>
         </div>
         <div class="mt-5 flex gap-3 justify-end">
-            <a href="{{ route('admin.fototeca.sublevels') }}"
+            <a href="{{ route('admin.fototeca.secondlevels') }}"
                 class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors">Cancelar</a>
             <button type="submit"
                 class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium shadow-lg shadow-emerald-500/20 transition-all">Guardar cambios</button>

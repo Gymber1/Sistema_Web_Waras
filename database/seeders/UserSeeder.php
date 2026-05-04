@@ -26,7 +26,16 @@ class UserSeeder extends Seeder
             'is_deletable' => false,    // Protegido: nunca puede ser eliminado
         ]);
 
-        // 2. MODERADOR DE BIBLIOTECA
+        // 2. ADMIN DE PRUEBA
+        User::create([
+            'name'            => 'admin',
+            'email'           => 'admin@admin',
+            'password'        => 'admin',
+            'is_admin_global' => true,
+            'is_deletable'    => true,
+        ]);
+
+        // 3. MODERADOR DE BIBLIOTECA
         $moderador_biblioteca = User::create([
             'name' => 'Moderador Biblioteca',
             'email' => 'biblioteca@waras.local',

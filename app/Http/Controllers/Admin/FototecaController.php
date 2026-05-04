@@ -48,8 +48,11 @@ class FototecaController extends Controller
         $sublevels        = Category::where('type', 'fototeca')->whereNotNull('parent_id')
                                 ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id'))
                                 ->orderBy('name')->get();
+        $secondlevels     = Category::where('type', 'fototeca')->whereNotNull('parent_id')
+                                ->whereHas('parent', fn($q) => $q->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')))
+                                ->orderBy('name')->get();
         $tags = PhotoTag::orderBy('name')->get();
-        return view('admin.fototeca.photos.create', compact('photographers', 'categories', 'subcategories', 'sublevels', 'tags'));
+        return view('admin.fototeca.photos.create', compact('photographers', 'categories', 'subcategories', 'sublevels', 'secondlevels', 'tags'));
     }
 
     public function storePhoto(Request $request)
@@ -118,17 +121,21 @@ class FototecaController extends Controller
         $sublevels     = Category::where('type', 'fototeca')->whereNotNull('parent_id')
                             ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id'))
                             ->orderBy('name')->get();
+        $secondlevels  = Category::where('type', 'fototeca')->whereNotNull('parent_id')
+                            ->whereHas('parent', fn($q) => $q->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')))
+                            ->orderBy('name')->get();
 
         // Determina qué categoría/subcategoría/subnivel tiene la foto actualmente
         $photoCatIds = $photo->categories->pluck('id')->toArray();
         $selCategory    = $photo->categories->first(fn($c) => $categories->contains('id', $c->id));
         $selSubcategory = $photo->categories->first(fn($c) => $subcategories->contains('id', $c->id));
         $selSublevel    = $photo->categories->first(fn($c) => $sublevels->contains('id', $c->id));
+        $selSecondlevel = $photo->categories->first(fn($c) => $secondlevels->contains('id', $c->id));
 
         $tags = PhotoTag::orderBy('name')->get();
         return view('admin.fototeca.photos.edit', compact(
-            'photo', 'photographers', 'categories', 'subcategories', 'sublevels',
-            'selCategory', 'selSubcategory', 'selSublevel', 'tags'
+            'photo', 'photographers', 'categories', 'subcategories', 'sublevels', 'secondlevels',
+            'selCategory', 'selSubcategory', 'selSublevel', 'selSecondlevel', 'tags'
         ));
     }
 
@@ -573,6 +580,92 @@ class FototecaController extends Controller
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Category::whereIn('id', $ids)->where('type', 'fototeca')->delete();
         return back()->with('success', count($ids) . ' subnivel(es) eliminado(s).');
+    }
+
+    // ============= 2DO NIVEL (Nivel 4) =============
+
+    public function indexSecondlevels()
+    {
+        $secondlevels = Category::where('type', 'fototeca')
+            ->whereHas('parent', fn($q) => $q->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')))
+            ->with(['parent', 'parent.parent', 'parent.parent.parent'])
+            ->orderBy('name')
+            ->paginate(10);
+        $parentCategories = Category::where('type', 'fototeca')
+            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                ->whereHas('parent', fn($q2) => $q2->whereNull('parent_id')))
+            ->with(['parent', 'parent.parent'])
+            ->orderBy('name')
+            ->get();
+        return view('admin.fototeca.secondlevels.index', compact('secondlevels', 'parentCategories'));
+    }
+
+    public function createSecondlevel()
+    {
+        $parentCategories = Category::where('type', 'fototeca')
+            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                ->whereHas('parent', fn($q2) => $q2->whereNull('parent_id')))
+            ->with(['parent', 'parent.parent'])
+            ->orderBy('name')
+            ->get();
+        return view('admin.fototeca.secondlevels.create', compact('parentCategories'));
+    }
+
+    public function storeSecondlevel(Request $request)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'parent_id' => 'required|exists:categories,id',
+        ]);
+
+        Category::create([
+            'name'      => $request->name,
+            'slug'      => $this->uniqueSlug($request->name, Category::class),
+            'type'      => 'fototeca',
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return redirect()->route('admin.fototeca.secondlevels')->with('success', '2do Nivel agregado correctamente.');
+    }
+
+    public function editSecondlevel(Category $category)
+    {
+        $parentCategories = Category::where('type', 'fototeca')
+            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                ->whereHas('parent', fn($q2) => $q2->whereNull('parent_id')))
+            ->with(['parent', 'parent.parent'])
+            ->orderBy('name')
+            ->get();
+        return view('admin.fototeca.secondlevels.edit', compact('category', 'parentCategories'));
+    }
+
+    public function updateSecondlevel(Request $request, Category $category)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'parent_id' => 'required|exists:categories,id',
+        ]);
+
+        $category->update([
+            'name'      => $request->name,
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return redirect()->route('admin.fototeca.secondlevels')->with('success', '2do Nivel actualizado correctamente.');
+    }
+
+    public function destroySecondlevel(Category $category)
+    {
+        $category->delete();
+        return redirect()->route('admin.fototeca.secondlevels')->with('success', '2do Nivel eliminado.');
+    }
+
+    public function bulkDestroySecondlevels(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Category::whereIn('id', $ids)->where('type', 'fototeca')->delete();
+        return back()->with('success', count($ids) . ' 2do nivel(es) eliminado(s).');
     }
 
     // ============= HELPERS =============

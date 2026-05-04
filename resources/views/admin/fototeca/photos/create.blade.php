@@ -81,8 +81,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">SubNivel</label>
-                    <select id="sel-sublevel" disabled
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">1er Nivel</label>
+                    <select id="sel-sublevel" onchange="cascadeSecondlevel()" disabled
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all disabled:opacity-50">
                         <option value="">— Primero elige subcategoría —</option>
                         @foreach($sublevels as $sub)
@@ -90,6 +90,18 @@
                         @endforeach
                     </select>
                     <input type="hidden" name="categories[]" id="hid-sublevel">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">2do Nivel</label>
+                    <select id="sel-secondlevel" disabled
+                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all disabled:opacity-50">
+                        <option value="">— Primero elige 1er nivel —</option>
+                        @foreach($secondlevels as $sec)
+                        <option value="{{ $sec->id }}" data-parent="{{ $sec->parent_id }}" data-name="{{ $sec->name }}">{{ $sec->name }}</option>
+                        @endforeach
+                    </select>
+                    <input type="hidden" name="categories[]" id="hid-secondlevel">
                 </div>
 
                 <div>
@@ -206,13 +218,17 @@ function cascadeSubcategory() {
     const catId  = document.getElementById('sel-category').value;
     const selSub = document.getElementById('sel-subcategory');
     const selLvl = document.getElementById('sel-sublevel');
-    document.getElementById('hid-category').value    = catId;
-    document.getElementById('hid-subcategory').value = '';
-    document.getElementById('hid-sublevel').value    = '';
+    const selSec = document.getElementById('sel-secondlevel');
+    document.getElementById('hid-category').value     = catId;
+    document.getElementById('hid-subcategory').value  = '';
+    document.getElementById('hid-sublevel').value     = '';
+    document.getElementById('hid-secondlevel').value  = '';
     selSub.innerHTML = '<option value="">— Seleccionar —</option>';
     selSub.disabled  = !catId;
     selLvl.innerHTML = '<option value="">— Primero elige subcategoría —</option>';
     selLvl.disabled  = true;
+    selSec.innerHTML = '<option value="">— Primero elige 1er nivel —</option>';
+    selSec.disabled  = true;
     if (!catId) return;
     document.querySelectorAll('#sel-subcategory-all option').forEach(opt => {
         if (opt.dataset.parent == catId) selSub.appendChild(opt.cloneNode(true));
@@ -223,19 +239,37 @@ function cascadeSubcategory() {
 function cascadeSublevel() {
     const subId  = document.getElementById('sel-subcategory').value;
     const selLvl = document.getElementById('sel-sublevel');
+    const selSec = document.getElementById('sel-secondlevel');
     document.getElementById('hid-subcategory').value = subId;
     document.getElementById('hid-sublevel').value    = '';
+    document.getElementById('hid-secondlevel').value = '';
     selLvl.innerHTML = '<option value="">— Seleccionar —</option>';
     selLvl.disabled  = !subId;
+    selSec.innerHTML = '<option value="">— Primero elige 1er nivel —</option>';
+    selSec.disabled  = true;
     if (!subId) return;
     document.querySelectorAll('#sel-sublevel-all option').forEach(opt => {
         if (opt.dataset.parent == subId) selLvl.appendChild(opt.cloneNode(true));
     });
-    if (selLvl.options.length <= 1) { selLvl.innerHTML = '<option value="">— Sin subniveles —</option>'; selLvl.disabled = true; }
+    if (selLvl.options.length <= 1) { selLvl.innerHTML = '<option value="">— Sin 1er niveles —</option>'; selLvl.disabled = true; }
 }
 
-document.getElementById('sel-sublevel').addEventListener('change', function() {
-    document.getElementById('hid-sublevel').value = this.value;
+function cascadeSecondlevel() {
+    const lvlId  = document.getElementById('sel-sublevel').value;
+    const selSec = document.getElementById('sel-secondlevel');
+    document.getElementById('hid-sublevel').value    = lvlId;
+    document.getElementById('hid-secondlevel').value = '';
+    selSec.innerHTML = '<option value="">— Seleccionar —</option>';
+    selSec.disabled  = !lvlId;
+    if (!lvlId) return;
+    document.querySelectorAll('#sel-secondlevel-all option').forEach(opt => {
+        if (opt.dataset.parent == lvlId) selSec.appendChild(opt.cloneNode(true));
+    });
+    if (selSec.options.length <= 1) { selSec.innerHTML = '<option value="">— Sin 2do niveles —</option>'; selSec.disabled = true; }
+}
+
+document.getElementById('sel-secondlevel').addEventListener('change', function() {
+    document.getElementById('hid-secondlevel').value = this.value;
 });
 
 function toggleSourceFields() {
@@ -254,6 +288,11 @@ toggleSourceFields();
 <select id="sel-sublevel-all" class="hidden">
     @foreach($sublevels as $lvl)
     <option value="{{ $lvl->id }}" data-parent="{{ $lvl->parent_id }}">{{ $lvl->name }}</option>
+    @endforeach
+</select>
+<select id="sel-secondlevel-all" class="hidden">
+    @foreach($secondlevels as $sec)
+    <option value="{{ $sec->id }}" data-parent="{{ $sec->parent_id }}">{{ $sec->name }}</option>
     @endforeach
 </select>
 @endsection
