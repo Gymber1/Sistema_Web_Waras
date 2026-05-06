@@ -114,20 +114,20 @@
             <p class="section-text">{{ $book->summary }}</p>
             @endif
 
-            @if($book->publisher)
-            <p class="section-label">Editorial</p>
-            <p class="section-text">
-                <a href="{{ route('biblioteca.editoriales.show', $book->publisher) }}" style="color:var(--accent);text-decoration:none;font-weight:600">
-                    {{ $book->publisher->name }}
-                </a>
-            </p>
-            @endif
-
             @if($book->categories->count())
             <p class="section-label">Categorías</p>
             <div class="cats">
                 @foreach($book->categories as $cat)
                     <span class="cat-badge">{{ $cat->name }}</span>
+                @endforeach
+            </div>
+            @endif
+
+            @if($book->descriptors->count())
+            <p class="section-label">Descriptores</p>
+            <div class="cats">
+                @foreach($book->descriptors as $desc)
+                    <span class="cat-badge" style="background:#f0fdf4;color:#166534;border-color:#bbf7d0;">{{ $desc->name }}</span>
                 @endforeach
             </div>
             @endif

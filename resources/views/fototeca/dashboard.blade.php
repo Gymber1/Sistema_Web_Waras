@@ -62,9 +62,9 @@
         <div class="hero-bg" style="background-image:url('{{ $heroBg ?? 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?auto=format&fit=crop&w=1920&q=80' }}');"></div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <p class="hero-eyebrow">Archivo Visual de Áncash</p>
-            <h1 class="hero-title">Fototeca<br><em>Ancashina</em></h1>
-            <p class="hero-subtitle">Preservando y compartiendo la memoria visual, histórica y cultural de nuestra región.</p>
+            <p class="hero-eyebrow">{{ \App\Models\SiteSetting::get('hero_fototeca_eyebrow', 'Archivo Visual de Áncash') }}</p>
+            <h1 class="hero-title">{{ \App\Models\SiteSetting::get('hero_fototeca_title', 'Fototeca Digital Ancashina') }}</h1>
+            <p class="hero-subtitle">{{ \App\Models\SiteSetting::get('hero_fototeca_subtitle', 'Preservando y compartiendo la memoria visual, histórica y cultural de nuestra región.') }}</p>
             <div class="hero-search-container">
                 <div class="hero-search-wrap">
                     <div class="hero-search-icon-wrap">
@@ -407,10 +407,10 @@
             const sortVal = document.getElementById('sortSelect')?.value ?? 'az';
             const arr = [...items];
             if (sortVal==='az') arr.sort((a,b)=>(a.title||a.full_name||'').localeCompare(b.title||b.full_name||'','es'));
-            else if (sortVal==='recent') arr.sort((a,b)=>(parseInt(b.year)||0)-(parseInt(a.year)||0));
-            else if (sortVal==='old') arr.sort((a,b)=>(parseInt(a.year)||9999)-(parseInt(b.year)||9999));
-            else if (sortVal==='year_asc') arr.sort((a,b)=>(parseInt(a.year)||0)-(parseInt(b.year)||0));
-            else if (sortVal==='year_desc') arr.sort((a,b)=>(parseInt(b.year)||0)-(parseInt(a.year)||0));
+            else if (sortVal==='recent') arr.sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''));
+            else if (sortVal==='old') arr.sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||''));
+            else if (sortVal==='year_asc') arr.sort((a,b)=>(parseInt(a.year_sort)||0)-(parseInt(b.year_sort)||0));
+            else if (sortVal==='year_desc') arr.sort((a,b)=>(parseInt(b.year_sort)||0)-(parseInt(a.year_sort)||0));
             return arr;
         }
 

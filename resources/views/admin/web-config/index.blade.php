@@ -85,6 +85,18 @@
             <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-rose-400 transition-colors flex-shrink-0 mt-1"></i>
         </a>
 
+        <a href="{{ route('admin.web-config.hero-textos') }}"
+            class="group bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border hover:border-sky-200 dark:hover:border-sky-500/30 p-6 flex items-start gap-4 transition-all hover:-translate-y-0.5 md:col-span-2 lg:col-span-1">
+            <div class="w-12 h-12 bg-sky-50 dark:bg-sky-500/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-sky-100 dark:group-hover:bg-sky-500/20 transition-colors">
+                <i data-lucide="type" class="w-6 h-6 text-sky-500"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-slate-800 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">Textos Principales</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Edita los títulos y subtítulos del hero en el portal, biblioteca y fototeca.</p>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-sky-400 transition-colors flex-shrink-0 mt-1"></i>
+        </a>
+
     </div>
 </div>
 @endsection

@@ -101,13 +101,13 @@ class BibliotecaController extends Controller
 
     public function showBook(Book $book)
     {
-        $book->load(['authors', 'publisher', 'categories']);
+        $book->load(['authors', 'categories', 'descriptors']);
         return view('biblioteca.libro', compact('book'));
     }
 
     public function showRevista(Book $book)
     {
-        $book->load(['authors', 'publisher', 'categories']);
+        $book->load(['authors', 'categories', 'descriptors']);
         return view('biblioteca.revista', compact('book'));
     }
 

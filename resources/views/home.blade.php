@@ -69,10 +69,10 @@
         <div class="hero-slide-bg" style="background-image: url('{{ $heroBg }}');"></div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <p class="hero-eyebrow">Asociación de Ciencia y Cultura</p>
-            <h1 class="hero-title">Portal de la Ciencia y la Cultura Ancashina</h1>
+            <p class="hero-eyebrow">{{ \App\Models\SiteSetting::get('hero_portal_eyebrow', 'Asociación de Ciencia y Cultura') }}</p>
+            <h1 class="hero-title">{{ \App\Models\SiteSetting::get('hero_portal_title', 'Portal de la Ciencia y la Cultura Ancashina') }}</h1>
             <p class="hero-subtitle">"Descubre nuestras colecciones de libros, fotos, música, artes y eventos históricos que preservan la memoria de nuestra región."</p>
-            <a href="#colecciones" class="hero-cta">Explorar Servicios</a>
+            <a href="#colecciones" class="hero-cta">{{ \App\Models\SiteSetting::get('hero_portal_cta', 'Explorar Servicios') }}</a>
         </div>
         <div class="scroll-indicator">
             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 9l7 7 7-7"/></svg>

@@ -74,8 +74,8 @@
     <!-- Hero Section -->
     <section class="hero" id="heroSection" style="background: linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)), url('{{ $heroBg ?? 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' }}') center/cover no-repeat; background-attachment: fixed;">
         <div class="hero-content">
-            <h1 class="hero-title">Biblioteca Digital Ancashina</h1>
-            <p class="hero-subtitle">"Conocimiento e historia accesible para todos"</p>
+            <h1 class="hero-title">{{ \App\Models\SiteSetting::get('hero_biblioteca_title', 'Biblioteca Digital Ancashina') }}</h1>
+            <p class="hero-subtitle">{{ \App\Models\SiteSetting::get('hero_biblioteca_subtitle', '"Conocimiento e historia accesible para todos"') }}</p>
             <div class="hero-search-container">
                 <div class="search-wrapper">
                     <div class="search-wrapper-inner">
@@ -524,7 +524,8 @@
                 author:       authors.length > 0 ? authors[0].name : 'Anónimo',
                 authorId:     authors.length > 0 ? authors[0].id : null,
                 authorNames:  authors.map(a => a.name),
-                year:         book.publication_date ? book.publication_date.split('T')[0].split('-')[0] : 'S/F',
+                year:         book.publication_year || (book.publication_date ? book.publication_date.split('T')[0].split('-')[0] : null),
+                created_at:   book.created_at || '',
                 type:         book.document_type || 'Libro',
                 description:  book.summary || 'Sin descripción disponible',
                 publisher:    book.publisher ? book.publisher.name : 'Sin editorial',
@@ -770,9 +771,11 @@
             if (sortVal === 'az') {
                 arr.sort((a, b) => (a.title || a.name || '').localeCompare(b.title || b.name || '', 'es'));
             } else if (sortVal === 'recent') {
-                arr.sort((a, b) => (parseInt(b.year) || 0) - (parseInt(a.year) || 0));
+                // Más recientes = mayor created_at primero
+                arr.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
             } else if (sortVal === 'old') {
-                arr.sort((a, b) => (parseInt(a.year) || 9999) - (parseInt(b.year) || 9999));
+                // Más antiguos = menor created_at primero
+                arr.sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
             } else if (sortVal === 'year_asc') {
                 arr.sort((a, b) => (parseInt(a.year) || 0) - (parseInt(b.year) || 0));
             } else if (sortVal === 'year_desc') {

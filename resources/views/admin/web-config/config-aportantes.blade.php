@@ -33,7 +33,7 @@
                 <i data-lucide="user" class="w-5 h-5 text-amber-500"></i>
                 Director
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="grid grid-cols-1 gap-5">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nombre</label>
                     <input type="text" name="director_nombre" value="{{ $aportantes['director']['nombre'] }}"
@@ -83,7 +83,7 @@
                     Eliminar categoría
                 </button>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <div class="grid grid-cols-1 gap-5 mb-5">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Título de la categoría</label>
                     <input type="text" name="categorias[{{ $ci }}][titulo]" value="{{ $cat['titulo'] }}"
@@ -137,7 +137,7 @@
                     <button type="button" onclick="removeItem(this)"
                             class="text-xs text-red-400 dark:text-red-500 hover:text-red-600 dark:hover:text-red-400 font-medium transition-colors">✕ Quitar</button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nombre</label>
                         <input type="text" name="categorias[{{ $ci }}][items][{{ $ii }}][nombre]" value="{{ $item['nombre'] }}"
@@ -244,7 +244,7 @@ function addItem(btn) {
             <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Aportante ${ii + 1}</span>
             <button type="button" onclick="removeItem(this)" class="text-xs text-red-400 hover:text-red-600 font-medium transition-colors">✕ Quitar</button>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4">
             <div>
                 <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nombre</label>
                 <input type="text" name="categorias[${ci}][items][${ii}][nombre]" value=""
@@ -279,7 +279,7 @@ function addCategoria() {
                 🗑 Eliminar categoría
             </button>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+        <div class="grid grid-cols-1 gap-5 mb-5">
             <div>
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Título de la categoría</label>
                 <input type="text" name="categorias[${ci}][titulo]" value=""

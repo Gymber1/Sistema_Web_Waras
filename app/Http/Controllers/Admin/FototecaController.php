@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers\Admin;
 
@@ -528,6 +528,14 @@ class FototecaController extends Controller
     {
         $photoTag->delete();
         return redirect()->route('admin.fototeca.tags')->with('success', 'Etiqueta eliminada.');
+    }
+
+    public function bulkDestroyTags(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        PhotoTag::whereIn('id', $ids)->delete();
+        return back()->with('success', count($ids) . ' etiqueta(s) eliminada(s).');
     }
 
     // ============= BULK DELETE =============

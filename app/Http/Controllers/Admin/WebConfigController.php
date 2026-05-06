@@ -424,6 +424,56 @@ class WebConfigController extends Controller
         return back()->with('success', 'Icono eliminado.');
     }
 
+    // ── TEXTOS HERO ──────────────────────────────────────────────────────────
+
+    public function heroTextos()
+    {
+        $defaults = [
+            'hero_portal_eyebrow'   => 'Asociación de Ciencia y Cultura',
+            'hero_portal_title'     => 'Portal de la Ciencia y la Cultura Ancashina',
+            'hero_portal_subtitle'  => '"Descubre nuestras colecciones de libros, fotos, música, artes y eventos históricos que preservan la memoria de nuestra región."',
+            'hero_portal_cta'       => 'Explorar Servicios',
+            'hero_biblioteca_title'    => 'Biblioteca Digital Ancashina',
+            'hero_biblioteca_subtitle' => '"Conocimiento e historia accesible para todos"',
+            'hero_fototeca_eyebrow'    => 'Archivo Visual de Áncash',
+            'hero_fototeca_title'      => 'Fototeca Digital Ancashina',
+            'hero_fototeca_subtitle'   => 'Preservando y compartiendo la memoria visual, histórica y cultural de nuestra región.',
+        ];
+
+        $values = [];
+        foreach ($defaults as $key => $default) {
+            $values[$key] = SiteSetting::get($key) ?? $default;
+        }
+
+        return view('admin.web-config.hero-textos', compact('values', 'defaults'));
+    }
+
+    public function updateHeroTextos(Request $request)
+    {
+        $allowed = [
+            'hero_portal_eyebrow', 'hero_portal_title', 'hero_portal_subtitle', 'hero_portal_cta',
+            'hero_biblioteca_title', 'hero_biblioteca_subtitle',
+            'hero_fototeca_eyebrow', 'hero_fototeca_title', 'hero_fototeca_subtitle',
+        ];
+
+        $sectionLabels = [
+            'portal'     => 'Portal Principal',
+            'biblioteca' => 'Biblioteca Digital',
+            'fototeca'   => 'Fototeca Digital',
+        ];
+
+        $section = $request->input('section');
+
+        foreach ($allowed as $key) {
+            if ($request->has($key)) {
+                SiteSetting::set($key, trim($request->input($key, '')));
+            }
+        }
+
+        $label = $sectionLabels[$section] ?? 'Textos del hero';
+        return back()->with('success', $label . ' actualizado correctamente.');
+    }
+
     private function defaultAportantes(): array
     {
         return [

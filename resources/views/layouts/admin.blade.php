@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" class="light">
 <head>
     <meta charset="UTF-8">
@@ -698,6 +698,8 @@
                 'table-secondlevels':    '{{ route("admin.fototeca.secondlevels.bulk-destroy") }}',
                 'table-thirdlevels':     '{{ route("admin.fototeca.thirdlevels.bulk-destroy") }}',
                 'table-foto-collections':'{{ route("admin.fototeca.collections.bulk-destroy") }}',
+                'table-descriptors':     '{{ route("admin.biblioteca.descriptors.bulk-destroy") }}',
+                'table-tags':            '{{ route("admin.fototeca.tags.bulk-destroy") }}',
                 'table-users':           '{{ route("admin.usuarios.bulk-destroy") }}',
             };
             const actionUrl = routeMap[tableId];
@@ -706,7 +708,7 @@
                 'table-publishers': 'editorial(es)', 'table-specials': 'colección(es)',
                 'table-photos': 'fotografía(s)', 'table-photographers': 'fotógrafo(s)',
                 'table-sublevels': 'subnivel(es)', 'table-secondlevels': '2do nivel(es)', 'table-thirdlevels': '3er nivel(es)',
-                'table-foto-collections': 'colección(es)', 'table-users': 'usuario(s)',
+                'table-foto-collections': 'colección(es)', 'table-descriptors': 'descriptor(es)', 'table-tags': 'etiqueta(s)', 'table-users': 'usuario(s)',
             };
             const item = labelMap[tableId] ?? 'elemento(s)';
             title.textContent = `Eliminar ${count} ${item}`;

@@ -120,7 +120,6 @@ document.getElementById('search-input').addEventListener('input', function () {
         <div class="flex items-center justify-between px-8 py-5 border-b border-slate-100 dark:border-dark-border">
             <div>
                 <h2 class="text-xl font-bold text-slate-800 dark:text-white">Agregar Descriptor</h2>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Se guardará en minúsculas automáticamente.</p>
             </div>
             <button onclick="closeModal('modal-create')" class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
                 <i data-lucide="x" class="w-5 h-5"></i>
@@ -164,7 +163,6 @@ document.getElementById('search-input').addEventListener('input', function () {
         <div class="flex items-center justify-between px-8 py-5 border-b border-slate-100 dark:border-dark-border">
             <div>
                 <h2 class="text-xl font-bold text-slate-800 dark:text-white">Editar Descriptor</h2>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Se guardará en minúsculas automáticamente.</p>
             </div>
             <button onclick="closeModal('modal-edit')" class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
                 <i data-lucide="x" class="w-5 h-5"></i>

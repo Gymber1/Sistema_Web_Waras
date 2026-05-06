@@ -114,6 +114,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/descriptors', [AdminBibliotecaController::class, 'storeDescriptor'])->name('descriptors.store');
             Route::put('/descriptors/{descriptor}', [AdminBibliotecaController::class, 'updateDescriptor'])->name('descriptors.update');
             Route::delete('/descriptors/{descriptor}', [AdminBibliotecaController::class, 'destroyDescriptor'])->name('descriptors.destroy');
+            Route::delete('/descriptors', [AdminBibliotecaController::class, 'bulkDestroyDescriptors'])->name('descriptors.bulk-destroy');
 
             // SubCategorías
             Route::get('/subcategories', [AdminBibliotecaController::class, 'indexSubcategories'])->name('subcategories');
@@ -211,6 +212,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/tags', [AdminFototecaController::class, 'storeTag'])->name('tags.store');
             Route::put('/tags/{photoTag}', [AdminFototecaController::class, 'updateTag'])->name('tags.update');
             Route::delete('/tags/{photoTag}', [AdminFototecaController::class, 'destroyTag'])->name('tags.destroy');
+            Route::delete('/tags', [AdminFototecaController::class, 'bulkDestroyTags'])->name('tags.bulk-destroy');
 
             // Colecciones Fototeca
             Route::get('/collections', [AdminFototecaController::class, 'indexCollections'])->name('collections');
@@ -248,6 +250,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/icono',              [WebConfigController::class, 'icono'])->name('icono');
             Route::post('/icono',             [WebConfigController::class, 'iconoUpdate'])->name('icono.update');
             Route::delete('/icono',           [WebConfigController::class, 'iconoDestroy'])->name('icono.destroy');
+            Route::get('/hero-textos',        [WebConfigController::class, 'heroTextos'])->name('hero-textos');
+            Route::post('/hero-textos',       [WebConfigController::class, 'updateHeroTextos'])->name('hero-textos.update');
             Route::post('/{key}',   [WebConfigController::class, 'update'])->name('update');
             Route::delete('/{key}', [WebConfigController::class, 'destroy'])->name('destroy');
         });

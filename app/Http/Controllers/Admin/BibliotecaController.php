@@ -620,7 +620,7 @@ class BibliotecaController extends Controller
         $request->validate(['name' => 'required|string|max:100|unique:descriptors,name']);
 
         Descriptor::create([
-            'name' => strtolower(trim($request->name)),
+            'name' => trim($request->name),
             'slug' => $this->uniqueSlug($request->name, Descriptor::class),
         ]);
 
@@ -632,7 +632,7 @@ class BibliotecaController extends Controller
         $request->validate(['name' => 'required|string|max:100|unique:descriptors,name,' . $descriptor->id]);
 
         $descriptor->update([
-            'name' => strtolower(trim($request->name)),
+            'name' => trim($request->name),
             'slug' => $this->uniqueSlug($request->name, Descriptor::class, $descriptor->id),
         ]);
 
@@ -643,6 +643,14 @@ class BibliotecaController extends Controller
     {
         $descriptor->delete();
         return back()->with('success', 'Descriptor eliminado.');
+    }
+
+    public function bulkDestroyDescriptors(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Descriptor::whereIn('id', $ids)->delete();
+        return back()->with('success', count($ids) . ' descriptor(es) eliminado(s).');
     }
 
     // ============= SUBCATEGORÍAS =============
@@ -788,7 +796,7 @@ class BibliotecaController extends Controller
     {
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
-        Book::whereIn('id', $ids)->where('type', 'libro')->each(function($b) {
+        Book::whereIn('id', $ids)->where('document_type', '!=', 'Revista')->each(function($b) {
             if ($b->cover_image_path) \Storage::disk('public')->delete($b->cover_image_path);
             $b->delete();
         });
@@ -799,7 +807,7 @@ class BibliotecaController extends Controller
     {
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
-        Book::whereIn('id', $ids)->where('type', 'revista')->each(function($b) {
+        Book::whereIn('id', $ids)->where('document_type', 'Revista')->each(function($b) {
             if ($b->cover_image_path) \Storage::disk('public')->delete($b->cover_image_path);
             $b->delete();
         });
