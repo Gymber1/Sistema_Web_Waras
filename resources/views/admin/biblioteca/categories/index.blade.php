@@ -26,8 +26,13 @@
 
     <div class="bulk-wrapper bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border overflow-hidden">
         <div class="bulk-bar"></div>
-        <div class="p-5 border-b border-slate-100 dark:border-dark-border">
+        <div class="p-5 border-b border-slate-100 dark:border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <span class="text-sm text-slate-500 dark:text-slate-400">{{ $allCategories->total() }} categorías</span>
+            <form method="GET" action="{{ route('admin.biblioteca.categories') }}" class="relative w-full sm:w-72">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <input type="text" name="search" value="{{ $q ?? '' }}" placeholder="Buscar categoría..."
+                    class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-slate-800 dark:text-white transition-all">
+            </form>
         </div>
 
         <div class="overflow-x-auto">

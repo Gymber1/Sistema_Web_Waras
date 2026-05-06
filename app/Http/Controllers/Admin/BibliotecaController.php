@@ -354,13 +354,16 @@ class BibliotecaController extends Controller
 
     // ============= CATEGORÍAS =============
 
-    public function indexCategories()
+    public function indexCategories(Request $request)
     {
+        $q = $request->input('search');
         $allCategories = Category::where('type', 'biblioteca')
             ->whereNull('parent_id')
+            ->when($q, fn($query) => $query->where('name', 'like', "%{$q}%"))
             ->orderBy('name')
-            ->paginate(10);
-        return view('admin.biblioteca.categories.index', compact('allCategories'));
+            ->paginate(10)
+            ->withQueryString();
+        return view('admin.biblioteca.categories.index', compact('allCategories', 'q'));
     }
 
     public function createCategory()

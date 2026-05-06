@@ -41,19 +41,28 @@ class FototecaController extends Controller
 
     public function createPhoto()
     {
-        $photographers    = Photographer::orderBy('full_name')->get();
-        $categories       = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->get();
-        $subcategories    = Category::where('type', 'fototeca')->whereNotNull('parent_id')
-                                ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
-                                ->orderBy('name')->get();
-        $sublevels        = Category::where('type', 'fototeca')->whereNotNull('parent_id')
-                                ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id'))
-                                ->orderBy('name')->get();
-        $secondlevels     = Category::where('type', 'fototeca')->whereNotNull('parent_id')
-                                ->whereHas('parent', fn($q) => $q->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')))
-                                ->orderBy('name')->get();
+        $photographers = Photographer::orderBy('full_name')->get();
+        $categories    = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->get();
+        $subcategories = Category::where('type', 'fototeca')->whereNotNull('parent_id')
+                            ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
+                            ->orderBy('name')->get();
+        $sublevels     = Category::where('type', 'fototeca')->whereNotNull('parent_id')
+                            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                                ->whereHas('parent', fn($q2) => $q2->whereNull('parent_id')))
+                            ->orderBy('name')->get();
+        $secondlevels  = Category::where('type', 'fototeca')->whereNotNull('parent_id')
+                            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                                ->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
+                                    ->whereHas('parent', fn($q3) => $q3->whereNull('parent_id'))))
+                            ->orderBy('name')->get();
+        $thirdlevels   = Category::where('type', 'fototeca')->whereNotNull('parent_id')
+                            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                                ->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
+                                    ->whereHas('parent', fn($q3) => $q3->whereNotNull('parent_id')
+                                        ->whereHas('parent', fn($q4) => $q4->whereNull('parent_id')))))
+                            ->orderBy('name')->get();
         $tags = PhotoTag::orderBy('name')->get();
-        return view('admin.fototeca.photos.create', compact('photographers', 'categories', 'subcategories', 'sublevels', 'secondlevels', 'tags'));
+        return view('admin.fototeca.photos.create', compact('photographers', 'categories', 'subcategories', 'sublevels', 'secondlevels', 'thirdlevels', 'tags'));
     }
 
     public function storePhoto(Request $request)
@@ -123,23 +132,31 @@ class FototecaController extends Controller
                             ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
                             ->orderBy('name')->get();
         $sublevels     = Category::where('type', 'fototeca')->whereNotNull('parent_id')
-                            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id'))
+                            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                                ->whereHas('parent', fn($q2) => $q2->whereNull('parent_id')))
                             ->orderBy('name')->get();
         $secondlevels  = Category::where('type', 'fototeca')->whereNotNull('parent_id')
-                            ->whereHas('parent', fn($q) => $q->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')))
+                            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                                ->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
+                                    ->whereHas('parent', fn($q3) => $q3->whereNull('parent_id'))))
+                            ->orderBy('name')->get();
+        $thirdlevels   = Category::where('type', 'fototeca')->whereNotNull('parent_id')
+                            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                                ->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
+                                    ->whereHas('parent', fn($q3) => $q3->whereNotNull('parent_id')
+                                        ->whereHas('parent', fn($q4) => $q4->whereNull('parent_id')))))
                             ->orderBy('name')->get();
 
-        // Determina qué categoría/subcategoría/subnivel tiene la foto actualmente
-        $photoCatIds = $photo->categories->pluck('id')->toArray();
         $selCategory    = $photo->categories->first(fn($c) => $categories->contains('id', $c->id));
         $selSubcategory = $photo->categories->first(fn($c) => $subcategories->contains('id', $c->id));
         $selSublevel    = $photo->categories->first(fn($c) => $sublevels->contains('id', $c->id));
         $selSecondlevel = $photo->categories->first(fn($c) => $secondlevels->contains('id', $c->id));
+        $selThirdlevel  = $photo->categories->first(fn($c) => $thirdlevels->contains('id', $c->id));
 
         $tags = PhotoTag::orderBy('name')->get();
         return view('admin.fototeca.photos.edit', compact(
-            'photo', 'photographers', 'categories', 'subcategories', 'sublevels', 'secondlevels',
-            'selCategory', 'selSubcategory', 'selSublevel', 'selSecondlevel', 'tags'
+            'photo', 'photographers', 'categories', 'subcategories', 'sublevels', 'secondlevels', 'thirdlevels',
+            'selCategory', 'selSubcategory', 'selSublevel', 'selSecondlevel', 'selThirdlevel', 'tags'
         ));
     }
 
@@ -301,10 +318,16 @@ class FototecaController extends Controller
 
     // ============= CATEGORÍAS (Nivel 1) =============
 
-    public function indexCategories()
+    public function indexCategories(Request $request)
     {
-        $categories = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->paginate(10);
-        return view('admin.fototeca.categories.index', compact('categories'));
+        $q = $request->input('search');
+        $categories = Category::where('type', 'fototeca')
+            ->whereNull('parent_id')
+            ->when($q, fn($query) => $query->where('name', 'like', "%{$q}%"))
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
+        return view('admin.fototeca.categories.index', compact('categories', 'q'));
     }
 
     public function createCategory()

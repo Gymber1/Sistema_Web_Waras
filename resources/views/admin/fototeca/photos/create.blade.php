@@ -94,7 +94,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">2do Nivel</label>
-                    <select id="sel-secondlevel" disabled
+                    <select id="sel-secondlevel" onchange="cascadeThirdlevel()" disabled
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all disabled:opacity-50">
                         <option value="">— Primero elige 1er nivel —</option>
                         @foreach($secondlevels as $sec)
@@ -102,6 +102,18 @@
                         @endforeach
                     </select>
                     <input type="hidden" name="categories[]" id="hid-secondlevel">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">3er Nivel</label>
+                    <select id="sel-thirdlevel" disabled
+                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all disabled:opacity-50">
+                        <option value="">— Primero elige 2do nivel —</option>
+                        @foreach($thirdlevels as $thr)
+                        <option value="{{ $thr->id }}" data-parent="{{ $thr->parent_id }}" data-name="{{ $thr->name }}">{{ $thr->name }}</option>
+                        @endforeach
+                    </select>
+                    <input type="hidden" name="categories[]" id="hid-thirdlevel">
                 </div>
 
                 <div>
@@ -265,10 +277,14 @@ function cascadeSublevel() {
 function cascadeSecondlevel() {
     const lvlId  = document.getElementById('sel-sublevel').value;
     const selSec = document.getElementById('sel-secondlevel');
+    const selThr = document.getElementById('sel-thirdlevel');
     document.getElementById('hid-sublevel').value    = lvlId;
     document.getElementById('hid-secondlevel').value = '';
+    document.getElementById('hid-thirdlevel').value  = '';
     selSec.innerHTML = '<option value="">— Seleccionar —</option>';
     selSec.disabled  = !lvlId;
+    selThr.innerHTML = '<option value="">— Primero elige 2do nivel —</option>';
+    selThr.disabled  = true;
     if (!lvlId) return;
     document.querySelectorAll('#sel-secondlevel-all option').forEach(opt => {
         if (opt.dataset.parent == lvlId) selSec.appendChild(opt.cloneNode(true));
@@ -276,8 +292,22 @@ function cascadeSecondlevel() {
     if (selSec.options.length <= 1) { selSec.innerHTML = '<option value="">— Sin 2do niveles —</option>'; selSec.disabled = true; }
 }
 
-document.getElementById('sel-secondlevel').addEventListener('change', function() {
-    document.getElementById('hid-secondlevel').value = this.value;
+function cascadeThirdlevel() {
+    const secId  = document.getElementById('sel-secondlevel').value;
+    const selThr = document.getElementById('sel-thirdlevel');
+    document.getElementById('hid-secondlevel').value = secId;
+    document.getElementById('hid-thirdlevel').value  = '';
+    selThr.innerHTML = '<option value="">— Seleccionar —</option>';
+    selThr.disabled  = !secId;
+    if (!secId) return;
+    document.querySelectorAll('#sel-thirdlevel-all option').forEach(opt => {
+        if (opt.dataset.parent == secId) selThr.appendChild(opt.cloneNode(true));
+    });
+    if (selThr.options.length <= 1) { selThr.innerHTML = '<option value="">— Sin 3er niveles —</option>'; selThr.disabled = true; }
+}
+
+document.getElementById('sel-thirdlevel').addEventListener('change', function() {
+    document.getElementById('hid-thirdlevel').value = this.value;
 });
 
 function toggleYearFields() {
@@ -308,6 +338,11 @@ toggleSourceFields();
 <select id="sel-secondlevel-all" class="hidden">
     @foreach($secondlevels as $sec)
     <option value="{{ $sec->id }}" data-parent="{{ $sec->parent_id }}">{{ $sec->name }}</option>
+    @endforeach
+</select>
+<select id="sel-thirdlevel-all" class="hidden">
+    @foreach($thirdlevels as $thr)
+    <option value="{{ $thr->id }}" data-parent="{{ $thr->parent_id }}">{{ $thr->name }}</option>
     @endforeach
 </select>
 @endsection
