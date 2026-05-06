@@ -19,12 +19,12 @@ class BibliotecaController extends Controller
     public function adminIndex()
     {
         $stats = [
-            'books'      => Book::where('document_type', '!=', 'Revista')->count(),
-            'magazines'  => Book::where('document_type', 'Revista')->count(),
-            'authors'    => Author::count(),
-            'categories' => Category::where('type', 'biblioteca')->count(),
-            'publishers' => Publisher::count(),
-            'specials'   => Book::where('is_special', true)->count(),
+            'books'       => Book::where('document_type', '!=', 'Revista')->count(),
+            'magazines'   => Book::where('document_type', 'Revista')->count(),
+            'authors'     => Author::count(),
+            'categories'  => Category::where('type', 'biblioteca')->count(),
+            'specials'    => Special::where('module', 'biblioteca')->count(),
+            'descriptors' => Descriptor::count(),
         ];
 
         return view('admin.biblioteca.index', compact('stats'));
@@ -662,7 +662,7 @@ class BibliotecaController extends Controller
 
     public function indexSpecials()
     {
-        $specials = Special::withCount('books')->orderBy('order')->orderBy('title')->paginate(10);
+        $specials = Special::where('module', 'biblioteca')->withCount('books')->orderBy('order')->orderBy('title')->paginate(10);
         return view('admin.biblioteca.specials.index', compact('specials'));
     }
 
@@ -684,6 +684,7 @@ class BibliotecaController extends Controller
             'slug'      => $this->uniqueSlug($request->title, Special::class),
             'type'      => $request->type,
             'is_active' => true,
+            'module'    => 'biblioteca',
         ];
         if ($request->hasFile('cover_image')) {
             $data['cover_image_path'] = $request->file('cover_image')->store('specials', 'public');
@@ -726,7 +727,7 @@ class BibliotecaController extends Controller
 
     public function assignBooksIndex()
     {
-        $specials = Special::withCount('books')->orderBy('order')->orderBy('title')->get();
+        $specials = Special::where('module', 'biblioteca')->withCount('books')->orderBy('order')->orderBy('title')->get();
         return view('admin.biblioteca.specials.assign', compact('specials'));
     }
 
@@ -859,7 +860,7 @@ class BibliotecaController extends Controller
     {
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
-        Special::whereIn('id', $ids)->each(function($s) {
+        Special::whereIn('id', $ids)->where('module', 'biblioteca')->each(function($s) {
             if ($s->cover_image_path) \Storage::disk('public')->delete($s->cover_image_path);
             $s->books()->detach();
             $s->delete();

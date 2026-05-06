@@ -17,7 +17,8 @@
     <button class="g-mobile-close" onclick="document.getElementById('mobileNav').classList.remove('open');document.body.style.overflow=''">✕</button>
     <a href="{{ route('fototeca.inicio') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Inicio')">Inicio</a>
     <a href="{{ route('fototeca.galeria.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Galería')">Galería</a>
-    <a href="{{ route('fototeca.fotografos.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')">Fotógrafos</a>
+    <a href="{{ route('fototeca.fotografos.index') }}" class="g-mobile-link active" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')">Fotógrafos</a>
+    <a href="{{ route('fototeca.colecciones.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Colecciones')">Colecciones</a>
     <a href="{{ route('fototeca.aportantes.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Aportantes')">Aportantes</a>
 </div>
 
@@ -31,6 +32,7 @@
         <a href="{{ route('fototeca.inicio') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Inicio')">Inicio</a>
         <a href="{{ route('fototeca.galeria.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Galería')">Galería</a>
         <a href="{{ route('fototeca.fotografos.index') }}" class="g-nav-link active" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')">Fotógrafos</a>
+        <a href="{{ route('fototeca.colecciones.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Colecciones')">Colecciones</a>
         <a href="{{ route('fototeca.aportantes.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Aportantes')">Aportantes</a>
         <a href="{{ route('home') }}" class="g-nav-btn">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
@@ -49,7 +51,7 @@
 
 {{-- Profile Header --}}
 <div class="profile-header">
-    <a href="{{ route('fototeca.fotografos.index') }}" class="back-btn">← Volver a Fotógrafos</a>
+    <a id="backBtn" href="{{ route('fototeca.fotografos.index') }}" class="back-btn">← Volver</a>
 
     <div class="profile-avatar-wrap">
         <div class="photo-corner photo-corner--tl"></div>
@@ -124,8 +126,8 @@
 
         <div class="profile-stats">
             <div class="stat-item">
-                <span class="stat-value">{{ $photographer->photos->count() }}</span>
-                <span class="stat-label">Fotografías</span>
+                <span class="stat-value">{{ $photographer->collections->count() }}</span>
+                <span class="stat-label">Colecciones</span>
             </div>
             @if($photographer->birth_date && $photographer->death_date)
             <div class="stat-item">
@@ -137,61 +139,41 @@
     </div>
 </div>
 
-{{-- Gallery --}}
-@if($photographer->photos->count() > 0)
+{{-- Collections --}}
+@if($photographer->collections->count() > 0)
 <div class="gallery-context-bar">
     <div class="gallery-context-line"></div>
-    <h2 class="gallery-context-title">Archivo de {{ \Illuminate\Support\Str::words($photographer->full_name, 2, '') }}</h2>
-    <span class="gallery-context-count">{{ $photographer->photos->count() }} fotografía(s) catalogada(s)</span>
+    <h2 class="gallery-context-title">Colecciones de {{ \Illuminate\Support\Str::words($photographer->full_name, 2, '') }}</h2>
+    <span class="gallery-context-count">{{ $photographer->collections->count() }} colección(es)</span>
     <div class="gallery-context-line"></div>
 </div>
 
-<div class="photo-grid">
-    @foreach($photographer->photos as $photo)
-    <article class="photo-card"
-             style="animation-delay: {{ $loop->index * 0.05 }}s"
-             onclick="window.location.href='{{ route('fototeca.galeria.show', $photo) }}'">
-        <div class="photo-card-img-wrap">
-            <div class="photo-corner photo-corner--tl"></div>
-            <div class="photo-corner photo-corner--br"></div>
-
-            @if($photo->thumbnail_url)
-                <img src="{{ $photo->thumbnail_url }}" alt="{{ $photo->title }}" class="photo-card-img" loading="lazy">
-            @elseif($photo->image_url)
-                <img src="{{ $photo->image_url }}" alt="{{ $photo->title }}" class="photo-card-img" loading="lazy">
+<div style="max-width:1280px;margin:0 auto;padding:0 2rem 4rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;">
+    @foreach($photographer->collections as $col)
+    <a href="{{ route('fototeca.colecciones.show', $col) }}"
+       onclick="sessionStorage.setItem('back_url', window.location.href); sessionStorage.setItem('back_label', '{{ addslashes($photographer->full_name) }}')"
+       style="background:#0e0e0e;border:1px solid #1e1e1e;border-radius:10px;overflow:hidden;text-decoration:none;display:block;transition:border-color 0.25s,transform 0.2s;"
+       onmouseover="this.style.borderColor='#c9a84c';this.style.transform='translateY(-3px)'"
+       onmouseout="this.style.borderColor='#1e1e1e';this.style.transform='translateY(0)'">
+        <div style="aspect-ratio:16/9;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+            @if($col->cover_image_path)
+                <img src="{{ Storage::url($col->cover_image_path) }}" alt="{{ $col->title }}"
+                     style="width:100%;height:100%;object-fit:cover;" loading="lazy">
             @else
-                <div class="photo-card-img-placeholder">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                </div>
-            @endif
-
-            <div class="photo-card-overlay">
-                <div class="photo-card-overlay-content">
-                    <p class="overlay-year">{{ $photo->year ?? 'S/F' }}</p>
-                    @if($photo->location)
-                    <p class="overlay-location">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                        {{ is_object($photo->location) ? $photo->location->name : $photo->location }}
-                    </p>
-                    @endif
-                    @if($photo->format)
-                    <span class="overlay-period-tag">{{ $photo->format }}</span>
-                    @endif
-                </div>
-            </div>
-        </div>
-        <div class="photo-card-info">
-            <p class="photo-card-year">{{ $photo->year ?? 'S/F' }}</p>
-            <h3 class="photo-card-title">{{ $photo->title }}</h3>
-            @if($photo->categories->count())
-            <div class="photo-card-meta">
-                @foreach($photo->categories->take(3) as $cat)
-                <span class="cat-badge">{{ $cat->name }}</span>
-                @endforeach
-            </div>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.2" style="opacity:0.25"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
             @endif
         </div>
-    </article>
+        <div style="padding:1rem 1.1rem 1.25rem;">
+            <p style="font-family:'Playfair Display',serif;font-size:1.05rem;color:#fff;margin-bottom:0.4rem;">{{ $col->title }}</p>
+            @if($col->description)
+            <p style="font-size:0.75rem;color:#666;margin-bottom:0.5rem;line-height:1.4;">{{ Str::limit($col->description, 70) }}</p>
+            @endif
+            <p style="font-size:0.72rem;color:#c9a84c;font-style:italic;display:flex;align-items:center;gap:4px;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                {{ $col->photos->count() }} {{ $col->photos->count() === 1 ? 'fotografía' : 'fotografías' }}
+            </p>
+        </div>
+    </a>
     @endforeach
 </div>
 
@@ -200,9 +182,9 @@
     <div class="empty-icon">
         <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
     </div>
-    <h2 class="empty-title">Archivo Vacío</h2>
-    <p class="empty-desc">No se encontraron fotografías digitalizadas para este fotógrafo.</p>
-    <a href="{{ route('fototeca.fotografos.index') }}" class="empty-btn">← Volver a Fotógrafos</a>
+    <h2 class="empty-title">Sin colecciones asignadas</h2>
+    <p class="empty-desc">Este fotógrafo aún no tiene colecciones fotográficas asignadas.</p>
+    <a id="backBtnEmpty" href="{{ route('fototeca.fotografos.index') }}" class="empty-btn">← Volver</a>
 </div>
 @endif
 
@@ -211,6 +193,28 @@
 </footer>
 
 <script>
+    // Back button — sabe de dónde vino
+    (function() {
+        const backUrl   = sessionStorage.getItem('back_url');
+        const backLabel = sessionStorage.getItem('back_label');
+        const defaultUrl = '{{ route('fototeca.fotografos.index') }}';
+        const defaultLabel = 'Fotógrafos';
+
+        ['backBtn', 'backBtnEmpty'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            if (backUrl) {
+                btn.href = backUrl;
+                btn.textContent = '← Volver a ' + (backLabel || defaultLabel);
+                sessionStorage.removeItem('back_url');
+                sessionStorage.removeItem('back_label');
+            } else {
+                btn.href = defaultUrl;
+                btn.textContent = '← Volver a ' + defaultLabel;
+            }
+        });
+    })();
+
     document.querySelectorAll('a[href*="#"]').forEach(link => {
         link.addEventListener('click', function(e) {
             const href = this.getAttribute('href');

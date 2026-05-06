@@ -965,12 +965,13 @@ body { padding-top: var(--nav-h); }
 .photographer-card:hover { border-color: rgba(197,166,109,0.5); }
 .pg-img-wrap {
     position: relative;
-    aspect-ratio: 1/1;
+    aspect-ratio: 3/4;
     overflow: hidden;
     background: #111;
 }
 .pg-img {
     width: 100%; height: 100%; object-fit: cover;
+    object-position: center 15%;
     filter: grayscale(1);
     transition: filter 0.5s ease, transform 0.5s ease;
 }
@@ -1256,7 +1257,7 @@ body { padding-top: var(--nav-h); }
     color: var(--text-muted);
 }
 .gallery-layout.no-sidebar .photo-grid {
-    padding: 0 2rem 3rem;
+    padding: 2.5rem 2rem 3rem;
     gap: 1.5rem;
 }
 

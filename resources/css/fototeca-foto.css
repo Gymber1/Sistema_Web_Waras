@@ -275,6 +275,53 @@ html, body { font-family: 'Inter', sans-serif; background: var(--bg-page); color
     margin-top: 0.5rem; text-align: center;
 }
 
+/* ── SHARE MODAL ── */
+.share-modal-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center; padding: 1rem;
+}
+.share-modal-backdrop.open { display: flex; }
+.share-modal {
+    background: #1a1a1a; border: 1px solid #333;
+    border-radius: 12px; width: 100%; max-width: 380px;
+    padding: 1.5rem; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.share-modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+.share-modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; color: #fff; font-weight: 500;
+}
+.share-modal-close {
+    background: none; border: none; color: #888; cursor: pointer;
+    padding: 0.25rem; border-radius: 4px; transition: color 0.2s;
+    display: flex; align-items: center;
+}
+.share-modal-close:hover { color: #fff; }
+.share-modal-photo-title {
+    font-size: 0.75rem; color: var(--text-muted);
+    margin-bottom: 1.25rem; line-height: 1.4;
+    border-bottom: 1px solid #2a2a2a; padding-bottom: 0.75rem;
+}
+.share-options {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;
+}
+.share-option {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.7rem 0.9rem; border-radius: 8px;
+    font-size: 0.82rem; font-weight: 500; text-decoration: none;
+    cursor: pointer; border: none; transition: opacity 0.2s, transform 0.15s;
+    width: 100%;
+}
+.share-option:hover { opacity: 0.85; transform: translateY(-1px); }
+.share-option--facebook { background: #1877f2; color: #fff; }
+.share-option--twitter  { background: #0f0f0f; color: #fff; border: 1px solid #333; }
+.share-option--whatsapp { background: #25d366; color: #fff; }
+.share-option--copy     { background: #2a2a2a; color: #ccc; border: 1px solid #3a3a3a; }
+
 /* ── LIGHTBOX ── */
 .lightbox {
     display: none;
@@ -329,8 +376,14 @@ html, body { font-family: 'Inter', sans-serif; background: var(--bg-page); color
 }
 .related-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
+}
+@media (max-width: 900px) {
+    .related-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+    .related-grid { grid-template-columns: repeat(2, 1fr); }
 }
 .related-card {
     border-radius: 6px; overflow: hidden; cursor: pointer;

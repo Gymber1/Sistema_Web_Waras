@@ -7,6 +7,7 @@ use App\Models\Photo;
 use App\Models\PhotoTag;
 use App\Models\Photographer;
 use App\Models\Category;
+use App\Models\Special;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -33,7 +34,7 @@ class FototecaController extends Controller
     public function indexPhotos()
     {
         $photos = Photo::with(['photographers:id,full_name', 'tag:id,name'])
-            ->select('id', 'title', 'slug', 'thumbnail_path', 'full_image_path', 'source_type', 'external_url', 'tag_id', 'location', 'year')
+            ->select('id', 'title', 'slug', 'thumbnail_path', 'full_image_path', 'source_type', 'external_url', 'tag_id', 'location', 'year', 'year_type', 'year_from', 'year_to')
             ->paginate(10);
         return view('admin.fototeca.photos.index', compact('photos'));
     }
@@ -69,26 +70,29 @@ class FototecaController extends Controller
             'categories'      => 'nullable|array',
             'categories.*'    => 'integer|exists:categories,id',
             'tag_id'          => 'nullable|exists:photo_tags,id',
+            'year_type'       => 'required|in:exact,range',
             'year'            => 'nullable|integer|min:1800|max:' . date('Y'),
+            'year_from'       => 'nullable|integer|min:1800|max:' . date('Y'),
+            'year_to'         => 'nullable|integer|min:1800|max:' . date('Y'),
             'provider'        => 'nullable|string|max:255',
-            'resolution'      => 'nullable|string|max:50',
             'location'        => 'nullable|string|max:255',
             'description'     => 'nullable|string',
-            'format'          => 'nullable|string|max:50',
             'source_type'     => 'required|in:local,external,none',
             'external_url'    => 'nullable|url',
-            'image_file'      => 'nullable|image|max:10240',
+            'image_file'      => 'nullable|image|max:20480',
         ]);
 
+        $yearType = $request->year_type ?? 'exact';
         $data = [
             'title'        => $request->title,
             'slug'         => $this->uniqueSlug($request->title, Photo::class),
             'description'  => $request->description,
-            'year'         => $request->year,
+            'year_type'    => $yearType,
+            'year'         => $yearType === 'exact' ? $request->year : null,
+            'year_from'    => $yearType === 'range' ? $request->year_from : null,
+            'year_to'      => $yearType === 'range' ? $request->year_to : null,
             'provider'     => $request->provider,
-            'resolution'   => $request->resolution,
             'location'     => $request->location,
-            'format'       => $request->format,
             'tag_id'       => $request->tag_id ?: null,
             'source_type'  => $request->source_type,
             'external_url' => $request->source_type === 'external' ? $request->external_url : null,
@@ -153,25 +157,28 @@ class FototecaController extends Controller
             'categories'      => 'nullable|array',
             'categories.*'    => 'integer|exists:categories,id',
             'tag_id'          => 'nullable|exists:photo_tags,id',
+            'year_type'       => 'required|in:exact,range',
             'year'            => 'nullable|integer|min:1800|max:' . date('Y'),
+            'year_from'       => 'nullable|integer|min:1800|max:' . date('Y'),
+            'year_to'         => 'nullable|integer|min:1800|max:' . date('Y'),
             'provider'        => 'nullable|string|max:255',
-            'resolution'      => 'nullable|string|max:50',
             'location'        => 'nullable|string|max:255',
             'description'     => 'nullable|string',
-            'format'          => 'nullable|string|max:50',
             'source_type'     => 'required|in:local,external,none',
             'external_url'    => 'nullable|url',
-            'image_file'      => 'nullable|image|max:10240',
+            'image_file'      => 'nullable|image|max:20480',
         ]);
 
+        $yearType = $request->year_type ?? 'exact';
         $data = [
             'title'        => $request->title,
             'description'  => $request->description,
-            'year'         => $request->year,
+            'year_type'    => $yearType,
+            'year'         => $yearType === 'exact' ? $request->year : null,
+            'year_from'    => $yearType === 'range' ? $request->year_from : null,
+            'year_to'      => $yearType === 'range' ? $request->year_to : null,
             'provider'     => $request->provider,
-            'resolution'   => $request->resolution,
             'location'     => $request->location,
-            'format'       => $request->format,
             'tag_id'       => $request->tag_id ?: null,
             'source_type'  => $request->source_type,
             'external_url' => $request->source_type === 'external' ? $request->external_url : null,
@@ -209,7 +216,8 @@ class FototecaController extends Controller
 
     public function createPhotographer()
     {
-        return view('admin.fototeca.photographers.create');
+        $collections = Special::where('module', 'fototeca')->orderBy('title')->get(['id', 'title']);
+        return view('admin.fototeca.photographers.create', compact('collections'));
     }
 
     public function storePhotographer(Request $request)
@@ -222,7 +230,9 @@ class FototecaController extends Controller
             'death_date'      => 'nullable|date',
             'biography'       => 'nullable|string',
             'studies_critique'=> 'nullable|string',
-            'photo'           => 'nullable|image|max:2048',
+            'photo'           => 'nullable|image|max:20480',
+            'collections'     => 'nullable|array',
+            'collections.*'   => 'exists:specials,id',
         ]);
 
         $data = [
@@ -239,13 +249,15 @@ class FototecaController extends Controller
             $data['photo_path'] = $request->file('photo')->store('photographers', 'public');
         }
 
-        Photographer::create($data);
+        $p = Photographer::create($data);
+        $p->collections()->sync($request->collections ?? []);
         return redirect()->route('admin.fototeca.photographers')->with('success', 'Fotógrafo agregado correctamente.');
     }
 
     public function editPhotographer(Photographer $photographer)
     {
-        return view('admin.fototeca.photographers.edit', compact('photographer'));
+        $collections = Special::where('module', 'fototeca')->orderBy('title')->get(['id', 'title']);
+        return view('admin.fototeca.photographers.edit', compact('photographer', 'collections'));
     }
 
     public function updatePhotographer(Request $request, Photographer $photographer)
@@ -258,7 +270,9 @@ class FototecaController extends Controller
             'death_date'       => 'nullable|date',
             'biography'        => 'nullable|string',
             'studies_critique' => 'nullable|string',
-            'photo'            => 'nullable|image|max:2048',
+            'photo'            => 'nullable|image|max:20480',
+            'collections'      => 'nullable|array',
+            'collections.*'    => 'exists:specials,id',
         ]);
 
         $data = [
@@ -275,6 +289,7 @@ class FototecaController extends Controller
         }
 
         $photographer->update($data);
+        $photographer->collections()->sync($request->collections ?? []);
         return redirect()->route('admin.fototeca.photographers')->with('success', 'Fotógrafo actualizado correctamente.');
     }
 
@@ -666,6 +681,210 @@ class FototecaController extends Controller
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Category::whereIn('id', $ids)->where('type', 'fototeca')->delete();
         return back()->with('success', count($ids) . ' 2do nivel(es) eliminado(s).');
+    }
+
+    // ============= 3ER NIVEL (Nivel 5) =============
+
+    public function indexThirdlevels()
+    {
+        $thirdlevels = Category::where('type', 'fototeca')
+            ->whereHas('parent', fn($q) => $q->whereHas('parent', fn($q2) => $q2->whereHas('parent', fn($q3) => $q3->whereNotNull('parent_id'))))
+            ->with(['parent', 'parent.parent', 'parent.parent.parent', 'parent.parent.parent.parent'])
+            ->orderBy('name')
+            ->paginate(10);
+        $parentCategories = Category::where('type', 'fototeca')
+            ->whereHas('parent', fn($q) => $q->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
+                ->whereHas('parent', fn($q3) => $q3->whereNull('parent_id'))))
+            ->with(['parent', 'parent.parent', 'parent.parent.parent'])
+            ->orderBy('name')
+            ->get();
+        return view('admin.fototeca.thirdlevels.index', compact('thirdlevels', 'parentCategories'));
+    }
+
+    public function createThirdlevel()
+    {
+        $parentCategories = Category::where('type', 'fototeca')
+            ->whereHas('parent', fn($q) => $q->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
+                ->whereHas('parent', fn($q3) => $q3->whereNull('parent_id'))))
+            ->with(['parent', 'parent.parent', 'parent.parent.parent'])
+            ->orderBy('name')
+            ->get();
+        return view('admin.fototeca.thirdlevels.create', compact('parentCategories'));
+    }
+
+    public function storeThirdlevel(Request $request)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'parent_id' => 'required|exists:categories,id',
+        ]);
+
+        Category::create([
+            'name'      => $request->name,
+            'slug'      => $this->uniqueSlug($request->name, Category::class),
+            'type'      => 'fototeca',
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return redirect()->route('admin.fototeca.thirdlevels')->with('success', '3er Nivel agregado correctamente.');
+    }
+
+    public function editThirdlevel(Category $category)
+    {
+        $parentCategories = Category::where('type', 'fototeca')
+            ->whereHas('parent', fn($q) => $q->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
+                ->whereHas('parent', fn($q3) => $q3->whereNull('parent_id'))))
+            ->with(['parent', 'parent.parent', 'parent.parent.parent'])
+            ->orderBy('name')
+            ->get();
+        return view('admin.fototeca.thirdlevels.edit', compact('category', 'parentCategories'));
+    }
+
+    public function updateThirdlevel(Request $request, Category $category)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'parent_id' => 'required|exists:categories,id',
+        ]);
+
+        $category->update([
+            'name'      => $request->name,
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return redirect()->route('admin.fototeca.thirdlevels')->with('success', '3er Nivel actualizado correctamente.');
+    }
+
+    public function destroyThirdlevel(Category $category)
+    {
+        $category->delete();
+        return redirect()->route('admin.fototeca.thirdlevels')->with('success', '3er Nivel eliminado.');
+    }
+
+    public function bulkDestroyThirdlevels(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Category::whereIn('id', $ids)->where('type', 'fototeca')->delete();
+        return back()->with('success', count($ids) . ' 3er nivel(es) eliminado(s).');
+    }
+
+    // ============= COLECCIONES =============
+
+    public function indexCollections()
+    {
+        $collections = Special::where('module', 'fototeca')->withCount('photos')->orderBy('order')->orderBy('title')->paginate(10);
+        return view('admin.fototeca.collections.index', compact('collections'));
+    }
+
+    public function createCollection()
+    {
+        return view('admin.fototeca.collections.create');
+    }
+
+    public function storeCollection(Request $request)
+    {
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'cover_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = [
+            'title'       => $request->title,
+            'slug'        => $this->uniqueSlug($request->title, Special::class),
+            'module'      => 'fototeca',
+            'type'        => 'libro',
+            'description' => $request->description,
+            'is_active'   => true,
+        ];
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image_path'] = $request->file('cover_image')->store('collections', 'public');
+        }
+
+        Special::create($data);
+        return redirect()->route('admin.fototeca.collections')->with('success', 'Colección creada correctamente.');
+    }
+
+    public function editCollection(Special $special)
+    {
+        return view('admin.fototeca.collections.edit', compact('special'));
+    }
+
+    public function updateCollection(Request $request, Special $special)
+    {
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'cover_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = [
+            'title'       => $request->title,
+            'description' => $request->description,
+        ];
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image_path'] = $request->file('cover_image')->store('collections', 'public');
+        }
+
+        $special->update($data);
+        return redirect()->route('admin.fototeca.collections')->with('success', 'Colección actualizada correctamente.');
+    }
+
+    public function destroyCollection(Special $special)
+    {
+        $special->delete();
+        return redirect()->route('admin.fototeca.collections')->with('success', 'Colección eliminada.');
+    }
+
+    public function bulkDestroyCollections(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Special::whereIn('id', $ids)->where('module', 'fototeca')->delete();
+        return back()->with('success', count($ids) . ' colección(es) eliminada(s).');
+    }
+
+    public function assignCollectionsIndex()
+    {
+        $collections = Special::where('module', 'fototeca')->withCount('photos')->orderBy('order')->orderBy('title')->get();
+        return view('admin.fototeca.collections.assign', compact('collections'));
+    }
+
+    public function manageCollection(Special $special)
+    {
+        $special->load('photos');
+        $assignedIds = $special->photos->pluck('id')->toArray();
+        $available   = Photo::whereNotIn('id', $assignedIds)->orderBy('title')->get(['id', 'title', 'year', 'year_type', 'year_from', 'year_to']);
+        return view('admin.fototeca.collections.manage', compact('special', 'available'));
+    }
+
+    public function assignPhoto(Request $request, Special $special)
+    {
+        $request->validate(['photo_id' => 'required|exists:photos,id']);
+        $maxOrder = $special->photos()->max('photo_special.order') ?? 0;
+        $special->photos()->syncWithoutDetaching([$request->photo_id => ['order' => $maxOrder + 1]]);
+
+        if ($request->expectsJson()) {
+            $photo = Photo::find($request->photo_id);
+            return response()->json(['success' => true, 'title' => $photo->title, 'photo_id' => $photo->id]);
+        }
+        return back()->with('success', 'Fotografía agregada a la colección.');
+    }
+
+    public function unassignPhoto(Special $special, Photo $photo)
+    {
+        $special->photos()->detach($photo->id);
+        if (request()->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
+        return back()->with('success', 'Fotografía quitada de la colección.');
+    }
+
+    public function clearCollection(Special $special)
+    {
+        $special->photos()->detach();
+        return redirect()->route('admin.fototeca.collections.manage', $special)->with('success', 'Colección vaciada.');
     }
 
     // ============= HELPERS =============

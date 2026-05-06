@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Special;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -37,5 +38,10 @@ class Photographer extends Model
             'photographer_id',
             'photo_id'
         )->withPivot('order')->withTimestamps()->orderByPivot('order');
+    }
+
+    public function collections(): BelongsToMany
+    {
+        return $this->belongsToMany(Special::class, 'photographer_special');
     }
 }

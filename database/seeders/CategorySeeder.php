@@ -31,7 +31,6 @@ class CategorySeeder extends Seeder
                 ['name' => $parentName, 'type' => 'biblioteca', 'parent_id' => null],
                 ['slug' => $this->uniqueSlug($parentName)],
             );
-
             foreach ($children as $childName) {
                 Category::firstOrCreate(
                     ['name' => $childName, 'type' => 'biblioteca', 'parent_id' => $parent->id],
@@ -41,352 +40,188 @@ class CategorySeeder extends Seeder
         }
 
         // ==========================================
-        // FOTOTECA (4 niveles: Categoría → Subcategoría → 1er Nivel → 2do Nivel)
+        // FOTOTECA — estructura exacta según tru.txt
+        // Niveles:
+        //   Categoría (nivel 1)
+        //   └─ Subcategoría (nivel 2)
+        //      └─ 1er Nivel (nivel 3)
+        //         └─ 2do Nivel (nivel 4)
+        //            └─ 3er Nivel (nivel 5)
         //
-        // Estructura:
-        //   Nivel 1 (Categoría):    clave raíz del array
-        //   Nivel 2 (Subcategoría): clave del array hijo
-        //   Nivel 3 (1er Nivel):    clave del array nieto
-        //   Nivel 4 (2do Nivel):    valores string en el array bisnieto
+        // Los 2do Nivel de "Por Ciudades" tienen 3er nivel:
+        //   (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)
         // ==========================================
-        $fototecaData = [
 
-            // ── Por Provincias ───────────────────────────────────────────
-            'Por Provincias' => [
+        // Períodos de tiempo usados como 3er Nivel
+        $periodos = ['Antes del Terremoto', 'Terremoto', 'Después del Terremoto', 'Siglo XXI'];
 
-                'Huaraz' => [
-                    'Por Distritos' => [
-                        'Huaraz', 'Independencia', 'Cochabamba', 'Colcabamba',
-                        'Huanchay', 'Jangas', 'La Libertad', 'Llanganuco',
-                        'Olleros', 'Pampas', 'Paro', 'Paucas', 'Piruro',
-                        'Ponta', 'Rajan', 'San Cristóbal', 'Taricá',
-                    ],
-                    'Ciudad de Huaraz' => [
-                        'Panorámica', 'Plaza de Armas', 'Catedral', 'Municipalidad',
-                        'Mercado Central', 'Barrio Belén', 'Barrio San Francisco',
-                        'Barrio La Soledad', 'Barrio Huarupampa', 'Barrio Centenario',
-                        'Barrio Nicrupampa', 'Puente Bedoya', 'Puente Quilcay',
-                        'Calles del Centro', 'Casas Coloniales', 'Edificios Históricos',
-                    ],
-                    'Sociedad y Cultura' => [
-                        'Instituciones Educativas', 'Instituciones Culturales',
-                        'Instituciones Sociales', 'Deportes', 'Familias',
-                    ],
-                ],
+        // ── CATEGORÍA: Por Provincias ─────────────────────────────────
+        $catProvincias = $this->cat('Por Provincias', null);
 
-                'Recuay' => [
-                    'Por Distritos' => [
-                        'Recuay', 'Catac', 'Cotaparaco', 'Huayllapampa',
-                        'Llacllin', 'Pampas Chico', 'Pampas Grande',
-                        'Pátay', 'Puchun', 'Tapacocha', 'Ticapampa',
-                    ],
-                    'Ciudad de Recuay' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
+        // Subcategoría: Por Distritos
+        $subDistritos = $this->cat('Por Distritos', $catProvincias->id);
 
-                'Carhuaz' => [
-                    'Por Distritos' => [
-                        'Carhuaz', 'Acopampa', 'Amashca', 'Anta',
-                        'Ataquero', 'Cochapeti', 'Hualpacanca', 'Marcará',
-                        'Pamparak', 'Paucas', 'Shilla', 'Tinco', 'Yungar',
-                    ],
-                    'Ciudad de Carhuaz' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
+        // Subcategoría: Por Ciudades
+        $subCiudades = $this->cat('Por Ciudades', $catProvincias->id);
 
-                'Yungay' => [
-                    'Por Distritos' => [
-                        'Yungay', 'Cascapara', 'Mancos', 'Matacoto',
-                        'Quillo', 'Ranrahirca', 'Shupluy', 'Yanama',
-                    ],
-                    'Ciudad de Yungay' => [
-                        'Plaza de Armas Original (antes 1970)', 'Ciudad Nueva',
-                        'Camposanto', 'El Calvario', 'Palmas',
-                    ],
-                ],
+        // 1er Nivel bajo "Por Ciudades"
+        foreach ([
+            'Panorámica',
+            'Plaza de Armas y Catedral',
+            'Puentes',
+            'Calles',
+            'Casas y Edificios',
+        ] as $primerNivelNombre) {
+            $pn = $this->cat($primerNivelNombre, $subCiudades->id);
+            // 2do Nivel: los 4 períodos directamente
+            foreach ($periodos as $periodo) {
+                $dn = $this->cat($periodo, $pn->id);
+                // 3er Nivel: tipos de vistas dentro de cada período
+                foreach ($this->terNivelVistas($primerNivelNombre) as $terNivel) {
+                    $this->cat($terNivel, $dn->id);
+                }
+            }
+        }
 
-                'Caraz' => [
-                    'Por Distritos' => [
-                        'Caraz', 'Chacas', 'Huallanca', 'Huaylas',
-                        'Mato', 'Pamparomas', 'Pueblo Libre', 'Santa Cruz',
-                        'Santo Toribio', 'Yuracmarca',
-                    ],
-                    'Ciudad de Caraz' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
+        // 1er Nivel: Por Barrios (con 2do Nivel = barrios, y 3er Nivel = períodos)
+        $pnBarrios = $this->cat('Por Barrios', $subCiudades->id);
+        $barrios = ['Belén', 'San Francisco', 'La Soledad', 'Huarupampa', 'Centenario', 'Nicrupampa'];
+        foreach ($barrios as $barrio) {
+            $dn = $this->cat($barrio, $pnBarrios->id);
+            foreach ($periodos as $periodo) {
+                $this->cat($periodo, $dn->id);
+            }
+        }
 
-                'Huari' => [
-                    'Por Distritos' => [
-                        'Huari', 'Anra', 'Cajay', 'Chavín de Huántar',
-                        'Huacachi', 'Huacchis', 'Huachis', 'Huantar',
-                        'Masin', 'Paucas', 'Ponto', 'Rahuapampa',
-                        'Rapayan', 'San Marcos', 'San Pedro de Chana', 'Uco',
-                    ],
-                    'Ciudad de Huari' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
-
-                'Bolognesi' => [
-                    'Por Distritos' => [
-                        'Chiquián', 'Abelardo Pardo Lezameta', 'Antonio Raymondi',
-                        'Aquia', 'Cajacay', 'Canis', 'Colquioc',
-                        'Huallanca', 'Huasta', 'Huayllacayán', 'La Primavera',
-                        'Mangas', 'Pacllon', 'San Miguel de Corpanqui', 'Ticllos',
-                    ],
-                    'Ciudad de Chiquián' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
-
-                'Ocros' => [
-                    'Por Distritos' => [
-                        'Ocros', 'Acas', 'Cajamarquilla', 'Carhuapampa',
-                        'Cochas', 'Congas', 'Llipa', 'San Cristóbal de Raján',
-                        'San Pedro', 'Santiago de Chilcas',
-                    ],
-                    'Ciudad de Ocros' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
-
-                'Sihuas' => [
-                    'Por Distritos' => [
-                        'Sihuas', 'Acobamba', 'Alfonso Ugarte', 'Cashapampa',
-                        'Chingalpo', 'Huayllabamba', 'Quiches', 'Ragash',
-                        'San Juan', 'Sicsibamba',
-                    ],
-                    'Ciudad de Sihuas' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
-
-                'Pomabamba' => [
-                    'Por Distritos' => [
-                        'Pomabamba', 'Huayllan', 'Parobamba', 'Quinuabamba',
-                    ],
-                    'Ciudad de Pomabamba' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
-
-                'Mariscal Luzuriaga' => [
-                    'Por Distritos' => [
-                        'Piscobamba', 'Casca', 'Eleazar Guzmán Barrón',
-                        'Fidel Olivas Escudero', 'Llama', 'Llumpa',
-                        'Lucma', 'Musga',
-                    ],
-                    'Ciudad de Piscobamba' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
-
-                'Asunción' => [
-                    'Por Distritos' => [
-                        'Chacas', 'Acochaca',
-                    ],
-                    'Ciudad de Chacas' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
-
-                'Antonio Raimondi' => [
-                    'Por Distritos' => [
-                        'Llamellín', 'Acza', 'Chaccho', 'Chingas',
-                        'Mirgas', 'San Juan de Rontoy',
-                    ],
-                    'Ciudad de Llamellín' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
-
-                'Carlos Fermín Fitzcarrald' => [
-                    'Por Distritos' => [
-                        'San Luis', 'San Nicolás', 'Yauya',
-                    ],
-                    'Ciudad de San Luis' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
-
-                'Corongo' => [
-                    'Por Distritos' => [
-                        'Corongo', 'Aco', 'Bambas', 'Cusca',
-                        'La Pampa', 'Pampas', 'Yanac',
-                    ],
-                    'Ciudad de Corongo' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
-
-                'Pallasca' => [
-                    'Por Distritos' => [
-                        'Cabana', 'Bolognesi', 'Conchucos', 'Huacaschuque',
-                        'Huandoval', 'Lacabamba', 'Llapo', 'Pallasca',
-                        'Pampas', 'Santa Rosa', 'Tauca',
-                    ],
-                    'Ciudad de Cabana' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
-
-                'Santa' => [
-                    'Por Distritos' => [
-                        'Chimbote', 'Cáceres del Perú', 'Coishco',
-                        'Macate', 'Moro', 'Nepeña', 'Samanco',
-                        'Santa', 'Nuevo Chimbote',
-                    ],
-                    'Ciudad de Chimbote' => [
-                        'Puerto de Chimbote', 'Plaza de Armas',
-                        'Calles Principales',
-                    ],
-                ],
-
-                'Casma' => [
-                    'Por Distritos' => [
-                        'Casma', 'Buena Vista Alta', 'Comandante Noel', 'Yautan',
-                    ],
-                    'Ciudad de Casma' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
-
-                'Huarmey' => [
-                    'Por Distritos' => [
-                        'Huarmey', 'Cochapeti', 'Culebras', 'Huayan', 'Malvas',
-                    ],
-                    'Ciudad de Huarmey' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
-
-                'Fitzcarrald' => [
-                    'Por Distritos' => [
-                        'San Luis', 'San Nicolás', 'Yauya',
-                    ],
-                    'Ciudad de San Luis' => [
-                        'Plaza de Armas', 'Calles Principales',
-                    ],
-                ],
-            ],
-
-            // ── Especiales ───────────────────────────────────────────────
-            'Especiales' => [
-
-                'Desastres en Ancash' => [
-                    'Aluviones' => [
-                        'Aluvión de Huaraz 1941', 'Aluvión de Chavín 1945',
-                        'Aluvión de Ranrahirca 1962', 'Aluvión del 31 de mayo 1970',
-                    ],
-                    'Terremotos' => [
-                        'Terremoto del 31 de mayo 1970',
-                        'Secuelas del Terremoto 1970',
-                    ],
-                    'Reconstrucción' => [
-                        'Reconstrucción de Huaraz', 'Reconstrucción de Yungay',
-                        'Plan de Reconstrucción CRYRZA',
-                    ],
-                ],
-
-                'Tradiciones y Costumbres de Huaraz' => [
-                    'Fiestas Religiosas' => [
-                        'Fiesta del Señor de Mayo', 'Semana Santa Huaracina',
-                        'Fiesta de Cruces', 'Carnavales Huaracinos',
-                        'Corpus Christi', 'Navidad y Año Nuevo',
-                    ],
-                    'Danzas y Música' => [
-                        'Shacshas', 'Antihuankas', 'Negritos',
-                        'Pallas', 'Chunchos',
-                    ],
-                    'Costumbres Cotidianas' => [
-                        'Mercados Tradicionales', 'Vestimenta Típica',
-                        'Gastronomía Ancashina',
-                    ],
-                ],
-
-                'Patrimonio Arqueológico Ancashino' => [
-                    'Chavín de Huántar' => [
-                        'Templo de Chavín', 'Galería Subterránea',
-                        'Lanzón Monolítico', 'Cabezas Clavas',
-                    ],
-                    'Sechín' => [
-                        'Complejo de Sechín', 'Relieves de Sechín',
-                    ],
-                    'Otros Sitios' => [
-                        'Wicahuain', 'Yaino', 'Tumshukaiko',
-                        'Honcopampa', 'Pashash',
-                    ],
-                ],
-
-                'Parque Nacional Huascarán' => [
-                    'Nevados' => [
-                        'Huascarán', 'Alpamayo', 'Artesonraju',
-                        'Cayesh', 'Chopicalqui', 'Copa', 'Contrahierbas',
-                        'Hualcán', 'Pucaranra', 'Santa Cruz',
-                    ],
-                    'Lagunas' => [
-                        'Laguna Parón', 'Laguna Llanganuco', 'Laguna Churup',
-                        'Laguna Rajucolta', 'Laguna Cullicocha',
-                        'Laguna Palcacocha',
-                    ],
-                    'Circuitos Trekking' => [
-                        'Santa Cruz Trek', 'Huayhuash Circuit',
-                        'Laguna 69', 'Base Camp Huascarán',
-                    ],
-                    'Flora y Fauna' => [
-                        'Puya Raimondi', 'Cóndor', 'Venado de Cola Blanca',
-                        'Oso de Anteojos', 'Vicuña',
-                    ],
-                ],
-
-                'Personajes Ilustres de Ancash' => [
-                    'Políticos e Intelectuales' => [
-                        'Pedro Cochachin (Ukuku)', 'Ezequiel Boza',
-                        'Augusto Bernardino Leguía',
-                    ],
-                    'Deportistas' => [
-                        'Teófilo Cubillas (conexión ancashina)',
-                    ],
-                    'Artistas y Escritores' => [
-                        'Marcos Yauri Montero', 'César Vallejo (visitas a Ancash)',
-                    ],
-                ],
-            ],
+        // 1er Nivel: Sociedad y Cultura (con 2do Nivel = instituciones, y 3er Nivel = períodos)
+        $pnSociedad = $this->cat('Sociedad y Cultura', $subCiudades->id);
+        $instituciones = [
+            'Instituciones Sociales',
+            'Instituciones Culturales',
+            'Instituciones Educativas',
+            'Deportes',
+            'Familias',
         ];
+        foreach ($instituciones as $inst) {
+            $dn = $this->cat($inst, $pnSociedad->id);
+            foreach ($periodos as $periodo) {
+                $this->cat($periodo, $dn->id);
+            }
+        }
 
-        $this->createFototecaCategories($fototecaData, null);
+        // ── CATEGORÍA: Especiales ─────────────────────────────────────
+        $catEspeciales = $this->cat('Especiales', null);
+
+        // Subcategoría: Desastres en Ancash
+        $subDesastres = $this->cat('Desastres en Ancash', $catEspeciales->id);
+        foreach ([
+            'Aluvión de Huaraz de 1941',
+            'Aluvión de Chavín de 1945',
+            'Aluvión de Ranrahirca de 1962',
+            'Terremoto del 31 de mayo de 1970',
+            'Aluvión del 31 de mayo de 1970',
+        ] as $desastre) {
+            $pn = $this->cat($desastre, $subDesastres->id);
+            // 3er Nivel: tipos de documentación
+            foreach (['Fotografías', 'Testimonios', 'Registro Oficial', 'Prensa'] as $terNivel) {
+                $this->cat($terNivel, $pn->id);
+            }
+        }
+
+        // Subcategoría: Tradiciones y Costumbres de Huaraz
+        $subTradiciones = $this->cat('Tradiciones y Costumbres de Huaraz', $catEspeciales->id);
+        foreach ([
+            'Fiesta del Señor de Mayo',
+            'Semana Santa Huaracina',
+            'Fiesta de Cruces y Carnavales',
+        ] as $tradicion) {
+            $pn = $this->cat($tradicion, $subTradiciones->id);
+            // 3er Nivel: aspectos de cada tradición
+            foreach (['Procesión', 'Danzas', 'Música', 'Gastronomía', 'Indumentaria'] as $aspecto) {
+                $this->cat($aspecto, $pn->id);
+            }
+        }
+
+        // Subcategoría: Patrimonio Arqueológico Ancashino
+        $subPatrimonio = $this->cat('Patrimonio Arqueológico Ancashino', $catEspeciales->id);
+        foreach ([
+            'Sechín',
+            'Chavín',
+            'Wicahuain',
+            'Yaino',
+            'Tumshukaiko',
+        ] as $sitio) {
+            $pn = $this->cat($sitio, $subPatrimonio->id);
+            // 3er Nivel: tipos de elementos arqueológicos
+            foreach (['Arquitectura', 'Relieves y Esculturas', 'Cerámica', 'Vista General', 'Excavaciones'] as $elem) {
+                $this->cat($elem, $pn->id);
+            }
+        }
+
+        // Subcategoría: Parque Nacional Huascarán
+        $subHuascaran = $this->cat('Parque Nacional Huascarán', $catEspeciales->id);
+
+        // 1er Nivel: Nevados y Lagunas
+        $pnNevados = $this->cat('Nevados y Lagunas', $subHuascaran->id);
+        // 2do Nivel: cada nevado/laguna + 3er Nivel: tipos de vistas
+        foreach ([
+            'Huascarán', 'Alpamayo', 'Artesonraju', 'Cayesh',
+            'Chopicalqui', 'Copa', 'Hualcán',
+            'Laguna Parón', 'Laguna Llanganuco', 'Laguna Churup', 'Laguna Palcacocha',
+        ] as $cumbre) {
+            $dn = $this->cat($cumbre, $pnNevados->id);
+            foreach (['Vista Panorámica', 'Amanecer y Atardecer', 'Expedición', 'Flora y Fauna'] as $vista) {
+                $this->cat($vista, $dn->id);
+            }
+        }
+
+        // 1er Nivel: Circuitos
+        $pnCircuitos = $this->cat('Circuitos', $subHuascaran->id);
+        foreach ([
+            'Santa Cruz Trek', 'Laguna 69', 'Base Camp Huascarán',
+            'Huayhuash Circuit', 'Churup',
+        ] as $circuito) {
+            $dn = $this->cat($circuito, $pnCircuitos->id);
+            foreach (['Inicio de Ruta', 'Campamento', 'Cumbre', 'Paisaje'] as $etapa) {
+                $this->cat($etapa, $dn->id);
+            }
+        }
+    }
+
+    /**
+     * Retorna los 3er Nivel apropiados según el tipo de vista de ciudad.
+     */
+    private function terNivelVistas(string $primerNivel): array
+    {
+        return match ($primerNivel) {
+            'Panorámica'              => ['Vista desde el Norte', 'Vista desde el Sur', 'Vista desde el Cerro', 'Aerial / Drone'],
+            'Plaza de Armas y Catedral' => ['Fachada Principal', 'Interior', 'Eventos y Ceremonias', 'Entorno'],
+            'Puentes'                 => ['Puente Bedoya', 'Puente Quilcay', 'Puente Raimondi', 'Otros Puentes'],
+            'Calles'                  => ['Calle José de Sucre', 'Calle Luzuriaga', 'Calle Bolívar', 'Mercado Central', 'Otras Calles'],
+            'Casas y Edificios'       => ['Viviendas Coloniales', 'Edificios Públicos', 'Mercados', 'Hoteles y Hospedajes'],
+            default                   => ['General'],
+        };
+    }
+
+    private function cat(string $name, ?int $parentId): Category
+    {
+        return Category::firstOrCreate(
+            ['name' => $name, 'type' => 'fototeca', 'parent_id' => $parentId],
+            ['slug' => $this->uniqueSlug($name)],
+        );
     }
 
     private function uniqueSlug(string $name): string
     {
         $base = Str::slug($name);
         $slug = $base;
-        $i = 2;
+        $i    = 2;
         while (Category::where('slug', $slug)->exists()) {
             $slug = $base . '-' . $i++;
         }
         return $slug;
     }
 
-    private function createFototecaCategories(array $categories, ?int $parentId): void
-    {
-        foreach ($categories as $key => $value) {
-            // Si la clave es string es un nodo con nombre propio
-            // Si el valor es un array con subelementos, seguir recursando
-            // Si el valor es un string (índice numérico), es una hoja
-            $name = is_string($key) ? $key : $value;
-
-            $category = Category::firstOrCreate(
-                ['name' => $name, 'type' => 'fototeca', 'parent_id' => $parentId],
-                ['slug' => $this->uniqueSlug($name)],
-            );
-
-            if (is_array($value) && count($value) > 0) {
-                $this->createFototecaCategories($value, $category->id);
-            }
-        }
-    }
+    // Método de compatibilidad con migraciones anteriores (ya no se usa)
+    private function createFototecaCategories(array $categories, ?int $parentId): void {}
 }

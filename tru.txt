@@ -1,0 +1,89 @@
+Categoría: Por Provincias (CATEGORÍA WEB)  
+
+SubCategoría: Por Distritos  
+
+SubCategoría: Por Ciudades  
+
+1er Nivel: Panorámica (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+1er Nivel: Plaza de Armas y Catedral (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+1er Nivel: Por Barrios  
+
+2do Nivel: Belén (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+2do Nivel: San Francisco (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+2do Nivel: La Soledad (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+2do Nivel: Huarupampa (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+2do Nivel: Centenario (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+2do Nivel: Nicrupampa (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+1er Nivel: Puentes (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+1er Nivel: Calles (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+1er Nivel: Casas y Edificios (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+1er Nivel: Sociedad y cultura  
+
+2do Nivel: Instituciones Sociales (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+2do Nivel: Instituciones Culturales (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+2do Nivel: Instituciones Educativas (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+2do Nivel: Deportes (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+2do Nivel: Familias (Antes del Terremoto / Terremoto / Después del Terremoto / Siglo XXI)  
+
+Categoría: Especiales (CATEGORÍA WEB)  
+
+SubCategoría: Desastres en Ancash:  
+
+1er Nivel: Aluvión de Huaraz de 1941  
+
+1er Nivel: Aluvión de Chavín de 1945  
+
+1er Nivel: Aluvión de Ranrahirca de 1962  
+
+1er Nivel: Terremoto del 31 de mayo de 1970  
+
+1er Nivel: Aluvión del 31 de mayo de 1970  
+
+SubCategoría: Tradiciones y Costumbres de Huaraz:  
+
+1er Nivel: Fiesta del Señor de Mayo  
+
+1er Nivel: Semana Santa Huaracina  
+
+1er Nivel: Fiesta de Cruces y Carnavales  
+
+SubCategoría: Patrimonio Arqueológico Ancashino  
+
+1er Nivel: Sechín  
+
+1er Nivel: Chavín  
+
+1er Nivel: Wicahuain  
+
+1er Nivel: Yaino  
+
+1er Nivel: Tumshukaiko  
+
+SubCategoría: Parque Nacional Huascarán  
+
+1er Nivel: Nevados y Lagunas  
+
+2do Nivel: Huascarán  
+
+2do Nivel: Alpamayo  
+
+2do Nivel: Artesonraju  
+
+2do Nivel: Cayesh. Etc.  
+
+1er Nivel: Circuitos

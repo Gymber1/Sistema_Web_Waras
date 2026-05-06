@@ -46,6 +46,8 @@ Route::prefix('fototeca')->name('fototeca.')->group(function () {
     Route::get('/tag/{photoTag}', [FototecaController::class, 'getPhotosByTag'])->name('tag');
     Route::get('/fotografos/{photographer}', [FototecaController::class, 'showPhotographer'])->name('fotografos.show');
     Route::get('/galeria/{photo}', [FototecaController::class, 'showPhoto'])->name('galeria.show');
+    Route::get('/colecciones', [FototecaController::class, 'indexColecciones'])->name('colecciones.index');
+    Route::get('/colecciones/{special}', [FototecaController::class, 'showColeccion'])->name('colecciones.show');
 });
 
 // ============= AUTENTICACIÓN =============
@@ -195,11 +197,35 @@ Route::middleware('auth')->group(function () {
             Route::delete('/secondlevels/{category}', [AdminFototecaController::class, 'destroySecondlevel'])->name('secondlevels.destroy');
             Route::delete('/secondlevels', [AdminFototecaController::class, 'bulkDestroySecondlevels'])->name('secondlevels.bulk-destroy');
 
+            // 3er Nivel (Nivel 5)
+            Route::get('/thirdlevels', [AdminFototecaController::class, 'indexThirdlevels'])->name('thirdlevels');
+            Route::get('/thirdlevels/create', [AdminFototecaController::class, 'createThirdlevel'])->name('thirdlevels.create');
+            Route::post('/thirdlevels', [AdminFototecaController::class, 'storeThirdlevel'])->name('thirdlevels.store');
+            Route::get('/thirdlevels/{category}/edit', [AdminFototecaController::class, 'editThirdlevel'])->name('thirdlevels.edit');
+            Route::put('/thirdlevels/{category}', [AdminFototecaController::class, 'updateThirdlevel'])->name('thirdlevels.update');
+            Route::delete('/thirdlevels/{category}', [AdminFototecaController::class, 'destroyThirdlevel'])->name('thirdlevels.destroy');
+            Route::delete('/thirdlevels', [AdminFototecaController::class, 'bulkDestroyThirdlevels'])->name('thirdlevels.bulk-destroy');
+
             // Etiquetas
             Route::get('/tags', [AdminFototecaController::class, 'indexTags'])->name('tags');
             Route::post('/tags', [AdminFototecaController::class, 'storeTag'])->name('tags.store');
             Route::put('/tags/{photoTag}', [AdminFototecaController::class, 'updateTag'])->name('tags.update');
             Route::delete('/tags/{photoTag}', [AdminFototecaController::class, 'destroyTag'])->name('tags.destroy');
+
+            // Colecciones Fototeca
+            Route::get('/collections', [AdminFototecaController::class, 'indexCollections'])->name('collections');
+            Route::get('/collections/create', [AdminFototecaController::class, 'createCollection'])->name('collections.create');
+            Route::post('/collections', [AdminFototecaController::class, 'storeCollection'])->name('collections.store');
+            Route::get('/collections/{special}/edit', [AdminFototecaController::class, 'editCollection'])->name('collections.edit');
+            Route::put('/collections/{special}', [AdminFototecaController::class, 'updateCollection'])->name('collections.update');
+            Route::delete('/collections/{special}', [AdminFototecaController::class, 'destroyCollection'])->name('collections.destroy');
+            Route::delete('/collections', [AdminFototecaController::class, 'bulkDestroyCollections'])->name('collections.bulk-destroy');
+            // Agregar a Colecciones
+            Route::get('/assign-collections', [AdminFototecaController::class, 'assignCollectionsIndex'])->name('assign-collections');
+            Route::get('/assign-collections/{special}/manage', [AdminFototecaController::class, 'manageCollection'])->name('collections.manage');
+            Route::post('/assign-collections/{special}/assign', [AdminFototecaController::class, 'assignPhoto'])->name('collections.assign');
+            Route::delete('/assign-collections/{special}/photos/{photo}', [AdminFototecaController::class, 'unassignPhoto'])->name('collections.unassign');
+            Route::post('/assign-collections/{special}/clear', [AdminFototecaController::class, 'clearCollection'])->name('collections.clear');
 
         });
 

@@ -111,7 +111,11 @@
 
                         {{-- Fecha --}}
                         <td class="px-6 py-4 text-center text-slate-600 dark:text-slate-300">
-                            {{ $photo->year ?? '—' }}
+                            @if($photo->year_type === 'range' && $photo->year_from)
+                                {{ $photo->year_from }}–{{ $photo->year_to }}
+                            @else
+                                {{ $photo->year ?? '—' }}
+                            @endif
                         </td>
 
                         {{-- Acciones --}}

@@ -23,20 +23,20 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
         @php
         $metrics = [
-            ['label' => 'Libros',       'value' => $stats['books'],      'icon' => 'book-open',  'color' => 'indigo'],
-            ['label' => 'Revistas',     'value' => $stats['magazines'],  'icon' => 'newspaper',  'color' => 'sky'],
-            ['label' => 'Autores',      'value' => $stats['authors'],    'icon' => 'users',      'color' => 'emerald'],
-            ['label' => 'Categorías',   'value' => $stats['categories'], 'icon' => 'tag',        'color' => 'violet'],
-            ['label' => 'Editoriales',  'value' => $stats['publishers'], 'icon' => 'building-2', 'color' => 'amber'],
-            ['label' => 'Especiales',   'value' => $stats['specials'],   'icon' => 'star',       'color' => 'rose'],
+            ['label' => 'Libros',       'value' => $stats['books'],       'icon' => 'book-open',  'color' => 'indigo'],
+            ['label' => 'Revistas',     'value' => $stats['magazines'],   'icon' => 'newspaper',  'color' => 'sky'],
+            ['label' => 'Autores',      'value' => $stats['authors'],     'icon' => 'users',      'color' => 'emerald'],
+            ['label' => 'Categorías',   'value' => $stats['categories'],  'icon' => 'tag',        'color' => 'violet'],
+            ['label' => 'Especiales',   'value' => $stats['specials'],    'icon' => 'star',       'color' => 'rose'],
+            ['label' => 'Descriptores', 'value' => $stats['descriptors'], 'icon' => 'hash',       'color' => 'teal'],
         ];
         $colorMap = [
             'indigo'  => ['bg' => 'bg-indigo-50 dark:bg-indigo-500/10',  'text' => 'text-indigo-500 dark:text-indigo-400'],
             'sky'     => ['bg' => 'bg-sky-50 dark:bg-sky-500/10',        'text' => 'text-sky-500 dark:text-sky-400'],
             'emerald' => ['bg' => 'bg-emerald-50 dark:bg-emerald-500/10','text' => 'text-emerald-500 dark:text-emerald-400'],
             'violet'  => ['bg' => 'bg-violet-50 dark:bg-violet-500/10',  'text' => 'text-violet-500 dark:text-violet-400'],
-            'amber'   => ['bg' => 'bg-amber-50 dark:bg-amber-500/10',    'text' => 'text-amber-500 dark:text-amber-400'],
             'rose'    => ['bg' => 'bg-rose-50 dark:bg-rose-500/10',      'text' => 'text-rose-500 dark:text-rose-400'],
+            'teal'    => ['bg' => 'bg-teal-50 dark:bg-teal-500/10',      'text' => 'text-teal-500 dark:text-teal-400'],
         ];
         @endphp
         @foreach($metrics as $m)
@@ -64,9 +64,9 @@
             ['title' => 'Autores',              'desc' => 'Registra y edita perfiles de autores: biografías, fotografías y libros vinculados.',        'icon' => 'users',       'color' => 'emerald', 'route' => 'admin.biblioteca.authors',        'count' => $stats['authors'],    'label' => 'Administrar Autores'],
             ['title' => 'Categorías',           'desc' => 'Crea y edita las categorías principales del catálogo (nivel 1).',                          'icon' => 'tag',         'color' => 'violet',  'route' => 'admin.biblioteca.categories',     'count' => null,                 'label' => 'Administrar Categorías'],
             ['title' => 'SubCategorías',        'desc' => 'Gestiona las subcategorías asociadas a cada categoría padre (nivel 2).',                   'icon' => 'tags',        'color' => 'purple',  'route' => 'admin.biblioteca.subcategories',  'count' => null,                 'label' => 'Administrar SubCategorías'],
-            ['title' => 'Editoriales',          'desc' => 'Registra las editoriales con datos de contacto y logotipos.',                              'icon' => 'building-2',  'color' => 'amber',   'route' => 'admin.biblioteca.publishers',     'count' => $stats['publishers'], 'label' => 'Administrar Editoriales'],
-            ['title' => 'Colecciones Especiales','desc' => 'Crea y edita los nombres de colecciones especiales curadas.',                             'icon' => 'star',        'color' => 'rose',    'route' => 'admin.biblioteca.specials',       'count' => $stats['specials'],   'label' => 'Administrar Especiales'],
-            ['title' => 'Asignar a Especiales', 'desc' => 'Vincula libros o revistas existentes a las colecciones especiales.',                       'icon' => 'link',        'color' => 'slate',   'route' => 'admin.biblioteca.specials.assign-books', 'count' => null,        'label' => 'Asignar Contenido'],
+            ['title' => 'Colecciones Especiales','desc' => 'Crea y edita los nombres de colecciones especiales curadas.',                             'icon' => 'star',        'color' => 'rose',    'route' => 'admin.biblioteca.specials',              'count' => $stats['specials'],      'label' => 'Administrar Especiales'],
+            ['title' => 'Asignar a Especiales', 'desc' => 'Vincula libros o revistas existentes a las colecciones especiales.',                       'icon' => 'link',        'color' => 'slate',   'route' => 'admin.biblioteca.specials.assign-books', 'count' => null,                    'label' => 'Asignar Contenido'],
+            ['title' => 'Descriptores',          'desc' => 'Gestiona las palabras clave que describen el contenido de los documentos.',                'icon' => 'hash',        'color' => 'teal',    'route' => 'admin.biblioteca.descriptors',           'count' => $stats['descriptors'],   'label' => 'Administrar Descriptores'],
         ];
         $sectionColorMap = [
             'indigo'  => ['icon_bg' => 'bg-indigo-50 dark:bg-indigo-500/10',   'icon_text' => 'text-indigo-500 dark:text-indigo-400',  'btn' => 'bg-brand-500 hover:bg-brand-600 shadow-brand-500/30'],
@@ -77,6 +77,7 @@
             'amber'   => ['icon_bg' => 'bg-amber-50 dark:bg-amber-500/10',     'icon_text' => 'text-amber-500 dark:text-amber-400',    'btn' => 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/30'],
             'rose'    => ['icon_bg' => 'bg-rose-50 dark:bg-rose-500/10',       'icon_text' => 'text-rose-500 dark:text-rose-400',      'btn' => 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/30'],
             'slate'   => ['icon_bg' => 'bg-slate-100 dark:bg-slate-700/40',    'icon_text' => 'text-slate-500 dark:text-slate-400',    'btn' => 'bg-slate-600 hover:bg-slate-700 shadow-slate-500/20'],
+            'teal'    => ['icon_bg' => 'bg-teal-50 dark:bg-teal-500/10',       'icon_text' => 'text-teal-500 dark:text-teal-400',      'btn' => 'bg-teal-500 hover:bg-teal-600 shadow-teal-500/30'],
         ];
         @endphp
 

@@ -68,7 +68,7 @@
                 <div class="photo-info">
                     <p class="photo-title">{{ $photo->title }}</p>
                     <p class="photo-meta">
-                        {{ $photo->year ?? 'S/F' }}
+                        {{ $photo->year_type === 'range' && $photo->year_from ? $photo->year_from.'–'.($photo->year_to ?? '?') : ($photo->year ?? 'S/F') }}
                         @if($photo->photographers->first())
                             · {{ $photo->photographers->first()->full_name }}
                         @endif

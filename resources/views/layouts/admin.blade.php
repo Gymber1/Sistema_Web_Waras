@@ -197,7 +197,10 @@
                                 ['route'=>'admin.fototeca.subcategories','pattern'=>'admin.fototeca.subcategories*','label'=>'SubCategorías'],
                                 ['route'=>'admin.fototeca.sublevels',    'pattern'=>'admin.fototeca.sublevels*',    'label'=>'1er Nivel'],
                                 ['route'=>'admin.fototeca.secondlevels', 'pattern'=>'admin.fototeca.secondlevels*','label'=>'2do Nivel'],
+                                ['route'=>'admin.fototeca.thirdlevels',  'pattern'=>'admin.fototeca.thirdlevels*', 'label'=>'3er Nivel'],
                                 ['route'=>'admin.fototeca.tags',         'pattern'=>'admin.fototeca.tags*',         'label'=>'Etiquetas'],
+                                ['route'=>'admin.fototeca.collections',        'pattern'=>'admin.fototeca.collections*',        'label'=>'Colecciones'],
+                                ['route'=>'admin.fototeca.assign-collections',  'pattern'=>'admin.fototeca.assign-collections*', 'label'=>'Agregar a Colecciones'],
                             ]; @endphp
                             @foreach($fotoLinks as $l)
                             <li>
@@ -693,6 +696,8 @@
                 'table-photographers':   '{{ route("admin.fototeca.photographers.bulk-destroy") }}',
                 'table-sublevels':       '{{ route("admin.fototeca.sublevels.bulk-destroy") }}',
                 'table-secondlevels':    '{{ route("admin.fototeca.secondlevels.bulk-destroy") }}',
+                'table-thirdlevels':     '{{ route("admin.fototeca.thirdlevels.bulk-destroy") }}',
+                'table-foto-collections':'{{ route("admin.fototeca.collections.bulk-destroy") }}',
                 'table-users':           '{{ route("admin.usuarios.bulk-destroy") }}',
             };
             const actionUrl = routeMap[tableId];
@@ -700,7 +705,8 @@
                 'table-books': 'libro(s)', 'table-magazines': 'revista(s)', 'table-authors': 'autor(es)',
                 'table-publishers': 'editorial(es)', 'table-specials': 'colección(es)',
                 'table-photos': 'fotografía(s)', 'table-photographers': 'fotógrafo(s)',
-                'table-sublevels': 'subnivel(es)', 'table-secondlevels': '2do nivel(es)', 'table-users': 'usuario(s)',
+                'table-sublevels': 'subnivel(es)', 'table-secondlevels': '2do nivel(es)', 'table-thirdlevels': '3er nivel(es)',
+                'table-foto-collections': 'colección(es)', 'table-users': 'usuario(s)',
             };
             const item = labelMap[tableId] ?? 'elemento(s)';
             title.textContent = `Eliminar ${count} ${item}`;

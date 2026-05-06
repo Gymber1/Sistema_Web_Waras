@@ -26,13 +26,13 @@ class FototecaController extends Controller
                 'id'           => $photo->id,
                 'title'        => $photo->title,
                 'photographer' => $photographerName,
-                'year'         => $photo->year ?? 'S/F',
+                'year'         => $photo->year_type === 'range' && $photo->year_from
+                                    ? $photo->year_from . '–' . ($photo->year_to ?? '?')
+                                    : ($photo->year ?? 'S/F'),
                 'source_type'  => $photo->source_type ?? 'local',
                 'image_url'    => $photo->thumbnail_url,
                 'description'  => $photo->description ?? '',
-                'resolution'   => $photo->resolution ?? 'N/A',
                 'location'     => $photo->location ?? '',
-                'format'       => $photo->format ?? '',
                 'external_url' => $photo->external_url ?? '',
                 'detail_url'   => '/fototeca/galeria/' . $photo->id,
                 'tag_id'       => $photo->tag_id,
@@ -126,8 +126,26 @@ class FototecaController extends Controller
 
     public function showPhotographer(\App\Models\Photographer $photographer)
     {
-        $photographer->load('photos.categories');
+        $photographer->load(['collections.photos', 'photos.categories']);
         return view('fototeca.fotografo', compact('photographer'));
+    }
+
+    public function indexColecciones()
+    {
+        $colecciones = \App\Models\Special::where('module', 'fototeca')
+            ->where('is_active', true)
+            ->withCount('photos')
+            ->orderBy('order')
+            ->orderBy('title')
+            ->get();
+        return view('fototeca.colecciones', compact('colecciones'));
+    }
+
+    public function showColeccion(\App\Models\Special $special)
+    {
+        abort_if($special->module !== 'fototeca', 404);
+        $special->load(['photos.photographers', 'photos.categories']);
+        return view('fototeca.coleccion', compact('special'));
     }
 
     public function getPhotosByCategory($categoryId)

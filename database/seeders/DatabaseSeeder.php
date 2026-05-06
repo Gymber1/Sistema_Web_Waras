@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
             BookSeeder::class,         // 8. Libros con relaciones
             PhotographerSeeder::class, // 9. Fotógrafos
             PhotoSeeder::class,        // 10. Fotografías con relaciones
-            SiteSettingSeeder::class,  // 11. Configuración inicial del sitio
+            SiteSettingSeeder::class,        // 11. Configuración inicial del sitio
+            FloatingButtonSeeder::class,     // 12. Botones flotantes (WhatsApp y Yape)
         ]);
     }
 }

@@ -39,7 +39,6 @@
                 <div>
                     <p class="text-sm font-semibold text-brand-700 dark:text-brand-300">Imagen actual cargada</p>
                     <p class="text-xs text-brand-600 dark:text-brand-400 mt-0.5">{{ $photo->title }}</p>
-                    @if($photo->resolution)<p class="text-xs text-brand-500 dark:text-brand-400/70 mt-0.5">Resolución: {{ $photo->resolution }}</p>@endif
                 </div>
             </div>
             @endif
@@ -150,9 +149,31 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Tipo de fecha</label>
+                    <select name="year_type" id="year_type" onchange="toggleYearFields()"
+                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                        <option value="exact" {{ old('year_type', $photo->year_type ?? 'exact') === 'exact' ? 'selected' : '' }}>Año exacto</option>
+                        <option value="range" {{ old('year_type', $photo->year_type) === 'range'             ? 'selected' : '' }}>Rango de años</option>
+                    </select>
+                </div>
+
+                {{-- Año exacto --}}
+                <div id="field-year-exact">
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Año de la fotografía</label>
                     <input type="number" name="year" value="{{ old('year', $photo->year) }}" min="1800" max="{{ date('Y') }}" placeholder="Ej. 1970"
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                </div>
+
+                {{-- Rango de años --}}
+                <div id="field-year-range" class="md:col-span-2" style="display:none">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Rango de años</label>
+                    <div class="flex items-center gap-3">
+                        <input type="number" name="year_from" value="{{ old('year_from', $photo->year_from) }}" min="1800" max="{{ date('Y') }}" placeholder="Desde (Ej. 1920)"
+                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                        <span class="text-slate-400 dark:text-slate-500 font-medium shrink-0">—</span>
+                        <input type="number" name="year_to" value="{{ old('year_to', $photo->year_to) }}" min="1800" max="{{ date('Y') }}" placeholder="Hasta (Ej. 1940)"
+                            class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                    </div>
                 </div>
 
                 <div>
@@ -167,22 +188,6 @@
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Resolución</label>
-                    <input type="text" name="resolution" value="{{ old('resolution', $photo->resolution) }}" placeholder="Ej. 4000x3000"
-                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Formato</label>
-                    <select name="format"
-                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
-                        <option value="">— Sin especificar —</option>
-                        @foreach(['JPG','PNG','RAW','TIFF','WEBP','BMP','GIF','HEIC','SVG'] as $fmt)
-                        <option value="{{ $fmt }}" @selected(old('format', $photo->format) === $fmt)>{{ $fmt }}</option>
-                        @endforeach
-                    </select>
-                </div>
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Tipo de acceso <span class="text-red-500">*</span></label>
@@ -250,8 +255,10 @@ function addChip(btn, chipsId, field) {
     const s = document.getElementById('search-' + field); if (s) s.value = '';
     document.getElementById('dropdown-' + field).classList.add('hidden');
 }
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.relative')) document.querySelectorAll('.tag-dropdown').forEach(d => d.classList.add('hidden'));
+document.addEventListener('mousedown', function(e) {
+    const inDropdown = e.target.closest('.tag-dropdown');
+    const inSearchInput = e.target.tagName === 'INPUT' && e.target.id && e.target.id.startsWith('search-');
+    if (!inDropdown && !inSearchInput) document.querySelectorAll('.tag-dropdown').forEach(d => d.classList.add('hidden'));
 });
 
 function cascadeSubcategory() {
@@ -307,6 +314,13 @@ function cascadeSecondlevel() {
     });
     if (selSec.options.length <= 1) { selSec.innerHTML = '<option value="">— Sin 2do niveles —</option>'; selSec.disabled = true; }
 }
+
+function toggleYearFields() {
+    const type = document.getElementById('year_type').value;
+    document.getElementById('field-year-exact').style.display = type === 'exact' ? '' : 'none';
+    document.getElementById('field-year-range').style.display = type === 'range' ? '' : 'none';
+}
+toggleYearFields();
 
 function toggleSourceFields() {
     const val = document.getElementById('source_type').value;

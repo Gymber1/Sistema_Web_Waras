@@ -28,6 +28,7 @@
             <button class="nav-item-btn" data-tab="Inicio">Inicio</button>
             <button class="nav-item-btn" data-tab="Galería">Galería</button>
             <button class="nav-item-btn" data-tab="Fotógrafos">Fotógrafos</button>
+            <a href="{{ route('fototeca.colecciones.index') }}" class="nav-item-btn" style="text-decoration:none;">Colecciones</a>
             <button class="nav-item-btn" data-tab="Aportantes">Sobre Nosotros</button>
             <a href="{{ route('home') }}" class="nav-portal-btn">Portal Principal</a>
             @auth
@@ -45,6 +46,7 @@
             <button class="nav-item-btn" data-tab="Inicio">Inicio</button>
             <button class="nav-item-btn" data-tab="Galería">Galería</button>
             <button class="nav-item-btn" data-tab="Fotógrafos">Fotógrafos</button>
+            <a href="{{ route('fototeca.colecciones.index') }}" class="nav-item-btn" style="text-decoration:none;">Colecciones</a>
             <button class="nav-item-btn" data-tab="Aportantes">Sobre Nosotros</button>
             <a href="{{ route('home') }}" style="color:var(--text-muted)">Portal Principal</a>
             @auth
@@ -245,7 +247,16 @@
                     <h2 class="gallery-context-title" id="sectionTitleAlt">Fotógrafos</h2>
                     <div class="gallery-context-line"></div>
                 </div>
-                <div class="gallery-results-count"><span id="photoCountNS">0</span> resultado(s)</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+                    <div class="gallery-results-count"><span id="photoCountNS">0</span> resultado(s)</div>
+                    <div style="position:relative;width:260px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:#555;pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input id="fotografosSearch" type="text" placeholder="Buscar fotógrafo..."
+                            oninput="filterFotografosGrid(this.value)"
+                            style="width:100%;padding:0.6rem 1rem 0.6rem 2.5rem;background:#111;border:1px solid #2a2a2a;border-radius:8px;color:#fff;font-size:0.83rem;outline:none;transition:border-color 0.2s;"
+                            onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#2a2a2a'">
+                    </div>
+                </div>
             </div>
 
             <div class="photo-grid" id="photosGrid"></div>
@@ -352,6 +363,7 @@
         const PHOTOS_PER_PAGE = 6; // 3 columnas × 2 filas
 
         // ── ESTADO ───────────────────────────────────────────────────
+        let fotografosSearchQuery = '';
         let state = {
             activeTab:       'Inicio',
             activeCategory:  { id: null, name: 'Todas' },
@@ -363,7 +375,12 @@
 
         // ── FILTRADO ─────────────────────────────────────────────────
         function getCurrentPhotos() {
-            if (state.activeTab === 'Fotógrafos') return photographersData;
+            if (state.activeTab === 'Fotógrafos') {
+                if (!fotografosSearchQuery) return photographersData;
+                return photographersData.filter(p =>
+                    (p.full_name || '').toLowerCase().includes(fotografosSearchQuery)
+                );
+            }
             let base = allPhotosFlat;
             if (state.activeCategory.id !== null) {
                 const catName = state.activeCategory.name;
@@ -667,6 +684,9 @@
             state.activeTab = tab;
             state.activeCategory = { id: null, name: 'Todas' };
             state.activeTagId = null;
+            fotografosSearchQuery = '';
+            const fsInput = document.getElementById('fotografosSearch');
+            if (fsInput) fsInput.value = '';
             state.openAccordions.clear(); state.closedAccordions.clear();
             hideAllSections();
 
@@ -1076,6 +1096,13 @@
             showSection(pendingTab);
         } else {
             showSection(validTabs.includes(serverActiveSection) ? serverActiveSection : 'Inicio');
+        }
+
+        // Filtro de fotógrafos — filtra datos y re-renderiza con paginación correcta
+        function filterFotografosGrid(q) {
+            fotografosSearchQuery = q.toLowerCase().trim();
+            state.currentPage = 1;
+            renderPhotos();
         }
     </script>
     <x-floating-buttons />

@@ -19,6 +19,7 @@ class Special extends Model
         'description',
         'cover_image_path',
         'type',
+        'module',
         'order',
         'is_active',
     ];
