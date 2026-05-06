@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 namespace App\Http\Controllers\Admin;
 
@@ -423,12 +423,17 @@ class FototecaController extends Controller
 
     public function indexSublevels()
     {
+        // depth 2: parent en depth 1 (parent.parent_id != null && parent.parent.parent_id = null)
         $sublevels = Category::where('type', 'fototeca')
-            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id'))
+            ->whereNotNull('parent_id')
+            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                ->whereHas('parent', fn($q2) => $q2->whereNull('parent_id')))
             ->with(['parent', 'parent.parent'])
             ->orderBy('name')
             ->paginate(10);
+        // padres válidos = depth 1
         $parentCategories = Category::where('type', 'fototeca')
+            ->whereNotNull('parent_id')
             ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
             ->with('parent')
             ->orderBy('name')
@@ -439,6 +444,7 @@ class FototecaController extends Controller
     public function createSublevel()
     {
         $parentCategories = Category::where('type', 'fototeca')
+            ->whereNotNull('parent_id')
             ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
             ->with('parent')
             ->orderBy('name')
@@ -466,6 +472,7 @@ class FototecaController extends Controller
     public function editSublevel(Category $category)
     {
         $parentCategories = Category::where('type', 'fototeca')
+            ->whereNotNull('parent_id')
             ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
             ->with('parent')
             ->orderBy('name')
@@ -605,16 +612,21 @@ class FototecaController extends Controller
         return back()->with('success', count($ids) . ' subnivel(es) eliminado(s).');
     }
 
-    // ============= 2DO NIVEL (Nivel 4) =============
+    // ============= 2DO NIVEL (depth 3) =============
 
     public function indexSecondlevels()
     {
+        // depth 3: parent en depth 2 (parent.parent_id != null && parent.parent.parent_id = null)
         $secondlevels = Category::where('type', 'fototeca')
-            ->whereHas('parent', fn($q) => $q->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')))
+            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                ->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
+                    ->whereHas('parent', fn($q3) => $q3->whereNull('parent_id'))))
             ->with(['parent', 'parent.parent', 'parent.parent.parent'])
             ->orderBy('name')
             ->paginate(10);
+        // padres válidos = depth 2
         $parentCategories = Category::where('type', 'fototeca')
+            ->whereNotNull('parent_id')
             ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
                 ->whereHas('parent', fn($q2) => $q2->whereNull('parent_id')))
             ->with(['parent', 'parent.parent'])
@@ -626,6 +638,7 @@ class FototecaController extends Controller
     public function createSecondlevel()
     {
         $parentCategories = Category::where('type', 'fototeca')
+            ->whereNotNull('parent_id')
             ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
                 ->whereHas('parent', fn($q2) => $q2->whereNull('parent_id')))
             ->with(['parent', 'parent.parent'])
@@ -654,6 +667,7 @@ class FototecaController extends Controller
     public function editSecondlevel(Category $category)
     {
         $parentCategories = Category::where('type', 'fototeca')
+            ->whereNotNull('parent_id')
             ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
                 ->whereHas('parent', fn($q2) => $q2->whereNull('parent_id')))
             ->with(['parent', 'parent.parent'])
@@ -691,18 +705,25 @@ class FototecaController extends Controller
         return back()->with('success', count($ids) . ' 2do nivel(es) eliminado(s).');
     }
 
-    // ============= 3ER NIVEL (Nivel 5) =============
+    // ============= 3ER NIVEL (depth 4) =============
 
     public function indexThirdlevels()
     {
+        // depth 4: parent en depth 3
         $thirdlevels = Category::where('type', 'fototeca')
-            ->whereHas('parent', fn($q) => $q->whereHas('parent', fn($q2) => $q2->whereHas('parent', fn($q3) => $q3->whereNotNull('parent_id'))))
+            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                ->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
+                    ->whereHas('parent', fn($q3) => $q3->whereNotNull('parent_id')
+                        ->whereHas('parent', fn($q4) => $q4->whereNull('parent_id')))))
             ->with(['parent', 'parent.parent', 'parent.parent.parent', 'parent.parent.parent.parent'])
             ->orderBy('name')
             ->paginate(10);
+        // padres válidos = depth 3
         $parentCategories = Category::where('type', 'fototeca')
-            ->whereHas('parent', fn($q) => $q->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
-                ->whereHas('parent', fn($q3) => $q3->whereNull('parent_id'))))
+            ->whereNotNull('parent_id')
+            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                ->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
+                    ->whereHas('parent', fn($q3) => $q3->whereNull('parent_id'))))
             ->with(['parent', 'parent.parent', 'parent.parent.parent'])
             ->orderBy('name')
             ->get();
@@ -712,8 +733,10 @@ class FototecaController extends Controller
     public function createThirdlevel()
     {
         $parentCategories = Category::where('type', 'fototeca')
-            ->whereHas('parent', fn($q) => $q->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
-                ->whereHas('parent', fn($q3) => $q3->whereNull('parent_id'))))
+            ->whereNotNull('parent_id')
+            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                ->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
+                    ->whereHas('parent', fn($q3) => $q3->whereNull('parent_id'))))
             ->with(['parent', 'parent.parent', 'parent.parent.parent'])
             ->orderBy('name')
             ->get();
@@ -740,8 +763,10 @@ class FototecaController extends Controller
     public function editThirdlevel(Category $category)
     {
         $parentCategories = Category::where('type', 'fototeca')
-            ->whereHas('parent', fn($q) => $q->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
-                ->whereHas('parent', fn($q3) => $q3->whereNull('parent_id'))))
+            ->whereNotNull('parent_id')
+            ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
+                ->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
+                    ->whereHas('parent', fn($q3) => $q3->whereNull('parent_id'))))
             ->with(['parent', 'parent.parent', 'parent.parent.parent'])
             ->orderBy('name')
             ->get();

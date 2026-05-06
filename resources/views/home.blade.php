@@ -658,7 +658,7 @@
             const origCards    = Array.from(carousel.querySelectorAll('.collection-card'));
             const n            = origCards.length;
             const ANIM_MS      = 700;
-            const AUTO_DELAY   = 4000;
+            const AUTO_DELAY   = 10000;
 
             let CARD_W = window.innerWidth < 768 ? 300 : 420;
             let GAP    = window.innerWidth < 768 ? 16  : 32;

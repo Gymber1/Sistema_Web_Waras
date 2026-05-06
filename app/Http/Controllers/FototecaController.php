@@ -37,9 +37,10 @@ class FototecaController extends Controller
                 'detail_url'   => '/fototeca/galeria/' . $photo->id,
                 'tag_id'       => $photo->tag_id,
                 'tag_name'     => $photo->tag?->name ?? '',
-                'categories'   => $photo->categories->pluck('name')->toArray(),
-                'created_at'   => $photo->created_at?->toISOString() ?? '',
-                'year_sort'    => $photo->year ?? $photo->year_from ?? 0,
+                'categories'      => $photo->categories->pluck('name')->toArray(),
+                'category_ids'    => $photo->categories->pluck('id')->toArray(),
+                'created_at'      => $photo->created_at?->toISOString() ?? '',
+                'year_sort'       => $photo->year ?? $photo->year_from ?? 0,
             ];
             foreach ($photo->categories as $cat) {
                 $photosByCategory[$cat->name][] = $photoData;

@@ -383,8 +383,8 @@
             }
             let base = allPhotosFlat;
             if (state.activeCategory.id !== null) {
-                const catName = state.activeCategory.name;
-                base = photosByCategory[catName] || [];
+                const catId = state.activeCategory.id;
+                base = allPhotosFlat.filter(p => p.category_ids && p.category_ids.includes(catId));
             }
             if (state.activeTagId !== null) {
                 base = base.filter(p => p.tag_id === state.activeTagId);
