@@ -116,31 +116,37 @@
 
         <!-- Obras -->
         @if($author->books->count() > 0)
-            <h2 class="section-title">Obras del autor</h2>
-            @php $colors = ['#5c4033','#2d4a6e','#3a5a40','#6b3a2a','#1a3a5c','#4a3a6b']; @endphp
-            <div class="books-grid">
-                @foreach($author->books as $i => $book)
-                <div class="book-card">
-                    <div class="book-cover" style="background: linear-gradient(135deg, {{ $colors[$i % count($colors)] }} 0%, {{ $colors[$i % count($colors)] }}cc 100%);">
-                        <span class="book-type-badge">{{ $book->document_type ?? 'Libro' }}</span>
-                        @if($book->cover_image_path)
-                            <img src="{{ Storage::url($book->cover_image_path) }}"
-                                 alt="{{ $book->title }}"
-                                 onerror="this.style.display='none'">
-                        @else
-                            <span class="book-cover-icon">📚</span>
-                        @endif
-                    </div>
-                    <div class="book-info">
-                        <h3 class="book-title">{{ $book->title }}</h3>
-                        <p class="book-year">{{ $book->publication_year ?? ($book->publication_date ? \Carbon\Carbon::parse($book->publication_date)->format('Y') : 'S/F') }}</p>
-                        @if($book->editorial_name)
-                            <p class="book-publisher">{{ $book->editorial_name }}</p>
-                        @endif
-                    </div>
+            @php
+                $colors = ['#5c4033','#2d4a6e','#3a5a40','#6b3a2a','#1a3a5c','#4a3a6b'];
+                $allBooks = $author->books->map(function($book, $i) use ($colors) {
+                    return [
+                        'url'           => $book->document_type === 'Revista'
+                                            ? route('biblioteca.revistas.show', $book)
+                                            : route('biblioteca.libros.show', $book),
+                        'color'         => $colors[$i % count($colors)],
+                        'type'          => $book->document_type ?? 'Libro',
+                        'cover'         => $book->cover_image_path ? Storage::url($book->cover_image_path) : null,
+                        'title'         => $book->title,
+                        'year'          => $book->publication_year ?? ($book->publication_date ? \Carbon\Carbon::parse($book->publication_date)->format('Y') : 'S/F'),
+                        'publisher'     => $book->editorial_name ?? null,
+                    ];
+                })->values()->toArray();
+            @endphp
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem; flex-wrap:wrap;">
+                <h2 class="section-title" style="margin:0;">Obras del autor</h2>
+                <div style="position:relative; min-width:220px;">
+                    <i class="fas fa-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#999;font-size:0.8rem;pointer-events:none;"></i>
+                    <input type="text" id="books-search" placeholder="Buscar obra..." oninput="searchBooks(this.value)"
+                        style="width:100%;padding:7px 12px 7px 30px;border:1px solid #ddd;border-radius:8px;font-size:0.85rem;outline:none;color:#333;background:#fafafa;transition:border .2s;"
+                        onfocus="this.style.borderColor='#b8860b'" onblur="this.style.borderColor='#ddd'">
                 </div>
-                @endforeach
             </div>
+            <div id="books-no-results" style="display:none; text-align:center; padding:2rem 0; color:#999; font-size:0.95rem;">
+                <i class="fas fa-search" style="font-size:1.5rem; opacity:0.3; display:block; margin-bottom:0.5rem;"></i>
+                No se encontraron obras con ese término.
+            </div>
+            <div id="books-grid" class="books-grid"></div>
+            <div id="books-pagination" style="display:none; text-align:center; margin-top:1.5rem; margin-bottom:1rem;"></div>
         @else
             <div class="no-books">
                 <i class="fas fa-book-open"></i>
@@ -151,6 +157,80 @@
     </div>
 
     <script>
+        // ── Paginación + búsqueda de obras ──────────────────────────
+        (function() {
+            const allBooks   = @json($allBooks ?? []);
+            const PER_PAGE   = 8;
+            const authorName = @json($author->name);
+            let filtered     = allBooks.slice();
+            let currentPage  = 1;
+
+            function cardHtml(b) {
+                return `<a href="${b.url}" class="book-card" style="text-decoration:none;color:inherit;display:block;"
+                    onclick="sessionStorage.setItem('back_url',window.location.href);sessionStorage.setItem('back_label',${JSON.stringify(authorName)});">
+                    <div class="book-cover" style="background:linear-gradient(135deg,${b.color} 0%,${b.color}cc 100%);">
+                        <span class="book-type-badge">${b.type}</span>
+                        ${b.cover ? `<img src="${b.cover}" alt="${b.title}" onerror="this.style.display='none'">` : '<span class="book-cover-icon">📚</span>'}
+                    </div>
+                    <div class="book-info">
+                        <h3 class="book-title">${b.title}</h3>
+                        <p class="book-year">${b.year}</p>
+                        ${b.publisher ? `<p class="book-publisher">${b.publisher}</p>` : ''}
+                    </div>
+                </a>`;
+            }
+
+            function render() {
+                const grid      = document.getElementById('books-grid');
+                const noResults = document.getElementById('books-no-results');
+                const pagCont   = document.getElementById('books-pagination');
+                if (!grid) return;
+
+                if (filtered.length === 0) {
+                    grid.innerHTML = '';
+                    noResults.style.display = 'block';
+                    pagCont.style.display   = 'none';
+                    return;
+                }
+
+                noResults.style.display = 'none';
+                const start = (currentPage - 1) * PER_PAGE;
+                grid.innerHTML = filtered.slice(start, start + PER_PAGE).map(cardHtml).join('');
+
+                const totalPages = Math.ceil(filtered.length / PER_PAGE);
+                if (totalPages <= 1) { pagCont.style.display = 'none'; return; }
+                pagCont.style.display = 'block';
+                pagCont.innerHTML = Array.from({length: totalPages}, (_, i) => i + 1).map(p => {
+                    const active = p === currentPage;
+                    return `<button onclick="goPage(${p})" style="margin:0 3px;padding:6px 14px;border-radius:6px;
+                        border:1px solid ${active?'#b8860b':'#ddd'};background:${active?'#b8860b':'#fff'};
+                        color:${active?'#fff':'#555'};font-size:0.85rem;cursor:pointer;
+                        font-weight:${active?'600':'400'};transition:all .2s;">${p}</button>`;
+                }).join('');
+            }
+
+            window.goPage = function(p) {
+                currentPage = p;
+                render();
+                document.getElementById('books-search')?.closest('div')?.previousElementSibling?.scrollIntoView({behavior:'smooth', block:'start'});
+            };
+
+            window.searchBooks = function(q) {
+                const term = q.toLowerCase().trim();
+                filtered = term
+                    ? allBooks.filter(b =>
+                        b.title.toLowerCase().includes(term) ||
+                        (b.publisher && b.publisher.toLowerCase().includes(term)) ||
+                        b.type.toLowerCase().includes(term) ||
+                        String(b.year).includes(term))
+                    : allBooks.slice();
+                currentPage = 1;
+                render();
+            };
+
+            render();
+        })();
+
         // Navegación con hash para abrir sección correcta al volver
         document.querySelectorAll('a[href*="#"]').forEach(link => {
             link.addEventListener('click', function(e) {

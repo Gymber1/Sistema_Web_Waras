@@ -836,17 +836,31 @@ body {
 .acc-parent-btn {
     width: 100%;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    padding: 0.875rem 2rem;
+    gap: 0.5rem;
+    padding: 0.875rem 1.25rem 0.875rem 2rem;
     color: #374151;
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 700;
     background: transparent;
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
     border-left: 4px solid transparent;
+    text-align: left;
+}
+
+.acc-parent-btn > span {
+    flex: 1;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+.acc-parent-btn .acc-chevron {
+    flex-shrink: 0;
+    margin-top: 3px;
 }
 
 .acc-parent-btn:hover {
@@ -884,9 +898,10 @@ body {
 .acc-child-btn {
     width: 100%;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    padding: 0.7rem 2rem 0.7rem 3rem;
+    gap: 0.5rem;
+    padding: 0.7rem 1.25rem 0.7rem 3rem;
     color: #6b7280;
     font-size: 0.8125rem;
     font-weight: 400;
@@ -896,6 +911,19 @@ body {
     transition: all 0.2s ease;
     border-left: 4px solid transparent;
     border-bottom: 1px solid #f3f4f6;
+    text-align: left;
+}
+
+.acc-child-btn > span {
+    flex: 1;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+.acc-child-btn .category-icon {
+    flex-shrink: 0;
+    margin-top: 3px;
 }
 
 .acc-child-btn:hover {

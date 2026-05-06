@@ -650,12 +650,13 @@
                     </div>
                 </li>`;
             } else {
+                const rootStyle = depth === 0 ? 'font-weight:700;color:#374151;' : '';
                 return `<li>
                     <button class="acc-child-btn ${isActive ? 'active' : ''}"
                             data-category-id="${node.id}" data-category-name="${node.name}"
-                            style="padding-left:${pl};">
+                            style="padding-left:${pl};${rootStyle}">
                         <span>${node.name}</span>
-                        <i class="fas fa-chevron-right category-icon" style="font-size:0.65rem;"></i>
+                        <i class="fas fa-chevron-right category-icon" style="font-size:0.65rem;flex-shrink:0;"></i>
                     </button>
                 </li>`;
             }
