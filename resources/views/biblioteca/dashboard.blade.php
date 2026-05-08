@@ -47,11 +47,14 @@
 
             <nav class="nav-menu" id="navMenu">
                 <a href="{{ route('biblioteca.inicio') }}" data-tab="Inicio" class="nav-item">Inicio</a>
+                <span class="nav-sep-bib">|</span>
                 <a href="{{ route('biblioteca.libros.index') }}" data-tab="Libros" class="nav-item">Biblioteca Digital</a>
-                <a href="{{ route('biblioteca.editorial.index') }}" data-tab="Waras Editorial" class="nav-item">Waras Editorial</a>
                 <a href="{{ route('biblioteca.revistas.index') }}" data-tab="Revistas" class="nav-item">Revistas</a>
                 <a href="{{ route('biblioteca.autores.index') }}" data-tab="Autores" class="nav-item">Autores</a>
+                <span class="nav-sep-bib">|</span>
                 <a href="{{ route('biblioteca.especiales.index') }}" data-tab="Especiales" class="nav-item">Especiales</a>
+                <span class="nav-sep-bib">|</span>
+                <a href="{{ route('biblioteca.editorial.index') }}" data-tab="Waras Editorial" class="nav-item">Waras Editorial</a>
             </nav>
             <div class="header-actions">
                 <a href="{{ route('home') }}" class="header-btn header-btn-outline">

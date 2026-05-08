@@ -141,40 +141,50 @@
 
 {{-- Collections --}}
 @if($photographer->collections->count() > 0)
-<div class="gallery-context-bar">
-    <div class="gallery-context-line"></div>
-    <h2 class="gallery-context-title">Colecciones de {{ \Illuminate\Support\Str::words($photographer->full_name, 2, '') }}</h2>
-    <span class="gallery-context-count">{{ $photographer->collections->count() }} colección(es)</span>
-    <div class="gallery-context-line"></div>
-</div>
 
-<div style="max-width:1280px;margin:0 auto;padding:0 2rem 4rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;">
-    @foreach($photographer->collections as $col)
-    <a href="{{ route('fototeca.colecciones.show', $col) }}"
-       onclick="sessionStorage.setItem('back_url', window.location.href); sessionStorage.setItem('back_label', '{{ addslashes($photographer->full_name) }}')"
-       style="background:#0e0e0e;border:1px solid #1e1e1e;border-radius:10px;overflow:hidden;text-decoration:none;display:block;transition:border-color 0.25s,transform 0.2s;"
-       onmouseover="this.style.borderColor='#c9a84c';this.style.transform='translateY(-3px)'"
-       onmouseout="this.style.borderColor='#1e1e1e';this.style.transform='translateY(0)'">
-        <div style="aspect-ratio:16/9;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-            @if($col->cover_image_path)
-                <img src="{{ Storage::url($col->cover_image_path) }}" alt="{{ $col->title }}"
-                     style="width:100%;height:100%;object-fit:cover;" loading="lazy">
-            @else
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.2" style="opacity:0.25"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            @endif
+@php
+$authorName = \Illuminate\Support\Str::words($photographer->full_name, 2, '');
+$allCols = $photographer->collections->map(fn($c) => [
+    'url'    => route('fototeca.colecciones.show', $c),
+    'cover'  => $c->cover_image_path ? Storage::url($c->cover_image_path) : null,
+    'title'  => $c->title,
+    'photographer' => $c->description ?: $photographer->full_name,
+    'count'  => $c->photos->count(),
+])->values()->toArray();
+@endphp
+
+<div style="max-width:1280px;margin:3rem auto 0;padding:0 2rem 5rem;">
+
+    {{-- Header + buscador --}}
+    <div class="gallery-context-bar" style="margin-bottom:2rem;">
+        <div class="gallery-context-line"></div>
+        <h2 class="gallery-context-title">Colecciones de {{ $authorName }}</h2>
+        <span class="gallery-context-count" id="col-count-label">{{ $photographer->collections->count() }} colección(es)</span>
+        <div class="gallery-context-line"></div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;">
+        <div style="position:relative;width:100%;max-width:400px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="col-search" placeholder="Buscar colección..."
+                oninput="colSearch(this.value)"
+                style="width:100%;padding:9px 14px 9px 34px;background:#111;border:1px solid #2a2a2a;border-radius:8px;color:#fff;font-size:.875rem;outline:none;transition:border-color .2s;box-sizing:border-box;"
+                onfocus="this.style.borderColor='#c9a84c'" onblur="this.style.borderColor='#2a2a2a'">
         </div>
-        <div style="padding:1rem 1.1rem 1.25rem;">
-            <p style="font-family:'Playfair Display',serif;font-size:1.05rem;color:#fff;margin-bottom:0.4rem;">{{ $col->title }}</p>
-            @if($col->description)
-            <p style="font-size:0.75rem;color:#666;margin-bottom:0.5rem;line-height:1.4;">{{ Str::limit($col->description, 70) }}</p>
-            @endif
-            <p style="font-size:0.72rem;color:#c9a84c;font-style:italic;display:flex;align-items:center;gap:4px;">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                {{ $col->photos->count() }} {{ $col->photos->count() === 1 ? 'fotografía' : 'fotografías' }}
-            </p>
-        </div>
-    </a>
-    @endforeach
+    </div>
+
+    {{-- Grid --}}
+    <div id="col-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;">
+    </div>
+
+    {{-- Sin resultados --}}
+    <div id="col-no-results" style="display:none;text-align:center;padding:3rem 0;color:#555;font-size:.9rem;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.2" style="opacity:.3;display:block;margin:0 auto .75rem"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        No se encontraron colecciones.
+    </div>
+
+    {{-- Paginación --}}
+    <div id="col-pagination" style="display:flex;align-items:center;justify-content:center;gap:.4rem;margin-top:2rem;flex-wrap:wrap;"></div>
 </div>
 
 @else
@@ -187,6 +197,90 @@
     <a id="backBtnEmpty" href="{{ route('fototeca.fotografos.index') }}" class="empty-btn">← Volver</a>
 </div>
 @endif
+
+<style>
+@media(max-width:1024px){ #col-grid{ grid-template-columns:repeat(3,1fr)!important; } }
+@media(max-width:640px){  #col-grid{ grid-template-columns:repeat(2,1fr)!important; } }
+@media(max-width:400px){  #col-grid{ grid-template-columns:1fr!important; } }
+.col-page-btn { background:none;border:1px solid #2a2a2a;color:#888;width:32px;height:32px;border-radius:6px;font-size:.8rem;cursor:pointer;transition:all .2s;font-family:inherit; }
+.col-page-btn:hover { border-color:#c9a84c;color:#c9a84c; }
+.col-page-btn.active { background:#c9a84c;border-color:#c9a84c;color:#000;font-weight:700; }
+</style>
+
+<script>
+(function(){
+    const allCols  = @json($allCols ?? []);
+    const backUrl  = window.location.href;
+    const backLabel = @json($photographer->full_name);
+    const PER_PAGE = 8;
+    let filtered   = allCols.slice();
+    let page       = 1;
+
+    function cardHtml(c) {
+        const img = c.cover
+            ? `<img src="${c.cover}" alt="${c.title}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">`
+            : `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.2" style="opacity:.25"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
+        return `<a href="${c.url}" onclick="sessionStorage.setItem('back_url','${backUrl}');sessionStorage.setItem('back_label',${JSON.stringify(backLabel)})"
+            style="background:#0e0e0e;border:1px solid #1e1e1e;border-radius:10px;overflow:hidden;text-decoration:none;display:block;transition:border-color .25s,transform .2s;"
+            onmouseover="this.style.borderColor='#c9a84c';this.style.transform='translateY(-3px)'"
+            onmouseout="this.style.borderColor='#1e1e1e';this.style.transform=''">
+            <div style="aspect-ratio:16/9;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;">${img}</div>
+            <div style="padding:.9rem 1rem 1.1rem;">
+                <p style="font-family:'Playfair Display',serif;font-size:1rem;color:#fff;margin-bottom:.35rem;">${c.title}</p>
+                <p style="font-size:.72rem;color:#c9a84c;font-style:italic;display:flex;align-items:center;gap:4px;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    ${c.count} ${c.count === 1 ? 'fotografía' : 'fotografías'}
+                </p>
+            </div>
+        </a>`;
+    }
+
+    function render() {
+        const grid = document.getElementById('col-grid');
+        const noRes = document.getElementById('col-no-results');
+        const pag   = document.getElementById('col-pagination');
+        const label = document.getElementById('col-count-label');
+
+        if (filtered.length === 0) {
+            grid.innerHTML = '';
+            noRes.style.display = '';
+            pag.innerHTML = '';
+            if (label) label.textContent = '0 colección(es)';
+            return;
+        }
+        noRes.style.display = 'none';
+        if (label) label.textContent = filtered.length + ' colección(es)';
+
+        const totalPages = Math.ceil(filtered.length / PER_PAGE);
+        if (page > totalPages) page = totalPages;
+        const start = (page - 1) * PER_PAGE;
+        grid.innerHTML = filtered.slice(start, start + PER_PAGE).map(cardHtml).join('');
+
+        // Paginación
+        if (totalPages <= 1) { pag.innerHTML = ''; return; }
+        let html = '';
+        for (let p = 1; p <= totalPages; p++) {
+            html += `<button class="col-page-btn${p===page?' active':''}" onclick="colGoPage(${p})">${p}</button>`;
+        }
+        pag.innerHTML = html;
+    }
+
+    window.colSearch = function(q) {
+        const t = q.toLowerCase().trim();
+        filtered = t ? allCols.filter(c => c.title.toLowerCase().includes(t)) : allCols.slice();
+        page = 1;
+        render();
+    };
+
+    window.colGoPage = function(p) {
+        page = p;
+        render();
+        document.getElementById('col-grid')?.scrollIntoView({behavior:'smooth', block:'start'});
+    };
+
+    render();
+})();
+</script>
 
 <footer class="g-footer">
     © 2024 FOTOTECA Digital Ancashina — Patrimonio Visual de la Región Ancash

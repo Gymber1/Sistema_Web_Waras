@@ -40,9 +40,12 @@
             </a>
             <nav class="desktop-nav">
                 <a href="{{ route('home') }}" class="nav-link" onclick="showView('inicio');return false;">Inicio</a>
+                <span class="nav-sep">|</span>
                 <a href="#colecciones" class="nav-link" onclick="showView('inicio');setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);return false;" style="white-space:nowrap;">Patrimonio Cultural</a>
+                <span class="nav-sep">|</span>
                 <button onclick="showView('organizacion')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Organización</button>
                 <button onclick="showView('aportantes')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Aportantes</button>
+                <span class="nav-sep">|</span>
                 <button onclick="openContactModal()" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Contacto</button>
                 @if(auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
                     <a href="{{ route('admin.dashboard') }}" class="btn-admin">Panel Admin</a>
@@ -259,6 +262,12 @@
 
     <!-- PREMIOS (movido desde vista-premios a organización) -->
     <section id="premios">
+        <div style="text-align:center;padding:3.5rem 2rem 0;max-width:900px;margin:0 auto;">
+            <h2 style="font-family:'Playfair Display',serif;font-size:2rem;color:#111;font-weight:700;margin-bottom:.5rem;">Premio Nacional</h2>
+            <p style="font-size:.65rem;font-weight:700;color:#cda274;text-transform:uppercase;letter-spacing:.22em;margin-bottom:.75rem;">Reconocimiento</p>
+            <p style="font-size:.95rem;color:#6b7280;max-width:580px;margin:0 auto;">Proyecto ganador del Ministerio de Cultura para recopilar y difundir el Patrimonio Documental Ancashino.</p>
+        </div>
+
         <div class="premios-video-wrap">
             <div class="premios-video">
                 <iframe
@@ -291,6 +300,7 @@
                     <div>
                         <p class="premios-director-label">Director del Proyecto</p>
                         <p class="premios-director-name">Giber García Álamo</p>
+                        <p class="premios-director-bio">Promotor inicial de la recopilación histórica. Asumió la dirección para rescatar, catalogar y promover la Identidad Ancashina a través de esta plataforma digital.</p>
                     </div>
                 </div>
             </div>

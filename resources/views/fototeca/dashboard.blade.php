@@ -26,9 +26,11 @@
         </button>
         <div class="global-nav-links" id="globalNavLinks">
             <button class="nav-item-btn" data-tab="Inicio">Inicio</button>
+            <span class="nav-sep-foto">|</span>
             <button class="nav-item-btn" data-tab="Galería">Galería</button>
             <button class="nav-item-btn" data-tab="Fotógrafos">Fotógrafos</button>
             <a href="{{ route('fototeca.colecciones.index') }}" class="nav-item-btn" style="text-decoration:none;">Colecciones</a>
+            <span class="nav-sep-foto">|</span>
             <button class="nav-item-btn" data-tab="Aportantes">Sobre Nosotros</button>
             <a href="{{ route('home') }}" class="nav-portal-btn">Portal Principal</a>
             @auth

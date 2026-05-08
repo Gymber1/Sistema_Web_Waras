@@ -866,7 +866,17 @@ class FototecaController extends Controller
             $data['cover_image_path'] = $request->file('cover_image')->store('collections', 'public');
         }
 
-        Special::create($data);
+        $collection = Special::create($data);
+
+        // Sincronizar pivot photographer_special
+        $photographerName = $request->input('featured_photographer');
+        if ($photographerName) {
+            $photographer = Photographer::where('full_name', $photographerName)->first();
+            if ($photographer) {
+                $collection->photographers()->sync([$photographer->id]);
+            }
+        }
+
         return redirect()->route('admin.fototeca.collections')->with('success', 'Colección creada correctamente.');
     }
 
@@ -893,6 +903,20 @@ class FototecaController extends Controller
         }
 
         $special->update($data);
+
+        // Sincronizar pivot photographer_special
+        $photographerName = $request->input('featured_photographer');
+        if ($photographerName) {
+            $photographer = Photographer::where('full_name', $photographerName)->first();
+            if ($photographer) {
+                $special->photographers()->sync([$photographer->id]);
+            } else {
+                $special->photographers()->detach();
+            }
+        } else {
+            $special->photographers()->detach();
+        }
+
         return redirect()->route('admin.fototeca.collections')->with('success', 'Colección actualizada correctamente.');
     }
 

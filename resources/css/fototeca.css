@@ -90,6 +90,7 @@ body { padding-top: var(--nav-h); }
     align-items: center;
     margin: 0 auto;
 }
+.nav-sep-foto { color: rgba(255,255,255,.3); font-size: .85rem; user-select: none; }
 .global-nav-links a, .global-nav-links button {
     color: var(--text-muted);
     text-decoration: none;

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\Book;
+use App\Models\Photographer;
 
 class Special extends Model
 {
@@ -37,6 +38,11 @@ class Special extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    public function photographers(): BelongsToMany
+    {
+        return $this->belongsToMany(Photographer::class, 'photographer_special');
+    }
 
     public function photos(): BelongsToMany
     {
