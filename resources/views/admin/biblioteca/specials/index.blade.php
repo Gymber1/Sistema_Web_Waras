@@ -31,8 +31,13 @@
     <div class="bulk-wrapper bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border overflow-hidden">
         <div class="bulk-bar"></div>
 
-        <div class="p-5 border-b border-slate-100 dark:border-dark-border flex items-center justify-between bg-white dark:bg-dark-surface">
+        <div class="p-5 border-b border-slate-100 dark:border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-dark-surface">
             <span class="text-sm text-slate-500 dark:text-slate-400">{{ $specials->total() }} colecciones</span>
+            <form method="GET" action="{{ route('admin.biblioteca.specials') }}" class="relative w-full sm:w-72">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <input type="text" name="search" value="{{ $q ?? '' }}" placeholder="Buscar colección..."
+                    class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-slate-800 dark:text-white transition-all">
+            </form>
         </div>
 
         <div class="overflow-x-auto">
@@ -42,6 +47,7 @@
                         <th class="px-4 py-4 w-10"><input type="checkbox" class="row-check check-all"></th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Portada</th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nombre de la colección</th>
+                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Autores</th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tipo</th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Elementos</th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Acciones</th>
@@ -49,6 +55,9 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-dark-border">
                     @forelse($specials as $special)
+                    @php
+                        $featuredAuthor = $special->description;
+                    @endphp
                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group">
                         <td class="px-4 py-4"><input type="checkbox" class="row-check" value="{{ $special->id }}"></td>
                         <td class="px-6 py-4">
@@ -64,6 +73,13 @@
                         </td>
                         <td class="px-6 py-4">
                             <span class="font-semibold text-slate-800 dark:text-white">{{ $special->title }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            @if($featuredAuthor)
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300">{{ $featuredAuthor }}</span>
+                            @else
+                                <span class="text-slate-400 dark:text-slate-500 text-xs">—</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4">
                             @if($special->type === 'libro')
@@ -92,7 +108,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-20 text-center">
+                        <td colspan="7" class="px-6 py-20 text-center">
                             <div class="flex flex-col items-center gap-3 text-slate-400 dark:text-slate-500">
                                 <i data-lucide="layers" class="w-10 h-10 opacity-30"></i>
                                 <p class="text-sm font-medium">No hay colecciones especiales creadas</p>

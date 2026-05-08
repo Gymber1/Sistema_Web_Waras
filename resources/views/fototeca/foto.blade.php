@@ -119,10 +119,10 @@
                         {{ is_object($photo->location) ? $photo->location->name : ($photo->location ?: '—') }}
                     </span>
                 </div>
-                @if($photo->source_archive)
+                @if($photo->provider)
                 <div class="meta-item" style="grid-column: 1 / -1;">
-                    <span class="meta-label">Archivo fuente</span>
-                    <span class="meta-value" style="font-size:0.8rem;">{{ $photo->source_archive }}</span>
+                    <span class="meta-label">Proveedor</span>
+                    <span class="meta-value" style="font-size:0.8rem;">{{ $photo->provider }}</span>
                 </div>
                 @endif
             </div>

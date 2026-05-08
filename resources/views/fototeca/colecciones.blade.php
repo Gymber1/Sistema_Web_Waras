@@ -123,7 +123,10 @@
             <div class="collection-card-body">
                 <p class="collection-card-title">{{ $col->title }}</p>
                 @if($col->description)
-                <p class="collection-card-meta" style="margin-bottom:0.5rem;line-height:1.4;">{{ Str::limit($col->description, 80) }}</p>
+                <p class="collection-card-meta" style="margin-bottom:0.5rem;">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    {{ $col->description }}
+                </p>
                 @endif
                 <p class="collection-card-count">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;margin-right:3px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>

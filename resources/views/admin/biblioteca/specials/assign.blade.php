@@ -58,6 +58,17 @@
 
             <div class="p-4 flex flex-col flex-1">
                 <h3 class="font-bold text-slate-800 dark:text-white text-sm leading-snug mb-1">{{ $special->title }}</h3>
+                @if($special->description)
+                <p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 mb-1">
+                    <i data-lucide="user" class="w-3 h-3 flex-shrink-0"></i>
+                    {{ $special->description }}
+                </p>
+                @else
+                <p class="text-xs text-amber-500 dark:text-amber-400 flex items-center gap-1 mb-1">
+                    <i data-lucide="alert-circle" class="w-3 h-3 flex-shrink-0"></i>
+                    Sin autor
+                </p>
+                @endif
                 <p class="text-xs text-slate-400 dark:text-slate-500 mb-4">
                     <span class="font-semibold text-slate-600 dark:text-slate-300">{{ $special->books_count }}</span>
                     {{ $isRevista ? ($special->books_count === 1 ? 'revista' : 'revistas') : ($special->books_count === 1 ? 'libro' : 'libros') }} asignados

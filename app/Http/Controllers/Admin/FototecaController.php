@@ -827,23 +827,31 @@ class FototecaController extends Controller
 
     // ============= COLECCIONES =============
 
-    public function indexCollections()
+    public function indexCollections(Request $request)
     {
-        $collections = Special::where('module', 'fototeca')->withCount('photos')->orderBy('order')->orderBy('title')->paginate(10);
-        return view('admin.fototeca.collections.index', compact('collections'));
+        $q = $request->input('search');
+        $collections = Special::where('module', 'fototeca')
+            ->withCount('photos')
+            ->when($q, fn($query) => $query->where('title', 'like', "%{$q}%"))
+            ->orderBy('order')
+            ->orderBy('title')
+            ->paginate(10)
+            ->withQueryString();
+        return view('admin.fototeca.collections.index', compact('collections', 'q'));
     }
 
     public function createCollection()
     {
-        return view('admin.fototeca.collections.create');
+        $photographers = Photographer::orderBy('full_name')->get();
+        return view('admin.fototeca.collections.create', compact('photographers'));
     }
 
     public function storeCollection(Request $request)
     {
         $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'cover_image' => 'nullable|image|max:5120',
+            'title'              => 'required|string|max:255',
+            'featured_photographer' => 'nullable|string|max:255',
+            'cover_image'        => 'nullable|image|max:20480',
         ]);
 
         $data = [
@@ -851,7 +859,7 @@ class FototecaController extends Controller
             'slug'        => $this->uniqueSlug($request->title, Special::class),
             'module'      => 'fototeca',
             'type'        => 'libro',
-            'description' => $request->description,
+            'description' => $request->input('featured_photographer'),
             'is_active'   => true,
         ];
         if ($request->hasFile('cover_image')) {
@@ -864,7 +872,8 @@ class FototecaController extends Controller
 
     public function editCollection(Special $special)
     {
-        return view('admin.fototeca.collections.edit', compact('special'));
+        $photographers = Photographer::orderBy('full_name')->get();
+        return view('admin.fototeca.collections.edit', compact('special', 'photographers'));
     }
 
     public function updateCollection(Request $request, Special $special)
@@ -872,12 +881,12 @@ class FototecaController extends Controller
         $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
-            'cover_image' => 'nullable|image|max:5120',
+            'cover_image' => 'nullable|image|max:20480',
         ]);
 
         $data = [
             'title'       => $request->title,
-            'description' => $request->description,
+            'description' => $request->input('featured_photographer'),
         ];
         if ($request->hasFile('cover_image')) {
             $data['cover_image_path'] = $request->file('cover_image')->store('collections', 'public');
@@ -909,10 +918,24 @@ class FototecaController extends Controller
 
     public function manageCollection(Special $special)
     {
-        $special->load('photos');
+        $special->load(['photos.photographers']);
         $assignedIds = $special->photos->pluck('id')->toArray();
-        $available   = Photo::whereNotIn('id', $assignedIds)->orderBy('title')->get(['id', 'title', 'year', 'year_type', 'year_from', 'year_to']);
-        return view('admin.fototeca.collections.manage', compact('special', 'available'));
+        $available   = Photo::whereNotIn('id', $assignedIds)
+            ->with('photographers')
+            ->orderBy('title')
+            ->get();
+
+        $featuredPhotographer = $special->description;
+        $suggested = collect();
+        if ($featuredPhotographer) {
+            $suggested = $available->filter(function($photo) use ($featuredPhotographer) {
+                return $photo->photographers->contains(fn($p) =>
+                    stripos($p->full_name, $featuredPhotographer) !== false ||
+                    stripos($featuredPhotographer, $p->full_name) !== false);
+            });
+        }
+
+        return view('admin.fototeca.collections.manage', compact('special', 'available', 'suggested', 'featuredPhotographer'));
     }
 
     public function assignPhoto(Request $request, Special $special)

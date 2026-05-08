@@ -125,6 +125,15 @@ Route::middleware('auth')->group(function () {
             Route::delete('/subcategories/{category}', [AdminBibliotecaController::class, 'destroySubcategory'])->name('subcategories.destroy');
             Route::delete('/subcategories', [AdminBibliotecaController::class, 'bulkDestroySubcategories'])->name('subcategories.bulk-destroy');
 
+            // 1er Nivel (depth 2)
+            Route::get('/firstlevels', [AdminBibliotecaController::class, 'indexFirstlevels'])->name('firstlevels');
+            Route::get('/firstlevels/create', [AdminBibliotecaController::class, 'createFirstlevel'])->name('firstlevels.create');
+            Route::post('/firstlevels', [AdminBibliotecaController::class, 'storeFirstlevel'])->name('firstlevels.store');
+            Route::get('/firstlevels/{category}/edit', [AdminBibliotecaController::class, 'editFirstlevel'])->name('firstlevels.edit');
+            Route::put('/firstlevels/{category}', [AdminBibliotecaController::class, 'updateFirstlevel'])->name('firstlevels.update');
+            Route::delete('/firstlevels/{category}', [AdminBibliotecaController::class, 'destroyFirstlevel'])->name('firstlevels.destroy');
+            Route::delete('/firstlevels', [AdminBibliotecaController::class, 'bulkDestroyFirstlevels'])->name('firstlevels.bulk-destroy');
+
             // Especiales (grupos/colecciones)
             Route::get('/specials', [AdminBibliotecaController::class, 'indexSpecials'])->name('specials');
             Route::get('/specials/create', [AdminBibliotecaController::class, 'createSpecial'])->name('specials.create');

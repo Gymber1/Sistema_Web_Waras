@@ -15,7 +15,29 @@
                 <h2 class="text-2xl font-bold text-slate-800 dark:text-white">{{ $special->title }}</h2>
                 <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 border border-brand-100 dark:border-brand-500/20">Colección</span>
             </div>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Gestiona las fotografías vinculadas a esta colección.</p>
+            @if($featuredPhotographer)
+            <p class="text-sm text-slate-600 dark:text-slate-300 mt-1 flex items-center gap-1.5">
+                <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"></i>
+                <span class="font-medium">Fotógrafo:</span> {{ $featuredPhotographer }}
+                <a href="{{ route('admin.fototeca.collections.edit', $special) }}"
+                    class="ml-1 inline-flex items-center gap-1 px-2.5 py-1 bg-brand-500 hover:bg-brand-600 text-white rounded-md text-xs font-medium transition-colors flex-shrink-0">
+                    <i data-lucide="user-check" class="w-3 h-3"></i>
+                    Cambiar fotógrafo
+                </a>
+            </p>
+            @else
+            <div class="flex items-center gap-2 mt-1.5">
+                <p class="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                    <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+                    Sin fotógrafo asignado
+                </p>
+                <a href="{{ route('admin.fototeca.collections.edit', $special) }}"
+                    class="inline-flex items-center gap-1 px-2.5 py-1 bg-brand-500 hover:bg-brand-600 text-white rounded-md text-xs font-medium transition-colors">
+                    <i data-lucide="user-plus" class="w-3 h-3"></i>
+                    Asignar fotógrafo
+                </a>
+            </div>
+            @endif
         </div>
         @if($special->cover_image_path)
         <img src="{{ Storage::url($special->cover_image_path) }}"
@@ -24,44 +46,39 @@
         @endif
     </div>
 
-    @if(session('success'))
-    <div class="mb-5 flex items-center gap-3 px-5 py-3.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-xl text-sm font-medium">
-        <i data-lucide="check-circle" class="w-4 h-4 shrink-0"></i>
-        {{ session('success') }}
-    </div>
-    @endif
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
-    {{-- Vaciar colección --}}
-    @if($special->photos->isNotEmpty())
-    <div class="mb-5 flex justify-end">
-        <form action="{{ route('admin.fototeca.collections.clear', $special) }}" method="POST">
-            @csrf
-            <button type="submit"
-                onclick="return confirm('¿Vaciar la colección «{{ addslashes($special->title) }}»? Las fotografías no se eliminarán.')"
-                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition-colors">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                Vaciar colección
-            </button>
-        </form>
-    </div>
-    @endif
-
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
-
-        <div class="lg:col-span-3">
+        {{-- Panel izquierdo: fotos asignadas --}}
+        <div>
             <div class="bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border overflow-hidden">
                 <div class="px-5 py-4 border-b border-slate-100 dark:border-dark-border flex items-center justify-between bg-slate-50/60 dark:bg-slate-800/30">
-                    <h3 class="font-semibold text-slate-700 dark:text-slate-300 text-sm">Fotografías asignadas</h3>
+                    <h3 class="font-semibold text-slate-700 dark:text-slate-300 text-sm">Contenido en la colección</h3>
                     <span id="counter-badge"
                         class="px-2.5 py-1 text-xs font-semibold rounded-md bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-400 border border-brand-100 dark:border-brand-500/20">
-                        {{ $special->photos->count() }} fotos
+                        {{ $special->photos->count() }} items
                     </span>
                 </div>
 
-                <div id="assigned-list" class="divide-y divide-slate-50 dark:divide-dark-border max-h-[480px] overflow-y-auto">
+                <div id="assigned-list" class="divide-y divide-slate-50 dark:divide-dark-border max-h-[520px] overflow-y-auto">
                     @forelse($special->photos as $photo)
-                    <div class="assigned-item flex items-center justify-between px-5 py-3 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 group transition-colors" data-id="{{ $photo->id }}">
-                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300 truncate pr-3">{{ $photo->title }}</span>
+                    <div class="assigned-item flex items-center gap-3 px-5 py-3 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 group transition-colors" data-id="{{ $photo->id }}">
+                        <div class="w-10 h-10 rounded-lg flex-shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800">
+                            @if($photo->thumbnail_url)
+                                <img src="{{ $photo->thumbnail_url }}" alt="{{ $photo->title }}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center text-slate-400\'><svg width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\'><path d=\'M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z\'/><circle cx=\'12\' cy=\'13\' r=\'4\'/></svg></div>'">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center text-slate-400">
+                                    <i data-lucide="camera" class="w-4 h-4"></i>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{{ $photo->title }}</p>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 truncate">
+                                {{ $photo->photographers->pluck('full_name')->join(', ') ?: '—' }}
+                                @php $y = $photo->year_type === 'range' && $photo->year_from ? $photo->year_from.'–'.($photo->year_to ?? '?') : ($photo->year ?? null); @endphp
+                                @if($y) · {{ $y }} @endif
+                            </p>
+                        </div>
                         <button type="button"
                             onclick="removeItem({{ $special->id }}, {{ $photo->id }}, this)"
                             class="flex-shrink-0 w-7 h-7 flex items-center justify-center text-slate-300 dark:text-slate-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
@@ -77,33 +94,103 @@
             </div>
         </div>
 
-        <div class="lg:col-span-2">
+        {{-- Panel derecho: agregar --}}
+        <div>
             <div class="bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border overflow-hidden sticky top-6">
                 <div class="px-5 py-4 border-b border-slate-100 dark:border-dark-border bg-slate-50/60 dark:bg-slate-800/30">
-                    <h3 class="font-semibold text-slate-700 dark:text-slate-300 text-sm">Agregar fotografía</h3>
+                    <h3 class="font-semibold text-slate-700 dark:text-slate-300 text-sm">Agregar catálogo</h3>
                 </div>
                 <div class="p-4 space-y-3">
+                    {{-- Buscador --}}
                     <div class="relative">
                         <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-                        <input type="text" id="search-available" placeholder="Buscar por título..."
+                        <input type="text" id="search-available" placeholder="Buscar por título, fotógrafo..."
                             oninput="filterAvailable(this.value)"
                             class="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
                     </div>
 
-                    <div id="available-list" class="max-h-[380px] overflow-y-auto divide-y divide-slate-50 dark:divide-dark-border border border-slate-100 dark:border-dark-border rounded-lg">
-                        @forelse($available as $photo)
-                        <div class="available-item flex items-center justify-between px-4 py-2.5 hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors cursor-pointer group"
-                             data-id="{{ $photo->id }}" data-title="{{ $photo->title }}"
-                             data-title-lower="{{ strtolower($photo->title) }}"
-                             onclick="addItem({{ $special->id }}, {{ $photo->id }}, '{{ addslashes($photo->title) }}', this)">
-                            <span class="text-sm text-slate-700 dark:text-slate-300 truncate pr-2 group-hover:text-brand-700 dark:group-hover:text-brand-300 group-hover:font-medium transition-colors">{{ $photo->title }}</span>
-                            <i data-lucide="plus" class="w-3.5 h-3.5 text-brand-500 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    {{-- Tabs --}}
+                    @if($featuredPhotographer)
+                    <div class="flex gap-2">
+                        <button type="button" id="tab-suggested" onclick="switchTab('suggested')"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-500 text-white transition-colors min-w-0" style="max-width:160px;" title="Sugeridos de {{ $featuredPhotographer }}">
+                            <i data-lucide="check" class="w-3 h-3 flex-shrink-0"></i>
+                            <span class="truncate">Sugeridos de {{ Str::limit($featuredPhotographer, 18) }}</span>
+                        </button>
+                        <button type="button" id="tab-all" onclick="switchTab('all')"
+                            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors">
+                            Todo el catálogo
+                        </button>
+                    </div>
+                    @endif
+
+                    {{-- Lista --}}
+                    <div id="available-list" class="max-h-[360px] overflow-y-auto divide-y divide-slate-50 dark:divide-dark-border border border-slate-100 dark:border-dark-border rounded-lg">
+
+                        {{-- Sugeridos --}}
+                        <div id="section-suggested">
+                            @forelse($suggested as $photo)
+                            @php $year = $photo->year_type === 'range' && $photo->year_from ? $photo->year_from.'–'.($photo->year_to ?? '?') : ($photo->year ?? null); @endphp
+                            <div class="available-item available-suggested flex items-center gap-3 px-3 py-2.5 hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors cursor-pointer group"
+                                 data-id="{{ $photo->id }}"
+                                 data-title="{{ addslashes($photo->title) }}"
+                                 data-photographer="{{ $photo->photographers->pluck('full_name')->join(', ') }}"
+                                 data-year="{{ $year }}"
+                                 data-title-lower="{{ strtolower($photo->title.' '.$photo->photographers->pluck('full_name')->join(' ')) }}"
+                                 onclick="addItem({{ $special->id }}, {{ $photo->id }}, '{{ addslashes($photo->title) }}', '{{ addslashes($photo->photographers->pluck('full_name')->join(', ')) }}', '{{ $year }}', '{{ $photo->thumbnail_url ?? '' }}', this)">
+                                <div class="w-10 h-10 rounded-lg flex-shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800">
+                                    @if($photo->thumbnail_url)
+                                        <img src="{{ $photo->thumbnail_url }}" alt="" class="w-full h-full object-cover">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center text-brand-400 text-xs font-bold">{{ $year ? substr($year, -2) : '?' }}</div>
+                                    @endif
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-slate-700 dark:text-slate-300 font-medium truncate group-hover:text-brand-700 dark:group-hover:text-brand-300">{{ $photo->title }}</p>
+                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                        <span class="text-xs text-slate-400 truncate">{{ $photo->photographers->pluck('full_name')->first() ?: '—' }}</span>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 flex-shrink-0">Sugerido</span>
+                                    </div>
+                                </div>
+                                <span class="flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 bg-brand-500 text-white rounded-lg text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                    <i data-lucide="plus" class="w-3 h-3"></i> Agregar
+                                </span>
+                            </div>
+                            @empty
+                            <div class="py-8 text-center text-slate-400 dark:text-slate-500 text-xs">No hay sugerencias para este fotógrafo.</div>
+                            @endforelse
                         </div>
-                        @empty
-                        <div class="py-8 text-center text-slate-400 dark:text-slate-500 text-sm">
-                            No hay fotografías disponibles.
+
+                        {{-- Todo el catálogo --}}
+                        <div id="section-all" style="display:none">
+                            @forelse($available as $photo)
+                            @php $year = $photo->year_type === 'range' && $photo->year_from ? $photo->year_from.'–'.($photo->year_to ?? '?') : ($photo->year ?? null); @endphp
+                            <div class="available-item available-all flex items-center gap-3 px-3 py-2.5 hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors cursor-pointer group"
+                                 data-id="{{ $photo->id }}"
+                                 data-title="{{ addslashes($photo->title) }}"
+                                 data-title-lower="{{ strtolower($photo->title.' '.$photo->photographers->pluck('full_name')->join(' ')) }}"
+                                 onclick="addItem({{ $special->id }}, {{ $photo->id }}, '{{ addslashes($photo->title) }}', '{{ addslashes($photo->photographers->pluck('full_name')->join(', ')) }}', '{{ $year }}', '{{ $photo->thumbnail_url ?? '' }}', this)">
+                                <div class="w-10 h-10 rounded-lg flex-shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800">
+                                    @if($photo->thumbnail_url)
+                                        <img src="{{ $photo->thumbnail_url }}" alt="" class="w-full h-full object-cover">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center text-slate-400 text-xs font-bold">{{ $year ? substr($year, -2) : '?' }}</div>
+                                    @endif
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-slate-700 dark:text-slate-300 font-medium truncate group-hover:text-brand-700 dark:group-hover:text-brand-300">{{ $photo->title }}</p>
+                                    <span class="text-xs text-slate-400 truncate">{{ $photo->photographers->pluck('full_name')->first() ?: '—' }}</span>
+                                </div>
+                                <span class="flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 bg-brand-500 text-white rounded-lg text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                    <i data-lucide="plus" class="w-3 h-3"></i> Agregar
+                                </span>
+                            </div>
+                            @empty
+                            <div class="py-8 text-center text-slate-400 dark:text-slate-500 text-xs">No hay fotografías disponibles.</div>
+                            @endforelse
                         </div>
-                        @endforelse
+
+                        <div id="no-results" style="display:none" class="py-6 text-center text-slate-400 text-xs">Sin resultados</div>
                     </div>
 
                     <div id="feedback" class="hidden px-4 py-2.5 rounded-lg text-sm font-medium text-center"></div>
@@ -118,29 +205,54 @@
 const assignUrl    = '/admin/fototeca/assign-collections/{{ $special->id }}/assign';
 const unassignBase = '/admin/fototeca/assign-collections/{{ $special->id }}/photos/';
 const csrfToken    = '{{ csrf_token() }}';
+const hasFeatured  = {{ $featuredPhotographer ? 'true' : 'false' }};
+let activeTab      = 'suggested';
+
+function switchTab(tab) {
+    activeTab = tab;
+    document.getElementById('section-suggested').style.display = tab === 'suggested' ? '' : 'none';
+    document.getElementById('section-all').style.display       = tab === 'all' ? '' : 'none';
+    const btnS = document.getElementById('tab-suggested');
+    const btnA = document.getElementById('tab-all');
+    if (btnS && btnA) {
+        btnS.className = tab === 'suggested'
+            ? 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-500 text-white transition-colors'
+            : 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors';
+        btnA.className = tab === 'all'
+            ? 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-500 text-white transition-colors'
+            : 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors';
+    }
+    filterAvailable(document.getElementById('search-available').value);
+}
 
 function updateCounter() {
     const count = document.querySelectorAll('.assigned-item').length;
-    const badge = document.getElementById('counter-badge');
-    badge.textContent = count + ' ' + (count === 1 ? 'foto' : 'fotos');
+    document.getElementById('counter-badge').textContent = count + ' items';
 }
 
 function showFeedback(msg, ok) {
     const el = document.getElementById('feedback');
     el.textContent = msg;
-    el.className = 'px-4 py-2.5 rounded-lg text-sm font-medium text-center ' + (ok ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400');
+    el.className = 'px-4 py-2.5 rounded-lg text-sm font-medium text-center ' + (ok
+        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+        : 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400');
     el.classList.remove('hidden');
     setTimeout(() => el.classList.add('hidden'), 2500);
 }
 
 function filterAvailable(q) {
     q = q.toLowerCase().trim();
-    document.querySelectorAll('.available-item').forEach(el => {
-        el.style.display = (!q || el.dataset.titleLower.includes(q)) ? '' : 'none';
+    const selector = activeTab === 'suggested' ? '.available-suggested' : '.available-all';
+    let visible = 0;
+    document.querySelectorAll(selector).forEach(el => {
+        const match = !q || el.dataset.titleLower.includes(q);
+        el.style.display = match ? '' : 'none';
+        if (match) visible++;
     });
+    document.getElementById('no-results').style.display = (visible === 0 && q) ? '' : 'none';
 }
 
-function addItem(specialId, photoId, title, rowEl) {
+function addItem(specialId, photoId, title, photographer, year, cover, rowEl) {
     rowEl.style.pointerEvents = 'none';
     rowEl.style.opacity = '0.5';
 
@@ -152,15 +264,22 @@ function addItem(specialId, photoId, title, rowEl) {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            rowEl.style.display = 'none';
+            document.querySelectorAll(`.available-item[data-id="${photoId}"]`).forEach(el => el.style.display = 'none');
             const emptyMsg = document.getElementById('empty-msg');
             if (emptyMsg) emptyMsg.remove();
             const list = document.getElementById('assigned-list');
             const div = document.createElement('div');
-            div.className = 'assigned-item flex items-center justify-between px-5 py-3 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 group transition-colors';
+            div.className = 'assigned-item flex items-center gap-3 px-5 py-3 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 group transition-colors';
             div.dataset.id = photoId;
+            const thumbHtml = cover
+                ? `<img src="${cover}" alt="" class="w-full h-full object-cover">`
+                : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
             div.innerHTML = `
-                <span class="text-sm font-medium text-slate-700 dark:text-slate-300 truncate pr-3">${title}</span>
+                <div class="w-10 h-10 rounded-lg flex-shrink-0 overflow-hidden bg-slate-200 dark:bg-slate-700 flex items-center justify-center">${thumbHtml}</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">${title}</p>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 truncate">${photographer || '—'}${year ? ' · ' + year : ''}</p>
+                </div>
                 <button type="button" onclick="removeItem(${specialId}, ${photoId}, this)"
                     class="flex-shrink-0 w-7 h-7 flex items-center justify-center text-slate-300 dark:text-slate-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
                     <i data-lucide="x" class="w-3.5 h-3.5"></i>
@@ -193,12 +312,14 @@ function removeItem(specialId, photoId, btn) {
             row.remove();
             updateCounter();
             showFeedback('Fotografía quitada de la colección', true);
-            const availableItem = document.querySelector(`.available-item[data-id="${photoId}"]`);
-            if (availableItem) {
-                availableItem.style.display = '';
-                availableItem.style.pointerEvents = '';
-                availableItem.style.opacity = '';
-            }
+            document.querySelectorAll(`.available-item[data-id="${photoId}"]`).forEach(el => {
+                el.style.pointerEvents = '';
+                el.style.opacity = '';
+                const isInActive = activeTab === 'suggested'
+                    ? el.classList.contains('available-suggested')
+                    : el.classList.contains('available-all');
+                el.style.display = (isInActive || !hasFeatured) ? '' : 'none';
+            });
             if (document.querySelectorAll('.assigned-item').length === 0) {
                 document.getElementById('assigned-list').innerHTML =
                     `<div id="empty-msg" class="py-14 text-center text-slate-400 dark:text-slate-500 text-sm">No hay fotografías asignadas aún.</div>`;
@@ -211,5 +332,7 @@ function removeItem(specialId, photoId, btn) {
         showFeedback('Error al quitar la fotografía', false);
     });
 }
+
+if (!hasFeatured) switchTab('all');
 </script>
 @endsection

@@ -49,6 +49,16 @@
                     class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
             </div>
             <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Fotógrafo destacado <span class="text-xs font-normal text-slate-400">(opcional)</span></label>
+                <x-searchable-select
+                    name="featured_photographer"
+                    label=""
+                    placeholder="— Sin fotógrafo destacado —"
+                    :selected="old('featured_photographer', $special->description ?? '')"
+                    :options="$photographers->map(fn($p) => ['value' => $p->full_name, 'text' => $p->full_name])" />
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1.5">Fotógrafo principal o representativo de esta colección.</p>
+            </div>
+            <div>
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Imagen de portada</label>
                 <input type="file" name="cover_image" accept="image/*"
                     class="w-full px-3 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-xs text-slate-600 dark:text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-brand-50 file:text-brand-700 dark:file:bg-brand-500/10 dark:file:text-brand-400 file:font-semibold hover:file:bg-brand-100">

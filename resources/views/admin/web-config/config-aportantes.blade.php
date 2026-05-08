@@ -27,47 +27,6 @@
     <form method="POST" action="{{ route('admin.web-config.aportantes.update') }}" enctype="multipart/form-data" id="aportantesForm">
         @csrf
 
-        {{-- ── DIRECTOR ── --}}
-        <div class="bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border p-6 md:p-8 mb-6">
-            <h3 class="text-base font-semibold text-slate-800 dark:text-white mb-5 flex items-center gap-2">
-                <i data-lucide="user" class="w-5 h-5 text-amber-500"></i>
-                Director
-            </h3>
-            <div class="grid grid-cols-1 gap-5">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nombre</label>
-                    <input type="text" name="director_nombre" value="{{ $aportantes['director']['nombre'] }}"
-                           class="w-full bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg px-4 py-2.5 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Cargo</label>
-                    <input type="text" name="director_cargo" value="{{ $aportantes['director']['cargo'] }}"
-                           class="w-full bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg px-4 py-2.5 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all">
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Biografía</label>
-                    <textarea name="director_bio" rows="3"
-                              class="w-full bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg px-4 py-2.5 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 resize-none transition-all">{{ $aportantes['director']['bio'] }}</textarea>
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Foto del director</label>
-                    <div class="flex items-center gap-4">
-                        @if($aportantes['director']['foto'])
-                            <img src="{{ $aportantes['director']['foto'] }}" alt="Director"
-                                 class="w-16 h-16 rounded-full object-cover border border-slate-200 dark:border-slate-700">
-                        @endif
-                        <input type="file" name="director_foto" accept="image/*"
-                               class="text-sm text-slate-500 dark:text-slate-400
-                                      file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0
-                                      file:text-sm file:font-medium file:bg-amber-50 dark:file:bg-amber-500/10 file:text-amber-700 dark:file:text-amber-400
-                                      hover:file:bg-amber-100 dark:hover:file:bg-amber-500/20">
-                        <input type="hidden" name="director_foto_actual" value="{{ $aportantes['director']['foto'] }}">
-                    </div>
-                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Deja vacío para mantener la foto actual.</p>
-                </div>
-            </div>
-        </div>
-
         {{-- ── CATEGORÍAS ── --}}
         <div id="categoriasContainer">
         @foreach($aportantes['categorias'] as $ci => $cat)

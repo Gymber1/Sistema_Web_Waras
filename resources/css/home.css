@@ -769,11 +769,22 @@ body { font-family: 'Poppins', sans-serif; color: #333; line-height: 1.6; backgr
     align-items: flex-start;
 }
 .modal-close {
-    position: absolute; top: -3rem; right: 0;
-    background: none; border: none; color: rgba(255,255,255,.6);
-    font-size: 2rem; cursor: pointer; transition: color .3s; line-height: 1;
+    position: absolute; top: 1rem; right: 1rem;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.25);
+    color: rgba(255,255,255,.9);
+    width: 2.25rem; height: 2.25rem;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; cursor: pointer;
+    transition: background .2s, border-color .2s, color .2s;
+    line-height: 1; z-index: 10;
 }
-.modal-close:hover { color: white; }
+.modal-close:hover {
+    background: rgba(255,255,255,.25);
+    border-color: rgba(255,255,255,.5);
+    color: white;
+}
 .modal-left { flex: 1; min-width: 280px; color: white; }
 .modal-badge {
     display: inline-block;

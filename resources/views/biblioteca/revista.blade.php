@@ -114,6 +114,11 @@
             <p class="section-text">{{ $book->summary }}</p>
             @endif
 
+            @if($book->provider)
+            <p class="section-label">Proveedor</p>
+            <p class="section-text">{{ $book->provider }}</p>
+            @endif
+
             @if($book->categories->count())
             <p class="section-label">Categorías</p>
             <div class="cats">

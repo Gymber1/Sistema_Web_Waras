@@ -65,8 +65,19 @@
                     </span>
                 </div>
             </div>
-            <div class="p-4 flex flex-col gap-3 flex-1">
+            <div class="p-4 flex flex-col gap-2 flex-1">
                 <h3 class="font-semibold text-slate-800 dark:text-white text-sm leading-snug">{{ $collection->title }}</h3>
+                @if($collection->description)
+                <p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                    <i data-lucide="user" class="w-3 h-3 flex-shrink-0"></i>
+                    {{ $collection->description }}
+                </p>
+                @else
+                <p class="text-xs text-amber-500 dark:text-amber-400 flex items-center gap-1">
+                    <i data-lucide="alert-circle" class="w-3 h-3 flex-shrink-0"></i>
+                    Sin fotógrafo
+                </p>
+                @endif
                 <div class="mt-auto">
                     <a href="{{ route('admin.fototeca.collections.manage', $collection) }}"
                         class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-lg text-xs font-medium transition-colors">

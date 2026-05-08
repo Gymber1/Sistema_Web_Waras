@@ -77,10 +77,12 @@
 
 
                 @php
-                    $bookCatParent = $book->categories->firstWhere('parent_id', null);
-                    $bookCatChild  = $book->categories->firstWhere('parent_id', '!=', null);
-                    $currentCatId  = old('category_id', $bookCatParent?->id ?? '');
-                    $currentSubId  = old('subcategory_id', $bookCatChild?->id ?? '');
+                    $bookCatDepth0  = $book->categories->first(fn($c) => is_null($c->parent_id));
+                    $bookCatDepth1  = $book->categories->first(fn($c) => !is_null($c->parent_id) && is_null(optional($c->parent)->parent_id));
+                    $bookCatDepth2  = $book->categories->first(fn($c) => !is_null($c->parent_id) && !is_null(optional($c->parent)->parent_id));
+                    $currentCatId   = old('category_id',   $bookCatDepth0?->id ?? '');
+                    $currentSubId   = old('subcategory_id', $bookCatDepth1?->id ?? '');
+                    $currentFirstId = old('firstlevel_id',  $bookCatDepth2?->id ?? '');
                 @endphp
 
                 <div>
@@ -96,10 +98,19 @@
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">SubCategoría</label>
-                    <select name="subcategory_id" id="subcategory_id"
+                    <select name="subcategory_id" id="subcategory_id" onchange="loadFirstlevels(this.value)"
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all disabled:opacity-50"
                         {{ $currentCatId ? '' : 'disabled' }}>
                         <option value="">— Sin subcategoría —</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">1er Nivel</label>
+                    <select name="firstlevel_id" id="firstlevel_id"
+                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all disabled:opacity-50"
+                        {{ $currentSubId ? '' : 'disabled' }}>
+                        <option value="">— Sin 1er nivel —</option>
                     </select>
                 </div>
 
@@ -230,10 +241,18 @@ const subcatsMap = @json(
         $cat->id => $cat->subcategories->map(fn($s) => ['id' => $s->id, 'name' => $s->name])->values()
     ])
 );
+const firstlevelsMap = @json(
+    $categories->flatMap(fn($cat) => $cat->subcategories)->mapWithKeys(fn($sub) => [
+        $sub->id => $sub->subcategories->map(fn($f) => ['id' => $f->id, 'name' => $f->name])->values()
+    ])
+);
 
 function loadSubcategories(catId, selectedId) {
-    const sel = document.getElementById('subcategory_id');
+    const sel  = document.getElementById('subcategory_id');
+    const selF = document.getElementById('firstlevel_id');
     sel.innerHTML = '<option value="">— Sin subcategoría —</option>';
+    selF.innerHTML = '<option value="">— Sin 1er nivel —</option>';
+    selF.disabled = true;
     if (!catId || !subcatsMap[catId] || subcatsMap[catId].length === 0) { sel.disabled = true; return; }
     subcatsMap[catId].forEach(sub => {
         const opt = document.createElement('option');
@@ -244,9 +263,27 @@ function loadSubcategories(catId, selectedId) {
     sel.disabled = false;
 }
 
+function loadFirstlevels(subId, selectedId) {
+    const sel = document.getElementById('firstlevel_id');
+    sel.innerHTML = '<option value="">— Sin 1er nivel —</option>';
+    if (!subId || !firstlevelsMap[subId] || firstlevelsMap[subId].length === 0) { sel.disabled = true; return; }
+    firstlevelsMap[subId].forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f.id; opt.textContent = f.name;
+        if (selectedId && f.id == selectedId) opt.selected = true;
+        sel.appendChild(opt);
+    });
+    sel.disabled = false;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const catId = document.getElementById('category_id').value;
-    if (catId) loadSubcategories(catId, '{{ $currentSubId }}');
+    if (catId) {
+        loadSubcategories(catId, '{{ $currentSubId }}');
+        if ('{{ $currentSubId }}') {
+            loadFirstlevels('{{ $currentSubId }}', '{{ $currentFirstId }}');
+        }
+    }
 });
 
 function removeChip(btn) { btn.closest('.chip').remove(); }

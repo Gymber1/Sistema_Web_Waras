@@ -95,10 +95,20 @@
                 {{-- SubCategoría --}}
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">SubCategoría</label>
-                    <select name="subcategory_id" id="subcategory_id"
+                    <select name="subcategory_id" id="subcategory_id" onchange="loadFirstlevels(this.value)"
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all disabled:opacity-50"
                         {{ old('category_id') ? '' : 'disabled' }}>
                         <option value="">— Selecciona primero una categoría —</option>
+                    </select>
+                </div>
+
+                {{-- 1er Nivel --}}
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">1er Nivel</label>
+                    <select name="firstlevel_id" id="firstlevel_id"
+                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all disabled:opacity-50"
+                        disabled>
+                        <option value="">— Selecciona primero una subcategoría —</option>
                     </select>
                 </div>
 
@@ -211,10 +221,18 @@ const subcatsMap = @json(
         $cat->id => $cat->subcategories->map(fn($s) => ['id' => $s->id, 'name' => $s->name])->values()
     ])
 );
+const firstlevelsMap = @json(
+    $categories->flatMap(fn($cat) => $cat->subcategories)->mapWithKeys(fn($sub) => [
+        $sub->id => $sub->subcategories->map(fn($f) => ['id' => $f->id, 'name' => $f->name])->values()
+    ])
+);
 
 function loadSubcategories(catId) {
     const sel = document.getElementById('subcategory_id');
+    const selF = document.getElementById('firstlevel_id');
     sel.innerHTML = '<option value="">— Sin subcategoría —</option>';
+    selF.innerHTML = '<option value="">— Selecciona primero una subcategoría —</option>';
+    selF.disabled = true;
     if (!catId || !subcatsMap[catId] || subcatsMap[catId].length === 0) { sel.disabled = true; return; }
     subcatsMap[catId].forEach(sub => {
         const opt = document.createElement('option');
@@ -224,10 +242,26 @@ function loadSubcategories(catId) {
     sel.disabled = false;
 }
 
+function loadFirstlevels(subId) {
+    const sel = document.getElementById('firstlevel_id');
+    sel.innerHTML = '<option value="">— Sin 1er nivel —</option>';
+    if (!subId || !firstlevelsMap[subId] || firstlevelsMap[subId].length === 0) { sel.disabled = true; return; }
+    firstlevelsMap[subId].forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f.id; opt.textContent = f.name;
+        sel.appendChild(opt);
+    });
+    sel.disabled = false;
+}
+
 @if(old('category_id'))
 document.addEventListener('DOMContentLoaded', function() {
     loadSubcategories('{{ old('category_id') }}');
     document.getElementById('subcategory_id').value = '{{ old('subcategory_id') }}';
+    if ('{{ old('subcategory_id') }}') {
+        loadFirstlevels('{{ old('subcategory_id') }}');
+        document.getElementById('firstlevel_id').value = '{{ old('firstlevel_id') }}';
+    }
 });
 @endif
 

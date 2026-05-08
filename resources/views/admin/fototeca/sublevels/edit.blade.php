@@ -34,18 +34,13 @@
                 <input type="text" name="name" value="{{ old('name', $category->name) }}" required autofocus
                     class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
             </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Subcategoría padre <span class="text-red-500">*</span></label>
-                <select name="parent_id" required
-                    class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
-                    <option value="">— Seleccionar subcategoría —</option>
-                    @foreach($parentCategories as $cat)
-                    <option value="{{ $cat->id }}" @selected(old('parent_id', $category->parent_id) == $cat->id)>
-                        {{ $cat->parent?->name ? $cat->parent->name . ' › ' : '' }}{{ $cat->name }}
-                    </option>
-                    @endforeach
-                </select>
-            </div>
+            <x-searchable-select
+                name="parent_id"
+                label="Subcategoría padre"
+                :required="true"
+                placeholder="— Seleccionar subcategoría —"
+                :selected="old('parent_id', $category->parent_id)"
+                :options="$parentCategories->map(fn($c) => ['value'=>$c->id, 'text'=>($c->parent?->name ? $c->parent->name.' › ' : '').$c->name])" />
         </div>
         <div class="mt-5 flex gap-3 justify-end">
             <a href="{{ route('admin.fototeca.sublevels') }}"

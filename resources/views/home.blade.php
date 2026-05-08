@@ -17,9 +17,8 @@
     <div class="mobile-menu" id="mobileMenu">
         <button class="mobile-menu-close" onclick="closeMobileMenu()">&#10005;</button>
         <a href="{{ route('home') }}" class="mobile-nav-link" onclick="showView('inicio');closeMobileMenu();return false;">Inicio</a>
-        <button onclick="showView('inicio');closeMobileMenu();setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Colecciones</button>
+        <button onclick="showView('inicio');closeMobileMenu();setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Patrimonio Cultural</button>
         <button onclick="showView('organizacion');closeMobileMenu();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Organización</button>
-        <button onclick="showView('premios');closeMobileMenu();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Premios</button>
         <button onclick="showView('aportantes');closeMobileMenu();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Aportantes</button>
         <button onclick="closeMobileMenu(); openContactModal();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Contacto</button>
         @if(auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
@@ -41,9 +40,8 @@
             </a>
             <nav class="desktop-nav">
                 <a href="{{ route('home') }}" class="nav-link" onclick="showView('inicio');return false;">Inicio</a>
-                <a href="#colecciones" class="nav-link" onclick="showView('inicio');setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);return false;">Colecciones</a>
+                <a href="#colecciones" class="nav-link" onclick="showView('inicio');setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);return false;" style="white-space:nowrap;">Patrimonio Cultural</a>
                 <button onclick="showView('organizacion')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Organización</button>
-                <button onclick="showView('premios')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Premios</button>
                 <button onclick="showView('aportantes')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Aportantes</button>
                 <button onclick="openContactModal()" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Contacto</button>
                 @if(auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
@@ -84,8 +82,8 @@
     <!-- Collections -->
     <section class="collections-section" id="colecciones">
         <div class="section-header">
-            <p class="section-eyebrow">Nuestro Acervo Cultural</p>
-            <h2 class="section-title">Explora Nuestras Colecciones</h2>
+            <p class="section-eyebrow">Patrimonio Cultural</p>
+            <h2 class="section-title">Patrimonio Cultural Ancashino</h2>
         </div>
         <div class="collections-wrapper">
             <div class="collections-carousel-container">
@@ -259,35 +257,8 @@
         </div>
     </section>
 
-    </div><!-- /view-organizacion -->
-
-    <!-- ===== VISTA: PREMIOS ===== -->
-    <div id="view-premios" class="page-view" style="display:none;">
-
-    <!-- Hero Banner -->
-    <section class="subview-hero">
-        <div class="subview-hero-bg" style="background-image:url('{{ $heroBg }}');"></div>
-        <div class="subview-hero-overlay"></div>
-        <div class="subview-hero-content">
-            <h1 class="subview-hero-title">Premios y Reconocimientos</h1>
-            <p class="subview-hero-sub">Logros y respaldos institucionales que garantizan la calidad y sostenibilidad de nuestro proyecto.</p>
-        </div>
-    </section>
-
-    <!-- PREMIOS -->
+    <!-- PREMIOS (movido desde vista-premios a organización) -->
     <section id="premios">
-        <div class="premios-hero" style="display:none;">
-            <div class="premios-badge">
-                <span class="premios-badge-icon">★</span>
-                <span class="premios-badge-text">Proyecto Ganador Nacional</span>
-            </div>
-            <h2 class="premios-title">
-                Mejoramiento y Sostenibilidad del Portal de la<br>
-                <em>Ciencia y Cultura Ancashina</em>
-            </h2>
-            <p class="premios-subtitle">Proyecto ganador del Ministerio de Cultura con el cual pretendemos recopilar y difundir el Patrimonio Documental Ancashino en una plataforma virtual que permita el acceso universal a fuentes bibliográficas y documentales ancashinas.</p>
-        </div>
-
         <div class="premios-video-wrap">
             <div class="premios-video">
                 <iframe
@@ -326,7 +297,7 @@
         </div>
     </section>
 
-    </div><!-- /view-premios -->
+    </div><!-- /view-organizacion -->
 
     <!-- ===== VISTA: APORTANTES ===== -->
     <div id="view-aportantes" class="page-view" style="display:none;">
@@ -351,9 +322,7 @@
                     <h2 class="section-title">Nuestros Aportantes</h2>
                 </div>
 
-                <div style="display:grid;grid-template-columns:1fr 340px;gap:4rem;align-items:start;">
-
-                    {{-- Columna izquierda: categorías --}}
+                <div style="max-width:860px;margin:0 auto;">
                     <div style="display:flex;flex-direction:column;gap:3.5rem;">
                         @foreach($aportantes['categorias'] as $cat)
                         <div>
@@ -417,23 +386,6 @@
                         </div>
                         @endforeach
                     </div>
-
-                    {{-- Columna derecha: Director --}}
-                    <div style="position:sticky;top:7rem;">
-                        <p style="font-size:.65rem;font-weight:700;color:#cda274;text-transform:uppercase;letter-spacing:.2em;margin-bottom:1.5rem;">Director</p>
-                        <div style="background:white;border:1px solid #e5e7eb;padding:2rem;text-align:center;">
-                            <div style="position:relative;width:140px;height:140px;margin:0 auto 1.5rem;">
-                                <img src="{{ $aportantes['director']['foto'] }}" alt="{{ $aportantes['director']['nombre'] }}"
-                                     style="width:140px;height:140px;object-fit:cover;border-radius:50%;border:3px solid #e5e7eb;"
-                                     onerror="this.style.display='none'">
-                                <div style="position:absolute;inset:-6px;border-radius:50%;border:1px solid #cda274;opacity:.4;pointer-events:none;"></div>
-                            </div>
-                            <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#111;margin-bottom:.4rem;">{{ $aportantes['director']['nombre'] }}</p>
-                            <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:.95rem;color:#cda274;margin-bottom:1rem;">{{ $aportantes['director']['cargo'] }}</p>
-                            <p class="about-text" style="font-size:.82rem;text-align:left;margin:0;">{{ $aportantes['director']['bio'] }}</p>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </section>

@@ -155,6 +155,7 @@
                                 ['route'=>'admin.biblioteca.authors',      'pattern'=>'admin.biblioteca.authors*',      'label'=>'Autores'],
                                 ['route'=>'admin.biblioteca.categories',   'pattern'=>'admin.biblioteca.categories*',   'label'=>'Categorías'],
                                 ['route'=>'admin.biblioteca.subcategories','pattern'=>'admin.biblioteca.subcategories*','label'=>'SubCategorías'],
+                                ['route'=>'admin.biblioteca.firstlevels',  'pattern'=>'admin.biblioteca.firstlevels*',  'label'=>'1er Nivel'],
                                 ['route'=>'admin.biblioteca.magazines',    'pattern'=>'admin.biblioteca.magazines*',    'label'=>'Revistas'],
                                 ['route'=>'admin.biblioteca.specials',            'pattern'=>'admin.biblioteca.specials',            'label'=>'Especiales'],
                                 ['route'=>'admin.biblioteca.specials.assign-books','pattern'=>'admin.biblioteca.specials.assign-books','label'=>'Agregar a Especiales'],

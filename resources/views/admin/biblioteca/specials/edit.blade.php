@@ -38,6 +38,17 @@
             </div>
 
             <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Autor destacado <span class="text-xs font-normal text-slate-400">(opcional)</span></label>
+                <x-searchable-select
+                    name="featured_author"
+                    label=""
+                    placeholder="— Sin autor destacado —"
+                    :selected="old('featured_author', $special->description ?? '')"
+                    :options="$authors->map(fn($a) => ['value' => $a->name, 'text' => $a->name])" />
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1.5">Autor principal o representativo de esta colección.</p>
+            </div>
+
+            <div>
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Tipo <span class="text-red-500">*</span></label>
                 @php $hasItems = $special->books()->exists(); @endphp
                 @if($hasItems)
