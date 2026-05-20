@@ -15,6 +15,12 @@ class FototecaController extends Controller
     {
         $totalPhotos        = Photo::count();
         $totalPhotographers = Photographer::count();
+        $colecciones = \App\Models\Special::where('module', 'fototeca')
+            ->where('is_active', true)
+            ->withCount('photos')
+            ->orderBy('order')
+            ->orderBy('title')
+            ->get();
         $totalCategories    = Category::where('type', 'fototeca')->count();
 
         $allPhotos = Photo::with(['photographers', 'categories', 'tag'])->get();
@@ -50,12 +56,13 @@ class FototecaController extends Controller
             }
         }
 
-        $photographersData = Photographer::withCount('photos')->get()->map(fn($p) => [
-            'id'           => $p->id,
-            'full_name'    => $p->full_name,
-            'photos_count' => $p->photos_count,
-            'biography'    => $p->biography ?? '',
-            'photo_path'   => $p->photo_path ? '/storage/' . $p->photo_path : null,
+        $photographersData = Photographer::withCount(['photos', 'collections'])->get()->map(fn($p) => [
+            'id'                => $p->id,
+            'full_name'         => $p->full_name,
+            'photos_count'      => $p->photos_count,
+            'collections_count' => $p->collections_count,
+            'biography'         => $p->biography ?? '',
+            'photo_path'        => $p->photo_path ? '/storage/' . $p->photo_path : null,
         ])->values()->toArray();
 
         $allCategories = Category::where('type', 'fototeca')
@@ -86,6 +93,7 @@ class FototecaController extends Controller
             'categoriesForFilters' => $buildTree($allCategories),
             'tagsData'             => $tagsData,
             'activeSection'        => $activeSection,
+            'colecciones'          => $colecciones,
             'canEditPanel'         => auth()->check() && (auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca')),
             'heroBg'               => ($p = SiteSetting::get('bg_fototeca')) ? asset('storage/' . $p) : null,
         ];
@@ -135,13 +143,7 @@ class FototecaController extends Controller
 
     public function indexColecciones()
     {
-        $colecciones = \App\Models\Special::where('module', 'fototeca')
-            ->where('is_active', true)
-            ->withCount('photos')
-            ->orderBy('order')
-            ->orderBy('title')
-            ->get();
-        return view('fototeca.colecciones', compact('colecciones'));
+        return view('fototeca.dashboard', $this->dashboardData('Colecciones'));
     }
 
     public function showColeccion(\App\Models\Special $special)

@@ -10,19 +10,80 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @vite('resources/css/biblioteca.css')
-
+    <style>
+        .mobile-nav-overlay { display: none !important; position: fixed; inset: 0; z-index: 1999; background: rgba(0,0,0,0.45); }
+        .mobile-nav-overlay.open { display: block !important; }
+        .mobile-nav {
+            display: none !important; visibility: hidden;
+            position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important;
+            bottom: auto !important; height: auto !important; min-height: 0 !important;
+            z-index: 2000; flex-direction: column;
+            background: rgba(15,20,35,0.98) !important;
+            backdrop-filter: blur(14px);
+            flex: none !important; align-self: flex-start !important;
+        }
+        .mobile-nav.open { display: flex !important; visibility: visible; }
+        .mobile-nav-header {
+            display: flex !important; align-items: center; justify-content: space-between;
+            padding: 0 1.25rem; height: 64px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
+        }
+        .mobile-nav-close { background: none; border: none; color: #aaa; cursor: pointer; font-size: 1.3rem; }
+        .mobile-nav-links { display: block !important; width: 100%; }
+        .mobile-nav-item {
+            display: block !important; padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            color: #ccc; text-decoration: none;
+            font-size: 0.72rem; font-weight: 600;
+            letter-spacing: 0.18em; text-transform: uppercase;
+            font-family: 'Poppins', sans-serif;
+            transition: color 0.2s, background 0.2s;
+            height: auto !important; min-height: 0 !important;
+            text-align: left !important;
+            width: 100% !important; box-sizing: border-box !important;
+            margin: 0 !important; float: none !important;
+        }
+        .mobile-nav-item:hover { color: #fff; background: rgba(255,255,255,0.04); }
+        .mobile-nav-portal { color: #aaa !important; opacity: 0.75; }
+    </style>
 </head>
 <body>
-    <!-- Mobile nav overlay -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileNav()"></div>
     <div class="mobile-nav" id="mobileNav">
-        <button class="mobile-nav-close" onclick="closeMobileNav()"><i class="fas fa-times"></i></button>
-        <a href="{{ route('biblioteca.inicio') }}" class="mobile-nav-item">Inicio</a>
-        <a href="{{ route('biblioteca.libros.index') }}" class="mobile-nav-item">Biblioteca Digital</a>
-        <a href="{{ route('biblioteca.editorial.index') }}" class="mobile-nav-item">Waras Editorial</a>
-        <a href="{{ route('biblioteca.revistas.index') }}" class="mobile-nav-item">Revistas</a>
-        <a href="{{ route('biblioteca.autores.index') }}" class="mobile-nav-item">Autores</a>
-        <a href="{{ route('biblioteca.especiales.index') }}" class="mobile-nav-item">Especiales</a>
-        <a href="{{ route('home') }}" class="mobile-nav-item" style="font-size:1rem;opacity:0.6">Portal Principal</a>
+        <div class="mobile-nav-header">
+            <a href="javascript:void(0)" class="logo" id="logoBtnMobile">
+                @php $navLogoMob = \App\Models\SiteSetting::get('nav_logo_biblioteca'); @endphp
+                @if($navLogoMob)
+                    <img src="{{ asset('storage/' . $navLogoMob) }}" alt="Logo" class="logo-icon">
+                @else
+                    <div class="logo-squares">
+                        <div class="logo-square logo-square-1"></div>
+                        <div class="logo-square logo-square-2"></div>
+                        <div class="logo-square logo-square-3"></div>
+                    </div>
+                @endif
+                <div class="logo-brand">
+                    <span class="logo-text">BIBLIOTECA</span>
+                    <span class="logo-text-sub">Digital Ancashina</span>
+                </div>
+            </a>
+            <button class="mobile-nav-close" onclick="closeMobileNav()">✕</button>
+        </div>
+        <nav class="mobile-nav-links">
+            <a href="{{ route('biblioteca.inicio') }}" class="mobile-nav-item" onclick="closeMobileNav()">Inicio</a>
+            <a href="{{ route('biblioteca.libros.index') }}" class="mobile-nav-item" onclick="closeMobileNav()">Biblioteca Digital</a>
+            <a href="{{ route('biblioteca.editorial.index') }}" class="mobile-nav-item" onclick="closeMobileNav()">Waras Editorial</a>
+            <a href="{{ route('biblioteca.revistas.index') }}" class="mobile-nav-item" onclick="closeMobileNav()">Revistas</a>
+            <a href="{{ route('biblioteca.autores.index') }}" class="mobile-nav-item" onclick="closeMobileNav()">Autores</a>
+            <a href="{{ route('biblioteca.especiales.index') }}" class="mobile-nav-item" onclick="closeMobileNav()">Especiales</a>
+            <a href="{{ route('home') }}" class="mobile-nav-item mobile-nav-portal" onclick="closeMobileNav()">Portal Principal</a>
+            @auth
+                @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('biblioteca'))
+                <a href="{{ route('admin.dashboard') }}" class="mobile-nav-item" style="color:#c5a66d;" onclick="closeMobileNav()">Panel Admin</a>
+                @endif
+            @endauth
+        </nav>
     </div>
 
     <!-- Header -->
@@ -938,13 +999,13 @@
                 // Template para LIBROS Y REVISTAS
                 grid.innerHTML = items.map((item, index) => `
                     <div class="book-card">
-                        <div class="book-cover" style="background:linear-gradient(135deg,${item.color} 0%,${item.color}cc 100%);">
+                        <div class="book-cover book-cover-clickable" data-item-id="book-${index}" style="background:linear-gradient(135deg,${item.color} 0%,${item.color}cc 100%);cursor:pointer;">
                             <span class="book-badge">${item.type}</span>
                             ${item.cover_url
                                 ? `<img src="${item.cover_url}" alt="${item.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
                                 : `<span class="book-cover-icon">${item.icon}</span>`}
                             <div class="book-cover-overlay">
-                                <button class="book-detail-btn" data-item-id="book-${index}">
+                                <button class="book-detail-btn">
                                     <i class="fas fa-eye"></i> Ver Detalles
                                 </button>
                             </div>
@@ -971,7 +1032,7 @@
             });
 
             // Agregar event listeners a los botones
-            document.querySelectorAll('.book-detail-btn').forEach((btn, index) => {
+            document.querySelectorAll('.book-cover-clickable').forEach((btn, index) => {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
                     closeMobileSidebar();
@@ -1418,13 +1479,13 @@
         function renderBookItems(grid, items) {
             grid.innerHTML = items.map((item, index) => `
                 <div class="book-card">
-                    <div class="book-cover" style="background:linear-gradient(135deg,${item.color} 0%,${item.color}cc 100%);">
+                    <div class="book-cover book-cover-clickable" data-item-idx="${index}" style="background:linear-gradient(135deg,${item.color} 0%,${item.color}cc 100%);cursor:pointer;">
                         <span class="book-badge">${item.type}</span>
                         ${item.cover_url
                             ? `<img src="${item.cover_url}" alt="${item.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
                             : `<span class="book-cover-icon">${item.icon}</span>`}
                         <div class="book-cover-overlay">
-                            <button class="book-detail-btn" data-item-idx="${index}">
+                            <button class="book-detail-btn">
                                 <i class="fas fa-eye"></i> Ver Detalles
                             </button>
                         </div>
@@ -1442,7 +1503,7 @@
                     </div>
                 </div>
             `).join('');
-            grid.querySelectorAll('.book-detail-btn').forEach((btn, idx) => {
+            grid.querySelectorAll('.book-cover-clickable').forEach((btn, idx) => {
                 btn.addEventListener('click', e => {
                     e.preventDefault();
                     closeMobileSidebar();
@@ -1626,13 +1687,13 @@
             } else {
                 grid.innerHTML = page.map((item, idx) => `
                     <div class="book-card">
-                        <div class="book-cover" style="background:linear-gradient(135deg,${item.color} 0%,${item.color}cc 100%);">
+                        <div class="book-cover book-cover-clickable" data-search-idx="${idx}" style="background:linear-gradient(135deg,${item.color} 0%,${item.color}cc 100%);cursor:pointer;">
                             <span class="book-badge">${item.type}</span>
                             ${item.cover_url
                                 ? `<img src="${item.cover_url}" alt="${item.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
                                 : `<span class="book-cover-icon">${item.icon}</span>`}
                             <div class="book-cover-overlay">
-                                <button class="book-detail-btn" data-search-idx="${idx}">
+                                <button class="book-detail-btn">
                                     <i class="fas fa-eye"></i> Ver Detalles
                                 </button>
                             </div>
@@ -1650,7 +1711,7 @@
                         </div>
                     </div>`).join('');
 
-                grid.querySelectorAll('.book-detail-btn').forEach(btn => {
+                grid.querySelectorAll('.book-cover-clickable').forEach(btn => {
                     btn.addEventListener('click', e => {
                         e.preventDefault();
                         closeMobileSidebar();
@@ -1668,8 +1729,16 @@
         }
 
         // ========== MOBILE NAV ==========
-        function openMobileNav()  { document.getElementById('mobileNav').classList.add('open'); document.body.style.overflow = 'hidden'; }
-        function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); document.body.style.overflow = ''; }
+        function openMobileNav()  {
+            document.getElementById('mobileNav').classList.add('open');
+            document.getElementById('mobileNavOverlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeMobileNav() {
+            document.getElementById('mobileNav').classList.remove('open');
+            document.getElementById('mobileNavOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
         window.openMobileNav  = openMobileNav;
         window.closeMobileNav = closeMobileNav;
 

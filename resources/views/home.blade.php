@@ -72,7 +72,7 @@
         <div class="hero-content">
             <p class="hero-eyebrow">{{ \App\Models\SiteSetting::get('hero_portal_eyebrow', 'Asociación de Ciencia y Cultura') }}</p>
             <h1 class="hero-title">{{ \App\Models\SiteSetting::get('hero_portal_title', 'Portal de la Ciencia y la Cultura Ancashina') }}</h1>
-            <p class="hero-subtitle">"Descubre nuestras colecciones de libros, fotos, música, artes y eventos históricos que preservan la memoria de nuestra región."</p>
+            <p class="hero-subtitle">{{ \App\Models\SiteSetting::get('hero_portal_subtitle', '"Descubre nuestras colecciones de libros, fotos, música, artes y eventos históricos que preservan la memoria de nuestra región."') }}</p>
             <a href="#colecciones" class="hero-cta">{{ \App\Models\SiteSetting::get('hero_portal_cta', 'Explorar Servicios') }}</a>
         </div>
         <div class="scroll-indicator">

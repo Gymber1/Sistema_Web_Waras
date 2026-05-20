@@ -9,54 +9,166 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Libre+Baskerville:ital@0;1&display=swap" rel="stylesheet">
     @vite('resources/css/fototeca.css')
+    <style>
+        /* Nav compartido */
+        .g-nav {
+            position: fixed !important; top: 0; left: 0; right: 0; z-index: 200;
+            height: 64px;
+            background: rgba(0,0,0,0.85) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #2a2a2a;
+            transition: background 0.3s ease, border-color 0.3s ease;
+            display: flex !important; align-items: center;
+            padding: 0 2rem; gap: 2rem;
+        }
+        body { padding-top: 64px; }
+        .g-nav-brand {
+            display: flex !important; flex-direction: row; align-items: center;
+            gap: 0.5rem; white-space: nowrap;
+            background: none; border: none; cursor: pointer; text-align: left;
+        }
+        .g-nav-brand-text-wrap { display: flex; flex-direction: column; }
+        .g-nav-brand-main {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; font-weight: 700;
+            color: #fff; letter-spacing: 0.15em; text-transform: uppercase; line-height: 1;
+        }
+        .g-nav-brand-sub {
+            font-size: 0.6rem; letter-spacing: 0.3em;
+            text-transform: uppercase; color: #c5a66d; margin-top: 2px;
+        }
+        .g-nav-links { display: flex !important; gap: 2rem; align-items: center; margin: 0 auto; }
+        .g-nav-link, button.g-nav-link {
+            font-size: 0.7rem; font-weight: 500;
+            text-transform: uppercase; letter-spacing: 0.2em;
+            color: #888; text-decoration: none;
+            padding-bottom: 2px;
+            border: none !important; border-bottom: 2px solid transparent !important;
+            background: none; cursor: pointer; font-family: 'Inter', sans-serif;
+            transition: color 0.2s;
+        }
+        .g-nav-link:hover, button.g-nav-link:hover { color: #fff; }
+        .g-nav-link.active, button.g-nav-link.active { color: #fff !important; border-bottom-color: #c5a66d !important; }
+        .g-nav-btn {
+            font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em;
+            padding: 0.4rem 1rem; border-radius: 2px; text-decoration: none;
+            border: 1px solid #2a2a2a !important; color: #fff;
+            transition: all 0.2s; white-space: nowrap; display: flex !important; align-items: center; gap: 0.35rem;
+        }
+        .g-nav-btn:hover { background: #fff; color: #000; }
+        .g-nav-btn.solid { background: #c5a66d; color: #000; border-color: #c5a66d !important; font-weight: 700; }
+        .g-nav-btn.solid:hover { background: #d4b783; border-color: #d4b783 !important; }
+        .g-hamburger { display: none; background: none; border: none; color: #fff; cursor: pointer; padding: 0.5rem; margin-left: auto; }
+        /* Mobile menu */
+        .ftc-mobile-menu {
+            display: none; visibility: hidden;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+            background: rgba(10,10,10,0.96);
+            backdrop-filter: blur(12px);
+            flex-direction: column;
+        }
+        .ftc-mobile-menu.open { display: flex !important; visibility: visible; }
+        .ftc-mobile-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 1.25rem; height: 64px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .ftc-mobile-brand { background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
+        .ftc-mobile-close {
+            background: none; border: none; color: #aaa; cursor: pointer;
+            font-size: 1.4rem; line-height: 1; padding: 0.25rem;
+        }
+        .ftc-mobile-links {
+            display: flex; flex-direction: column;
+        }
+        .ftc-mobile-link {
+            display: block; width: 100%; text-align: left;
+            padding: 1rem 1.5rem;
+            border: none; border-bottom: 1px solid rgba(255,255,255,0.07);
+            background: none; cursor: pointer;
+            color: #ccc; text-decoration: none;
+            font-size: 0.72rem; font-weight: 600;
+            letter-spacing: 0.18em; text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+            transition: color 0.2s, background 0.2s;
+        }
+        .ftc-mobile-link:hover { color: #fff; background: rgba(255,255,255,0.04); }
+        .ftc-mobile-link.active { color: #c5a66d !important; }
+        .ftc-mobile-admin { color: #c5a66d; }
+        .g-nav.nav-transparent { background: rgba(0,0,0,0.35) !important; border-bottom-color: transparent; }
+        @media (max-width: 768px) {
+            .g-nav-links { display: none !important; }
+            .g-hamburger { display: flex !important; }
+        }
+        .nav-sep-foto { color: rgba(255,255,255,.25); font-size: .85rem; user-select: none; }
+        .col-card-item:hover { border-color: #c9a84c !important; transform: translateY(-3px); }
+    </style>
 </head>
 <body>
 
     <!-- ── GLOBAL NAV ──────────────────────────────────────────────── -->
-    <nav class="global-nav" id="globalNav">
-        <button class="global-nav-brand" id="logoBtn">
+    {{-- Mobile nav --}}
+    <div class="ftc-mobile-menu" id="globalNavMobile">
+        <div class="ftc-mobile-header">
+            <button class="g-nav-brand ftc-mobile-brand" id="logoBtnMobile">
+                @php $navLogo = \App\Models\SiteSetting::get('nav_logo_fototeca'); @endphp
+                @if($navLogo)
+                    <img src="{{ asset('storage/' . $navLogo) }}" alt="Logo" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;">
+                @endif
+                <div class="g-nav-brand-text-wrap">
+                    <span class="g-nav-brand-main">FOTOTECA</span>
+                    <span class="g-nav-brand-sub">Digital Ancashina</span>
+                </div>
+            </button>
+            <button class="ftc-mobile-close" id="globalNavMobileClose">✕</button>
+        </div>
+        <nav class="ftc-mobile-links">
+            <button class="nav-item-btn ftc-mobile-link" data-tab="Inicio">Inicio</button>
+            <button class="nav-item-btn ftc-mobile-link" data-tab="Galería">Galería</button>
+            <button class="nav-item-btn ftc-mobile-link" data-tab="Fotógrafos">Fotógrafos</button>
+            <button class="nav-item-btn ftc-mobile-link" data-tab="Colecciones">Colecciones</button>
+            <button class="nav-item-btn ftc-mobile-link" data-tab="Aportantes">Sobre Nosotros</button>
+            <a href="{{ route('home') }}" class="ftc-mobile-link">Portal Principal</a>
+            @auth
+                @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca'))
+                <a href="{{ route('admin.dashboard') }}" class="ftc-mobile-link ftc-mobile-admin">Panel Admin</a>
+                @endif
+            @endauth
+        </nav>
+    </div>
+
+    <nav class="g-nav" id="globalNav">
+        <button class="g-nav-brand" id="logoBtn">
             @php $navLogo = \App\Models\SiteSetting::get('nav_logo_fototeca'); @endphp
             @if($navLogo)
-                <img src="{{ asset('storage/' . $navLogo) }}" alt="Logo">
+                <img src="{{ asset('storage/' . $navLogo) }}" alt="Logo" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;">
             @endif
-            <div class="global-nav-brand-text">
-                <span class="global-nav-brand-main">FOTOTECA</span>
-                <span class="global-nav-brand-sub">Digital Ancashina</span>
+            <div class="g-nav-brand-text-wrap">
+                <span class="g-nav-brand-main">FOTOTECA</span>
+                <span class="g-nav-brand-sub">Digital Ancashina</span>
             </div>
         </button>
-        <div class="global-nav-links" id="globalNavLinks">
-            <button class="nav-item-btn" data-tab="Inicio">Inicio</button>
+        <div class="g-nav-links" id="globalNavLinks">
+            <button class="nav-item-btn g-nav-link" data-tab="Inicio">Inicio</button>
             <span class="nav-sep-foto">|</span>
-            <button class="nav-item-btn" data-tab="Galería">Galería</button>
-            <button class="nav-item-btn" data-tab="Fotógrafos">Fotógrafos</button>
-            <a href="{{ route('fototeca.colecciones.index') }}" class="nav-item-btn" style="text-decoration:none;">Colecciones</a>
+            <button class="nav-item-btn g-nav-link" data-tab="Galería">Galería</button>
+            <button class="nav-item-btn g-nav-link" data-tab="Fotógrafos">Fotógrafos</button>
+            <button class="nav-item-btn g-nav-link" data-tab="Colecciones">Colecciones</button>
             <span class="nav-sep-foto">|</span>
-            <button class="nav-item-btn" data-tab="Aportantes">Sobre Nosotros</button>
-            <a href="{{ route('home') }}" class="nav-portal-btn">Portal Principal</a>
+            <button class="nav-item-btn g-nav-link" data-tab="Aportantes">Sobre Nosotros</button>
+            <a href="{{ route('home') }}" class="g-nav-btn">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                Portal Principal
+            </a>
             @auth
                 @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca'))
-                <a href="{{ route('admin.dashboard') }}" class="nav-panel-btn">
-                    Panel
-                </a>
+                <a href="{{ route('admin.dashboard') }}" class="g-nav-btn solid">Panel</a>
                 @endif
             @endauth
         </div>
-        <button class="global-nav-hamburger" id="globalNavHamburger" aria-label="Menú">
-            <span></span><span></span><span></span>
+        <button class="g-hamburger" id="globalNavHamburger" aria-label="Menú">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <div class="global-nav-mobile" id="globalNavMobile">
-            <button class="nav-item-btn" data-tab="Inicio">Inicio</button>
-            <button class="nav-item-btn" data-tab="Galería">Galería</button>
-            <button class="nav-item-btn" data-tab="Fotógrafos">Fotógrafos</button>
-            <a href="{{ route('fototeca.colecciones.index') }}" class="nav-item-btn" style="text-decoration:none;">Colecciones</a>
-            <button class="nav-item-btn" data-tab="Aportantes">Sobre Nosotros</button>
-            <a href="{{ route('home') }}" style="color:var(--text-muted)">Portal Principal</a>
-            @auth
-                @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca'))
-                <a href="{{ route('admin.dashboard') }}" style="color:var(--text-accent)">Panel Admin</a>
-                @endif
-            @endauth
-        </div>
     </nav>
 
     <!-- ── HERO ────────────────────────────────────────────────────── -->
@@ -264,6 +376,49 @@
             <div class="photo-grid" id="photosGrid"></div>
             <div id="photosPagination"></div>
         </main>
+    </div>
+
+    <!-- ── COLECCIONES ───────────────────────────────────────────────── -->
+    <div class="aportantes-section" id="coleccionesSection" style="display:none">
+        <div style="max-width:1280px;margin:0 auto;padding:3rem 2rem 5rem;">
+            <h1 style="font-family:'Playfair Display',serif;font-size:2.2rem;color:#fff;font-weight:500;margin-bottom:0.5rem;">Colecciones Fotográficas</h1>
+            <p style="font-size:0.9rem;color:#666;margin-bottom:2.5rem;">Archivos temáticos del patrimonio visual de la región Ancash</p>
+
+            <div style="position:relative;margin-bottom:2rem;">
+                <svg style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:#555;pointer-events:none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="colSearchInput" placeholder="Buscar colección..."
+                    oninput="filterColecciones(this.value)"
+                    style="display:block;width:100%;padding:0.9rem 1.2rem 0.9rem 3rem;background:#111;border:1px solid #2a2a2a;border-radius:10px;color:#fff;font-size:0.9rem;outline:none;box-sizing:border-box;font-family:'Inter',sans-serif;">
+            </div>
+
+            @if($colecciones->count() > 0)
+            <div id="coleccionesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;">
+                @foreach($colecciones as $col)
+                <a href="{{ route('fototeca.colecciones.show', $col) }}"
+                   class="col-card-item"
+                   data-title="{{ strtolower($col->title) }}"
+                   style="background:#0e0e0e;border:1px solid #1e1e1e;border-radius:10px;overflow:hidden;text-decoration:none;display:block;transition:border-color 0.25s,transform 0.2s;">
+                    <div style="aspect-ratio:16/9;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                        @if($col->cover_image_path)
+                            <img src="{{ Storage::url($col->cover_image_path) }}" alt="{{ $col->title }}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+                        @else
+                            <svg style="color:#c9a84c;opacity:0.3" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        @endif
+                    </div>
+                    <div style="padding:1rem 1.1rem 1.25rem;">
+                        <div style="font-family:'Playfair Display',serif;font-size:1.05rem;color:#fff;margin-bottom:0.4rem;">{{ $col->title }}</div>
+                        <div style="font-size:0.72rem;color:#c9a84c;font-style:italic;">{{ $col->photos_count }} fotografías</div>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+            @else
+            <div style="text-align:center;padding:5rem 2rem;color:#444;">
+                <svg style="color:#c9a84c;opacity:0.3;margin-bottom:1rem" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <p style="font-size:1rem;">No hay colecciones disponibles.</p>
+            </div>
+            @endif
+        </div>
     </div>
 
     <!-- ── APORTANTES ──────────────────────────────────────────────── -->
@@ -512,7 +667,7 @@
                                 <p class="pg-bio">${p.biography || 'Sin biografía disponible.'}</p>
                                 <div class="pg-footer">
                                     <span class="pg-footer-link">Ver colección</span>
-                                    <span class="pg-count-badge">${p.photos_count} foto${p.photos_count!==1?'s':''}</span>
+                                    <span class="pg-count-badge">${p.collections_count} colección${p.collections_count!==1?'es':''}</span>
                                 </div>
                             </div>
                         </div>`).join('');
@@ -677,6 +832,7 @@
             document.getElementById('heroSection').classList.add('hidden');
             document.getElementById('inicioSection').classList.add('hidden');
             document.getElementById('galleryLayout').classList.add('hidden');
+            document.getElementById('coleccionesSection').style.display = 'none';
             document.getElementById('aportantesSection').style.display = 'none';
         }
 
@@ -694,6 +850,10 @@
 
             if (tab === 'Aportantes') {
                 document.getElementById('aportantesSection').style.display = 'block';
+            } else if (tab === 'Colecciones') {
+                document.getElementById('coleccionesSection').style.display = 'block';
+                const si = document.getElementById('colSearchInput'); if (si) si.value = '';
+                filterColecciones('');
             } else if (tab === 'Inicio') {
                 document.getElementById('heroSection').classList.remove('hidden');
                 document.getElementById('inicioSection').classList.remove('hidden');
@@ -717,12 +877,22 @@
                 btn.classList.toggle('active', btn.getAttribute('data-tab') === state.activeTab);
             });
             const tabUrlMap = {
-                'Inicio':     '{{ route('fototeca.dashboard') }}',
-                'Galería':    '{{ route('fototeca.galeria.index') }}',
-                'Fotógrafos': '{{ route('fototeca.fotografos.index') }}',
-                'Aportantes': '{{ route('fototeca.aportantes.index') }}',
+                'Inicio':       '{{ route('fototeca.dashboard') }}',
+                'Galería':      '{{ route('fototeca.galeria.index') }}',
+                'Fotógrafos':   '{{ route('fototeca.fotografos.index') }}',
+                'Colecciones':  '{{ route('fototeca.colecciones.index') }}',
+                'Aportantes':   '{{ route('fototeca.aportantes.index') }}',
             };
             if (tabUrlMap[state.activeTab]) history.replaceState(null, '', tabUrlMap[state.activeTab]);
+        }
+
+        // ── FILTRO COLECCIONES ───────────────────────────────────────
+        function filterColecciones(q) {
+            const nq = (q||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+            document.querySelectorAll('#coleccionesGrid .col-card-item').forEach(card => {
+                const title = (card.dataset.title||'').normalize('NFD').replace(/[̀-ͯ]/g,'');
+                card.style.display = (!nq || title.includes(nq)) ? 'block' : 'none';
+            });
         }
 
         // ── BÚSQUEDA HERO ────────────────────────────────────────────
@@ -769,7 +939,7 @@
                         <div class="hsd-thumb">${p.photo_path ? `<img src="${p.photo_path}" alt="">` : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-muted)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'}</div>
                         <div class="hsd-info">
                             <div class="hsd-title">${p.full_name}</div>
-                            <div class="hsd-sub">${p.photos_count} foto${p.photos_count!==1?'s':''}</div>
+                            <div class="hsd-sub">${p.collections_count} colección${p.collections_count!==1?'es':''}</div>
                         </div>
                         <span class="hsd-badge">Fotógrafo</span>
                     </a>`).join('');
@@ -891,19 +1061,16 @@
 
         // ── NAV MÓVIL ────────────────────────────────────────────────
         (function() {
-            const btn  = document.getElementById('globalNavHamburger');
-            const menu = document.getElementById('globalNavMobile');
-            if (!btn||!menu) return;
-            btn.addEventListener('click', () => {
-                const isOpen = menu.classList.contains('open');
-                btn.classList.toggle('open', !isOpen);
-                menu.classList.toggle('open', !isOpen);
-            });
-            document.addEventListener('click', e => {
-                if (!btn.contains(e.target)&&!menu.contains(e.target)) {
-                    btn.classList.remove('open'); menu.classList.remove('open');
-                }
-            });
+            const btn   = document.getElementById('globalNavHamburger');
+            const menu  = document.getElementById('globalNavMobile');
+            const close = document.getElementById('globalNavMobileClose');
+            if (!btn || !menu) return;
+            function openMenu()  { menu.classList.add('open');    document.body.style.overflow = 'hidden'; }
+            function closeMenu() { menu.classList.remove('open'); document.body.style.overflow = ''; }
+            btn.addEventListener('click', openMenu);
+            if (close) close.addEventListener('click', closeMenu);
+            // cerrar al hacer tab (los botones de sección)
+            menu.querySelectorAll('.nav-item-btn').forEach(b => b.addEventListener('click', closeMenu));
         })();
 
         // ── APORTANTES ACORDEÓN ───────────────────────────────────────
@@ -956,7 +1123,7 @@
                         : `<div class="ftc-author-placeholder">👤</div>`}
                     <div class="ftc-author-body">
                         <p class="ftc-author-name">${p.full_name}</p>
-                        <p class="ftc-author-count">${p.photos_count} foto${p.photos_count !== 1 ? 's' : ''}</p>
+                        <p class="ftc-author-count">${p.collections_count} colección${p.collections_count !== 1 ? 'es' : ''}</p>
                     </div>
                 </div>`;
             }
@@ -1091,7 +1258,7 @@
         // ========== FIN CARRUSELES ==========
 
         // ── INICIO ───────────────────────────────────────────────────
-        const validTabs = ['Inicio','Galería','Fotógrafos','Aportantes'];
+        const validTabs = ['Inicio','Galería','Fotógrafos','Colecciones','Aportantes'];
         const pendingTab = sessionStorage.getItem('fototeca_tab');
         if (pendingTab && validTabs.includes(pendingTab)) {
             sessionStorage.removeItem('fototeca_tab');
