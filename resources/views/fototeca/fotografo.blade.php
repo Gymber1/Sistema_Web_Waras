@@ -326,5 +326,6 @@ $allCols = $photographer->collections->map(fn($c) => [
     });
 </script>
 <x-floating-buttons />
+<script>document.addEventListener('contextmenu', e => { if (e.target.tagName === 'IMG') e.preventDefault(); });</script>
 </body>
 </html>

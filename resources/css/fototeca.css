@@ -1286,3 +1286,6 @@ body { padding-top: var(--nav-h); }
     background: rgba(0,0,0,0.15);
     color: #333;
 }
+
+/* ── PROTECCIÓN DE IMÁGENES ─────────────────────────────────── */
+img { -webkit-user-drag: none; user-drag: none; -webkit-user-select: none; user-select: none; }

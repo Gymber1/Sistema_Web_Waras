@@ -234,5 +234,6 @@ function filterPhotos(q) {
 }
 </script>
 <x-floating-buttons />
+<script>document.addEventListener('contextmenu', e => { if (e.target.tagName === 'IMG') e.preventDefault(); });</script>
 </body>
 </html>

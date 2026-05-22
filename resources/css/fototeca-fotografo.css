@@ -378,3 +378,6 @@ body { display: flex; flex-direction: column; }
     .profile-name { font-size: 1.5rem; }
     .profile-bio { font-size: 0.88rem; }
 }
+
+/* ── PROTECCIÓN DE IMÁGENES ─────────────────────────────────── */
+img { -webkit-user-drag: none; user-drag: none; -webkit-user-select: none; user-select: none; }
