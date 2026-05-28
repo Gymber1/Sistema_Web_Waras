@@ -10,23 +10,56 @@
     @vite('resources/css/fototeca-especial.css')
 </head>
 <body>
-<header class="header">
-    <div class="header-container">
-        <a href="{{ route('fototeca.dashboard') }}" class="logo">
-            <div class="logo-icon"><i class="fas fa-camera"></i></div>
-            <div style="display:flex;align-items:center;gap:.5rem">
-                <span class="logo-main">Fototeca</span>
-                <span class="logo-sub">Ancashina</span>
-            </div>
+{{-- Mobile nav --}}
+<div class="g-mobile-nav" id="mobileNav">
+    <div class="g-mobile-header">
+        <a href="{{ route('fototeca.inicio') }}" class="g-mobile-brand">
+            <span class="g-nav-brand-main">FOTOTECA</span>
+            <span class="g-nav-brand-sub">Digital Ancashina</span>
         </a>
-        <nav><ul class="nav-menu">
-            <li><a href="{{ route('fototeca.dashboard') }}" class="nav-item">Inicio</a></li>
-            <li><a href="{{ route('fototeca.dashboard') }}#Galería" class="nav-item">Galería</a></li>
-            <li><a href="{{ route('fototeca.dashboard') }}#Fotógrafos" class="nav-item">Fotógrafos</a></li>
-            <li><a href="{{ route('fototeca.dashboard') }}#Especiales" class="nav-item active">Destacados</a></li>
-        </ul></nav>
+        <button class="g-mobile-close" onclick="document.getElementById('mobileNav').classList.remove('open');document.body.style.overflow=''">✕</button>
     </div>
-</header>
+    <nav class="g-mobile-links">
+        <a href="{{ route('fototeca.inicio') }}" class="g-mobile-link">Inicio</a>
+        <a href="{{ route('fototeca.galeria.index') }}" class="g-mobile-link">Galería</a>
+        <a href="{{ route('fototeca.fotografos.index') }}" class="g-mobile-link">Fotógrafos</a>
+        <a href="{{ route('fototeca.colecciones.index') }}" class="g-mobile-link">Colecciones</a>
+        <a href="{{ route('fototeca.aportantes.index') }}" class="g-mobile-link">Aportantes</a>
+        <a href="{{ route('home') }}" class="g-mobile-link" style="opacity:0.7;font-size:0.68rem;">Portal Principal</a>
+        @auth
+            @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca'))
+            <a href="{{ route('admin.dashboard') }}" class="g-mobile-link g-mobile-admin">Panel Admin</a>
+            @endif
+        @endauth
+    </nav>
+</div>
+
+{{-- Nav --}}
+<nav class="g-nav">
+    <a href="{{ route('fototeca.inicio') }}" class="g-nav-brand">
+        <span class="g-nav-brand-main">FOTOTECA</span>
+        <span class="g-nav-brand-sub">Digital Ancashina</span>
+    </a>
+    <div class="g-nav-links">
+        <a href="{{ route('fototeca.inicio') }}" class="g-nav-link">Inicio</a>
+        <a href="{{ route('fototeca.galeria.index') }}" class="g-nav-link">Galería</a>
+        <a href="{{ route('fototeca.fotografos.index') }}" class="g-nav-link">Fotógrafos</a>
+        <a href="{{ route('fototeca.colecciones.index') }}" class="g-nav-link">Colecciones</a>
+        <a href="{{ route('fototeca.aportantes.index') }}" class="g-nav-link">Aportantes</a>
+        <a href="{{ route('home') }}" class="g-nav-btn">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            Portal Principal
+        </a>
+        @auth
+            @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca'))
+            <a href="{{ route('admin.dashboard') }}" class="g-nav-btn solid">Panel</a>
+            @endif
+        @endauth
+    </div>
+    <button class="g-hamburger" onclick="document.getElementById('mobileNav').classList.add('open');document.body.style.overflow='hidden'" aria-label="Menú">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+</nav>
 
 <div class="page-body">
     <a href="{{ route('fototeca.dashboard') }}#Especiales" class="back-btn" onclick="sessionStorage.setItem('fototeca_tab','Especiales')">

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Photo;
 use App\Models\PhotoTag;
 use App\Models\Photographer;
+use App\Models\Donor;
 use App\Models\Category;
 use App\Models\Special;
 use Illuminate\Http\Request;
@@ -42,6 +43,7 @@ class FototecaController extends Controller
     public function createPhoto()
     {
         $photographers = Photographer::orderBy('full_name')->get();
+        $donors        = Donor::orderBy('full_name')->get();
         $categories    = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->get();
         $subcategories = Category::where('type', 'fototeca')->whereNotNull('parent_id')
                             ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
@@ -62,7 +64,7 @@ class FototecaController extends Controller
                                         ->whereHas('parent', fn($q4) => $q4->whereNull('parent_id')))))
                             ->orderBy('name')->get();
         $tags = PhotoTag::orderBy('name')->get();
-        return view('admin.fototeca.photos.create', compact('photographers', 'categories', 'subcategories', 'sublevels', 'secondlevels', 'thirdlevels', 'tags'));
+        return view('admin.fototeca.photos.create', compact('photographers', 'donors', 'categories', 'subcategories', 'sublevels', 'secondlevels', 'thirdlevels', 'tags'));
     }
 
     public function storePhoto(Request $request)
@@ -118,6 +120,7 @@ class FototecaController extends Controller
 
         $photo = Photo::create($data);
         $photo->photographers()->sync($this->withOrder($request->photographers ?? []));
+        $photo->donors()->sync($this->withOrder($request->donors ?? []));
         $photo->categories()->sync($request->categories ?? []);
 
         return redirect()->route('admin.fototeca.photos')->with('success', 'Fotografía agregada correctamente.');
@@ -125,8 +128,9 @@ class FototecaController extends Controller
 
     public function editPhoto(Photo $photo)
     {
-        $photo->load(['photographers', 'categories']);
+        $photo->load(['photographers', 'donors', 'categories']);
         $photographers = Photographer::orderBy('full_name')->get();
+        $donors        = Donor::orderBy('full_name')->get();
         $categories    = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->get();
         $subcategories = Category::where('type', 'fototeca')->whereNotNull('parent_id')
                             ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
@@ -155,7 +159,7 @@ class FototecaController extends Controller
 
         $tags = PhotoTag::orderBy('name')->get();
         return view('admin.fototeca.photos.edit', compact(
-            'photo', 'photographers', 'categories', 'subcategories', 'sublevels', 'secondlevels', 'thirdlevels',
+            'photo', 'photographers', 'donors', 'categories', 'subcategories', 'sublevels', 'secondlevels', 'thirdlevels',
             'selCategory', 'selSubcategory', 'selSublevel', 'selSecondlevel', 'selThirdlevel', 'tags'
         ));
     }
@@ -212,6 +216,7 @@ class FototecaController extends Controller
 
         $photo->update($data);
         $photo->photographers()->sync($this->withOrder($request->photographers ?? []));
+        $photo->donors()->sync($this->withOrder($request->donors ?? []));
         $photo->categories()->sync($request->categories ?? []);
 
         return redirect()->route('admin.fototeca.photos')->with('success', 'Fotografía actualizada correctamente.');
@@ -314,6 +319,99 @@ class FototecaController extends Controller
     {
         $photographer->delete();
         return redirect()->route('admin.fototeca.photographers')->with('success', 'Fotógrafo eliminado.');
+    }
+
+    // ============= DONADORES =============
+
+    public function indexDonors()
+    {
+        $donors = Donor::withCount('photos as photos_count')->paginate(10);
+        return view('admin.fototeca.donors.index', compact('donors'));
+    }
+
+    public function createDonor()
+    {
+        $collections = Special::where('module', 'fototeca')->orderBy('title')->get(['id', 'title']);
+        return view('admin.fototeca.donors.create', compact('collections'));
+    }
+
+    public function storeDonor(Request $request)
+    {
+        $request->validate([
+            'full_name'       => 'required|string|max:255',
+            'birth_place'     => 'nullable|string|max:255',
+            'birth_date'      => 'nullable|date',
+            'death_place'     => 'nullable|string|max:255',
+            'death_date'      => 'nullable|date',
+            'biography'       => 'nullable|string',
+            'studies_critique'=> 'nullable|string',
+            'photo'           => 'nullable|image|max:20480',
+            'collections'     => 'nullable|array',
+            'collections.*'   => 'exists:specials,id',
+        ]);
+
+        $data = [
+            'full_name'        => $request->full_name,
+            'slug'             => $this->uniqueSlug($request->full_name, Donor::class),
+            'birth_place'      => $request->birth_place,
+            'birth_date'       => $request->birth_date,
+            'death_place'      => $request->death_place,
+            'death_date'       => $request->death_date,
+            'biography'        => $request->biography,
+            'studies_critique' => $request->studies_critique,
+        ];
+        if ($request->hasFile('photo')) {
+            $data['photo_path'] = $request->file('photo')->store('donors', 'public');
+        }
+
+        $d = Donor::create($data);
+        $d->collections()->sync($request->collections ?? []);
+        return redirect()->route('admin.fototeca.donors')->with('success', 'Donador agregado correctamente.');
+    }
+
+    public function editDonor(Donor $donor)
+    {
+        $collections = Special::where('module', 'fototeca')->orderBy('title')->get(['id', 'title']);
+        return view('admin.fototeca.donors.edit', compact('donor', 'collections'));
+    }
+
+    public function updateDonor(Request $request, Donor $donor)
+    {
+        $request->validate([
+            'full_name'        => 'required|string|max:255',
+            'birth_place'      => 'nullable|string|max:255',
+            'birth_date'       => 'nullable|date',
+            'death_place'      => 'nullable|string|max:255',
+            'death_date'       => 'nullable|date',
+            'biography'        => 'nullable|string',
+            'studies_critique' => 'nullable|string',
+            'photo'            => 'nullable|image|max:20480',
+            'collections'      => 'nullable|array',
+            'collections.*'    => 'exists:specials,id',
+        ]);
+
+        $data = [
+            'full_name'        => $request->full_name,
+            'birth_place'      => $request->birth_place,
+            'birth_date'       => $request->birth_date,
+            'death_place'      => $request->death_place,
+            'death_date'       => $request->death_date,
+            'biography'        => $request->biography,
+            'studies_critique' => $request->studies_critique,
+        ];
+        if ($request->hasFile('photo')) {
+            $data['photo_path'] = $request->file('photo')->store('donors', 'public');
+        }
+
+        $donor->update($data);
+        $donor->collections()->sync($request->collections ?? []);
+        return redirect()->route('admin.fototeca.donors')->with('success', 'Donador actualizado correctamente.');
+    }
+
+    public function destroyDonor(Donor $donor)
+    {
+        $donor->delete();
+        return redirect()->route('admin.fototeca.donors')->with('success', 'Donador eliminado.');
     }
 
     // ============= CATEGORÍAS (Nivel 1) =============
@@ -589,6 +687,17 @@ class FototecaController extends Controller
         return back()->with('success', count($ids) . ' fotógrafo(s) eliminado(s).');
     }
 
+    public function bulkDestroyDonors(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Donor::whereIn('id', $ids)->each(function($d) {
+            if ($d->photo_path) \Storage::disk('public')->delete($d->photo_path);
+            $d->delete();
+        });
+        return back()->with('success', count($ids) . ' donador(es) eliminado(s).');
+    }
+
     public function bulkDestroyCategories(Request $request)
     {
         $ids     = array_filter(explode(',', $request->input('ids', '')));
@@ -843,24 +952,27 @@ class FototecaController extends Controller
     public function createCollection()
     {
         $photographers = Photographer::orderBy('full_name')->get();
-        return view('admin.fototeca.collections.create', compact('photographers'));
+        $donors        = Donor::orderBy('full_name')->get();
+        return view('admin.fototeca.collections.create', compact('photographers', 'donors'));
     }
 
     public function storeCollection(Request $request)
     {
         $request->validate([
-            'title'              => 'required|string|max:255',
+            'title'                 => 'required|string|max:255',
             'featured_photographer' => 'nullable|string|max:255',
-            'cover_image'        => 'nullable|image|max:20480',
+            'featured_donor'        => 'nullable|string|max:255',
+            'cover_image'           => 'nullable|image|max:20480',
         ]);
 
         $data = [
-            'title'       => $request->title,
-            'slug'        => $this->uniqueSlug($request->title, Special::class),
-            'module'      => 'fototeca',
-            'type'        => 'libro',
-            'description' => $request->input('featured_photographer'),
-            'is_active'   => true,
+            'title'          => $request->title,
+            'slug'           => $this->uniqueSlug($request->title, Special::class),
+            'module'         => 'fototeca',
+            'type'           => 'libro',
+            'description'    => $request->input('featured_photographer'),
+            'featured_donor' => $request->input('featured_donor'),
+            'is_active'      => true,
         ];
         if ($request->hasFile('cover_image')) {
             $data['cover_image_path'] = $request->file('cover_image')->store('collections', 'public');
@@ -868,14 +980,8 @@ class FototecaController extends Controller
 
         $collection = Special::create($data);
 
-        // Sincronizar pivot photographer_special
-        $photographerName = $request->input('featured_photographer');
-        if ($photographerName) {
-            $photographer = Photographer::where('full_name', $photographerName)->first();
-            if ($photographer) {
-                $collection->photographers()->sync([$photographer->id]);
-            }
-        }
+        $this->syncFeaturedPhotographer($collection, $request->input('featured_photographer'));
+        $this->syncFeaturedDonor($collection, $request->input('featured_donor'));
 
         return redirect()->route('admin.fototeca.collections')->with('success', 'Colección creada correctamente.');
     }
@@ -883,20 +989,23 @@ class FototecaController extends Controller
     public function editCollection(Special $special)
     {
         $photographers = Photographer::orderBy('full_name')->get();
-        return view('admin.fototeca.collections.edit', compact('special', 'photographers'));
+        $donors        = Donor::orderBy('full_name')->get();
+        return view('admin.fototeca.collections.edit', compact('special', 'photographers', 'donors'));
     }
 
     public function updateCollection(Request $request, Special $special)
     {
         $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'cover_image' => 'nullable|image|max:20480',
+            'title'                 => 'required|string|max:255',
+            'featured_photographer' => 'nullable|string|max:255',
+            'featured_donor'        => 'nullable|string|max:255',
+            'cover_image'           => 'nullable|image|max:20480',
         ]);
 
         $data = [
-            'title'       => $request->title,
-            'description' => $request->input('featured_photographer'),
+            'title'          => $request->title,
+            'description'    => $request->input('featured_photographer'),
+            'featured_donor' => $request->input('featured_donor'),
         ];
         if ($request->hasFile('cover_image')) {
             $data['cover_image_path'] = $request->file('cover_image')->store('collections', 'public');
@@ -904,20 +1013,34 @@ class FototecaController extends Controller
 
         $special->update($data);
 
-        // Sincronizar pivot photographer_special
-        $photographerName = $request->input('featured_photographer');
-        if ($photographerName) {
-            $photographer = Photographer::where('full_name', $photographerName)->first();
-            if ($photographer) {
-                $special->photographers()->sync([$photographer->id]);
-            } else {
-                $special->photographers()->detach();
-            }
-        } else {
-            $special->photographers()->detach();
-        }
+        $this->syncFeaturedPhotographer($special, $request->input('featured_photographer'));
+        $this->syncFeaturedDonor($special, $request->input('featured_donor'));
 
         return redirect()->route('admin.fototeca.collections')->with('success', 'Colección actualizada correctamente.');
+    }
+
+    private function syncFeaturedPhotographer(Special $collection, ?string $name): void
+    {
+        if ($name) {
+            $photographer = Photographer::where('full_name', $name)->first();
+            if ($photographer) {
+                $collection->photographers()->sync([$photographer->id]);
+                return;
+            }
+        }
+        $collection->photographers()->detach();
+    }
+
+    private function syncFeaturedDonor(Special $collection, ?string $name): void
+    {
+        if ($name) {
+            $donor = Donor::where('full_name', $name)->first();
+            if ($donor) {
+                $collection->donors()->sync([$donor->id]);
+                return;
+            }
+        }
+        $collection->donors()->detach();
     }
 
     public function destroyCollection(Special $special)
@@ -934,32 +1057,61 @@ class FototecaController extends Controller
         return back()->with('success', count($ids) . ' colección(es) eliminada(s).');
     }
 
-    public function assignCollectionsIndex()
+    public function assignCollectionsIndex(Request $request)
     {
-        $collections = Special::where('module', 'fototeca')->withCount('photos')->orderBy('order')->orderBy('title')->get();
-        return view('admin.fototeca.collections.assign', compact('collections'));
+        $tipo = $request->input('tipo', 'fotografos'); // 'fotografos' | 'donadores'
+
+        $query = Special::where('module', 'fototeca')->withCount('photos');
+
+        if ($tipo === 'donadores') {
+            // colecciones con donador destacado
+            $query->whereNotNull('featured_donor')->where('featured_donor', '!=', '');
+        } else {
+            // colecciones con fotógrafo destacado (guardado en description)
+            $query->whereNotNull('description')->where('description', '!=', '');
+        }
+
+        $collections = $query->orderBy('order')->orderBy('title')
+            ->paginate(8)
+            ->withQueryString();
+
+        return view('admin.fototeca.collections.assign', compact('collections', 'tipo'));
     }
 
-    public function manageCollection(Special $special)
+    public function manageCollection(Request $request, Special $special)
     {
-        $special->load(['photos.photographers']);
+        // tipo según el filtro de la página anterior; si no viene, autodetecta
+        $tipo = $request->input('tipo');
+        if (!$tipo) {
+            $tipo = $special->featured_donor ? 'donadores' : 'fotografos';
+        }
+        $esDonadores = $tipo === 'donadores';
+
+        $special->load(['photos.photographers', 'photos.donors']);
         $assignedIds = $special->photos->pluck('id')->toArray();
         $available   = Photo::whereNotIn('id', $assignedIds)
-            ->with('photographers')
+            ->with(['photographers', 'donors'])
             ->orderBy('title')
             ->get();
 
-        $featuredPhotographer = $special->description;
+        // Destacado según tipo
+        $featured       = $esDonadores ? $special->featured_donor : $special->description;
+        $featuredLabel  = $esDonadores ? 'Donador' : 'Fotógrafo';
+        $featuredType   = $tipo;
+
         $suggested = collect();
-        if ($featuredPhotographer) {
-            $suggested = $available->filter(function($photo) use ($featuredPhotographer) {
-                return $photo->photographers->contains(fn($p) =>
-                    stripos($p->full_name, $featuredPhotographer) !== false ||
-                    stripos($featuredPhotographer, $p->full_name) !== false);
+        if ($featured) {
+            $suggested = $available->filter(function($photo) use ($featured, $esDonadores) {
+                $people = $esDonadores ? $photo->donors : $photo->photographers;
+                return $people->contains(fn($p) =>
+                    stripos($p->full_name, $featured) !== false ||
+                    stripos($featured, $p->full_name) !== false);
             });
         }
 
-        return view('admin.fototeca.collections.manage', compact('special', 'available', 'suggested', 'featuredPhotographer'));
+        return view('admin.fototeca.collections.manage', compact(
+            'special', 'available', 'suggested', 'featured', 'featuredLabel', 'featuredType', 'esDonadores'
+        ));
     }
 
     public function assignPhoto(Request $request, Special $special)

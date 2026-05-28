@@ -66,6 +66,16 @@ class Photo extends Model
         )->withPivot('order')->withTimestamps()->orderByPivot('order');
     }
 
+    public function donors(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Donor::class,
+            'photo_donor',
+            'photo_id',
+            'donor_id'
+        )->withPivot('order')->withTimestamps()->orderByPivot('order');
+    }
+
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(

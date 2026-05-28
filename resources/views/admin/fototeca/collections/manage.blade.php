@@ -6,7 +6,7 @@
 <div class="max-w-[960px] mx-auto">
 
     <div class="mb-6 flex items-start gap-4">
-        <a href="{{ route('admin.fototeca.assign-collections') }}"
+        <a href="{{ route('admin.fototeca.assign-collections', ['tipo' => $featuredType]) }}"
             class="mt-0.5 p-2 rounded-lg bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-500 dark:text-slate-400 transition-colors shadow-premium dark:shadow-premium-dark">
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
         </a>
@@ -15,26 +15,26 @@
                 <h2 class="text-2xl font-bold text-slate-800 dark:text-white">{{ $special->title }}</h2>
                 <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 border border-brand-100 dark:border-brand-500/20">Colección</span>
             </div>
-            @if($featuredPhotographer)
+            @if($featured)
             <p class="text-sm text-slate-600 dark:text-slate-300 mt-1 flex items-center gap-1.5">
-                <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"></i>
-                <span class="font-medium">Fotógrafo:</span> {{ $featuredPhotographer }}
+                <i data-lucide="{{ $esDonadores ? 'heart-handshake' : 'user' }}" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"></i>
+                <span class="font-medium">{{ $featuredLabel }}:</span> {{ $featured }}
                 <a href="{{ route('admin.fototeca.collections.edit', $special) }}"
                     class="ml-1 inline-flex items-center gap-1 px-2.5 py-1 bg-brand-500 hover:bg-brand-600 text-white rounded-md text-xs font-medium transition-colors flex-shrink-0">
                     <i data-lucide="user-check" class="w-3 h-3"></i>
-                    Cambiar fotógrafo
+                    Cambiar {{ strtolower($featuredLabel) }}
                 </a>
             </p>
             @else
             <div class="flex items-center gap-2 mt-1.5">
                 <p class="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                     <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
-                    Sin fotógrafo asignado
+                    Sin {{ strtolower($featuredLabel) }} asignado
                 </p>
                 <a href="{{ route('admin.fototeca.collections.edit', $special) }}"
                     class="inline-flex items-center gap-1 px-2.5 py-1 bg-brand-500 hover:bg-brand-600 text-white rounded-md text-xs font-medium transition-colors">
                     <i data-lucide="user-plus" class="w-3 h-3"></i>
-                    Asignar fotógrafo
+                    Asignar {{ strtolower($featuredLabel) }}
                 </a>
             </div>
             @endif
@@ -74,7 +74,7 @@
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">{{ $photo->title }}</p>
                             <p class="text-xs text-slate-400 dark:text-slate-500 truncate">
-                                {{ $photo->photographers->pluck('full_name')->join(', ') ?: '—' }}
+                                {{ ($esDonadores ? $photo->donors : $photo->photographers)->pluck('full_name')->join(', ') ?: '—' }}
                                 @php $y = $photo->year_type === 'range' && $photo->year_from ? $photo->year_from.'–'.($photo->year_to ?? '?') : ($photo->year ?? null); @endphp
                                 @if($y) · {{ $y }} @endif
                             </p>
@@ -104,18 +104,18 @@
                     {{-- Buscador --}}
                     <div class="relative">
                         <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-                        <input type="text" id="search-available" placeholder="Buscar por título, fotógrafo..."
+                        <input type="text" id="search-available" placeholder="Buscar por título, {{ strtolower($featuredLabel) }}..."
                             oninput="filterAvailable(this.value)"
                             class="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
                     </div>
 
                     {{-- Tabs --}}
-                    @if($featuredPhotographer)
+                    @if($featured)
                     <div class="flex gap-2">
                         <button type="button" id="tab-suggested" onclick="switchTab('suggested')"
-                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-500 text-white transition-colors min-w-0" style="max-width:160px;" title="Sugeridos de {{ $featuredPhotographer }}">
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-500 text-white transition-colors min-w-0" style="max-width:160px;" title="Sugeridos de {{ $featured }}">
                             <i data-lucide="check" class="w-3 h-3 flex-shrink-0"></i>
-                            <span class="truncate">Sugeridos de {{ Str::limit($featuredPhotographer, 18) }}</span>
+                            <span class="truncate">Sugeridos de {{ Str::limit($featured, 18) }}</span>
                         </button>
                         <button type="button" id="tab-all" onclick="switchTab('all')"
                             class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors">
@@ -134,10 +134,10 @@
                             <div class="available-item available-suggested flex items-center gap-3 px-3 py-2.5 hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors cursor-pointer group"
                                  data-id="{{ $photo->id }}"
                                  data-title="{{ addslashes($photo->title) }}"
-                                 data-photographer="{{ $photo->photographers->pluck('full_name')->join(', ') }}"
+                                 data-photographer="{{ ($esDonadores ? $photo->donors : $photo->photographers)->pluck('full_name')->join(', ') }}"
                                  data-year="{{ $year }}"
-                                 data-title-lower="{{ strtolower($photo->title.' '.$photo->photographers->pluck('full_name')->join(' ')) }}"
-                                 onclick="addItem({{ $special->id }}, {{ $photo->id }}, '{{ addslashes($photo->title) }}', '{{ addslashes($photo->photographers->pluck('full_name')->join(', ')) }}', '{{ $year }}', '{{ $photo->thumbnail_url ?? '' }}', this)">
+                                 data-title-lower="{{ strtolower($photo->title.' '.$photo->photographers->pluck('full_name')->join(' ').' '.$photo->donors->pluck('full_name')->join(' ')) }}"
+                                 onclick="addItem({{ $special->id }}, {{ $photo->id }}, '{{ addslashes($photo->title) }}', '{{ addslashes(($esDonadores ? $photo->donors : $photo->photographers)->pluck('full_name')->join(', ')) }}', '{{ $year }}', '{{ $photo->thumbnail_url ?? '' }}', this)">
                                 <div class="w-10 h-10 rounded-lg flex-shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800">
                                     @if($photo->thumbnail_url)
                                         <img src="{{ $photo->thumbnail_url }}" alt="" class="w-full h-full object-cover">
@@ -148,7 +148,7 @@
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm text-slate-700 dark:text-slate-300 font-medium truncate group-hover:text-brand-700 dark:group-hover:text-brand-300">{{ $photo->title }}</p>
                                     <div class="flex items-center gap-1.5 mt-0.5">
-                                        <span class="text-xs text-slate-400 truncate">{{ $photo->photographers->pluck('full_name')->first() ?: '—' }}</span>
+                                        <span class="text-xs text-slate-400 truncate">{{ ($esDonadores ? $photo->donors : $photo->photographers)->pluck('full_name')->first() ?: '—' }}</span>
                                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 flex-shrink-0">Sugerido</span>
                                     </div>
                                 </div>
@@ -157,7 +157,7 @@
                                 </span>
                             </div>
                             @empty
-                            <div class="py-8 text-center text-slate-400 dark:text-slate-500 text-xs">No hay sugerencias para este fotógrafo.</div>
+                            <div class="py-8 text-center text-slate-400 dark:text-slate-500 text-xs">No hay sugerencias para este {{ strtolower($featuredLabel) }}.</div>
                             @endforelse
                         </div>
 
@@ -168,8 +168,8 @@
                             <div class="available-item available-all flex items-center gap-3 px-3 py-2.5 hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors cursor-pointer group"
                                  data-id="{{ $photo->id }}"
                                  data-title="{{ addslashes($photo->title) }}"
-                                 data-title-lower="{{ strtolower($photo->title.' '.$photo->photographers->pluck('full_name')->join(' ')) }}"
-                                 onclick="addItem({{ $special->id }}, {{ $photo->id }}, '{{ addslashes($photo->title) }}', '{{ addslashes($photo->photographers->pluck('full_name')->join(', ')) }}', '{{ $year }}', '{{ $photo->thumbnail_url ?? '' }}', this)">
+                                 data-title-lower="{{ strtolower($photo->title.' '.$photo->photographers->pluck('full_name')->join(' ').' '.$photo->donors->pluck('full_name')->join(' ')) }}"
+                                 onclick="addItem({{ $special->id }}, {{ $photo->id }}, '{{ addslashes($photo->title) }}', '{{ addslashes(($esDonadores ? $photo->donors : $photo->photographers)->pluck('full_name')->join(', ')) }}', '{{ $year }}', '{{ $photo->thumbnail_url ?? '' }}', this)">
                                 <div class="w-10 h-10 rounded-lg flex-shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800">
                                     @if($photo->thumbnail_url)
                                         <img src="{{ $photo->thumbnail_url }}" alt="" class="w-full h-full object-cover">
@@ -179,7 +179,7 @@
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm text-slate-700 dark:text-slate-300 font-medium truncate group-hover:text-brand-700 dark:group-hover:text-brand-300">{{ $photo->title }}</p>
-                                    <span class="text-xs text-slate-400 truncate">{{ $photo->photographers->pluck('full_name')->first() ?: '—' }}</span>
+                                    <span class="text-xs text-slate-400 truncate">{{ ($esDonadores ? $photo->donors : $photo->photographers)->pluck('full_name')->first() ?: '—' }}</span>
                                 </div>
                                 <span class="flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 bg-brand-500 text-white rounded-lg text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                                     <i data-lucide="plus" class="w-3 h-3"></i> Agregar
@@ -205,7 +205,7 @@
 const assignUrl    = '/admin/fototeca/assign-collections/{{ $special->id }}/assign';
 const unassignBase = '/admin/fototeca/assign-collections/{{ $special->id }}/photos/';
 const csrfToken    = '{{ csrf_token() }}';
-const hasFeatured  = {{ $featuredPhotographer ? 'true' : 'false' }};
+const hasFeatured  = {{ $featured ? 'true' : 'false' }};
 let activeTab      = 'suggested';
 
 function switchTab(tab) {

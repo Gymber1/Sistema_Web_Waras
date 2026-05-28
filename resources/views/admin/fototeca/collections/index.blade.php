@@ -48,6 +48,7 @@
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Portada</th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nombre de la colección</th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Fotógrafos</th>
+                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Donadores</th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Fotografías</th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Acciones</th>
                     </tr>
@@ -80,6 +81,13 @@
                                 <span class="text-slate-400 dark:text-slate-500 text-xs">—</span>
                             @endif
                         </td>
+                        <td class="px-6 py-4">
+                            @if($collection->featured_donor)
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">{{ $collection->featured_donor }}</span>
+                            @else
+                                <span class="text-slate-400 dark:text-slate-500 text-xs">—</span>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 text-center text-slate-600 dark:text-slate-300 font-semibold">{{ $collection->photos_count }}</td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center justify-end gap-1">
@@ -100,7 +108,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-20 text-center">
+                        <td colspan="7" class="px-6 py-20 text-center">
                             <div class="flex flex-col items-center gap-3 text-slate-400 dark:text-slate-500">
                                 <i data-lucide="image" class="w-10 h-10 opacity-30"></i>
                                 <p class="text-sm font-medium">No hay colecciones creadas</p>

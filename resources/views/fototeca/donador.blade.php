@@ -3,12 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $photographer->full_name }} · Fototeca Digital Ancashina</title>
+    <title>{{ $donor->full_name }} · Fototeca Digital Ancashina</title>
     <link rel="icon" type="image/png" href="/Logo-Fototeca-Waras.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    @vite('resources/css/fototeca-fotografo.css')
+    @vite('resources/css/fototeca-donador.css')
 </head>
 <body>
 
@@ -24,7 +24,8 @@
     <nav class="g-mobile-links">
         <a href="{{ route('fototeca.inicio') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Inicio')">Inicio</a>
         <a href="{{ route('fototeca.galeria.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Galería')">Galería</a>
-        <a href="{{ route('fototeca.fotografos.index') }}" class="g-mobile-link active" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')">Fotógrafos</a>
+        <a href="{{ route('fototeca.fotografos.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')">Fotógrafos</a>
+        <a href="{{ route('fototeca.donadores.index') }}" class="g-mobile-link active" onclick="sessionStorage.setItem('fototeca_tab','Donadores')">Donadores</a>
         <a href="{{ route('fototeca.colecciones.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Colecciones')">Colecciones</a>
         <a href="{{ route('fototeca.aportantes.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Aportantes')">Aportantes</a>
         <a href="{{ route('home') }}" class="g-mobile-link" style="opacity:0.7;font-size:0.68rem;">Portal Principal</a>
@@ -45,7 +46,8 @@
     <div class="g-nav-links">
         <a href="{{ route('fototeca.inicio') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Inicio')">Inicio</a>
         <a href="{{ route('fototeca.galeria.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Galería')">Galería</a>
-        <a href="{{ route('fototeca.fotografos.index') }}" class="g-nav-link active" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')">Fotógrafos</a>
+        <a href="{{ route('fototeca.fotografos.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')">Fotógrafos</a>
+        <a href="{{ route('fototeca.donadores.index') }}" class="g-nav-link active" onclick="sessionStorage.setItem('fototeca_tab','Donadores')">Donadores</a>
         <a href="{{ route('fototeca.colecciones.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Colecciones')">Colecciones</a>
         <a href="{{ route('fototeca.aportantes.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Aportantes')">Aportantes</a>
         <a href="{{ route('home') }}" class="g-nav-btn">
@@ -65,14 +67,14 @@
 
 {{-- Profile Header --}}
 <div class="profile-header">
-    <a id="backBtn" href="{{ route('fototeca.fotografos.index') }}" class="back-btn">← Volver</a>
+    <a id="backBtn" href="{{ route('fototeca.donadores.index') }}" class="back-btn">← Volver</a>
 
     <div class="profile-avatar-wrap">
         <div class="photo-corner photo-corner--tl"></div>
         <div class="photo-corner photo-corner--br"></div>
-        @if($photographer->photo_path)
-            <img src="{{ Storage::url($photographer->photo_path) }}"
-                 alt="{{ $photographer->full_name }}"
+        @if($donor->photo_path)
+            <img src="{{ Storage::url($donor->photo_path) }}"
+                 alt="{{ $donor->full_name }}"
                  class="profile-avatar">
         @else
             <div class="profile-avatar-placeholder">
@@ -82,70 +84,70 @@
     </div>
 
     <div class="profile-info">
-        <h1 class="profile-name">{{ $photographer->full_name }}</h1>
+        <h1 class="profile-name">{{ $donor->full_name }}</h1>
 
         <div class="profile-meta">
-            @if($photographer->birth_date || $photographer->death_date)
+            @if($donor->birth_date || $donor->death_date)
             <span>
-                {{ $photographer->birth_date?->year ?? '?' }}
+                {{ $donor->birth_date?->year ?? '?' }}
                 &ndash;
-                {{ $photographer->death_date?->year ?? 'presente' }}
+                {{ $donor->death_date?->year ?? 'presente' }}
             </span>
             @endif
-            @if($photographer->birth_place)
+            @if($donor->birth_place)
             <span class="profile-meta-sep">|</span>
-            <span>{{ $photographer->birth_place }}</span>
+            <span>{{ $donor->birth_place }}</span>
             @endif
         </div>
 
-        @if($photographer->birth_date || $photographer->death_date || $photographer->birth_place || $photographer->death_place)
+        @if($donor->birth_date || $donor->death_date || $donor->birth_place || $donor->death_place)
         <div class="profile-dates-block">
-            @if($photographer->birth_date)
+            @if($donor->birth_date)
             <div class="profile-dates-item">
                 <span class="profile-dates-label">Fecha de nacimiento</span>
-                <span class="profile-dates-value">{{ $photographer->birth_date->format('d/m/Y') }}</span>
+                <span class="profile-dates-value">{{ $donor->birth_date->format('d/m/Y') }}</span>
             </div>
             @endif
-            @if($photographer->birth_place)
+            @if($donor->birth_place)
             <div class="profile-dates-item">
                 <span class="profile-dates-label">Lugar de nacimiento</span>
-                <span class="profile-dates-value">{{ $photographer->birth_place }}</span>
+                <span class="profile-dates-value">{{ $donor->birth_place }}</span>
             </div>
             @endif
-            @if($photographer->death_date)
+            @if($donor->death_date)
             <div class="profile-dates-item">
                 <span class="profile-dates-label">Fecha de fallecimiento</span>
-                <span class="profile-dates-value">{{ $photographer->death_date->format('d/m/Y') }}</span>
+                <span class="profile-dates-value">{{ $donor->death_date->format('d/m/Y') }}</span>
             </div>
             @endif
-            @if($photographer->death_place)
+            @if($donor->death_place)
             <div class="profile-dates-item">
                 <span class="profile-dates-label">Lugar de fallecimiento</span>
-                <span class="profile-dates-value">{{ $photographer->death_place }}</span>
+                <span class="profile-dates-value">{{ $donor->death_place }}</span>
             </div>
             @endif
         </div>
         @endif
 
         <p class="profile-bio">
-            {{ $photographer->biography ?? ($photographer->bio ?? 'Biografía no disponible.') }}
+            {{ $donor->biography ?? ($donor->bio ?? 'Biografía no disponible.') }}
         </p>
 
-        @if($photographer->studies_critique)
+        @if($donor->studies_critique)
         <div class="profile-critique">
             <div class="profile-critique-label">Crítica y Estudios</div>
-            {{ $photographer->studies_critique }}
+            {{ $donor->studies_critique }}
         </div>
         @endif
 
         <div class="profile-stats">
             <div class="stat-item">
-                <span class="stat-value">{{ $photographer->collections->count() }}</span>
+                <span class="stat-value">{{ $donor->collections->count() }}</span>
                 <span class="stat-label">Colecciones</span>
             </div>
-            @if($photographer->birth_date && $photographer->death_date)
+            @if($donor->birth_date && $donor->death_date)
             <div class="stat-item">
-                <span class="stat-value">{{ $photographer->death_date->year - $photographer->birth_date->year }}</span>
+                <span class="stat-value">{{ $donor->death_date->year - $donor->birth_date->year }}</span>
                 <span class="stat-label">Años de vida</span>
             </div>
             @endif
@@ -154,15 +156,15 @@
 </div>
 
 {{-- Collections --}}
-@if($photographer->collections->count() > 0)
+@if($donor->collections->count() > 0)
 
 @php
-$authorName = \Illuminate\Support\Str::words($photographer->full_name, 2, '');
-$allCols = $photographer->collections->map(fn($c) => [
+$authorName = \Illuminate\Support\Str::words($donor->full_name, 2, '');
+$allCols = $donor->collections->map(fn($c) => [
     'url'    => route('fototeca.colecciones.show', $c),
     'cover'  => $c->cover_image_path ? Storage::url($c->cover_image_path) : null,
     'title'  => $c->title,
-    'photographer' => $c->description ?: $photographer->full_name,
+    'photographer' => $c->description ?: $donor->full_name,
     'count'  => $c->photos->count(),
 ])->values()->toArray();
 @endphp
@@ -173,7 +175,7 @@ $allCols = $photographer->collections->map(fn($c) => [
     <div class="gallery-context-bar" style="margin-bottom:2rem;">
         <div class="gallery-context-line"></div>
         <h2 class="gallery-context-title">Colecciones de {{ $authorName }}</h2>
-        <span class="gallery-context-count" id="col-count-label">{{ $photographer->collections->count() }} colección(es)</span>
+        <span class="gallery-context-count" id="col-count-label">{{ $donor->collections->count() }} colección(es)</span>
         <div class="gallery-context-line"></div>
     </div>
 
@@ -208,7 +210,7 @@ $allCols = $photographer->collections->map(fn($c) => [
     </div>
     <h2 class="empty-title">Sin colecciones asignadas</h2>
     <p class="empty-desc">Este fotógrafo aún no tiene colecciones fotográficas asignadas.</p>
-    <a id="backBtnEmpty" href="{{ route('fototeca.fotografos.index') }}" class="empty-btn">← Volver</a>
+    <a id="backBtnEmpty" href="{{ route('fototeca.donadores.index') }}" class="empty-btn">← Volver</a>
 </div>
 @endif
 
@@ -225,7 +227,7 @@ $allCols = $photographer->collections->map(fn($c) => [
 (function(){
     const allCols  = @json($allCols ?? []);
     const backUrl  = window.location.href;
-    const backLabel = @json($photographer->full_name);
+    const backLabel = @json($donor->full_name);
     const PER_PAGE = 8;
     let filtered   = allCols.slice();
     let page       = 1;
@@ -305,7 +307,7 @@ $allCols = $photographer->collections->map(fn($c) => [
     (function() {
         const backUrl   = sessionStorage.getItem('back_url');
         const backLabel = sessionStorage.getItem('back_label');
-        const defaultUrl = '{{ route('fototeca.fotografos.index') }}';
+        const defaultUrl = '{{ route('fototeca.donadores.index') }}';
         const defaultLabel = 'Fotógrafos';
 
         ['backBtn', 'backBtnEmpty'].forEach(id => {

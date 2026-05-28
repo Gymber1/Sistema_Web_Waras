@@ -60,12 +60,26 @@
 
 {{-- Mobile nav --}}
 <div class="g-mobile-nav" id="mobileNav">
-    <button class="g-mobile-close" onclick="document.getElementById('mobileNav').classList.remove('open');document.body.style.overflow=''">✕</button>
-    <a href="{{ route('fototeca.inicio') }}" class="g-mobile-link">Inicio</a>
-    <a href="{{ route('fototeca.galeria.index') }}" class="g-mobile-link">Galería</a>
-    <a href="{{ route('fototeca.fotografos.index') }}" class="g-mobile-link">Fotógrafos</a>
-    <a href="{{ route('fototeca.colecciones.index') }}" class="g-mobile-link active">Colecciones</a>
-    <a href="{{ route('fototeca.aportantes.index') }}" class="g-mobile-link">Aportantes</a>
+    <div class="g-mobile-header">
+        <a href="{{ route('fototeca.inicio') }}" class="g-mobile-brand">
+            <span class="g-nav-brand-main">FOTOTECA</span>
+            <span class="g-nav-brand-sub">Digital Ancashina</span>
+        </a>
+        <button class="g-mobile-close" onclick="document.getElementById('mobileNav').classList.remove('open');document.body.style.overflow=''">✕</button>
+    </div>
+    <nav class="g-mobile-links">
+        <a href="{{ route('fototeca.inicio') }}" class="g-mobile-link">Inicio</a>
+        <a href="{{ route('fototeca.galeria.index') }}" class="g-mobile-link">Galería</a>
+        <a href="{{ route('fototeca.fotografos.index') }}" class="g-mobile-link">Fotógrafos</a>
+        <a href="{{ route('fototeca.colecciones.index') }}" class="g-mobile-link active">Colecciones</a>
+        <a href="{{ route('fototeca.aportantes.index') }}" class="g-mobile-link">Aportantes</a>
+        <a href="{{ route('home') }}" class="g-mobile-link" style="opacity:0.7;font-size:0.68rem;">Portal Principal</a>
+        @auth
+            @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca'))
+            <a href="{{ route('admin.dashboard') }}" class="g-mobile-link g-mobile-admin">Panel Admin</a>
+            @endif
+        @endauth
+    </nav>
 </div>
 
 {{-- Nav --}}

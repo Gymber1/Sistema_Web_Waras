@@ -10,8 +10,11 @@ html,body{font-family:'Poppins',sans-serif;color:#333;line-height:1.6;background
 .logo-square-1{height:28px;background:#60a5fa}
 .logo-square-2{height:22px;background:#f87171;margin-top:6px}
 .logo-square-3{height:16px;background:var(--accent);margin-top:12px}
-.logo-text{font-size:1.5rem;font-weight:800;letter-spacing:.05em;font-family:'Playfair Display',serif}
-.logo-sub{font-size:.85rem;font-weight:300;margin-left:.5rem;font-style:italic;opacity:.9}
+.logo-brand{display:flex;flex-direction:column;gap:1px}
+.logo-icon{width:32px;height:32px;object-fit:contain;flex-shrink:0}
+.logo-text{font-size:1.1rem;font-weight:800;letter-spacing:.12em;font-family:'Playfair Display',serif;line-height:1}
+.logo-text-sub,.logo-sub{font-size:.6rem;font-weight:400;letter-spacing:.25em;text-transform:uppercase;color:#9ca3af;line-height:1;margin-left:0;font-style:normal;opacity:1}
+.nav-sep-bib{color:rgba(255,255,255,.25);font-size:.85rem;user-select:none}
 .nav-menu{display:flex;gap:.25rem}
 .nav-item{color:#e2e8f0;font-size:.875rem;font-weight:500;padding:.5rem 1rem;border-radius:.375rem;transition:all .2s;text-decoration:none;text-transform:uppercase;letter-spacing:.05em}
 .nav-item:hover,.nav-item.active{background:rgba(255,255,255,.1);color:var(--accent)}
@@ -22,10 +25,17 @@ html,body{font-family:'Poppins',sans-serif;color:#333;line-height:1.6;background
 .header-btn-solid{background:var(--accent);color:var(--primary);border:1px solid var(--accent)}
 .header-btn-solid:hover{background:#b08d4b;border-color:#b08d4b}
 .hamburger-btn{display:none;background:none;border:none;cursor:pointer;color:white;padding:.5rem;min-width:44px;min-height:44px;align-items:center;justify-content:center}
-.mobile-nav{display:none;position:fixed;inset:0;background:rgba(27,42,71,.98);z-index:2000;flex-direction:column;align-items:center;justify-content:center;gap:1.75rem}
-.mobile-nav.open{display:flex}
-.mobile-nav-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;color:white;cursor:pointer;font-size:1.5rem;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
-.mobile-nav-item{color:white;text-decoration:none;font-size:1.3rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;min-height:44px;display:flex;align-items:center}
+.mobile-nav-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1999}
+.mobile-nav-overlay.open{display:block}
+.mobile-nav{display:none;visibility:hidden;position:fixed;top:0;left:0;right:0;bottom:auto;height:auto;min-height:0;background:rgba(15,20,35,.98);backdrop-filter:blur(14px);z-index:2000;flex-direction:column}
+.mobile-nav.open{display:flex;visibility:visible}
+.mobile-nav-header{display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;height:64px;border-bottom:1px solid rgba(255,255,255,.08)}
+.mobile-nav-close{background:none;border:none;color:#aaa;cursor:pointer;font-size:1.3rem;line-height:1;padding:.25rem}
+.mobile-nav-links{display:block;width:100%}
+.mobile-nav-item{display:block;width:100%;box-sizing:border-box;text-align:left;padding:1rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.07);color:#ccc;text-decoration:none;font-size:.72rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;transition:color .2s,background .2s}
+.mobile-nav-item:hover,.mobile-nav-item.active{color:#fff;background:rgba(255,255,255,.04)}
+.mobile-nav-portal{color:#aaa;opacity:.75}
+.mobile-nav-admin{color:#c5a66d}
 @media(max-width:1024px){.nav-menu{display:none}.hamburger-btn{display:flex}.page-body{padding:5.5rem 1rem 3rem}}
 .page-body{max-width:960px;margin:0 auto;padding:6rem 1.5rem 4rem}
 .back-btn{display:inline-flex;align-items:center;gap:.5rem;background:none;border:none;color:var(--primary);font-size:.95rem;font-weight:600;cursor:pointer;margin-bottom:1.5rem;transition:color .2s;text-decoration:none;font-family:'Poppins',sans-serif}
@@ -60,4 +70,4 @@ html,body{font-family:'Poppins',sans-serif;color:#333;line-height:1.6;background
 .btn-icon:hover{border-color:var(--accent);color:var(--accent)}
 .toast{display:none;font-size:.8rem;color:#6b7280;margin-top:.75rem}
 @media(max-width:640px){.detail-card{flex-direction:column;align-items:center}.cover-box{width:160px}.cover-img,.cover-placeholder{width:160px}}
-@media(max-width:1024px){.nav-menu{display:none}.hamburger-btn{display:flex}.header-actions{margin-left:0}.page-body{padding:5.5rem 1rem 3rem}}
+@media(max-width:1024px){.nav-menu{display:none}.hamburger-btn{display:flex}.header-actions{display:none}.page-body{padding:5.5rem 1rem 3rem}}

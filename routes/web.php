@@ -40,11 +40,13 @@ Route::prefix('fototeca')->name('fototeca.')->group(function () {
     Route::get('/inicio', [FototecaController::class, 'index'])->name('inicio');
     Route::get('/galeria', [FototecaController::class, 'indexGaleria'])->name('galeria.index');
     Route::get('/fotografos', [FototecaController::class, 'indexFotografos'])->name('fotografos.index');
+    Route::get('/donadores', [FototecaController::class, 'indexDonadores'])->name('donadores.index');
     Route::get('/nosotros', [FototecaController::class, 'indexAportantes'])->name('aportantes.index');
     Route::get('/search', [FototecaController::class, 'search'])->name('search');
     Route::get('/category/{category}', [FototecaController::class, 'getPhotosByCategory'])->name('category');
     Route::get('/tag/{photoTag}', [FototecaController::class, 'getPhotosByTag'])->name('tag');
     Route::get('/fotografos/{photographer}', [FototecaController::class, 'showPhotographer'])->name('fotografos.show');
+    Route::get('/donadores/{donor}', [FototecaController::class, 'showDonor'])->name('donadores.show');
     Route::get('/galeria/{photo}', [FototecaController::class, 'showPhoto'])->name('galeria.show');
     Route::get('/colecciones', [FototecaController::class, 'indexColecciones'])->name('colecciones.index');
     Route::get('/colecciones/{special}', [FototecaController::class, 'showColeccion'])->name('colecciones.show');
@@ -170,6 +172,15 @@ Route::middleware('auth')->group(function () {
             Route::put('/photographers/{photographer}', [AdminFototecaController::class, 'updatePhotographer'])->name('photographers.update');
             Route::delete('/photographers/{photographer}', [AdminFototecaController::class, 'destroyPhotographer'])->name('photographers.destroy');
             Route::delete('/photographers', [AdminFototecaController::class, 'bulkDestroyPhotographers'])->name('photographers.bulk-destroy');
+
+            // Donadores
+            Route::get('/donors', [AdminFototecaController::class, 'indexDonors'])->name('donors');
+            Route::get('/donors/create', [AdminFototecaController::class, 'createDonor'])->name('donors.create');
+            Route::post('/donors', [AdminFototecaController::class, 'storeDonor'])->name('donors.store');
+            Route::get('/donors/{donor}/edit', [AdminFototecaController::class, 'editDonor'])->name('donors.edit');
+            Route::put('/donors/{donor}', [AdminFototecaController::class, 'updateDonor'])->name('donors.update');
+            Route::delete('/donors/{donor}', [AdminFototecaController::class, 'destroyDonor'])->name('donors.destroy');
+            Route::delete('/donors', [AdminFototecaController::class, 'bulkDestroyDonors'])->name('donors.bulk-destroy');
 
             // Categorías (Nivel 1)
             Route::get('/categories', [AdminFototecaController::class, 'indexCategories'])->name('categories');

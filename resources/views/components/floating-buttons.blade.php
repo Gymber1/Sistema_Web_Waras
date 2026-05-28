@@ -87,10 +87,10 @@
     <a href="{{ $btn->link ?? '#' }}"
        @if(!$isYape && !$isWa && $btn->link) target="_blank" rel="noopener" @endif
        id="{{ $btnId }}"
-       style="display:block;width:56px;height:56px;border-radius:50%;overflow:hidden;
-              box-shadow:0 0 15px {{ $glow }};transition:transform .3s,box-shadow .3s;cursor:pointer;"
-       onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 0 25px {{ $glowHover }}'"
-       onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 0 15px {{ $glow }}'"
+       style="display:block;width:46px;height:46px;border-radius:50%;overflow:hidden;
+              box-shadow:0 0 8px {{ $glow }};transition:transform .3s,box-shadow .3s;cursor:pointer;"
+       onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 0 14px {{ $glowHover }}'"
+       onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 0 8px {{ $glow }}'"
        onclick="toggleFbPop(event,'{{ $popId }}',{{ $buttons->pluck('id')->map(fn($id)=> "'fb-pop-{$id}'")->join(',') }})">
         <img src="{{ $imgSrc }}" alt="{{ $btn->nombre }}" style="width:100%;height:100%;object-fit:cover;">
     </a>

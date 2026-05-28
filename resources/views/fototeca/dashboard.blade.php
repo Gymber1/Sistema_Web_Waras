@@ -13,13 +13,13 @@
         /* Nav compartido */
         .g-nav {
             position: fixed !important; top: 0; left: 0; right: 0; z-index: 200;
-            height: 64px;
+            height: 64px; width: 100%; max-width: 100vw; box-sizing: border-box;
             background: rgba(0,0,0,0.85) !important;
             backdrop-filter: blur(12px);
             border-bottom: 1px solid #2a2a2a;
             transition: background 0.3s ease, border-color 0.3s ease;
             display: flex !important; align-items: center;
-            padding: 0 2rem; gap: 2rem;
+            padding: 0 1.25rem; gap: 2rem;
         }
         body { padding-top: 64px; }
         .g-nav-brand {
@@ -102,6 +102,24 @@
         }
         .nav-sep-foto { color: rgba(255,255,255,.25); font-size: .85rem; user-select: none; }
         .col-card-item:hover { border-color: #c9a84c !important; transform: translateY(-3px); }
+        /* Buscador hero visible */
+        .hero-search-wrap {
+            background: rgba(255,255,255,0.12) !important;
+            border: 1.5px solid rgba(255,255,255,0.5) !important;
+            border-radius: 4px !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.6) !important;
+        }
+        .hero-search-input { color: #fff !important; }
+        .hero-search-input::placeholder { color: rgba(255,255,255,0.6) !important; }
+        .hero-search-icon-wrap { color: rgba(255,255,255,0.8) !important; }
+        .hero-search-btn {
+            background: #c5a66d !important;
+            color: #0a0a0a !important;
+            font-weight: 800 !important;
+        }
+        .hero-search-btn:hover { background: #d4b783 !important; }
     </style>
 </head>
 <body>
@@ -126,6 +144,7 @@
             <button class="nav-item-btn ftc-mobile-link" data-tab="Inicio">Inicio</button>
             <button class="nav-item-btn ftc-mobile-link" data-tab="Galería">Galería</button>
             <button class="nav-item-btn ftc-mobile-link" data-tab="Fotógrafos">Fotógrafos</button>
+            <button class="nav-item-btn ftc-mobile-link" data-tab="Donadores">Donadores</button>
             <button class="nav-item-btn ftc-mobile-link" data-tab="Colecciones">Colecciones</button>
             <button class="nav-item-btn ftc-mobile-link" data-tab="Aportantes">Sobre Nosotros</button>
             <a href="{{ route('home') }}" class="ftc-mobile-link">Portal Principal</a>
@@ -153,6 +172,7 @@
             <span class="nav-sep-foto">|</span>
             <button class="nav-item-btn g-nav-link" data-tab="Galería">Galería</button>
             <button class="nav-item-btn g-nav-link" data-tab="Fotógrafos">Fotógrafos</button>
+            <button class="nav-item-btn g-nav-link" data-tab="Donadores">Donadores</button>
             <button class="nav-item-btn g-nav-link" data-tab="Colecciones">Colecciones</button>
             <span class="nav-sep-foto">|</span>
             <button class="nav-item-btn g-nav-link" data-tab="Aportantes">Sobre Nosotros</button>
@@ -244,6 +264,27 @@
             </div>
             <div class="carousel-ver-mas">
                 <button class="carousel-ver-mas-btn" onclick="showSection('Fotógrafos')">
+                    Ver más <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Carrusel: Donadores -->
+        <div class="inicio-carousel-section">
+            <div class="inicio-carousel-header">
+                <h2 class="inicio-carousel-title">Donadores</h2>
+                <span class="inicio-carousel-count">{{ $totalDonors }} registrados</span>
+            </div>
+            <div class="inicio-carousel-track-wrap">
+                <div class="inicio-carousel-track" id="trackDonadores"></div>
+            </div>
+            <div class="inicio-carousel-controls">
+                <button class="ico-btn" onclick="moveFtcCarousel('donadores',-1)">‹</button>
+                <div class="ico-dots" id="dotsDonadores"></div>
+                <button class="ico-btn" onclick="moveFtcCarousel('donadores',1)">›</button>
+            </div>
+            <div class="carousel-ver-mas">
+                <button class="carousel-ver-mas-btn" onclick="showSection('Donadores')">
                     Ver más <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
                 </button>
             </div>
@@ -504,6 +545,7 @@
         // ── DATOS DESDE LARAVEL ──────────────────────────────────────
         const photosByCategory  = @json($photosByCategory ?? []);
         const photographersData = @json($photographersData ?? []);
+        const donorsData        = @json($donorsData ?? []);
         const categoriesFromDB  = @json($categoriesForFilters ?? []);
         const tagsFromDB        = @json($tagsData ?? []);
 
@@ -535,6 +577,12 @@
             if (state.activeTab === 'Fotógrafos') {
                 if (!fotografosSearchQuery) return photographersData;
                 return photographersData.filter(p =>
+                    (p.full_name || '').toLowerCase().includes(fotografosSearchQuery)
+                );
+            }
+            if (state.activeTab === 'Donadores') {
+                if (!fotografosSearchQuery) return donorsData;
+                return donorsData.filter(p =>
                     (p.full_name || '').toLowerCase().includes(fotografosSearchQuery)
                 );
             }
@@ -634,10 +682,12 @@
             if (resultsOnly) resultsOnly.style.display = hasTags ? 'none' : '';
             document.getElementById('sidebarPhotoCount').textContent = allPhotosFlat.length + ' fotografías catalogadas';
 
-            // no-sidebar context bar (Fotógrafos)
+            // no-sidebar context bar (Fotógrafos / Donadores)
             const nsBar = document.getElementById('nosidebarContextBar');
             const isFotografos = state.activeTab === 'Fotógrafos';
-            if (nsBar) nsBar.style.display = isFotografos ? '' : 'none';
+            const isDonadores  = state.activeTab === 'Donadores';
+            const isPersonGrid = isFotografos || isDonadores;
+            if (nsBar) nsBar.style.display = isPersonGrid ? '' : 'none';
             const nsCount = document.getElementById('photoCountNS');
             if (nsCount) nsCount.textContent = allItems.length;
             const nsTitle = document.getElementById('sectionTitleAlt');
@@ -648,14 +698,17 @@
             const start = (state.currentPage - 1) * PHOTOS_PER_PAGE;
             const items = allItems.slice(start, start + PHOTOS_PER_PAGE);
 
-            // ── Fotógrafos ──
-            if (isFotografos) {
+            // ── Fotógrafos / Donadores ──
+            if (isPersonGrid) {
+                const baseUrl = isDonadores ? '/fototeca/donadores/' : '/fototeca/fotografos/';
+                const tabName = isDonadores ? 'Donadores' : 'Fotógrafos';
+                const emptyMsg = isDonadores ? 'No hay donadores registrados.' : 'No hay fotógrafos registrados.';
                 grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
                 grid.style.maxWidth = ''; grid.style.margin = '';
                 grid.innerHTML = allItems.length === 0
-                    ? `<div style="grid-column:1/-1;text-align:center;padding:4rem 0;color:var(--text-muted);">No hay fotógrafos registrados.</div>`
+                    ? `<div style="grid-column:1/-1;text-align:center;padding:4rem 0;color:var(--text-muted);">${emptyMsg}</div>`
                     : items.map((p, i) => `
-                        <div class="photographer-card" onclick="window.location.href='/fototeca/fotografos/${p.id}';sessionStorage.setItem('fototeca_tab','Fotógrafos')" style="animation-delay:${i*0.06}s">
+                        <div class="photographer-card" onclick="window.location.href='${baseUrl}${p.id}';sessionStorage.setItem('fototeca_tab','${tabName}')" style="animation-delay:${i*0.06}s">
                             <div class="pg-img-wrap">
                                 <div class="pg-img-overlay"></div>
                                 ${p.photo_path
@@ -836,7 +889,7 @@
             document.getElementById('aportantesSection').style.display = 'none';
         }
 
-        const TABS_NO_SIDEBAR = new Set(['Fotógrafos']);
+        const TABS_NO_SIDEBAR = new Set(['Fotógrafos', 'Donadores']);
 
         function showSection(tab) {
             state.activeTab = tab;
@@ -880,6 +933,7 @@
                 'Inicio':       '{{ route('fototeca.dashboard') }}',
                 'Galería':      '{{ route('fototeca.galeria.index') }}',
                 'Fotógrafos':   '{{ route('fototeca.fotografos.index') }}',
+                'Donadores':    '{{ route('fototeca.donadores.index') }}',
                 'Colecciones':  '{{ route('fototeca.colecciones.index') }}',
                 'Aportantes':   '{{ route('fototeca.aportantes.index') }}',
             };
@@ -1104,6 +1158,7 @@
 
             const rawGaleria    = Object.values(photosByCategory).flat().filter((p, i, a) => a.findIndex(x => x.id === p.id) === i);
             const rawFotografos = photographersData;
+            const rawDonadores  = donorsData;
             function photoCardHTML(photo) {
                 return `<div class="ftc-carousel-card" onclick="window.location.href='${photo.detail_url}'">
                     ${photo.image_url
@@ -1118,6 +1173,18 @@
 
             function fotografoCardHTML(p) {
                 return `<div class="ftc-author-card" onclick="window.location.href='/fototeca/fotografos/${p.id}'">
+                    ${p.photo_path
+                        ? `<img class="ftc-author-avatar" src="${p.photo_path}" alt="${p.full_name}" loading="lazy" onerror="this.style.display='none'">`
+                        : `<div class="ftc-author-placeholder">👤</div>`}
+                    <div class="ftc-author-body">
+                        <p class="ftc-author-name">${p.full_name}</p>
+                        <p class="ftc-author-count">${p.collections_count} colección${p.collections_count !== 1 ? 'es' : ''}</p>
+                    </div>
+                </div>`;
+            }
+
+            function donadorCardHTML(p) {
+                return `<div class="ftc-author-card" onclick="window.location.href='/fototeca/donadores/${p.id}'">
                     ${p.photo_path
                         ? `<img class="ftc-author-avatar" src="${p.photo_path}" alt="${p.full_name}" loading="lazy" onerror="this.style.display='none'">`
                         : `<div class="ftc-author-placeholder">👤</div>`}
@@ -1229,6 +1296,7 @@
             function initCarousels() {
                 ftcCarousels.galeria    = buildCarousel('trackGaleria',    'dotsGaleria',    rawGaleria,    photoCardHTML,    CARD_W_PHOTO);
                 ftcCarousels.fotografos = buildCarousel('trackFotografos', 'dotsFotografos', rawFotografos, fotografoCardHTML, CARD_W_AUTHOR);
+                ftcCarousels.donadores  = buildCarousel('trackDonadores',  'dotsDonadores',  rawDonadores,  donadorCardHTML,  CARD_W_AUTHOR);
             }
 
             window.moveFtcCarousel = function(name, dir) {
@@ -1258,7 +1326,7 @@
         // ========== FIN CARRUSELES ==========
 
         // ── INICIO ───────────────────────────────────────────────────
-        const validTabs = ['Inicio','Galería','Fotógrafos','Colecciones','Aportantes'];
+        const validTabs = ['Inicio','Galería','Fotógrafos','Donadores','Colecciones','Aportantes'];
         const pendingTab = sessionStorage.getItem('fototeca_tab');
         if (pendingTab && validTabs.includes(pendingTab)) {
             sessionStorage.removeItem('fototeca_tab');

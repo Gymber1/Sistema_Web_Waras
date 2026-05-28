@@ -18,6 +18,7 @@ class Special extends Model
         'title',
         'slug',
         'description',
+        'featured_donor',
         'cover_image_path',
         'type',
         'module',
@@ -42,6 +43,11 @@ class Special extends Model
     public function photographers(): BelongsToMany
     {
         return $this->belongsToMany(Photographer::class, 'photographer_special');
+    }
+
+    public function donors(): BelongsToMany
+    {
+        return $this->belongsToMany(Donor::class, 'donor_special');
     }
 
     public function photos(): BelongsToMany

@@ -28,11 +28,23 @@
         </a>
     </div>
 
-    <div class="mb-5">
+    <div class="mb-5 flex flex-col sm:flex-row sm:items-center gap-3">
         <div class="relative w-full sm:w-80">
             <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
             <input type="text" id="search-collections" placeholder="Buscar colección..."
                 class="w-full pl-9 pr-4 py-2 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-slate-800 dark:text-white transition-all shadow-premium dark:shadow-premium-dark">
+        </div>
+
+        {{-- Botones de filtro: Fotógrafos / Donadores --}}
+        <div class="inline-flex rounded-lg border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-surface p-1 self-start shadow-premium dark:shadow-premium-dark">
+            <a href="{{ route('admin.fototeca.assign-collections', ['tipo' => 'fotografos']) }}"
+                class="px-4 py-1.5 rounded-md text-sm font-medium transition-colors {{ $tipo === 'fotografos' ? 'bg-brand-500 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50' }}">
+                Fotógrafos
+            </a>
+            <a href="{{ route('admin.fototeca.assign-collections', ['tipo' => 'donadores']) }}"
+                class="px-4 py-1.5 rounded-md text-sm font-medium transition-colors {{ $tipo === 'donadores' ? 'bg-brand-500 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50' }}">
+                Donadores
+            </a>
         </div>
     </div>
 
@@ -40,7 +52,7 @@
     <div class="bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border p-16 text-center">
         <div class="flex flex-col items-center gap-3 text-slate-400 dark:text-slate-500">
             <i data-lucide="image" class="w-10 h-10 opacity-30"></i>
-            <p class="text-sm font-medium">No hay colecciones creadas</p>
+            <p class="text-sm font-medium">No hay colecciones con {{ $tipo === 'donadores' ? 'donador' : 'fotógrafo' }} destacado</p>
             <a href="{{ route('admin.fototeca.collections.create') }}" class="text-xs text-brand-600 dark:text-brand-400 hover:underline">Crear la primera colección →</a>
         </div>
     </div>
@@ -67,19 +79,33 @@
             </div>
             <div class="p-4 flex flex-col gap-2 flex-1">
                 <h3 class="font-semibold text-slate-800 dark:text-white text-sm leading-snug">{{ $collection->title }}</h3>
-                @if($collection->description)
-                <p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                    <i data-lucide="user" class="w-3 h-3 flex-shrink-0"></i>
-                    {{ $collection->description }}
-                </p>
+                @if($tipo === 'donadores')
+                    @if($collection->featured_donor)
+                    <p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                        <i data-lucide="heart-handshake" class="w-3 h-3 flex-shrink-0"></i>
+                        {{ $collection->featured_donor }}
+                    </p>
+                    @else
+                    <p class="text-xs text-amber-500 dark:text-amber-400 flex items-center gap-1">
+                        <i data-lucide="alert-circle" class="w-3 h-3 flex-shrink-0"></i>
+                        Sin donador
+                    </p>
+                    @endif
                 @else
-                <p class="text-xs text-amber-500 dark:text-amber-400 flex items-center gap-1">
-                    <i data-lucide="alert-circle" class="w-3 h-3 flex-shrink-0"></i>
-                    Sin fotógrafo
-                </p>
+                    @if($collection->description)
+                    <p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                        <i data-lucide="user" class="w-3 h-3 flex-shrink-0"></i>
+                        {{ $collection->description }}
+                    </p>
+                    @else
+                    <p class="text-xs text-amber-500 dark:text-amber-400 flex items-center gap-1">
+                        <i data-lucide="alert-circle" class="w-3 h-3 flex-shrink-0"></i>
+                        Sin fotógrafo
+                    </p>
+                    @endif
                 @endif
                 <div class="mt-auto">
-                    <a href="{{ route('admin.fototeca.collections.manage', $collection) }}"
+                    <a href="{{ route('admin.fototeca.collections.manage', ['special' => $collection, 'tipo' => $tipo]) }}"
                         class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-lg text-xs font-medium transition-colors">
                         <i data-lucide="settings-2" class="w-3.5 h-3.5"></i>
                         Gestionar contenido
@@ -89,6 +115,12 @@
         </div>
         @endforeach
     </div>
+
+    @if($collections->hasPages())
+    <div class="mt-6">
+        <x-admin-pagination :paginator="$collections" />
+    </div>
+    @endif
     @endif
 </div>
 

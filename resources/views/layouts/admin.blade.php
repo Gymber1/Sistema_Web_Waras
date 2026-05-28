@@ -194,6 +194,7 @@
                                 ['route'=>'admin.fototeca.index',        'pattern'=>'admin.fototeca.index',         'label'=>'Detalles'],
                                 ['route'=>'admin.fototeca.photos',       'pattern'=>'admin.fototeca.photos*',       'label'=>'Fotos'],
                                 ['route'=>'admin.fototeca.photographers','pattern'=>'admin.fototeca.photographers*','label'=>'Fotógrafos'],
+                                ['route'=>'admin.fototeca.donors',       'pattern'=>'admin.fototeca.donors*',       'label'=>'Donadores'],
                                 ['route'=>'admin.fototeca.categories',   'pattern'=>'admin.fototeca.categories*',   'label'=>'Categorías'],
                                 ['route'=>'admin.fototeca.subcategories','pattern'=>'admin.fototeca.subcategories*','label'=>'SubCategorías'],
                                 ['route'=>'admin.fototeca.sublevels',    'pattern'=>'admin.fototeca.sublevels*',    'label'=>'1er Nivel'],
@@ -695,6 +696,7 @@
                 'table-specials':        '{{ route("admin.biblioteca.specials.bulk-destroy") }}',
                 'table-photos':          '{{ route("admin.fototeca.photos.bulk-destroy") }}',
                 'table-photographers':   '{{ route("admin.fototeca.photographers.bulk-destroy") }}',
+                'table-donors':          '{{ route("admin.fototeca.donors.bulk-destroy") }}',
                 'table-sublevels':       '{{ route("admin.fototeca.sublevels.bulk-destroy") }}',
                 'table-secondlevels':    '{{ route("admin.fototeca.secondlevels.bulk-destroy") }}',
                 'table-thirdlevels':     '{{ route("admin.fototeca.thirdlevels.bulk-destroy") }}',
@@ -707,7 +709,7 @@
             const labelMap  = {
                 'table-books': 'libro(s)', 'table-magazines': 'revista(s)', 'table-authors': 'autor(es)',
                 'table-publishers': 'editorial(es)', 'table-specials': 'colección(es)',
-                'table-photos': 'fotografía(s)', 'table-photographers': 'fotógrafo(s)',
+                'table-photos': 'fotografía(s)', 'table-photographers': 'fotógrafo(s)', 'table-donors': 'donador(es)',
                 'table-sublevels': 'subnivel(es)', 'table-secondlevels': '2do nivel(es)', 'table-thirdlevels': '3er nivel(es)',
                 'table-foto-collections': 'colección(es)', 'table-descriptors': 'descriptor(es)', 'table-tags': 'etiqueta(s)', 'table-users': 'usuario(s)',
             };

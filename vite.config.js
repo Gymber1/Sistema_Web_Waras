@@ -17,6 +17,7 @@ export default defineConfig({
                 'resources/css/fototeca.css',
                 'resources/css/fototeca-foto.css',
                 'resources/css/fototeca-fotografo.css',
+                'resources/css/fototeca-donador.css',
                 'resources/css/fototeca-especial.css',
                 'resources/css/login.css',
                 'resources/css/admin.css',

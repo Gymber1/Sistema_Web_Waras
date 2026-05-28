@@ -56,6 +56,23 @@
                     </div>
                 </div>
 
+                <div class="md:col-span-3">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Donadores</label>
+                    <div id="chips-donors" class="flex flex-wrap gap-2 p-3 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg min-h-[48px]"></div>
+                    <div class="relative mt-2">
+                        <input type="text" id="search-donors" placeholder="Buscar y agregar donador..."
+                            oninput="filterDropdown(this,'dropdown-donors')" onfocus="showDropdown('dropdown-donors')"
+                            class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                        <div id="dropdown-donors" class="tag-dropdown hidden absolute z-50 w-full mt-1 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-lg shadow-lg max-h-52 overflow-y-auto">
+                            @foreach($donors as $d)
+                            <button type="button" data-id="{{ $d->id }}" data-name="{{ $d->full_name }}"
+                                onclick="addChip(this,'chips-donors','donors')"
+                                class="w-full text-left px-4 py-2.5 hover:bg-brand-50 dark:hover:bg-brand-500/10 text-sm text-slate-700 dark:text-slate-300 border-b border-slate-50 dark:border-dark-border last:border-0 transition-colors">{{ $d->full_name }}</button>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Categoría</label>
                     <select id="sel-category" onchange="cascadeSubcategory()"

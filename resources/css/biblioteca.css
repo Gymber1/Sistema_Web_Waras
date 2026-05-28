@@ -1049,9 +1049,16 @@ body {
     .hamburger-btn { display: flex; }
     .hero-title { font-size: 2.2rem !important; }
     .main-wrapper { margin-top: 56px; flex-direction: column; }
-    .sidebar { display: none; width: 100%; position: fixed; top: 0; left: 0; height: 100vh; z-index: 250; overflow-y: auto; max-height: none; }
-    .sidebar.mobile-open { display: block; }
+    .sidebar {
+        display: block; width: 80%; max-width: 320px;
+        position: fixed; top: 0; left: 0; height: 100vh;
+        z-index: 250; overflow-y: auto; max-height: none;
+        transform: translateX(-100%); transition: transform 0.28s ease;
+        box-shadow: 2px 0 24px rgba(0,0,0,0.45);
+    }
+    .sidebar.mobile-open { transform: translateX(0); }
     .sidebar-toggle-btn { display: flex; }
+    #sidebarCloseBtn { display: block !important; }
     .content { padding: 1.5rem 1rem; }
     .books-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; }
     .toolbar { flex-direction: column; gap: 0.75rem; align-items: flex-start; }

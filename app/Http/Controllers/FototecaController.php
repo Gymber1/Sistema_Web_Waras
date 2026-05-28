@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Photo;
 use App\Models\PhotoTag;
 use App\Models\Photographer;
+use App\Models\Donor;
 use App\Models\Category;
 use App\Models\SiteSetting;
 
@@ -15,6 +16,7 @@ class FototecaController extends Controller
     {
         $totalPhotos        = Photo::count();
         $totalPhotographers = Photographer::count();
+        $totalDonors        = Donor::count();
         $colecciones = \App\Models\Special::where('module', 'fototeca')
             ->where('is_active', true)
             ->withCount('photos')
@@ -65,6 +67,15 @@ class FototecaController extends Controller
             'photo_path'        => $p->photo_path ? '/storage/' . $p->photo_path : null,
         ])->values()->toArray();
 
+        $donorsData = Donor::withCount(['photos', 'collections'])->get()->map(fn($p) => [
+            'id'                => $p->id,
+            'full_name'         => $p->full_name,
+            'photos_count'      => $p->photos_count,
+            'collections_count' => $p->collections_count,
+            'biography'         => $p->biography ?? '',
+            'photo_path'        => $p->photo_path ? '/storage/' . $p->photo_path : null,
+        ])->values()->toArray();
+
         $allCategories = Category::where('type', 'fototeca')
             ->whereNull('parent_id')
             ->with('subcategories')
@@ -87,9 +98,11 @@ class FototecaController extends Controller
         return [
             'totalPhotos'          => $totalPhotos,
             'totalPhotographers'   => $totalPhotographers,
+            'totalDonors'          => $totalDonors,
             'totalCategories'      => $totalCategories,
             'photosByCategory'     => $photosByCategory,
             'photographersData'    => $photographersData,
+            'donorsData'           => $donorsData,
             'categoriesForFilters' => $buildTree($allCategories),
             'tagsData'             => $tagsData,
             'activeSection'        => $activeSection,
@@ -106,6 +119,7 @@ class FototecaController extends Controller
 
     public function indexGaleria()    { return view('fototeca.dashboard', $this->dashboardData('Galería')); }
     public function indexFotografos() { return view('fototeca.dashboard', $this->dashboardData('Fotógrafos')); }
+    public function indexDonadores()  { return view('fototeca.dashboard', $this->dashboardData('Donadores')); }
     public function indexAportantes() { return view('fototeca.dashboard', $this->dashboardData('Aportantes')); }
 
     public function showPhoto(\App\Models\Photo $photo)
@@ -139,6 +153,12 @@ class FototecaController extends Controller
     {
         $photographer->load(['collections.photos', 'photos.categories']);
         return view('fototeca.fotografo', compact('photographer'));
+    }
+
+    public function showDonor(\App\Models\Donor $donor)
+    {
+        $donor->load(['collections.photos', 'photos.categories']);
+        return view('fototeca.donador', compact('donor'));
     }
 
     public function indexColecciones()

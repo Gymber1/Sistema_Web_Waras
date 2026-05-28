@@ -15,17 +15,28 @@
 
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
-        <button class="mobile-menu-close" onclick="closeMobileMenu()">&#10005;</button>
-        <a href="{{ route('home') }}" class="mobile-nav-link" onclick="showView('inicio');closeMobileMenu();return false;">Inicio</a>
-        <button onclick="showView('inicio');closeMobileMenu();setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Patrimonio Cultural</button>
-        <button onclick="showView('organizacion');closeMobileMenu();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Organización</button>
-        <button onclick="showView('aportantes');closeMobileMenu();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Aportantes</button>
-        <button onclick="closeMobileMenu(); openContactModal();" class="mobile-nav-link" style="background:none;border:none;cursor:pointer;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:white;font-family:'Poppins',sans-serif;">Contacto</button>
-        @if(auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
-            <a href="{{ route('admin.dashboard') }}" class="mobile-nav-btn">Panel Admin</a>
-        @else
-            <a href="{{ route('login') }}" class="mobile-nav-btn">Ingresar</a>
-        @endif
+        <div class="mobile-menu-backdrop" onclick="closeMobileMenu()"></div>
+        <div class="mobile-menu-panel">
+            <div class="mobile-menu-header">
+                <span class="mobile-menu-brand">Portal Waras</span>
+                <button class="mobile-menu-close" onclick="closeMobileMenu()" aria-label="Cerrar menú">&times;</button>
+            </div>
+            <div class="mobile-menu-links">
+                <a href="{{ route('home') }}" class="mobile-nav-link" onclick="showView('inicio');closeMobileMenu();return false;">Inicio</a>
+                <button onclick="showView('inicio');closeMobileMenu();setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);" class="mobile-nav-link">Patrimonio Cultural</button>
+                <button onclick="showView('organizacion');closeMobileMenu();" class="mobile-nav-link">Organización</button>
+                <button onclick="showView('aportantes');closeMobileMenu();" class="mobile-nav-link">Aportantes</button>
+                <button onclick="closeMobileMenu(); openContactModal();" class="mobile-nav-link">Contacto</button>
+                @if(auth()->check() && (auth()->user()->is_admin_global || auth()->user()->modules()->exists()))
+                    <a href="{{ route('admin.dashboard') }}" class="mobile-nav-btn">Panel Admin</a>
+                    <a href="{{ route('logout') }}" class="mobile-nav-logout"
+                       onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();">Cerrar Sesión</a>
+                    <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST" style="display:none;">@csrf</form>
+                @else
+                    <a href="{{ route('login') }}" class="mobile-nav-btn">Ingresar</a>
+                @endif
+            </div>
+        </div>
     </div>
 
     <!-- Navbar -->

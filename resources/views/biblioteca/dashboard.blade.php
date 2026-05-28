@@ -257,7 +257,7 @@
                     <i class="fas fa-filter"></i>
                     <span class="sidebar-title">Explorar Catálogo</span>
                 </div>
-                <button onclick="closeMobileSidebar()" id="sidebarCloseBtn" style="background:none;border:none;color:white;font-size:1.25rem;cursor:pointer;display:none;padding:0"><i class="fas fa-times"></i></button>
+                <button onclick="closeMobileSidebar()" id="sidebarCloseBtn" style="background:none;border:none;color:#1b2a47;font-size:1.25rem;cursor:pointer;display:none;padding:0"><i class="fas fa-times"></i></button>
             </div>
 
             <div class="categories-section">

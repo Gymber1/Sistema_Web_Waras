@@ -10,33 +10,63 @@
     @vite('resources/css/biblioteca-especial.css')
 </head>
 <body>
+<div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="document.getElementById('mobileNav').classList.remove('open');document.getElementById('mobileNavOverlay').classList.remove('open');document.body.style.overflow=''"></div>
 <div class="mobile-nav" id="mobileNav">
-    <button class="mobile-nav-close" onclick="document.getElementById('mobileNav').classList.remove('open');document.body.style.overflow=''"><i class="fas fa-times"></i></button>
-    <a href="{{ route('biblioteca.inicio') }}" class="mobile-nav-item">Inicio</a>
-    <a href="{{ route('biblioteca.libros.index') }}" class="mobile-nav-item">Biblioteca Digital</a>
-    <a href="{{ route('biblioteca.editorial.index') }}" class="mobile-nav-item">Waras Editorial</a>
-    <a href="{{ route('biblioteca.revistas.index') }}" class="mobile-nav-item">Revistas</a>
-    <a href="{{ route('biblioteca.autores.index') }}" class="mobile-nav-item">Autores</a>
-    <a href="{{ route('biblioteca.especiales.index') }}" class="mobile-nav-item active">Especiales</a>
-    <a href="{{ route('home') }}" class="mobile-nav-item" style="font-size:1rem;opacity:0.6">Portal Principal</a>
-</div>
-<header class="header">
-    <div class="header-container">
+    <div class="mobile-nav-header">
         <a href="{{ route('biblioteca.dashboard') }}" class="logo">
             <div class="logo-squares">
                 <div class="logo-square logo-square-1"></div>
                 <div class="logo-square logo-square-2"></div>
                 <div class="logo-square logo-square-3"></div>
             </div>
-            <span class="logo-text">WARAS</span><span class="logo-sub">Biblioteca</span>
+            <span class="logo-text">BIBLIOTECA</span>
+            <span class="logo-text-sub">Digital Ancashina</span>
+        </a>
+        <button class="mobile-nav-close" onclick="document.getElementById('mobileNav').classList.remove('open');document.getElementById('mobileNavOverlay').classList.remove('open');document.body.style.overflow=''">✕</button>
+    </div>
+    <nav class="mobile-nav-links">
+        <a href="{{ route('biblioteca.inicio') }}" class="mobile-nav-item">Inicio</a>
+        <a href="{{ route('biblioteca.libros.index') }}" class="mobile-nav-item">Biblioteca Digital</a>
+        <a href="{{ route('biblioteca.editorial.index') }}" class="mobile-nav-item">Waras Editorial</a>
+        <a href="{{ route('biblioteca.revistas.index') }}" class="mobile-nav-item">Revistas</a>
+        <a href="{{ route('biblioteca.autores.index') }}" class="mobile-nav-item">Autores</a>
+        <a href="{{ route('biblioteca.especiales.index') }}" class="mobile-nav-item active">Especiales</a>
+        <a href="{{ route('home') }}" class="mobile-nav-item mobile-nav-portal">Portal Principal</a>
+        @auth
+            @if(auth()->user()->is_admin_global || auth()->user()->canAccessModule('biblioteca'))
+            <a href="{{ route('admin.dashboard') }}" class="mobile-nav-item mobile-nav-admin">Panel Admin</a>
+            @endif
+        @endauth
+    </nav>
+</div>
+<header class="header">
+    <div class="header-container">
+        <a href="{{ route('biblioteca.dashboard') }}" class="logo">
+            @php $navLogo = \App\Models\SiteSetting::get('nav_logo_biblioteca'); @endphp
+            @if($navLogo)
+                <img src="{{ asset('storage/' . $navLogo) }}" alt="Logo" class="logo-icon">
+            @else
+                <div class="logo-squares">
+                    <div class="logo-square logo-square-1"></div>
+                    <div class="logo-square logo-square-2"></div>
+                    <div class="logo-square logo-square-3"></div>
+                </div>
+            @endif
+            <div class="logo-brand">
+                <span class="logo-text">BIBLIOTECA</span>
+                <span class="logo-text-sub">Digital Ancashina</span>
+            </div>
         </a>
         <nav class="nav-menu">
             <a href="{{ route('biblioteca.inicio') }}" class="nav-item">Inicio</a>
+            <span class="nav-sep-bib">|</span>
             <a href="{{ route('biblioteca.libros.index') }}" class="nav-item">Biblioteca Digital</a>
-            <a href="{{ route('biblioteca.editorial.index') }}" class="nav-item">Waras Editorial</a>
             <a href="{{ route('biblioteca.revistas.index') }}" class="nav-item">Revistas</a>
             <a href="{{ route('biblioteca.autores.index') }}" class="nav-item">Autores</a>
+            <span class="nav-sep-bib">|</span>
             <a href="{{ route('biblioteca.especiales.index') }}" class="nav-item active">Especiales</a>
+            <span class="nav-sep-bib">|</span>
+            <a href="{{ route('biblioteca.editorial.index') }}" class="nav-item">Waras Editorial</a>
         </nav>
         <div class="header-actions">
             <a href="{{ route('home') }}" class="header-btn header-btn-outline">
@@ -50,7 +80,7 @@
                 @endif
             @endauth
         </div>
-        <button class="hamburger-btn" onclick="document.getElementById('mobileNav').classList.add('open');document.body.style.overflow='hidden'" aria-label="Menú">
+        <button class="hamburger-btn" onclick="document.getElementById('mobileNav').classList.add('open');document.getElementById('mobileNavOverlay').classList.add('open');document.body.style.overflow='hidden'" aria-label="Menú">
             <i class="fas fa-bars" style="font-size:1.3rem"></i>
         </button>
     </div>
