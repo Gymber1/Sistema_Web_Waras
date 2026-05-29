@@ -25,6 +25,7 @@
         <a href="{{ route('fototeca.inicio') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Inicio')">Inicio</a>
         <a href="{{ route('fototeca.galeria.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Galería')">Galería</a>
         <a href="{{ route('fototeca.fotografos.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')">Fotógrafos</a>
+        <a href="{{ route('fototeca.donadores.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Donadores')">Donadores</a>
         <a href="{{ route('fototeca.colecciones.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Colecciones')">Colecciones</a>
         <a href="{{ route('fototeca.aportantes.index') }}" class="g-mobile-link" onclick="sessionStorage.setItem('fototeca_tab','Aportantes')">Aportantes</a>
         <a href="{{ route('home') }}" class="g-mobile-link" style="opacity:0.7;font-size:0.68rem;">Portal Principal</a>
@@ -44,9 +45,12 @@
     </a>
     <div class="g-nav-links">
         <a href="{{ route('fototeca.inicio') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Inicio')">Inicio</a>
+        <span class="nav-sep-foto" style="color:rgba(255,255,255,.25);font-size:.85rem;user-select:none;">|</span>
         <a href="{{ route('fototeca.galeria.index') }}" class="g-nav-link active" onclick="sessionStorage.setItem('fototeca_tab','Galería')">Galería</a>
         <a href="{{ route('fototeca.fotografos.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Fotógrafos')">Fotógrafos</a>
+        <a href="{{ route('fototeca.donadores.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Donadores')">Donadores</a>
         <a href="{{ route('fototeca.colecciones.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Colecciones')">Colecciones</a>
+        <span class="nav-sep-foto" style="color:rgba(255,255,255,.25);font-size:.85rem;user-select:none;">|</span>
         <a href="{{ route('fototeca.aportantes.index') }}" class="g-nav-link" onclick="sessionStorage.setItem('fototeca_tab','Aportantes')">Aportantes</a>
         <a href="{{ route('home') }}" class="g-nav-btn">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
@@ -107,12 +111,25 @@
             <h1 class="photo-title">{{ $photo->title }}</h1>
 
             @if($photo->photographers->count())
-            <div class="photographer-line">
+            <div class="photographer-line" @if($photo->donors->count()) style="margin-bottom:0.75rem;padding-bottom:0;border-bottom:none;" @endif>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                 <span>
                     @foreach($photo->photographers as $i => $photographer)
                         @if($i > 0), @endif
                         <a href="{{ route('fototeca.fotografos.show', $photographer) }}" class="photographer-link">{{ $photographer->full_name }}</a>
+                    @endforeach
+                </span>
+            </div>
+            @endif
+
+            @if($photo->donors->count())
+            <div class="photographer-line">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                <span>
+                    Donado por:
+                    @foreach($photo->donors as $i => $donor)
+                        @if($i > 0), @endif
+                        <a href="{{ route('fototeca.donadores.show', $donor) }}" class="photographer-link">{{ $donor->full_name }}</a>
                     @endforeach
                 </span>
             </div>

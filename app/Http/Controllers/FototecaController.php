@@ -9,6 +9,7 @@ use App\Models\Photographer;
 use App\Models\Donor;
 use App\Models\Category;
 use App\Models\SiteSetting;
+use Illuminate\Support\Facades\Auth;
 
 class FototecaController extends Controller
 {
@@ -95,6 +96,10 @@ class FototecaController extends Controller
             ->get(['id', 'name', 'slug', 'photos_count'])
             ->toArray();
 
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        $canEditPanel = $user && ($user->is_admin_global || $user->canAccessModule('fototeca'));
+
         return [
             'totalPhotos'          => $totalPhotos,
             'totalPhotographers'   => $totalPhotographers,
@@ -107,7 +112,7 @@ class FototecaController extends Controller
             'tagsData'             => $tagsData,
             'activeSection'        => $activeSection,
             'colecciones'          => $colecciones,
-            'canEditPanel'         => auth()->check() && (auth()->user()->is_admin_global || auth()->user()->canAccessModule('fototeca')),
+            'canEditPanel'         => $canEditPanel,
             'heroBg'               => ($p = SiteSetting::get('bg_fototeca')) ? asset('storage/' . $p) : null,
         ];
     }
@@ -124,7 +129,7 @@ class FototecaController extends Controller
 
     public function showPhoto(\App\Models\Photo $photo)
     {
-        $photo->load(['photographers', 'categories']);
+        $photo->load(['photographers', 'donors', 'categories']);
 
         $catIds = $photo->categories->pluck('id');
         $related = \App\Models\Photo::where('id', '!=', $photo->id)
@@ -173,7 +178,7 @@ class FototecaController extends Controller
         return view('fototeca.coleccion', compact('special'));
     }
 
-    public function getPhotosByCategory($categoryId)
+    public function getPhotosByCategory(int $categoryId)
     {
         $photos = Photo::whereHas('categories', function ($query) use ($categoryId) {
             $query->where('categories.id', $categoryId);
