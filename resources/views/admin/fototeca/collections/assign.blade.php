@@ -29,19 +29,25 @@
     </div>
 
     <div class="mb-5 flex flex-col sm:flex-row sm:items-center gap-3">
-        <div class="relative w-full sm:w-80">
-            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-            <input type="text" id="search-collections" placeholder="Buscar colección..."
-                class="w-full pl-9 pr-4 py-2 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-slate-800 dark:text-white transition-all shadow-premium dark:shadow-premium-dark">
-        </div>
+        <form method="GET" action="{{ route('admin.fototeca.assign-collections') }}" class="relative w-full sm:w-80">
+            <input type="hidden" name="tipo" value="{{ $tipo }}">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input type="text" id="search-collections" name="search" value="{{ $q ?? '' }}" placeholder="Buscar colección..."
+                class="w-full pl-9 pr-9 py-2 bg-white dark:bg-dark-surface border border-slate-200 dark:border-dark-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-slate-800 dark:text-white transition-all shadow-premium dark:shadow-premium-dark">
+            @if(!empty($q))
+            <a href="{{ route('admin.fototeca.assign-collections', ['tipo' => $tipo]) }}" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" title="Limpiar búsqueda">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </a>
+            @endif
+        </form>
 
         {{-- Botones de filtro: Fotógrafos / Donadores --}}
         <div class="inline-flex rounded-lg border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-surface p-1 self-start shadow-premium dark:shadow-premium-dark">
-            <a href="{{ route('admin.fototeca.assign-collections', ['tipo' => 'fotografos']) }}"
+            <a href="{{ route('admin.fototeca.assign-collections', ['tipo' => 'fotografos', 'search' => $q]) }}"
                 class="px-4 py-1.5 rounded-md text-sm font-medium transition-colors {{ $tipo === 'fotografos' ? 'bg-brand-500 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50' }}">
                 Fotógrafos
             </a>
-            <a href="{{ route('admin.fototeca.assign-collections', ['tipo' => 'donadores']) }}"
+            <a href="{{ route('admin.fototeca.assign-collections', ['tipo' => 'donadores', 'search' => $q]) }}"
                 class="px-4 py-1.5 rounded-md text-sm font-medium transition-colors {{ $tipo === 'donadores' ? 'bg-brand-500 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50' }}">
                 Donadores
             </a>
@@ -52,8 +58,13 @@
     <div class="bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border p-16 text-center">
         <div class="flex flex-col items-center gap-3 text-slate-400 dark:text-slate-500">
             <i data-lucide="image" class="w-10 h-10 opacity-30"></i>
-            <p class="text-sm font-medium">No hay colecciones con {{ $tipo === 'donadores' ? 'donador' : 'fotógrafo' }} destacado</p>
-            <a href="{{ route('admin.fototeca.collections.create') }}" class="text-xs text-brand-600 dark:text-brand-400 hover:underline">Crear la primera colección →</a>
+            @if(!empty($q))
+                <p class="text-sm font-medium">No se encontraron colecciones para «{{ $q }}»</p>
+                <a href="{{ route('admin.fototeca.assign-collections', ['tipo' => $tipo]) }}" class="text-xs text-brand-600 dark:text-brand-400 hover:underline">Limpiar búsqueda →</a>
+            @else
+                <p class="text-sm font-medium">No hay colecciones con {{ $tipo === 'donadores' ? 'donador' : 'fotógrafo' }} destacado</p>
+                <a href="{{ route('admin.fototeca.collections.create') }}" class="text-xs text-brand-600 dark:text-brand-400 hover:underline">Crear la primera colección →</a>
+            @endif
         </div>
     </div>
     @else
@@ -125,11 +136,17 @@
 </div>
 
 <script>
-document.getElementById('search-collections').addEventListener('input', function() {
-    const q = this.value.toLowerCase();
-    document.querySelectorAll('.collection-card').forEach(card => {
-        card.style.display = (!q || card.dataset.title.includes(q)) ? '' : 'none';
+(function () {
+    const input = document.getElementById('search-collections');
+    if (!input) return;
+    const form = input.closest('form');
+    let timer;
+    input.addEventListener('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            form.requestSubmit ? form.requestSubmit() : form.submit();
+        }, 450);
     });
-});
+})();
 </script>
 @endsection

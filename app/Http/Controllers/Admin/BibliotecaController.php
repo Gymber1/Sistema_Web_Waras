@@ -32,18 +32,27 @@ class BibliotecaController extends Controller
 
     // ============= LIBROS =============
 
-    public function indexBooks()
+    public function indexBooks(Request $request)
     {
+        $q = trim((string) $request->input('search', ''));
+
         $books = Book::where('document_type', '!=', 'Revista')
             ->with(['authors', 'publisher', 'categories'])
-            ->paginate(10);
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('title', 'like', "%{$q}%")
+                        ->orWhereHas('authors', fn($aq) => $aq->where('name', 'like', "%{$q}%"));
+                });
+            })
+            ->paginate(10)
+            ->withQueryString();
         $authors    = Author::orderBy('name')->get();
         $categories = Category::where('type', 'biblioteca')
             ->whereNull('parent_id')
             ->with('subcategories')
             ->get();
         $publishers = Publisher::orderBy('name')->get();
-        return view('admin.biblioteca.books.index', compact('books', 'authors', 'categories', 'publishers'));
+        return view('admin.biblioteca.books.index', compact('books', 'authors', 'categories', 'publishers', 'q'));
     }
 
     public function createBook()
@@ -184,12 +193,17 @@ class BibliotecaController extends Controller
 
     // ============= AUTORES =============
 
-    public function indexAuthors()
+    public function indexAuthors(Request $request)
     {
-        $authors    = Author::withCount('books')->paginate(10);
+        $q = trim((string) $request->input('search', ''));
+
+        $authors    = Author::withCount('books')
+            ->when($q !== '', fn($query) => $query->where('name', 'like', "%{$q}%"))
+            ->paginate(10)
+            ->withQueryString();
         $books      = Book::orderBy('title')->get(['id', 'title', 'document_type']);
         $categories = Category::where('type', 'biblioteca')->whereNull('parent_id')->get();
-        return view('admin.biblioteca.authors.index', compact('authors', 'books', 'categories'));
+        return view('admin.biblioteca.authors.index', compact('authors', 'books', 'categories', 'q'));
     }
 
     public function createAuthor()
@@ -276,11 +290,16 @@ class BibliotecaController extends Controller
 
     // ============= EDITORIALES =============
 
-    public function indexPublishers()
+    public function indexPublishers(Request $request)
     {
-        $publishers = Publisher::withCount('books')->paginate(10);
+        $q = trim((string) $request->input('search', ''));
+
+        $publishers = Publisher::withCount('books')
+            ->when($q !== '', fn($query) => $query->where('name', 'like', "%{$q}%"))
+            ->paginate(10)
+            ->withQueryString();
         $books      = Book::orderBy('title')->get(['id', 'title', 'document_type']);
-        return view('admin.biblioteca.publishers.index', compact('publishers', 'books'));
+        return view('admin.biblioteca.publishers.index', compact('publishers', 'books', 'q'));
     }
 
     public function createPublisher()
@@ -470,18 +489,22 @@ class BibliotecaController extends Controller
 
     // ============= REVISTAS =============
 
-    public function indexMagazines()
+    public function indexMagazines(Request $request)
     {
+        $q = trim((string) $request->input('search', ''));
+
         $magazines  = Book::where('document_type', 'Revista')
             ->with(['authors', 'publisher', 'categories'])
-            ->paginate(10);
+            ->when($q !== '', fn($query) => $query->where('title', 'like', "%{$q}%"))
+            ->paginate(10)
+            ->withQueryString();
         $authors    = Author::orderBy('name')->get();
         $categories = Category::where('type', 'biblioteca')
             ->whereNull('parent_id')
             ->with('subcategories')
             ->get();
         $publishers = Publisher::orderBy('name')->get();
-        return view('admin.biblioteca.magazines.index', compact('magazines', 'authors', 'categories', 'publishers'));
+        return view('admin.biblioteca.magazines.index', compact('magazines', 'authors', 'categories', 'publishers', 'q'));
     }
 
     public function createMagazine()
@@ -618,10 +641,16 @@ class BibliotecaController extends Controller
 
     // ============= DESCRIPTORES =============
 
-    public function indexDescriptors()
+    public function indexDescriptors(Request $request)
     {
-        $descriptors = Descriptor::withCount('books')->orderBy('name')->paginate(10);
-        return view('admin.biblioteca.descriptors.index', compact('descriptors'));
+        $q = trim((string) $request->input('search', ''));
+
+        $descriptors = Descriptor::withCount('books')
+            ->when($q !== '', fn($query) => $query->where('name', 'like', "%{$q}%"))
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
+        return view('admin.biblioteca.descriptors.index', compact('descriptors', 'q'));
     }
 
     public function storeDescriptor(Request $request)

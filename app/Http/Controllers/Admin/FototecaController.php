@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\Special;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class FototecaController extends Controller
 {
@@ -32,12 +33,25 @@ class FototecaController extends Controller
 
     // ============= FOTOGRAFÍAS =============
 
-    public function indexPhotos()
+    public function indexPhotos(Request $request)
     {
+        $q = trim((string) $request->input('search', ''));
+
         $photos = Photo::with(['photographers:id,full_name', 'tag:id,name'])
             ->select('id', 'title', 'slug', 'thumbnail_path', 'full_image_path', 'source_type', 'external_url', 'tag_id', 'location', 'year', 'year_type', 'year_from', 'year_to')
-            ->paginate(10);
-        return view('admin.fototeca.photos.index', compact('photos'));
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('title', 'like', "%{$q}%")
+                        ->orWhere('location', 'like', "%{$q}%")
+                        ->orWhereHas('photographers', fn($pq) => $pq->where('full_name', 'like', "%{$q}%"))
+                        ->orWhereHas('donors', fn($dq) => $dq->where('full_name', 'like', "%{$q}%"));
+                });
+            })
+            ->orderBy('title')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.fototeca.photos.index', compact('photos', 'q'));
     }
 
     public function createPhoto()
@@ -230,10 +244,19 @@ class FototecaController extends Controller
 
     // ============= FOTÓGRAFOS =============
 
-    public function indexPhotographers()
+    public function indexPhotographers(Request $request)
     {
-        $photographers = Photographer::withCount('photos as photos_count')->paginate(10);
-        return view('admin.fototeca.photographers.index', compact('photographers'));
+        $q = trim((string) $request->input('search', ''));
+
+        $photographers = Photographer::withCount('photos as photos_count')
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('full_name', 'like', "%{$q}%");
+                });
+            })
+            ->paginate(10)
+            ->withQueryString();
+        return view('admin.fototeca.photographers.index', compact('photographers', 'q'));
     }
 
     public function createPhotographer()
@@ -323,10 +346,19 @@ class FototecaController extends Controller
 
     // ============= DONADORES =============
 
-    public function indexDonors()
+    public function indexDonors(Request $request)
     {
-        $donors = Donor::withCount('photos as photos_count')->paginate(10);
-        return view('admin.fototeca.donors.index', compact('donors'));
+        $q = trim((string) $request->input('search', ''));
+
+        $donors = Donor::withCount('photos as photos_count')
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('full_name', 'like', "%{$q}%");
+                });
+            })
+            ->paginate(10)
+            ->withQueryString();
+        return view('admin.fototeca.donors.index', compact('donors', 'q'));
     }
 
     public function createDonor()
@@ -479,15 +511,23 @@ class FototecaController extends Controller
 
     // ============= SUBCATEGORÍAS (Nivel 2) =============
 
-    public function indexSubcategories()
+    public function indexSubcategories(Request $request)
     {
+        $q = trim((string) $request->input('search', ''));
+
         $subcategories = Category::where('type', 'fototeca')
             ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
             ->with('parent')
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', "%{$q}%");
+                });
+            })
             ->orderBy('name')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
         $parentCategories = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->get();
-        return view('admin.fototeca.subcategories.index', compact('subcategories', 'parentCategories'));
+        return view('admin.fototeca.subcategories.index', compact('subcategories', 'parentCategories', 'q'));
     }
 
     public function createSubcategory()
@@ -542,16 +582,24 @@ class FototecaController extends Controller
 
     // ============= SUBNIVEL (Nivel 3) =============
 
-    public function indexSublevels()
+    public function indexSublevels(Request $request)
     {
+        $q = trim((string) $request->input('search', ''));
+
         // depth 2: parent en depth 1 (parent.parent_id != null && parent.parent.parent_id = null)
         $sublevels = Category::where('type', 'fototeca')
             ->whereNotNull('parent_id')
             ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
                 ->whereHas('parent', fn($q2) => $q2->whereNull('parent_id')))
             ->with(['parent', 'parent.parent'])
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', "%{$q}%");
+                });
+            })
             ->orderBy('name')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
         // padres válidos = depth 1
         $parentCategories = Category::where('type', 'fototeca')
             ->whereNotNull('parent_id')
@@ -559,7 +607,7 @@ class FototecaController extends Controller
             ->with('parent')
             ->orderBy('name')
             ->get();
-        return view('admin.fototeca.sublevels.index', compact('sublevels', 'parentCategories'));
+        return view('admin.fototeca.sublevels.index', compact('sublevels', 'parentCategories', 'q'));
     }
 
     public function createSublevel()
@@ -624,10 +672,20 @@ class FototecaController extends Controller
 
     // ============= ETIQUETAS =============
 
-    public function indexTags()
+    public function indexTags(Request $request)
     {
-        $tags = PhotoTag::withCount('photos')->orderBy('name')->paginate(10);
-        return view('admin.fototeca.tags.index', compact('tags'));
+        $q = trim((string) $request->input('search', ''));
+
+        $tags = PhotoTag::withCount('photos')
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', "%{$q}%");
+                });
+            })
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
+        return view('admin.fototeca.tags.index', compact('tags', 'q'));
     }
 
     public function storeTag(Request $request)
@@ -681,7 +739,7 @@ class FototecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Photographer::whereIn('id', $ids)->each(function($p) {
-            if ($p->photo_path) \Storage::disk('public')->delete($p->photo_path);
+            if ($p->photo_path) Storage::disk('public')->delete($p->photo_path);
             $p->delete();
         });
         return back()->with('success', count($ids) . ' fotógrafo(s) eliminado(s).');
@@ -692,7 +750,7 @@ class FototecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Donor::whereIn('id', $ids)->each(function($d) {
-            if ($d->photo_path) \Storage::disk('public')->delete($d->photo_path);
+            if ($d->photo_path) Storage::disk('public')->delete($d->photo_path);
             $d->delete();
         });
         return back()->with('success', count($ids) . ' donador(es) eliminado(s).');
@@ -746,16 +804,24 @@ class FototecaController extends Controller
 
     // ============= 2DO NIVEL (depth 3) =============
 
-    public function indexSecondlevels()
+    public function indexSecondlevels(Request $request)
     {
+        $q = trim((string) $request->input('search', ''));
+
         // depth 3: parent en depth 2 (parent.parent_id != null && parent.parent.parent_id = null)
         $secondlevels = Category::where('type', 'fototeca')
             ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
                 ->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
                     ->whereHas('parent', fn($q3) => $q3->whereNull('parent_id'))))
             ->with(['parent', 'parent.parent', 'parent.parent.parent'])
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', "%{$q}%");
+                });
+            })
             ->orderBy('name')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
         // padres válidos = depth 2
         $parentCategories = Category::where('type', 'fototeca')
             ->whereNotNull('parent_id')
@@ -764,7 +830,7 @@ class FototecaController extends Controller
             ->with(['parent', 'parent.parent'])
             ->orderBy('name')
             ->get();
-        return view('admin.fototeca.secondlevels.index', compact('secondlevels', 'parentCategories'));
+        return view('admin.fototeca.secondlevels.index', compact('secondlevels', 'parentCategories', 'q'));
     }
 
     public function createSecondlevel()
@@ -839,8 +905,10 @@ class FototecaController extends Controller
 
     // ============= 3ER NIVEL (depth 4) =============
 
-    public function indexThirdlevels()
+    public function indexThirdlevels(Request $request)
     {
+        $q = trim((string) $request->input('search', ''));
+
         // depth 4: parent en depth 3
         $thirdlevels = Category::where('type', 'fototeca')
             ->whereHas('parent', fn($q) => $q->whereNotNull('parent_id')
@@ -848,8 +916,14 @@ class FototecaController extends Controller
                     ->whereHas('parent', fn($q3) => $q3->whereNotNull('parent_id')
                         ->whereHas('parent', fn($q4) => $q4->whereNull('parent_id')))))
             ->with(['parent', 'parent.parent', 'parent.parent.parent', 'parent.parent.parent.parent'])
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', "%{$q}%");
+                });
+            })
             ->orderBy('name')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
         // padres válidos = depth 3
         $parentCategories = Category::where('type', 'fototeca')
             ->whereNotNull('parent_id')
@@ -859,7 +933,7 @@ class FototecaController extends Controller
             ->with(['parent', 'parent.parent', 'parent.parent.parent'])
             ->orderBy('name')
             ->get();
-        return view('admin.fototeca.thirdlevels.index', compact('thirdlevels', 'parentCategories'));
+        return view('admin.fototeca.thirdlevels.index', compact('thirdlevels', 'parentCategories', 'q'));
     }
 
     public function createThirdlevel()
@@ -1060,6 +1134,7 @@ class FototecaController extends Controller
     public function assignCollectionsIndex(Request $request)
     {
         $tipo = $request->input('tipo', 'fotografos'); // 'fotografos' | 'donadores'
+        $q    = trim((string) $request->input('search', ''));
 
         $query = Special::where('module', 'fototeca')->withCount('photos');
 
@@ -1071,11 +1146,19 @@ class FototecaController extends Controller
             $query->whereNotNull('description')->where('description', '!=', '');
         }
 
+        $query->when($q !== '', function ($qb) use ($q) {
+            $qb->where(function ($sub) use ($q) {
+                $sub->where('title', 'like', "%{$q}%")
+                    ->orWhere('description', 'like', "%{$q}%")
+                    ->orWhere('featured_donor', 'like', "%{$q}%");
+            });
+        });
+
         $collections = $query->orderBy('order')->orderBy('title')
             ->paginate(8)
             ->withQueryString();
 
-        return view('admin.fototeca.collections.assign', compact('collections', 'tipo'));
+        return view('admin.fototeca.collections.assign', compact('collections', 'tipo', 'q'));
     }
 
     public function manageCollection(Request $request, Special $special)

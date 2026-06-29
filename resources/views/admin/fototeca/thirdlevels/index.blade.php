@@ -32,11 +32,16 @@
         <div class="bulk-bar"></div>
         <div class="p-5 border-b border-slate-100 dark:border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <span class="text-sm text-slate-500 dark:text-slate-400">{{ $thirdlevels->total() }} 3er niveles</span>
-            <div class="relative w-full sm:w-72">
-                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-                <input type="text" id="search-input" placeholder="Buscar 3er nivel..."
-                    class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-slate-800 dark:text-white transition-all">
-            </div>
+            <form method="GET" action="{{ route('admin.fototeca.thirdlevels') }}" class="relative w-full sm:w-72">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <input id="search-input" name="search" type="text" value="{{ $q ?? '' }}" placeholder="Buscar 3er nivel..."
+                    class="w-full pl-9 pr-9 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-slate-800 dark:text-white transition-all">
+                @if(!empty($q))
+                <a href="{{ route('admin.fototeca.thirdlevels') }}" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" title="Limpiar búsqueda">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </a>
+                @endif
+            </form>
         </div>
         <div class="overflow-x-auto">
             <table id="table-thirdlevels" class="w-full text-left text-sm">
@@ -114,13 +119,4 @@
         <x-admin-pagination :paginator="$thirdlevels" />
     </div>
 </div>
-
-<script>
-document.getElementById('search-input').addEventListener('input', function() {
-    const q = this.value.toLowerCase();
-    document.querySelectorAll('.thr-row').forEach(row => {
-        row.style.display = row.querySelector('.thr-name').textContent.toLowerCase().includes(q) ? '' : 'none';
-    });
-});
-</script>
 @endsection

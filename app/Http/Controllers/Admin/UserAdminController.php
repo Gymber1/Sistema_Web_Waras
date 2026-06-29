@@ -10,11 +10,21 @@ use Illuminate\Validation\Rules\Password;
 
 class UserAdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('modules')->paginate(10);
+        $q = trim((string) $request->input('search', ''));
+
+        $users = User::with('modules')
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', "%{$q}%")
+                        ->orWhere('email', 'like', "%{$q}%");
+                });
+            })
+            ->paginate(10)
+            ->withQueryString();
         $modules = Module::orderBy('name')->get();
-        return view('admin.users.index', compact('users', 'modules'));
+        return view('admin.users.index', compact('users', 'modules', 'q'));
     }
 
     public function store(Request $request)

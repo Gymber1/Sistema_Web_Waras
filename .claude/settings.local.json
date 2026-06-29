@@ -90,7 +90,15 @@
       "Bash(grep -c 'esDonadores ? \\\\$photo->donors : \\\\$photo->photographers' app/Http/Controllers/Admin/FototecaController.php)",
       "Bash(awk 'NR>=397 && NR<=460' resources/css/home.css)",
       "Bash(Get-Content resources/css/home.css)",
-      "Bash(Select-Object -Skip 396 -First 60)"
+      "Bash(Select-Object -Skip 396 -First 60)",
+      "Bash(ls -la public/build/.vite/)",
+      "Bash(grep -o 'home-[A-Za-z0-9_-]*\\\\.css' public/build/.vite/manifest.json)",
+      "Bash(xargs -n1 basename)",
+      "Bash(php -l \"c:/Users/NITRO/Documents/Proyectos/Waras/app/Http/Controllers/Admin/FototecaController.php\")",
+      "Bash(php -l app/Http/Controllers/Admin/BibliotecaController.php)",
+      "Bash(php -l app/Http/Controllers/Admin/UserAdminController.php)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\NITRO\\\\Documents\\\\Proyectos\\\\Waras\" -Directory)",
+      "Bash(Select-Object Name)"
     ]
   }
 }

@@ -33,11 +33,16 @@
     <div class="bulk-wrapper bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border overflow-hidden">
         <div class="bulk-bar"></div>
         <div class="p-5 border-b border-slate-100 dark:border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="relative w-full sm:w-80">
-                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-                <input type="text" id="searchUsers" placeholder="Buscar usuarios..."
-                    class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-slate-800 dark:text-white transition-all">
-            </div>
+            <form method="GET" action="{{ route('admin.usuarios.index') }}" class="relative w-full sm:w-80">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <input id="search-input" name="search" type="text" value="{{ $q ?? '' }}" placeholder="Buscar usuarios..."
+                    class="w-full pl-9 pr-9 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-slate-800 dark:text-white transition-all">
+                @if(!empty($q))
+                <a href="{{ route('admin.usuarios.index') }}" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" title="Limpiar búsqueda">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </a>
+                @endif
+            </form>
             <span class="text-sm text-slate-500 dark:text-slate-400">{{ $users->total() }} registros</span>
         </div>
 
@@ -269,13 +274,5 @@ function openResetModal(userId, userName) {
 @if($errors->any())
     openModal('modal-create');
 @endif
-
-document.getElementById('searchUsers').addEventListener('input', function() {
-    const q = this.value.toLowerCase();
-    document.querySelectorAll('.user-row').forEach(row => {
-        const match = row.dataset.name.includes(q) || row.dataset.email.includes(q);
-        row.style.display = match ? '' : 'none';
-    });
-});
 </script>
 @endpush

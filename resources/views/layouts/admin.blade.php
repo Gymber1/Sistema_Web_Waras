@@ -761,5 +761,111 @@
         _bulkAction = null;
     }
     </script>
+
+    {{-- Búsqueda automática AJAX (sin recargar, sin parpadeo) para todos los buscadores del panel --}}
+    <script>
+    (function () {
+        const input = document.getElementById('search-input');
+        if (!input) return;
+        const form = input.closest('form[method="GET"], form[method="get"]');
+        if (!form) return;
+        // El contenedor de la tabla/paginación que se reemplaza en cada búsqueda
+        const wrapper = form.closest('.bulk-wrapper');
+        if (!wrapper) return;
+
+        let timer;
+        let controller = null;
+        let seq = 0;
+
+        function buildUrl() {
+            const curForm = wrapper.querySelector('form[method="GET"], form[method="get"]') || form;
+            const action = curForm.getAttribute('action') || window.location.pathname;
+            const params = new URLSearchParams(new FormData(curForm));
+            const qs = params.toString();
+            return qs ? `${action}?${qs}` : action;
+        }
+
+        async function runSearch() {
+            const url = buildUrl();
+            const mySeq = ++seq;
+
+            // Cancelar petición anterior en curso
+            if (controller) controller.abort();
+            controller = new AbortController();
+
+            wrapper.style.opacity = '0.6';
+            wrapper.style.transition = 'opacity .15s';
+
+            // El input actual en el DOM (cambia tras cada reemplazo)
+            const curInput = wrapper.querySelector('#search-input');
+
+            try {
+                const res = await fetch(url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    signal: controller.signal,
+                });
+                const html = await res.text();
+                if (mySeq !== seq) return; // llegó una respuesta vieja, ignorar
+
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const newWrapper = doc.querySelector('.bulk-wrapper');
+                if (!newWrapper) { window.location.href = url; return; }
+
+                // Guardar estado del input para restaurarlo tras el reemplazo
+                const sel = curInput ? curInput.selectionStart : null;
+                const val = curInput ? curInput.value : '';
+                const wasFocused = (document.activeElement === curInput);
+
+                wrapper.innerHTML = newWrapper.innerHTML;
+
+                // Restaurar el input (el reemplazo trae uno nuevo desde el servidor)
+                const newInput = wrapper.querySelector('#search-input');
+                if (newInput) {
+                    newInput.value = val;
+                    if (wasFocused) {
+                        newInput.focus();
+                        try { newInput.setSelectionRange(sel, sel); } catch (e) {}
+                    }
+                    bindInput(newInput);
+                }
+
+                // Re-renderizar iconos lucide y re-enganchar selección masiva (la tabla es nueva)
+                if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+                if (typeof initBulkSelect === 'function') {
+                    wrapper.querySelectorAll('table[id]').forEach(t => initBulkSelect(t.id));
+                }
+
+                // Actualizar la URL del navegador sin recargar
+                history.replaceState(null, '', url);
+            } catch (e) {
+                if (e.name !== 'AbortError') window.location.href = url;
+            } finally {
+                if (mySeq === seq) wrapper.style.opacity = '';
+            }
+        }
+
+        function bindInput(el) {
+            el.addEventListener('input', function () {
+                clearTimeout(timer);
+                timer = setTimeout(runSearch, 400);
+            });
+            el.addEventListener('keydown', function (ev) {
+                if (ev.key === 'Enter') { ev.preventDefault(); clearTimeout(timer); runSearch(); }
+            });
+        }
+
+        // Evitar el submit nativo (recarga) — usamos AJAX. Delegado en el wrapper
+        // para que siga funcionando tras reemplazar el contenido.
+        wrapper.addEventListener('submit', function (ev) {
+            const f = ev.target.closest('form[method="GET"], form[method="get"]');
+            if (f && f.querySelector('#search-input')) {
+                ev.preventDefault();
+                clearTimeout(timer);
+                runSearch();
+            }
+        });
+        bindInput(input);
+    })();
+    </script>
 </body>
 </html>
