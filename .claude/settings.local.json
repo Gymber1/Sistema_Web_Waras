@@ -98,7 +98,24 @@
       "Bash(php -l app/Http/Controllers/Admin/BibliotecaController.php)",
       "Bash(php -l app/Http/Controllers/Admin/UserAdminController.php)",
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\NITRO\\\\Documents\\\\Proyectos\\\\Waras\" -Directory)",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "Bash(git fetch *)",
+      "Bash(git pull *)",
+      "Bash(git push *)",
+      "Bash(php -l app/Models/SiteSetting.php)",
+      "Bash(git add *)",
+      "Bash(git config *)",
+      "Bash(chmod +x .git/hooks/pre-commit)",
+      "Bash(printf '\\\\n/* deploy-hook test */\\\\n')",
+      "Bash(sh .git/hooks/pre-commit)",
+      "Bash(git restore *)",
+      "Bash(sed -i '/\\\\/\\\\* deploy-hook test \\\\*\\\\//d' resources/css/home.css)",
+      "Bash(cd \"c:/Users/NITRO/Documents/Proyectos/Waras\" && mkdir -p .githooks && cp .git/hooks/pre-commit .githooks/pre-commit && echo \"copia versionada creada en .githooks/\" && ls -l .githooks/)",
+      "Bash(echo \"core.hooksPath = $\\(git config core.hooksPath\\)\")",
+      "Bash(git check-ignore *)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\NITRO\\Documents\\Proyectos\\Waras\\.git\\hooks"
     ]
   }
 }

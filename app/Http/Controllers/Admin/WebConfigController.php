@@ -373,6 +373,78 @@ class WebConfigController extends Controller
         return back()->with('success', 'Aportantes actualizados correctamente.');
     }
 
+    // ── NUESTRA ORGANIZACIÓN ─────────────────────────────────────────────────
+
+    public function organizacion()
+    {
+        $org = SiteSetting::organizacion();
+        return view('admin.web-config.config-organizacion', compact('org'));
+    }
+
+    public function organizacionUpdate(Request $request)
+    {
+        $org = SiteSetting::organizacion();
+
+        // Campos de texto simples
+        $textKeys = [
+            'hero_title', 'hero_subtitle',
+            'quienes_eyebrow', 'quienes_title', 'quienes_title_em',
+            'quienes_p1', 'quienes_p2', 'quienes_p3', 'quienes_img_label',
+            'finalidad_title', 'finalidad_text',
+            'objetivo_title',
+            'lineas_title', 'lineas_subtitle',
+            'objetivos_label', 'beneficiarios_label',
+            'premio_title', 'premio_eyebrow', 'premio_text', 'premio_video',
+            'premio_rec_label', 'premio_ministerio',
+            'director_label', 'director_name', 'director_bio',
+        ];
+        foreach ($textKeys as $key) {
+            if ($request->has($key)) {
+                $org[$key] = trim((string) $request->input($key, ''));
+            }
+        }
+
+        // Listas (se reciben como arrays; se filtran vacíos)
+        $listKeys = ['objetivo_items', 'objetivos_items', 'beneficiarios_items'];
+        foreach ($listKeys as $key) {
+            if ($request->has($key)) {
+                $org[$key] = array_values(array_filter(
+                    array_map(fn($v) => trim((string) $v), $request->input($key, [])),
+                    fn($v) => $v !== ''
+                ));
+            }
+        }
+
+        // Imágenes (subida opcional; conservar la actual si no se sube nada)
+        $imageFields = [
+            'quienes_img'   => 'organizacion',
+            'finalidad_img' => 'organizacion',
+            'objetivo_img'  => 'organizacion',
+            'director_img'  => 'organizacion',
+        ];
+        foreach ($imageFields as $field => $folder) {
+            if ($request->hasFile($field)) {
+                $request->validate([
+                    $field => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                ]);
+                // Borrar la anterior si era una imagen subida (en storage)
+                $current = $org[$field] ?? '';
+                if (is_string($current) && str_starts_with($current, '/storage/')) {
+                    $rel = substr($current, strlen('/storage/'));
+                    if (Storage::disk('public')->exists($rel)) {
+                        Storage::disk('public')->delete($rel);
+                    }
+                }
+                $path = $request->file($field)->store($folder, 'public');
+                $org[$field] = '/storage/' . $path;
+            }
+        }
+
+        SiteSetting::set('organizacion_data', json_encode($org, JSON_UNESCAPED_UNICODE));
+
+        return back()->with('success', 'Sección "Nuestra Organización" actualizada correctamente.');
+    }
+
     public function icono()
     {
         $icons = [

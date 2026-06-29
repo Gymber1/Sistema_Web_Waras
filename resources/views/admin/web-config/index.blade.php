@@ -72,6 +72,19 @@
             <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-amber-400 transition-colors flex-shrink-0 mt-1"></i>
         </a>
 
+        {{-- Nuestra Organización --}}
+        <a href="{{ route('admin.web-config.organizacion') }}"
+            class="group bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border hover:border-teal-200 dark:hover:border-teal-500/30 p-6 flex items-start gap-4 transition-all hover:-translate-y-0.5">
+            <div class="w-12 h-12 bg-teal-50 dark:bg-teal-500/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-teal-100 dark:group-hover:bg-teal-500/20 transition-colors">
+                <i data-lucide="building-2" class="w-6 h-6 text-teal-500"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-slate-800 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">Nuestra Organización</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Edita la sección "Nuestra Organización": quiénes somos, finalidad, objetivos, beneficiarios, premio y director.</p>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-teal-400 transition-colors flex-shrink-0 mt-1"></i>
+        </a>
+
         {{-- Contacto --}}
         <a href="{{ route('admin.web-config.edit-contacto') }}"
             class="group bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border hover:border-rose-200 dark:hover:border-rose-500/30 p-6 flex items-start gap-4 transition-all hover:-translate-y-0.5 md:col-span-2 lg:col-span-1">

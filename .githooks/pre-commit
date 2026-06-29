@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# Hook pre-commit: compila los assets de Vite automáticamente cuando
+# se hace commit de cambios en CSS/JS, y los agrega al commit.
+# Así nunca hace falta correr "npx vite build" a mano.
+
+# ¿Hay cambios staged en archivos que afectan el build?
+CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^resources/(css|js)/|^vite\.config\.js|^tailwind\.config\.js|^package\.json' || true)
+
+if [ -z "$CHANGED" ]; then
+    # No se tocaron CSS/JS: commit normal, sin build.
+    exit 0
+fi
+
+echo "🎨 Cambios en CSS/JS detectados — compilando assets con Vite..."
+
+# Ejecutar el build (usa npm run build => vite build)
+if ! npm run build --silent; then
+    echo "❌ El build de Vite falló. Se cancela el commit."
+    echo "   Revisa el error de arriba y vuelve a intentar."
+    exit 1
+fi
+
+# Agregar los assets compilados al commit
+git add public/build
+
+echo "✅ Assets compilados y añadidos al commit (public/build)."
+exit 0

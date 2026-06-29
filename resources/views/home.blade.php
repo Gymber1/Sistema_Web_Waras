@@ -199,8 +199,8 @@
             <div class="subview-hero-bg" style="background-image:url('{{ $heroBg }}');"></div>
             <div class="subview-hero-overlay"></div>
             <div class="subview-hero-content">
-                <h1 class="subview-hero-title">Nuestra Organización</h1>
-                <p class="subview-hero-sub">Conoce la misión, visión y los valores que impulsan la preservación del patrimonio regional.</p>
+                <h1 class="subview-hero-title">{{ $org['hero_title'] }}</h1>
+                <p class="subview-hero-sub">{{ $org['hero_subtitle'] }}</p>
             </div>
         </section>
 
@@ -211,19 +211,19 @@
                     <div class="org-img-shadow"></div>
                     <div class="org-img-clip">
                         <img class="org-img"
-                            src="/Fundadores.jpg"
-                            alt="Fundadores Asociación Waras">
+                            src="{{ $org['quienes_img'] }}"
+                            alt="{{ $org['quienes_img_label'] }}">
                     </div>
-                    <span class="org-img-label">Fundadores de WARAS</span>
+                    <span class="org-img-label">{{ $org['quienes_img_label'] }}</span>
                 </div>
                 <div>
                     <div class="org-eyebrow">
-                        <span class="org-eyebrow-text">Quiénes Somos</span>
+                        <span class="org-eyebrow-text">{{ $org['quienes_eyebrow'] }}</span>
                     </div>
-                    <h2 class="org-title">Asociación Waras:<br><em>Ciencia y Cultura</em></h2>
-                    <p class="org-text">La <strong>Asociación Waras: Ciencia y Cultura</strong> nació ante el vacío estructural e histórico del Estado en la protección de la identidad cultural.</p>
-                    <p class="org-text">Un grupo de ciudadanos conscientes de que la protección del Medio Ambiente, la Educación, la Cultura y la Investigación son el germen para un sólido Desarrollo Económico y Social decidió aportar para viabilizar el progreso sostenido de Áncash.</p>
-                    <p class="org-text">Áncash es una región privilegiada, con una profunda tradición cultural que subsiste a través del tiempo y una diversidad de recursos naturales únicos. Este portal digital es uno de los espacios que construimos para sistematizar, preservar y difundir el conocimiento.</p>
+                    <h2 class="org-title">{{ $org['quienes_title'] }}<br><em>{{ $org['quienes_title_em'] }}</em></h2>
+                    @if($org['quienes_p1'])<p class="org-text">{!! $org['quienes_p1'] !!}</p>@endif
+                    @if($org['quienes_p2'])<p class="org-text">{!! $org['quienes_p2'] !!}</p>@endif
+                    @if($org['quienes_p3'])<p class="org-text">{!! $org['quienes_p3'] !!}</p>@endif
                 </div>
             </div>
         </section>
@@ -233,19 +233,20 @@
             <div class="org-cards-inner">
                 <div class="org-card org-card-light">
                     <div class="">
-                        <img src="/Nuestra_Finalidad.png" alt="Nuestra Finalidad" style="width:100px;height:50px;object-fit:contain;">
+                        <img src="{{ $org['finalidad_img'] }}" alt="{{ $org['finalidad_title'] }}" style="width:100px;height:50px;object-fit:contain;">
                     </div>
-                    <h3 class="org-card-title">Nuestra Finalidad</h3>
-                    <p class="org-card-text">Promover estudios, investigaciones, capacitaciones, propuestas y espacios que aporten al desarrollo económico, social, ambiental, cultural, educacional, científico, tecnológico, y ciudadanía en el departamento de Áncash para la mejora de la calidad de vida de sus ciudadanos.</p>
+                    <h3 class="org-card-title">{{ $org['finalidad_title'] }}</h3>
+                    <p class="org-card-text">{{ $org['finalidad_text'] }}</p>
                 </div>
                 <div class="org-card org-card-dark">
                     <div class="">
-                        <img src="/Objetivo_General.png" alt="Objetivo General" style="width:100px;height:50px;object-fit:contain;">
+                        <img src="{{ $org['objetivo_img'] }}" alt="{{ $org['objetivo_title'] }}" style="width:100px;height:50px;object-fit:contain;">
                     </div>
-                    <h3 class="org-card-title">Objetivo General</h3>
+                    <h3 class="org-card-title">{{ $org['objetivo_title'] }}</h3>
                     <ul class="org-card-list">
-                        <li><span class="org-card-list-arrow">›</span> Contribuir al Desarrollo Económico y Social del Departamento de Ancash.</li>
-                        <li><span class="org-card-list-arrow">›</span> Preservar y Difundir la Cultura Ancashina al mundo a través de plataformas digitales.</li>
+                        @foreach($org['objetivo_items'] as $item)
+                        <li><span class="org-card-list-arrow">›</span> {{ $item }}</li>
+                        @endforeach
                     </ul>
                 </div>
             </div>
@@ -255,31 +256,24 @@
         <section class="org-lines-section">
             <div class="org-lines-inner">
                 <div class="org-lines-header">
-                    <h2 class="org-lines-title">Líneas de Trabajo y Alcance</h2>
-                    <p class="org-lines-sub">Estrategias específicas orientadas a la investigación, desarrollo y preservación del acervo ancashino.</p>
+                    <h2 class="org-lines-title">{{ $org['lineas_title'] }}</h2>
+                    <p class="org-lines-sub">{{ $org['lineas_subtitle'] }}</p>
                 </div>
                 <div class="org-lines-grid">
                     <div>
-                        <p class="org-lines-col-label">Objetivos Específicos</p>
+                        <p class="org-lines-col-label">{{ $org['objetivos_label'] }}</p>
                         <ul class="org-lines-list">
-                            <li class="org-lines-item"><span class="org-lines-check">✓</span> Promover e impulsar las ciencias, arte, identidad, ciudadanía y cultura.</li>
-                            <li class="org-lines-item"><span class="org-lines-check">✓</span> Promover la investigación y capacitación educativa, artística y ambiental.</li>
-                            <li class="org-lines-item"><span class="org-lines-check">✓</span> Promover y ejecutar proyectos y programas que desarrollen capacidades científicas.</li>
-                            <li class="org-lines-item"><span class="org-lines-check">✓</span> Lograr el desarrollo de nuestros fines en alianza y convenios con instituciones.</li>
-                            <li class="org-lines-item"><span class="org-lines-check">✓</span> Desarrollar un Sistema y Portal de Información de alcance regional.</li>
+                            @foreach($org['objetivos_items'] as $item)
+                            <li class="org-lines-item"><span class="org-lines-check">✓</span> {{ $item }}</li>
+                            @endforeach
                         </ul>
                     </div>
                     <div>
-                        <p class="org-lines-col-label">Nuestros Beneficiarios</p>
+                        <p class="org-lines-col-label">{{ $org['beneficiarios_label'] }}</p>
                         <div class="org-beneficiaries-grid">
-                            <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Estudiantes de primaria y secundaria</div>
-                            <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Estudiantes de nivel superior</div>
-                            <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Docentes de nivel básico y superior</div>
-                            <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Autoridades y partidos políticos</div>
-                            <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Empresarios e inversores regionales</div>
-                            <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Turistas nacionales e internacionales</div>
-                            <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Población con interés en ciencia</div>
-                            <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> Investigadores culturales</div>
+                            @foreach($org['beneficiarios_items'] as $item)
+                            <div class="org-beneficiary-item"><span class="org-beneficiary-dot"></span> {{ $item }}</div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -289,16 +283,17 @@
         <!-- PREMIOS (movido desde vista-premios a organización) -->
         <section id="premios">
             <div style="text-align:center;padding:3.5rem 2rem 0;max-width:900px;margin:0 auto;">
-                <h2 style="font-family:'Playfair Display',serif;font-size:2rem;color:#111;font-weight:700;margin-bottom:.5rem;">Premio Nacional</h2>
-                <p style="font-size:.65rem;font-weight:700;color:#cda274;text-transform:uppercase;letter-spacing:.22em;margin-bottom:.75rem;">Reconocimiento</p>
-                <p style="font-size:.95rem;color:#6b7280;max-width:580px;margin:0 auto;">Proyecto ganador del Ministerio de Cultura para recopilar y difundir el Patrimonio Documental Ancashino.</p>
+                <h2 style="font-family:'Playfair Display',serif;font-size:2rem;color:#111;font-weight:700;margin-bottom:.5rem;">{{ $org['premio_title'] }}</h2>
+                <p style="font-size:.65rem;font-weight:700;color:#cda274;text-transform:uppercase;letter-spacing:.22em;margin-bottom:.75rem;">{{ $org['premio_eyebrow'] }}</p>
+                <p style="font-size:.95rem;color:#6b7280;max-width:580px;margin:0 auto;">{{ $org['premio_text'] }}</p>
             </div>
 
+            @if($org['premio_video'])
             <div class="premios-video-wrap">
                 <div class="premios-video">
                     <iframe
-                        src="https://www.youtube.com/embed/DPZWSG2LZ_8?rel=0&modestbranding=1"
-                        title="Giber García Álamo — Director del Proyecto WARAS"
+                        src="{{ $org['premio_video'] }}"
+                        title="{{ $org['director_name'] }} — {{ $org['director_label'] }}"
                         frameborder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowfullscreen
@@ -306,10 +301,11 @@
                     </iframe>
                 </div>
             </div>
+            @endif
 
             <div class="premios-reconocimiento">
                 <div class="premios-rec-card">
-                    <p class="premios-rec-label">Beneficiario de las Líneas de Apoyo Económico para el Sector Cultura</p>
+                    <p class="premios-rec-label">{{ $org['premio_rec_label'] }}</p>
                     <div class="premios-ministerio">
                         <div class="premios-ministerio-peru">
                             <div class="premios-ministerio-escudo">
@@ -317,16 +313,16 @@
                             </div>
                             <span class="premios-ministerio-peru-text">PERÚ</span>
                         </div>
-                        <div class="premios-ministerio-nombre">Ministerio de Cultura</div>
+                        <div class="premios-ministerio-nombre">{{ $org['premio_ministerio'] }}</div>
                     </div>
                     <div class="premios-director">
                         <img class="premios-director-avatar"
-                            src="/giber.png"
-                            alt="Giber García Álamo">
+                            src="{{ $org['director_img'] }}"
+                            alt="{{ $org['director_name'] }}">
                         <div>
-                            <p class="premios-director-label">Director del Proyecto</p>
-                            <p class="premios-director-name">Giber García Álamo</p>
-                            <p class="premios-director-bio">Promotor inicial de la recopilación histórica. Asumió la dirección para rescatar, catalogar y promover la Identidad Ancashina a través de esta plataforma digital.</p>
+                            <p class="premios-director-label">{{ $org['director_label'] }}</p>
+                            <p class="premios-director-name">{{ $org['director_name'] }}</p>
+                            <p class="premios-director-bio">{{ $org['director_bio'] }}</p>
                         </div>
                     </div>
                 </div>

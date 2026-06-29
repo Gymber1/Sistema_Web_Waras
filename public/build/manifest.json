@@ -1,0 +1,163 @@
+{
+  "resources/css/admin.css": {
+    "file": "assets/admin-DFSa0lPq.css",
+    "src": "resources/css/admin.css",
+    "isEntry": true,
+    "name": "admin",
+    "names": [
+      "admin.css"
+    ]
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-1fLGtsZL.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/css/biblioteca-autor.css": {
+    "file": "assets/biblioteca-autor-BTM6DZvE.css",
+    "src": "resources/css/biblioteca-autor.css",
+    "isEntry": true,
+    "name": "biblioteca-autor",
+    "names": [
+      "biblioteca-autor.css"
+    ]
+  },
+  "resources/css/biblioteca-editorial.css": {
+    "file": "assets/biblioteca-editorial-CJCAfAhP.css",
+    "src": "resources/css/biblioteca-editorial.css",
+    "isEntry": true,
+    "name": "biblioteca-editorial",
+    "names": [
+      "biblioteca-editorial.css"
+    ]
+  },
+  "resources/css/biblioteca-especial.css": {
+    "file": "assets/biblioteca-especial-3TW3VoXP.css",
+    "src": "resources/css/biblioteca-especial.css",
+    "isEntry": true,
+    "name": "biblioteca-especial",
+    "names": [
+      "biblioteca-especial.css"
+    ]
+  },
+  "resources/css/biblioteca-libro.css": {
+    "file": "assets/biblioteca-libro-mb6BbcJB.css",
+    "src": "resources/css/biblioteca-libro.css",
+    "isEntry": true,
+    "name": "biblioteca-libro",
+    "names": [
+      "biblioteca-libro.css"
+    ]
+  },
+  "resources/css/biblioteca-revista.css": {
+    "file": "assets/biblioteca-revista-qxyPyACu.css",
+    "src": "resources/css/biblioteca-revista.css",
+    "isEntry": true,
+    "name": "biblioteca-revista",
+    "names": [
+      "biblioteca-revista.css"
+    ]
+  },
+  "resources/css/biblioteca.css": {
+    "file": "assets/biblioteca-4BGtf2Av.css",
+    "src": "resources/css/biblioteca.css",
+    "isEntry": true,
+    "name": "biblioteca",
+    "names": [
+      "biblioteca.css"
+    ]
+  },
+  "resources/css/contacto.css": {
+    "file": "assets/contacto-BoJVc0Fx.css",
+    "src": "resources/css/contacto.css",
+    "isEntry": true,
+    "name": "contacto",
+    "names": [
+      "contacto.css"
+    ]
+  },
+  "resources/css/fototeca-donador.css": {
+    "file": "assets/fototeca-fotografo-acZPgioS.css",
+    "src": "resources/css/fototeca-fotografo.css",
+    "isEntry": true,
+    "name": "fototeca-donador",
+    "names": [
+      "fototeca-fotografo.css",
+      "fototeca-donador.css"
+    ]
+  },
+  "resources/css/fototeca-especial.css": {
+    "file": "assets/fototeca-especial-DMYZS5tw.css",
+    "src": "resources/css/fototeca-especial.css",
+    "isEntry": true,
+    "name": "fototeca-especial",
+    "names": [
+      "fototeca-especial.css"
+    ]
+  },
+  "resources/css/fototeca-foto.css": {
+    "file": "assets/fototeca-foto-B4aHEj8E.css",
+    "src": "resources/css/fototeca-foto.css",
+    "isEntry": true,
+    "name": "fototeca-foto",
+    "names": [
+      "fototeca-foto.css"
+    ]
+  },
+  "resources/css/fototeca-fotografo.css": {
+    "file": "assets/fototeca-fotografo-acZPgioS.css",
+    "src": "resources/css/fototeca-fotografo.css",
+    "isEntry": true,
+    "name": "fototeca-donador",
+    "names": [
+      "fototeca-fotografo.css",
+      "fototeca-donador.css"
+    ]
+  },
+  "resources/css/fototeca.css": {
+    "file": "assets/fototeca-xZgv-ng2.css",
+    "src": "resources/css/fototeca.css",
+    "isEntry": true,
+    "name": "fototeca",
+    "names": [
+      "fototeca.css"
+    ]
+  },
+  "resources/css/home.css": {
+    "file": "assets/home-SEymhEZc.css",
+    "src": "resources/css/home.css",
+    "isEntry": true,
+    "name": "home",
+    "names": [
+      "home.css"
+    ]
+  },
+  "resources/css/login.css": {
+    "file": "assets/login-G3ASrN0P.css",
+    "src": "resources/css/login.css",
+    "isEntry": true,
+    "name": "login",
+    "names": [
+      "login.css"
+    ]
+  },
+  "resources/css/nosotros.css": {
+    "file": "assets/nosotros-CENoUrnT.css",
+    "src": "resources/css/nosotros.css",
+    "isEntry": true,
+    "name": "nosotros",
+    "names": [
+      "nosotros.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-taXXq4rK.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}

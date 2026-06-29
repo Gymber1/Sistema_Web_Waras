@@ -258,6 +258,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/contacto', [WebConfigController::class, 'contacto'])->name('contacto');
             Route::get('/aportantes',  [WebConfigController::class, 'aportantes'])->name('aportantes');
             Route::post('/aportantes', [WebConfigController::class, 'aportantesUpdate'])->name('aportantes.update');
+            Route::get('/organizacion',  [WebConfigController::class, 'organizacion'])->name('organizacion');
+            Route::post('/organizacion', [WebConfigController::class, 'organizacionUpdate'])->name('organizacion.update');
             Route::post('/contact/update',                  [WebConfigController::class, 'updateContact'])->name('contact.update');
             Route::delete('/contact/{key}',               [WebConfigController::class, 'destroyContact'])->name('contact.destroy');
             Route::post('/floating-btn/{floatingButton}',            [WebConfigController::class, 'updateFloatingButton'])->name('floating-btn.update');
