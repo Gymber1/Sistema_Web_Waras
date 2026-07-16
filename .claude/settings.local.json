@@ -112,7 +112,13 @@
       "Bash(sed -i '/\\\\/\\\\* deploy-hook test \\\\*\\\\//d' resources/css/home.css)",
       "Bash(cd \"c:/Users/NITRO/Documents/Proyectos/Waras\" && mkdir -p .githooks && cp .git/hooks/pre-commit .githooks/pre-commit && echo \"copia versionada creada en .githooks/\" && ls -l .githooks/)",
       "Bash(echo \"core.hooksPath = $\\(git config core.hooksPath\\)\")",
-      "Bash(git check-ignore *)"
+      "Bash(git check-ignore *)",
+      "Bash(php -l app/Models/Author.php)",
+      "Bash(echo \"=== ¿queda algun \\\\\\\\Storage? ===\")",
+      "Bash(grep -c '\\\\\\\\\\\\\\\\Storage::' app/Http/Controllers/Admin/BibliotecaController.php)",
+      "Bash(echo \"=== ¿queda algun \\\\\\\\Storage:: con barra? \\(debe ser 0\\) ===\")",
+      "Bash(grep -c '\\\\\\\\Storage::' app/Http/Controllers/Admin/BibliotecaController.php)",
+      "Bash(php artisan tinker '--execute= *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\NITRO\\Documents\\Proyectos\\Waras\\.git\\hooks"

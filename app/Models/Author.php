@@ -15,11 +15,22 @@ class Author extends Model
     protected $fillable = [
         'name',
         'slug',
+        'birth_place',
+        'birth_date',
+        'death_place',
+        'death_date',
+        'occupation',
         'biography',
+        'studies_critique',
         'nationality',
         'email',
         'website',
         'photo_path',
+    ];
+
+    protected $casts = [
+        'birth_date' => 'date',
+        'death_date' => 'date',
     ];
 
     /**

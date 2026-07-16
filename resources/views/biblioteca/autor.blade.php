@@ -121,6 +121,17 @@
             <div class="profile-info">
                 <h1 class="profile-name">{{ $author->name }}</h1>
                 <div class="profile-meta">
+                    @if($author->birth_date || $author->death_date)
+                    <span class="profile-meta-item">
+                        <i class="fas fa-calendar"></i>
+                        {{ $author->birth_date?->year ?? '?' }} – {{ $author->death_date?->year ?? 'presente' }}
+                    </span>
+                    @endif
+                    @if($author->occupation)
+                    <span class="profile-meta-item">
+                        <i class="fas fa-user-pen"></i> {{ $author->occupation }}
+                    </span>
+                    @endif
                     @if($author->nationality)
                     <span class="profile-meta-item">
                         <i class="fas fa-globe-americas"></i> {{ $author->nationality }}
@@ -135,10 +146,47 @@
                     </span>
                     @endif
                 </div>
+
+                @if($author->birth_date || $author->birth_place || $author->death_date || $author->death_place)
+                <div class="author-dates">
+                    @if($author->birth_date)
+                    <div class="author-dates-item">
+                        <span class="author-dates-label">Fecha de nacimiento</span>
+                        <span class="author-dates-value">{{ $author->birth_date->format('d/m/Y') }}</span>
+                    </div>
+                    @endif
+                    @if($author->birth_place)
+                    <div class="author-dates-item">
+                        <span class="author-dates-label">Lugar de nacimiento</span>
+                        <span class="author-dates-value">{{ $author->birth_place }}</span>
+                    </div>
+                    @endif
+                    @if($author->death_date)
+                    <div class="author-dates-item">
+                        <span class="author-dates-label">Fecha de fallecimiento</span>
+                        <span class="author-dates-value">{{ $author->death_date->format('d/m/Y') }}</span>
+                    </div>
+                    @endif
+                    @if($author->death_place)
+                    <div class="author-dates-item">
+                        <span class="author-dates-label">Lugar de fallecimiento</span>
+                        <span class="author-dates-value">{{ $author->death_place }}</span>
+                    </div>
+                    @endif
+                </div>
+                @endif
+
                 @if($author->biography)
                     <p class="profile-bio">{{ $author->biography }}</p>
                 @else
                     <p class="no-bio">Sin biografía disponible.</p>
+                @endif
+
+                @if($author->studies_critique)
+                <div class="author-critique">
+                    <h3 class="author-critique-title">Estudios y crítica</h3>
+                    <p class="author-critique-text">{{ $author->studies_critique }}</p>
+                </div>
                 @endif
             </div>
         </div>

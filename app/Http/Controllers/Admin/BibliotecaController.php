@@ -11,6 +11,7 @@ use App\Models\Special;
 use App\Models\Descriptor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class BibliotecaController extends Controller
 {
@@ -217,9 +218,15 @@ class BibliotecaController extends Controller
     public function storeAuthor(Request $request)
     {
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'biography'   => 'nullable|string',
-            'nationality' => 'nullable|string|max:100',
+            'name'             => 'required|string|max:255',
+            'biography'        => 'nullable|string',
+            'studies_critique' => 'nullable|string',
+            'nationality'      => 'nullable|string|max:100',
+            'occupation'       => 'nullable|string|max:255',
+            'birth_place'      => 'nullable|string|max:255',
+            'birth_date'       => 'nullable|date',
+            'death_place'      => 'nullable|string|max:255',
+            'death_date'       => 'nullable|date|after_or_equal:birth_date',
             'books'       => 'nullable|array',
             'books.*'     => 'exists:books,id',
             'categories'  => 'nullable|array',
@@ -228,10 +235,16 @@ class BibliotecaController extends Controller
         ]);
 
         $data = [
-            'name'        => $request->name,
-            'slug'        => $this->uniqueSlug($request->name, Author::class),
-            'biography'   => $request->biography,
-            'nationality' => $request->nationality,
+            'name'             => $request->name,
+            'slug'             => $this->uniqueSlug($request->name, Author::class),
+            'biography'        => $request->biography,
+            'studies_critique' => $request->studies_critique,
+            'nationality'      => $request->nationality,
+            'occupation'       => $request->occupation,
+            'birth_place'      => $request->birth_place,
+            'birth_date'       => $request->birth_date,
+            'death_place'      => $request->death_place,
+            'death_date'       => $request->death_date,
         ];
         if ($request->hasFile('photo')) {
             $data['photo_path'] = $request->file('photo')->store('authors', 'public');
@@ -247,9 +260,15 @@ class BibliotecaController extends Controller
     public function updateAuthor(Request $request, Author $author)
     {
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'biography'   => 'nullable|string',
-            'nationality' => 'nullable|string|max:100',
+            'name'             => 'required|string|max:255',
+            'biography'        => 'nullable|string',
+            'studies_critique' => 'nullable|string',
+            'nationality'      => 'nullable|string|max:100',
+            'occupation'       => 'nullable|string|max:255',
+            'birth_place'      => 'nullable|string|max:255',
+            'birth_date'       => 'nullable|date',
+            'death_place'      => 'nullable|string|max:255',
+            'death_date'       => 'nullable|date|after_or_equal:birth_date',
             'books'       => 'nullable|array',
             'books.*'     => 'exists:books,id',
             'categories'  => 'nullable|array',
@@ -258,9 +277,15 @@ class BibliotecaController extends Controller
         ]);
 
         $data = [
-            'name'        => $request->name,
-            'biography'   => $request->biography,
-            'nationality' => $request->nationality,
+            'name'             => $request->name,
+            'biography'        => $request->biography,
+            'studies_critique' => $request->studies_critique,
+            'nationality'      => $request->nationality,
+            'occupation'       => $request->occupation,
+            'birth_place'      => $request->birth_place,
+            'birth_date'       => $request->birth_date,
+            'death_place'      => $request->death_place,
+            'death_date'       => $request->death_date,
         ];
         if ($request->hasFile('photo')) {
             $data['photo_path'] = $request->file('photo')->store('authors', 'public');
@@ -938,7 +963,7 @@ class BibliotecaController extends Controller
     public function destroySpecialCover(Special $special)
     {
         if ($special->cover_image_path) {
-            \Storage::disk('public')->delete($special->cover_image_path);
+            Storage::disk('public')->delete($special->cover_image_path);
             $special->update(['cover_image_path' => null]);
         }
         return redirect()->route('admin.biblioteca.specials.edit', $special)
@@ -952,7 +977,7 @@ class BibliotecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Book::whereIn('id', $ids)->where('document_type', '!=', 'Revista')->each(function($b) {
-            if ($b->cover_image_path) \Storage::disk('public')->delete($b->cover_image_path);
+            if ($b->cover_image_path) Storage::disk('public')->delete($b->cover_image_path);
             $b->delete();
         });
         return back()->with('success', count($ids) . ' libro(s) eliminado(s).');
@@ -963,7 +988,7 @@ class BibliotecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Book::whereIn('id', $ids)->where('document_type', 'Revista')->each(function($b) {
-            if ($b->cover_image_path) \Storage::disk('public')->delete($b->cover_image_path);
+            if ($b->cover_image_path) Storage::disk('public')->delete($b->cover_image_path);
             $b->delete();
         });
         return back()->with('success', count($ids) . ' revista(s) eliminada(s).');
@@ -974,7 +999,7 @@ class BibliotecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Author::whereIn('id', $ids)->each(function($a) {
-            if ($a->photo_path) \Storage::disk('public')->delete($a->photo_path);
+            if ($a->photo_path) Storage::disk('public')->delete($a->photo_path);
             $a->delete();
         });
         return back()->with('success', count($ids) . ' autor(es) eliminado(s).');
@@ -985,7 +1010,7 @@ class BibliotecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Publisher::whereIn('id', $ids)->each(function($p) {
-            if ($p->logo_path) \Storage::disk('public')->delete($p->logo_path);
+            if ($p->logo_path) Storage::disk('public')->delete($p->logo_path);
             $p->delete();
         });
         return back()->with('success', count($ids) . ' editorial(es) eliminada(s).');
@@ -1024,7 +1049,7 @@ class BibliotecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Special::whereIn('id', $ids)->where('module', 'biblioteca')->each(function($s) {
-            if ($s->cover_image_path) \Storage::disk('public')->delete($s->cover_image_path);
+            if ($s->cover_image_path) Storage::disk('public')->delete($s->cover_image_path);
             $s->books()->detach();
             $s->delete();
         });

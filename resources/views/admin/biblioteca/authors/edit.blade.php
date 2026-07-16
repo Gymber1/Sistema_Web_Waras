@@ -63,6 +63,36 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Ocupación / profesión</label>
+                    <input type="text" name="occupation" value="{{ old('occupation', $author->occupation) }}" placeholder="Ej. Poeta, historiador"
+                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Lugar de nacimiento</label>
+                    <input type="text" name="birth_place" value="{{ old('birth_place', $author->birth_place) }}" placeholder="Ej. Huaraz, Áncash"
+                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Fecha de nacimiento</label>
+                    <input type="date" name="birth_date" value="{{ old('birth_date', $author->birth_date?->format('Y-m-d')) }}"
+                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Lugar de fallecimiento</label>
+                    <input type="text" name="death_place" value="{{ old('death_place', $author->death_place) }}" placeholder="Dejar vacío si aún vive"
+                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Fecha de fallecimiento</label>
+                    <input type="date" name="death_date" value="{{ old('death_date', $author->death_date?->format('Y-m-d')) }}"
+                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all">
+                </div>
+
+                <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Foto del autor</label>
                     @if($author->photo_path)
                     <div class="flex items-center gap-2 mb-2 p-2.5 bg-brand-50 dark:bg-brand-500/10 border border-brand-100 dark:border-brand-500/20 rounded-lg">
@@ -78,6 +108,12 @@
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Biografía</label>
                     <textarea name="biography" rows="4"
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all resize-y">{{ old('biography', $author->biography) }}</textarea>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Estudios / crítica a su obra</label>
+                    <textarea name="studies_critique" rows="3" placeholder="Análisis, publicaciones o crítica académica sobre su obra..."
+                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all resize-y">{{ old('studies_critique', $author->studies_critique) }}</textarea>
                 </div>
 
                 <div class="md:col-span-2">
