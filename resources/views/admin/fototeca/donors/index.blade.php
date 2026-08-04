@@ -51,9 +51,9 @@
                     <tr>
                         <th class="px-4 py-4 w-10"><input type="checkbox" class="row-check check-all"></th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Foto</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nombre Completo</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Fotografías</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nac. / Fallec.</th>
+                        <x-sort-th column="full_name" label="Nombre Completo" />
+                        <x-sort-th column="photos_count" label="Fotografías" />
+                        <x-sort-th column="birth_date" label="Nac. / Fallec." />
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Acciones</th>
                     </tr>
                 </thead>

@@ -52,10 +52,10 @@
                     <tr>
                         <th class="px-4 py-4 w-10"><input type="checkbox" class="row-check check-all"></th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Logo</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nombre</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Libros</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Teléfono</th>
+                        <x-sort-th column="name" label="Nombre" />
+                        <x-sort-th column="books_count" label="Libros" />
+                        <x-sort-th column="email" label="Email" />
+                        <x-sort-th column="phone" label="Teléfono" />
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Acciones</th>
                     </tr>
                 </thead>

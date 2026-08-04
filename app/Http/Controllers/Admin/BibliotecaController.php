@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\HasSortableColumns;
 use App\Models\Book;
 use App\Models\Author;
 use App\Models\Publisher;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Storage;
 
 class BibliotecaController extends Controller
 {
+    use HasSortableColumns;
+
     // ============= DASHBOARD DEL MÓDULO =============
 
     public function adminIndex()
@@ -37,16 +40,26 @@ class BibliotecaController extends Controller
     {
         $q = trim((string) $request->input('search', ''));
 
-        $books = Book::where('document_type', '!=', 'Revista')
+        $query = Book::where('document_type', '!=', 'Revista')
             ->with(['authors', 'publisher', 'categories'])
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($sub) use ($q) {
                     $sub->where('title', 'like', "%{$q}%")
                         ->orWhereHas('authors', fn($aq) => $aq->where('name', 'like', "%{$q}%"));
                 });
-            })
-            ->paginate(10)
-            ->withQueryString();
+            });
+        $query = $this->applySort($query, $request, ['title', 'publication_year'], 'title', 'asc', [
+            // Ordenar por el nombre del primer autor asociado
+            'authors' => fn($qb, $dir) => $qb->orderBy(
+                Author::select('name')
+                    ->join('book_author', 'authors.id', '=', 'book_author.author_id')
+                    ->whereColumn('book_author.book_id', 'books.id')
+                    ->orderBy('name')
+                    ->limit(1),
+                $dir
+            ),
+        ]);
+        $books = $query->paginate(10)->withQueryString();
         $authors    = Author::orderBy('name')->get();
         $categories = Category::where('type', 'biblioteca')
             ->whereNull('parent_id')
@@ -198,10 +211,10 @@ class BibliotecaController extends Controller
     {
         $q = trim((string) $request->input('search', ''));
 
-        $authors    = Author::withCount('books')
-            ->when($q !== '', fn($query) => $query->where('name', 'like', "%{$q}%"))
-            ->paginate(10)
-            ->withQueryString();
+        $query = Author::withCount('books')
+            ->when($q !== '', fn($query) => $query->where('name', 'like', "%{$q}%"));
+        $query = $this->applySort($query, $request, ['name', 'books_count', 'nationality'], 'name', 'asc');
+        $authors    = $query->paginate(10)->withQueryString();
         $books      = Book::orderBy('title')->get(['id', 'title', 'document_type']);
         $categories = Category::where('type', 'biblioteca')->whereNull('parent_id')->get();
         return view('admin.biblioteca.authors.index', compact('authors', 'books', 'categories', 'q'));
@@ -319,10 +332,10 @@ class BibliotecaController extends Controller
     {
         $q = trim((string) $request->input('search', ''));
 
-        $publishers = Publisher::withCount('books')
-            ->when($q !== '', fn($query) => $query->where('name', 'like', "%{$q}%"))
-            ->paginate(10)
-            ->withQueryString();
+        $query = Publisher::withCount('books')
+            ->when($q !== '', fn($query) => $query->where('name', 'like', "%{$q}%"));
+        $query = $this->applySort($query, $request, ['name', 'books_count', 'email', 'phone'], 'name', 'asc');
+        $publishers = $query->paginate(10)->withQueryString();
         $books      = Book::orderBy('title')->get(['id', 'title', 'document_type']);
         return view('admin.biblioteca.publishers.index', compact('publishers', 'books', 'q'));
     }
@@ -405,12 +418,11 @@ class BibliotecaController extends Controller
     public function indexCategories(Request $request)
     {
         $q = $request->input('search');
-        $allCategories = Category::where('type', 'biblioteca')
+        $query = Category::where('type', 'biblioteca')
             ->whereNull('parent_id')
-            ->when($q, fn($query) => $query->where('name', 'like', "%{$q}%"))
-            ->orderBy('name')
-            ->paginate(10)
-            ->withQueryString();
+            ->when($q, fn($query) => $query->where('name', 'like', "%{$q}%"));
+        $query = $this->applySort($query, $request, ['name'], 'name', 'asc');
+        $allCategories = $query->paginate(10)->withQueryString();
         return view('admin.biblioteca.categories.index', compact('allCategories', 'q'));
     }
 
@@ -518,11 +530,20 @@ class BibliotecaController extends Controller
     {
         $q = trim((string) $request->input('search', ''));
 
-        $magazines  = Book::where('document_type', 'Revista')
+        $query = Book::where('document_type', 'Revista')
             ->with(['authors', 'publisher', 'categories'])
-            ->when($q !== '', fn($query) => $query->where('title', 'like', "%{$q}%"))
-            ->paginate(10)
-            ->withQueryString();
+            ->when($q !== '', fn($query) => $query->where('title', 'like', "%{$q}%"));
+        $query = $this->applySort($query, $request, ['title', 'publication_year'], 'title', 'asc', [
+            'authors' => fn($qb, $dir) => $qb->orderBy(
+                Author::select('name')
+                    ->join('book_author', 'authors.id', '=', 'book_author.author_id')
+                    ->whereColumn('book_author.book_id', 'books.id')
+                    ->orderBy('name')
+                    ->limit(1),
+                $dir
+            ),
+        ]);
+        $magazines  = $query->paginate(10)->withQueryString();
         $authors    = Author::orderBy('name')->get();
         $categories = Category::where('type', 'biblioteca')
             ->whereNull('parent_id')
@@ -670,11 +691,10 @@ class BibliotecaController extends Controller
     {
         $q = trim((string) $request->input('search', ''));
 
-        $descriptors = Descriptor::withCount('books')
-            ->when($q !== '', fn($query) => $query->where('name', 'like', "%{$q}%"))
-            ->orderBy('name')
-            ->paginate(10)
-            ->withQueryString();
+        $query = Descriptor::withCount('books')
+            ->when($q !== '', fn($query) => $query->where('name', 'like', "%{$q}%"));
+        $query = $this->applySort($query, $request, ['name', 'books_count'], 'name', 'asc');
+        $descriptors = $query->paginate(10)->withQueryString();
         return view('admin.biblioteca.descriptors.index', compact('descriptors', 'q'));
     }
 
@@ -821,13 +841,11 @@ class BibliotecaController extends Controller
     public function indexSpecials(Request $request)
     {
         $q = $request->input('search');
-        $specials = Special::where('module', 'biblioteca')
+        $query = Special::where('module', 'biblioteca')
             ->withCount('books')
-            ->when($q, fn($query) => $query->where('title', 'like', "%{$q}%"))
-            ->orderBy('order')
-            ->orderBy('title')
-            ->paginate(10)
-            ->withQueryString();
+            ->when($q, fn($query) => $query->where('title', 'like', "%{$q}%"));
+        $query = $this->applySort($query, $request, ['title', 'type', 'books_count', 'order'], 'order', 'asc');
+        $specials = $query->paginate(10)->withQueryString();
         return view('admin.biblioteca.specials.index', compact('specials', 'q'));
     }
 

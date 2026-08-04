@@ -118,7 +118,11 @@
       "Bash(grep -c '\\\\\\\\\\\\\\\\Storage::' app/Http/Controllers/Admin/BibliotecaController.php)",
       "Bash(echo \"=== ¿queda algun \\\\\\\\Storage:: con barra? \\(debe ser 0\\) ===\")",
       "Bash(grep -c '\\\\\\\\Storage::' app/Http/Controllers/Admin/BibliotecaController.php)",
-      "Bash(php artisan tinker '--execute= *)"
+      "Bash(php artisan tinker '--execute= *)",
+      "Bash(php -l \"C:/Users/NITRO/Documents/Proyectos/Waras/app/Http/Controllers/Admin/BibliotecaController.php\")",
+      "Bash(php -l \"C:/Users/NITRO/Documents/Proyectos/Waras/app/Http/Controllers/Admin/FototecaController.php\")",
+      "Bash(php -l app/Http/Controllers/Concerns/HasSortableColumns.php)",
+      "Bash(awk -F: '{s+=$2} END {print s\" headers ordenables en total\"}')"
     ],
     "additionalDirectories": [
       "c:\\Users\\NITRO\\Documents\\Proyectos\\Waras\\.git\\hooks"

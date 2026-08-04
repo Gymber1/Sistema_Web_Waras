@@ -1,4 +1,4 @@
-<div class="px-6 py-4 border-t border-slate-100 dark:border-dark-border flex flex-col sm:flex-row items-center justify-between gap-3">
+<div class="admin-pagination px-6 py-4 border-t border-slate-100 dark:border-dark-border flex flex-col sm:flex-row items-center justify-between gap-3">
     <p class="text-sm text-slate-500 dark:text-slate-400">
         Mostrando <span class="font-semibold text-slate-700 dark:text-slate-200">{{ $paginator->firstItem() ?? 0 }}</span>
         a <span class="font-semibold text-slate-700 dark:text-slate-200">{{ $paginator->lastItem() ?? 0 }}</span>

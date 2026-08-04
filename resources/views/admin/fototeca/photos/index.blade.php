@@ -57,11 +57,11 @@
                     <tr>
                         <th class="px-4 py-4 w-10"><input type="checkbox" class="row-check check-all"></th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Imagen</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Título</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Fotógrafos</th>
+                        <x-sort-th column="title" label="Título" />
+                        <x-sort-th column="photographers" label="Fotógrafos" />
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Etiqueta</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ubicación</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Fecha</th>
+                        <x-sort-th column="location" label="Ubicación" />
+                        <x-sort-th column="year" label="Fecha" align="center" />
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Acciones</th>
                     </tr>
                 </thead>

@@ -51,10 +51,10 @@
                     <tr>
                         <th class="px-4 py-4 w-10"><input type="checkbox" class="row-check check-all"></th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Portada</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Título</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Autores</th>
+                        <x-sort-th column="title" label="Título" />
+                        <x-sort-th column="authors" label="Autores" />
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Categorías</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">Año</th>
+                        <x-sort-th column="publication_year" label="Año" align="center" />
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Acciones</th>
                     </tr>
                 </thead>

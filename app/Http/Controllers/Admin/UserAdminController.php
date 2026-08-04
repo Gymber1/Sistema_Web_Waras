@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\HasSortableColumns;
 use App\Models\User;
 use App\Models\Module;
 use Illuminate\Http\Request;
@@ -10,19 +11,23 @@ use Illuminate\Validation\Rules\Password;
 
 class UserAdminController extends Controller
 {
+    use HasSortableColumns;
+
     public function index(Request $request)
     {
         $q = trim((string) $request->input('search', ''));
 
-        $users = User::with('modules')
+        $query = User::with('modules')
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($sub) use ($q) {
                     $sub->where('name', 'like', "%{$q}%")
                         ->orWhere('email', 'like', "%{$q}%");
                 });
-            })
-            ->paginate(10)
-            ->withQueryString();
+            });
+
+        $query = $this->applySort($query, $request, ['name', 'email', 'is_admin_global', 'created_at'], 'name', 'asc');
+
+        $users = $query->paginate(10)->withQueryString();
         $modules = Module::orderBy('name')->get();
         return view('admin.users.index', compact('users', 'modules', 'q'));
     }

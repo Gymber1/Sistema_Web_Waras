@@ -51,11 +51,11 @@
                 <thead class="bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-200 dark:border-dark-border">
                     <tr>
                         <th class="px-4 py-4 w-10"><input type="checkbox" class="row-check check-all"></th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nombre</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Rol</th>
+                        <x-sort-th column="name" label="Nombre" />
+                        <x-sort-th column="email" label="Email" />
+                        <x-sort-th column="is_admin_global" label="Rol" />
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Módulos Accesibles</th>
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Creado</th>
+                        <x-sort-th column="created_at" label="Creado" />
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Acciones</th>
                     </tr>
                 </thead>

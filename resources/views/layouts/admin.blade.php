@@ -781,12 +781,18 @@
             const curForm = wrapper.querySelector('form[method="GET"], form[method="get"]') || form;
             const action = curForm.getAttribute('action') || window.location.pathname;
             const params = new URLSearchParams(new FormData(curForm));
+            // Preservar el ordenamiento activo (sort/dir de la URL actual) al buscar
+            const cur = new URLSearchParams(window.location.search);
+            ['sort', 'dir'].forEach(k => {
+                if (cur.get(k) && !params.has(k)) params.set(k, cur.get(k));
+            });
             const qs = params.toString();
             return qs ? `${action}?${qs}` : action;
         }
 
-        async function runSearch() {
-            const url = buildUrl();
+        // Carga una URL por AJAX y reemplaza el contenido del wrapper (sin recargar la página).
+        // Se usa para buscar, ordenar (sort) y paginar.
+        async function loadInto(url) {
             const mySeq = ++seq;
 
             // Cancelar petición anterior en curso
@@ -844,6 +850,10 @@
             }
         }
 
+        function runSearch() {
+            return loadInto(buildUrl());
+        }
+
         function bindInput(el) {
             el.addEventListener('input', function () {
                 clearTimeout(timer);
@@ -864,6 +874,18 @@
                 runSearch();
             }
         });
+
+        // Ordenamiento (clic en encabezado) y paginación por AJAX (sin recargar).
+        wrapper.addEventListener('click', function (ev) {
+            const link = ev.target.closest('.sort-link, .admin-pagination a');
+            if (!link) return;
+            const href = link.getAttribute('href');
+            if (!href || href === '#') return;
+            ev.preventDefault();
+            clearTimeout(timer);
+            loadInto(href);
+        });
+
         bindInput(input);
     })();
     </script>
