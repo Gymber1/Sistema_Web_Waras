@@ -346,22 +346,22 @@
                 <div class="sort-select-wrap">
                     <button class="sort-btn" id="sortBtn" aria-haspopup="listbox">
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                        <span id="sortLabel">Ordenar: A-Z</span>
+                        <span id="sortLabel">Ordenar: Año ↑</span>
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                     </button>
                     <div class="sort-dropdown" id="sortDropdown" role="listbox">
-                        <button class="sort-option active" data-value="az" role="option">A–Z</button>
+                        <button class="sort-option" data-value="az" role="option">A–Z</button>
                         <button class="sort-option" data-value="recent" role="option">Más recientes</button>
                         <button class="sort-option" data-value="old" role="option">Más antiguos</button>
-                        <button class="sort-option" data-value="year_asc" role="option">Por año ↑</button>
+                        <button class="sort-option active" data-value="year_asc" role="option">Por año ↑</button>
                         <button class="sort-option" data-value="year_desc" role="option">Por año ↓</button>
                     </div>
                     <!-- hidden select for JS compatibility -->
                     <select id="sortSelect" style="display:none">
+                        <option value="year_asc">Por año ↑</option>
                         <option value="az">A-Z</option>
                         <option value="recent">Más recientes</option>
                         <option value="old">Más antiguos</option>
-                        <option value="year_asc">Por año ↑</option>
                         <option value="year_desc">Por año ↓</option>
                     </select>
                 </div>

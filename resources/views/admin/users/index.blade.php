@@ -178,7 +178,7 @@
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Contraseña <span class="text-red-500">*</span></label>
                     <input type="password" name="password" required
                         class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all"
-                        placeholder="Mínimo 8 caracteres">
+                        placeholder="Escribe la contraseña">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Rol <span class="text-red-500">*</span></label>
@@ -234,11 +234,17 @@
         </div>
         <form id="resetForm" method="POST" class="p-8 space-y-5">
             @csrf
+            @if($errors->resetPassword->any())
+            <div class="flex items-start gap-3 px-4 py-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 rounded-lg text-sm">
+                <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                <ul class="space-y-1">@foreach($errors->resetPassword->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+            </div>
+            @endif
             <div>
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nueva Contraseña <span class="text-red-500">*</span></label>
                 <input type="password" name="password" required
                     class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none transition-all"
-                    placeholder="Mínimo 8 caracteres">
+                    placeholder="Escribe la nueva contraseña">
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Confirmar Contraseña <span class="text-red-500">*</span></label>
@@ -271,7 +277,12 @@ function openResetModal(userId, userName) {
     openModal('modal-reset');
 }
 
-@if($errors->any())
+// Reabrir el modal correcto según de dónde vino el error
+@if($errors->resetPassword->any())
+    // Error al cambiar contraseña → reabrir ese modal con el usuario correcto
+    openResetModal({{ session('reset_user_id') }}, @json(session('reset_user_name')));
+@elseif($errors->any())
+    // Error al crear/editar usuario → reabrir el modal de crear
     openModal('modal-create');
 @endif
 </script>

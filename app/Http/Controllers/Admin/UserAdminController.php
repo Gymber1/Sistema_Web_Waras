@@ -7,7 +7,7 @@ use App\Http\Controllers\Concerns\HasSortableColumns;
 use App\Models\User;
 use App\Models\Module;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Validator;
 
 class UserAdminController extends Controller
 {
@@ -37,7 +37,7 @@ class UserAdminController extends Controller
         $validated = $request->validate([
             'name'       => 'required|string|max:255',
             'email'      => 'required|email|unique:users,email',
-            'password'   => ['required', Password::min(8)],
+            'password'   => ['required', 'string', 'min:1'],
             'role'       => 'required|in:admin,moderator',
             'modules'    => 'nullable|array',
             'modules.*'  => 'exists:modules,id',
@@ -70,7 +70,7 @@ class UserAdminController extends Controller
         $validated = $request->validate([
             'name'      => 'required|string|max:255',
             'email'     => 'required|email|unique:users,email,' . $user->id,
-            'password'  => ['nullable', Password::min(8)],
+            'password'  => ['nullable', 'string', 'min:1'],
             'role'      => 'required|in:admin,moderator',
             'modules'   => 'nullable|array',
             'modules.*' => 'exists:modules,id',
@@ -112,9 +112,17 @@ class UserAdminController extends Controller
 
     public function resetPassword(Request $request, User $user)
     {
-        $request->validate([
-            'password' => ['required', 'confirmed', Password::min(8)],
+        // Bag propio para que el error se muestre en el modal de contraseña (no en el de crear)
+        $validator = Validator::make($request->all(), [
+            'password' => ['required', 'confirmed', 'string', 'min:1'],
         ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator, 'resetPassword')
+                ->with('reset_user_id', $user->id)
+                ->with('reset_user_name', $user->name);
+        }
 
         $user->update(['password' => $request->password]);
 
