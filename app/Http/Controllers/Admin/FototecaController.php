@@ -534,7 +534,16 @@ class FototecaController extends Controller
                     $sub->where('name', 'like', "%{$q}%");
                 });
             });
-        $query = $this->applySort($query, $request, ['name'], 'name', 'asc');
+        $query = $this->applySort($query, $request, ['name'], 'name', 'asc', [
+            // Ordenar por el nombre de la categoría padre directa
+            'parent' => fn($qb, $dir) => $qb->orderBy(
+                Category::from('categories as parent')
+                    ->select('parent.name')
+                    ->whereColumn('parent.id', 'categories.parent_id')
+                    ->limit(1),
+                $dir
+            ),
+        ]);
         $subcategories = $query->paginate(10)->withQueryString();
         $parentCategories = Category::where('type', 'fototeca')->whereNull('parent_id')->orderBy('name')->get();
         return view('admin.fototeca.subcategories.index', compact('subcategories', 'parentCategories', 'q'));
@@ -607,7 +616,16 @@ class FototecaController extends Controller
                     $sub->where('name', 'like', "%{$q}%");
                 });
             });
-        $query = $this->applySort($query, $request, ['name'], 'name', 'asc');
+        $query = $this->applySort($query, $request, ['name'], 'name', 'asc', [
+            // Ordenar por el nombre de la categoría padre directa (subcategoría)
+            'parent' => fn($qb, $dir) => $qb->orderBy(
+                Category::from('categories as parent')
+                    ->select('parent.name')
+                    ->whereColumn('parent.id', 'categories.parent_id')
+                    ->limit(1),
+                $dir
+            ),
+        ]);
         $sublevels = $query->paginate(10)->withQueryString();
         // padres válidos = depth 1
         $parentCategories = Category::where('type', 'fototeca')
@@ -827,7 +845,16 @@ class FototecaController extends Controller
                     $sub->where('name', 'like', "%{$q}%");
                 });
             });
-        $query = $this->applySort($query, $request, ['name'], 'name', 'asc');
+        $query = $this->applySort($query, $request, ['name'], 'name', 'asc', [
+            // Ordenar por el nombre de la categoría padre directa (1er Nivel)
+            'parent' => fn($qb, $dir) => $qb->orderBy(
+                Category::from('categories as parent')
+                    ->select('parent.name')
+                    ->whereColumn('parent.id', 'categories.parent_id')
+                    ->limit(1),
+                $dir
+            ),
+        ]);
         $secondlevels = $query->paginate(10)->withQueryString();
         // padres válidos = depth 2
         $parentCategories = Category::where('type', 'fototeca')
@@ -928,7 +955,16 @@ class FototecaController extends Controller
                     $sub->where('name', 'like', "%{$q}%");
                 });
             });
-        $query = $this->applySort($query, $request, ['name'], 'name', 'asc');
+        $query = $this->applySort($query, $request, ['name'], 'name', 'asc', [
+            // Ordenar por el nombre de la categoría padre directa (2do Nivel)
+            'parent' => fn($qb, $dir) => $qb->orderBy(
+                Category::from('categories as parent')
+                    ->select('parent.name')
+                    ->whereColumn('parent.id', 'categories.parent_id')
+                    ->limit(1),
+                $dir
+            ),
+        ]);
         $thirdlevels = $query->paginate(10)->withQueryString();
         // padres válidos = depth 3
         $parentCategories = Category::where('type', 'fototeca')

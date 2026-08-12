@@ -78,7 +78,9 @@ class Book extends Model
 
     public function descriptors(): BelongsToMany
     {
-        return $this->belongsToMany(Descriptor::class, 'book_descriptor');
+        return $this->belongsToMany(Descriptor::class, 'book_descriptor')
+            ->withPivot('order')
+            ->orderBy('order');
     }
 
     /**

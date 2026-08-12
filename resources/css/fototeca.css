@@ -109,7 +109,7 @@ body { padding-top: var(--nav-h); }
     border-bottom-color: transparent;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .g-nav-links { display: none; }
     .g-hamburger { display: flex; }
 }
@@ -467,6 +467,28 @@ body { padding-top: var(--nav-h); }
 .sidebar::-webkit-scrollbar { width: 4px; }
 .sidebar::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
 .sidebar.no-sidebar { display: none; }
+
+/* Ocultar/mostrar el panel lateral (botón del usuario) */
+.sidebar-collapse-btn {
+    margin-left: auto; background: none; border: none; color: var(--gold); cursor: pointer;
+    font-size: 1.05rem; padding: 0.15rem; display: inline-flex; align-items: center; line-height: 1;
+    opacity: 0.9; transition: opacity .2s, color .2s;
+}
+.sidebar-collapse-btn:hover { color: #fff; opacity: 1; }
+.gallery-layout.sidebar-collapsed .sidebar { display: none; }
+.sidebar-show-btn {
+    display: none; position: sticky; top: calc(var(--nav-h) + 12px); align-self: flex-start;
+    z-index: 40; background: var(--gold); color: #000; border: none; cursor: pointer;
+    padding: 0.5rem 0.7rem; border-radius: 0 6px 6px 0; font-size: 0.75rem; font-weight: 600;
+    align-items: center; gap: 0.35rem; box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+}
+.sidebar-show-btn:hover { background: var(--gold-hover, #b8934f); }
+.gallery-layout.sidebar-collapsed .sidebar-show-btn { display: inline-flex; }
+@media (max-width: 1024px) {
+    /* En móvil/tablet el panel usa el overlay; el colapso de escritorio no aplica */
+    .sidebar-collapse-btn, .gallery-layout.sidebar-collapsed .sidebar-show-btn { display: none !important; }
+    .gallery-layout.sidebar-collapsed .sidebar { display: flex; }
+}
 .sidebar-header {
     padding: 1.5rem 1.5rem 1rem;
     border-bottom: 1px solid var(--border-line);

@@ -251,13 +251,19 @@
     <!-- Main Content -->
     <div class="main-wrapper hidden" id="mainWrapper">
         <!-- Sidebar -->
+        <button class="sidebar-show-btn" id="sidebarShowBtn" onclick="toggleSidebarCollapse()" title="Mostrar panel de materias">
+            <i class="fas fa-filter"></i> Materias
+        </button>
         <aside class="sidebar" id="mobileSidebar">
             <div class="sidebar-header" style="justify-content:space-between">
                 <div style="display:flex;align-items:center;gap:0.75rem">
                     <i class="fas fa-filter"></i>
                     <span class="sidebar-title">Explorar Catálogo</span>
                 </div>
-                <button onclick="closeMobileSidebar()" id="sidebarCloseBtn" style="background:none;border:none;color:#1b2a47;font-size:1.25rem;cursor:pointer;display:none;padding:0"><i class="fas fa-times"></i></button>
+                <div style="display:flex;align-items:center;gap:0.9rem">
+                    <button onclick="toggleSidebarCollapse()" id="sidebarCollapseBtn" class="sidebar-collapse-btn" title="Ocultar panel"><i class="fas fa-angles-left"></i></button>
+                    <button onclick="closeMobileSidebar()" id="sidebarCloseBtn" style="background:none;border:none;color:#1b2a47;font-size:1.25rem;cursor:pointer;display:none;padding:0"><i class="fas fa-times"></i></button>
+                </div>
             </div>
 
             <div class="categories-section">
@@ -297,10 +303,10 @@
                     <i class="fas fa-sliders-h" style="color: #9ca3af;"></i>
                     <span>Ordenar por:</span>
                     <select class="sort-select" id="sortSelect">
+                        <option value="year_asc" selected>Por año ↑</option>
                         <option value="az">Ordenar A-Z</option>
                         <option value="recent">Más recientes</option>
                         <option value="old">Más antiguos</option>
-                        <option value="year_asc">Por año ↑</option>
                         <option value="year_desc">Por año ↓</option>
                     </select>
                 </div>
@@ -551,22 +557,35 @@
     <script>
         // ========== CATEGORÍAS DINÁMICAS DESDE LARAVEL ==========
         const categoriesFromDatabase = @json($categoriesForFilters ?? []);
+        const revistaCategoriesFromDatabase = @json($revistaCategoriesForFilters ?? []);
+        // Devuelve el árbol de categorías correcto según la sección activa
+        function categoriesTreeForTab(tab) {
+            return tab === 'Revistas' ? revistaCategoriesFromDatabase : categoriesFromDatabase;
+        }
 
-        // Flat list of {id, name} objects from DB (parents + children)
-        const allDbCategories = [];
-        categoriesFromDatabase.forEach(parent => {
-            allDbCategories.push({ id: parent.id, name: parent.name });
-            (parent.children || []).forEach(child => {
-                allDbCategories.push({ id: child.id, name: child.name });
+        // Aplana un árbol de categorías a una lista de {id, name} (padres + hijos)
+        function flattenCategoryTree(tree) {
+            const out = [];
+            (tree || []).forEach(parent => {
+                out.push({ id: parent.id, name: parent.name });
+                (parent.children || []).forEach(child => {
+                    out.push({ id: child.id, name: child.name });
+                });
             });
-        });
+            return out;
+        }
+
+        // Listas planas independientes: libros vs revistas
+        const allDbCategories        = flattenCategoryTree(categoriesFromDatabase);
+        const allRevistaDbCategories = flattenCategoryTree(revistaCategoriesFromDatabase);
 
         // categoriesBySection stores arrays of {id, name} objects
-        // Books/Revistas use DB categories; others use label-only items (no filtering)
+        // Libros y Revistas usan SUS PROPIAS categorías (independientes).
+        // Si una sección no tiene categorías registradas, solo se muestra "Todos".
         const categoriesBySection = {
-            'Libros':          allDbCategories.length ? allDbCategories : [{ id: null, name: 'Todos' }],
-            'Revistas':        allDbCategories.length ? allDbCategories : [{ id: null, name: 'Todos' }],
-            'Waras Editorial': allDbCategories.length ? allDbCategories : [{ id: null, name: 'Todos' }],
+            'Libros':          allDbCategories.length        ? allDbCategories        : [{ id: null, name: 'Todos' }],
+            'Revistas':        allRevistaDbCategories.length ? allRevistaDbCategories : [{ id: null, name: 'Todos' }],
+            'Waras Editorial': allDbCategories.length        ? allDbCategories        : [{ id: null, name: 'Todos' }],
             'Especiales':      [{ id: null, name: 'Todos' }],
             'Autores':         [{ id: null, name: 'Todos' }],
         };
@@ -737,7 +756,8 @@
 
         function renderCategories() {
             const list = document.getElementById('categoriesList');
-            const useAccordion = ['Libros', 'Revistas', 'Waras Editorial'].includes(state.activeTab) && categoriesFromDatabase.length > 0;
+            const activeTree = categoriesTreeForTab(state.activeTab);
+            const useAccordion = ['Libros', 'Revistas', 'Waras Editorial'].includes(state.activeTab) && activeTree.length > 0;
 
             if (useAccordion) {
                 const allActive = state.activeCategory && state.activeCategory.id === null;
@@ -748,7 +768,7 @@
                     </button>
                 </li>`;
 
-                list.innerHTML = todosItem + categoriesFromDatabase.map(node => buildCatNodeHtml(node, 0)).join('');
+                list.innerHTML = todosItem + activeTree.map(node => buildCatNodeHtml(node, 0)).join('');
 
                 // "Todos" button
                 const todosBtn = list.querySelector('.category-btn');
@@ -1129,6 +1149,9 @@
         function showDetailView(item) {
             if (item.detail_url) {
                 sessionStorage.setItem('biblioteca_tab', state.activeTab);
+                // Guardar la URL exacta del catálogo actual (incluye ?descriptor= si aplica)
+                // para que el botón "Atrás" de la ficha regrese al mismo estado.
+                sessionStorage.setItem('biblioteca_return_url', window.location.href);
                 window.location.href = item.detail_url;
                 return;
             }
@@ -1253,20 +1276,74 @@
         // Activar sección según la ruta visitada (definida por el servidor)
         const validTabs = ['Inicio','Libros','Revistas','Waras Editorial','Especiales','Autores'];
 
-        // serverActiveSection tiene prioridad cuando la URL apunta a una sección concreta.
-        // sessionStorage solo aplica cuando se llega al dashboard raíz (/biblioteca o /biblioteca/inicio).
-        const sectionTab = validTabs.includes(serverActiveSection) ? serverActiveSection : 'Inicio';
-        if (sectionTab !== 'Inicio') {
-            sessionStorage.removeItem('biblioteca_tab');
-            showSection(sectionTab);
-        } else {
-            const pendingTab = sessionStorage.getItem('biblioteca_tab');
-            if (pendingTab && validTabs.includes(pendingTab)) {
+        // Deja la interfaz en el estado correcto según la URL actual + sessionStorage.
+        // Se usa al cargar la página y también al volver con la flecha del navegador (bfcache),
+        // para evitar bugs visuales de un DOM restaurado en un estado inconsistente.
+        function initViewFromLocation() {
+            // Asegurar que la vista de detalle (SPA) quede oculta al (re)inicializar
+            document.getElementById('detailView')?.classList.add('hidden');
+
+            // ¿Llega desde un descriptor de la ficha de un libro? (?descriptor=Nombre)
+            const urlDescriptor = new URLSearchParams(window.location.search).get('descriptor');
+
+            // serverActiveSection tiene prioridad cuando la URL apunta a una sección concreta.
+            // sessionStorage solo aplica cuando se llega al dashboard raíz (/biblioteca o /biblioteca/inicio).
+            const sectionTab = validTabs.includes(serverActiveSection) ? serverActiveSection : 'Inicio';
+            if (urlDescriptor) {
+                // Forzar la sección Libros y aplicar el filtro de descriptor
+                showSection('Libros');
+                applyDescriptorFromName(urlDescriptor);
+            } else if (sectionTab !== 'Inicio') {
                 sessionStorage.removeItem('biblioteca_tab');
-                if (pendingTab === 'Inicio') showHero(); else showSection(pendingTab);
+                showSection(sectionTab);
             } else {
-                showHero();
+                const pendingTab = sessionStorage.getItem('biblioteca_tab');
+                if (pendingTab && validTabs.includes(pendingTab)) {
+                    sessionStorage.removeItem('biblioteca_tab');
+                    if (pendingTab === 'Inicio') showHero(); else showSection(pendingTab);
+                } else {
+                    showHero();
+                }
             }
+        }
+
+        initViewFromLocation();
+
+        // Al volver con la flecha del navegador desde una página restaurada de la caché
+        // (bfcache), el DOM puede quedar en un estado inconsistente → reconstruir la vista.
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted) initViewFromLocation();
+        });
+
+        // Activa el filtro por nombre de descriptor (usado al llegar desde una ficha de libro).
+        // Filtra SIEMPRE de forma estricta por el nombre exacto del descriptor, esté o no
+        // entre los 20 más usados (chips). Así el filtro que viene de ?descriptor= sí funciona.
+        function applyDescriptorFromName(name) {
+            const target = normalizeStr(name);
+            const input = document.getElementById('contentSearchInput');
+            if (input) input.value = name;
+
+            // Si coincide con un chip del top-20, marcarlo visualmente
+            const match = (topDescriptorsData || []).find(d => normalizeStr(d.name) === target);
+            activeDescriptorId = match ? match.id : null;
+            renderDescriptorChips();
+
+            filterByDescriptorName(name);
+            const grid = document.getElementById('booksGrid');
+            if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Filtra el catálogo por el NOMBRE del descriptor (coincidencia exacta, sin acentos/mayúsculas)
+        function filterByDescriptorName(name) {
+            const target = normalizeStr(name);
+            const tab = state.activeTab;
+            const allItems = dataBySectionAndCategory[tab]?.['default'] || [];
+            const filtered = allItems.filter(item =>
+                (item.descriptorNames || []).some(dn => normalizeStr(dn) === target)
+            );
+            searchFilteredItems = filtered;
+            state.currentPage = 1;
+            renderSearchResults(filtered, name, false);
         }
 
         // ========== BÚSQUEDA ==========
@@ -1741,6 +1818,22 @@
         }
         window.openMobileNav  = openMobileNav;
         window.closeMobileNav = closeMobileNav;
+
+        // ========== OCULTAR/MOSTRAR PANEL LATERAL (escritorio) ==========
+        function toggleSidebarCollapse() {
+            const wrapper = document.getElementById('mainWrapper');
+            const collapsed = wrapper.classList.toggle('sidebar-collapsed');
+            try { localStorage.setItem('biblioteca_sidebar_collapsed', collapsed ? '1' : '0'); } catch (e) {}
+        }
+        window.toggleSidebarCollapse = toggleSidebarCollapse;
+        // Restaurar preferencia al cargar
+        (function() {
+            try {
+                if (localStorage.getItem('biblioteca_sidebar_collapsed') === '1') {
+                    document.getElementById('mainWrapper')?.classList.add('sidebar-collapsed');
+                }
+            } catch (e) {}
+        })();
 
         // ========== MOBILE SIDEBAR ==========
         function openMobileSidebar() {

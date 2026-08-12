@@ -117,7 +117,7 @@ body { font-family: 'Poppins', sans-serif; color: #333; line-height: 1.6; backgr
 }
 .mobile-nav-logout:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.5); }
 
-@media(max-width: 768px) {
+@media(max-width: 1024px) {
     .desktop-nav { display: none; }
     .hamburger-btn { display: block; }
 }

@@ -159,7 +159,9 @@
             <p class="section-label">Descriptores</p>
             <div class="cats">
                 @foreach($book->descriptors as $desc)
-                    <span class="cat-badge" style="background:#f0fdf4;color:#166534;border-color:#bbf7d0;">{{ $desc->name }}</span>
+                    <a href="{{ route('biblioteca.libros.index', ['descriptor' => $desc->name]) }}"
+                       class="cat-badge cat-badge-link" style="background:#f0fdf4;color:#166534;border-color:#bbf7d0;text-decoration:none;"
+                       title="Ver libros con el descriptor «{{ $desc->name }}»">{{ $desc->name }}</a>
                 @endforeach
             </div>
             @endif
@@ -197,20 +199,30 @@
 
 <script>
     (function() {
-        const backUrl   = sessionStorage.getItem('back_url');
-        const backLabel = sessionStorage.getItem('back_label');
+        const backUrl    = sessionStorage.getItem('back_url');
+        const backLabel  = sessionStorage.getItem('back_label');
+        const returnUrl  = sessionStorage.getItem('biblioteca_return_url'); // URL exacta del catálogo (con ?descriptor=)
         const tab  = sessionStorage.getItem('biblioteca_tab') || 'Libros';
         const base = '{{ route('biblioteca.dashboard') }}';
+        const backBtn = document.getElementById('backBtn');
+        const bc      = document.getElementById('breadcrumbSection');
+
         if (backUrl) {
-            document.getElementById('backBtn').href = backUrl;
-            const bc = document.getElementById('breadcrumbSection');
+            // Contexto explícito (p. ej. desde una colección/especial)
+            backBtn.href = backUrl;
             bc.href = backUrl;
             bc.textContent = backLabel || 'Especiales';
             sessionStorage.removeItem('back_url');
             sessionStorage.removeItem('back_label');
+        } else if (returnUrl) {
+            // Regresar exactamente al catálogo desde donde se abrió el libro
+            // (conserva el filtro por descriptor u otra vista).
+            backBtn.href = returnUrl;
+            bc.href = returnUrl;
+            bc.textContent = tab;
+            sessionStorage.removeItem('biblioteca_return_url');
         } else {
-            document.getElementById('backBtn').href = base + '#' + tab;
-            const bc = document.getElementById('breadcrumbSection');
+            backBtn.href = base + '#' + tab;
             bc.href = base + '#' + tab;
             bc.textContent = tab;
         }

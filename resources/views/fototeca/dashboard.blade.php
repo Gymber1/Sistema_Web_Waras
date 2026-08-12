@@ -96,7 +96,7 @@
         .ftc-mobile-link.active { color: #c5a66d !important; }
         .ftc-mobile-admin { color: #c5a66d; }
         .g-nav.nav-transparent { background: rgba(0,0,0,0.35) !important; border-bottom-color: transparent; }
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .g-nav-links { display: none !important; }
             .g-hamburger { display: flex !important; }
         }
@@ -299,6 +299,11 @@
     <!-- ── GALLERY LAYOUT ─────────────────────────────────────────── -->
     <div class="gallery-layout hidden" id="galleryLayout">
 
+        <!-- Botón flotante para volver a mostrar el panel -->
+        <button class="sidebar-show-btn" id="ftcSidebarShowBtn" onclick="toggleFtcSidebar()" title="Mostrar filtros">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg> Filtros
+        </button>
+
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
@@ -309,6 +314,9 @@
                     <p class="sidebar-title-text">FOTOTECA</p>
                     <p class="sidebar-subtitle-text">Ancash Digital</p>
                 </div>
+                <button class="sidebar-collapse-btn" onclick="toggleFtcSidebar()" title="Ocultar panel" aria-label="Ocultar panel">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+                </button>
                 <button class="sidebar-close-btn" id="sidebarClose">✕</button>
             </div>
 
@@ -1091,6 +1099,21 @@
         }
         document.getElementById('hamburgerBtn')?.addEventListener('click', openSidebar);
         document.getElementById('sidebarClose')?.addEventListener('click', closeSidebar);
+
+        // Ocultar/mostrar el panel de filtros en escritorio
+        function toggleFtcSidebar() {
+            const layout = document.getElementById('galleryLayout');
+            const collapsed = layout.classList.toggle('sidebar-collapsed');
+            try { localStorage.setItem('fototeca_sidebar_collapsed', collapsed ? '1' : '0'); } catch (e) {}
+        }
+        window.toggleFtcSidebar = toggleFtcSidebar;
+        (function () {
+            try {
+                if (localStorage.getItem('fototeca_sidebar_collapsed') === '1') {
+                    document.getElementById('galleryLayout')?.classList.add('sidebar-collapsed');
+                }
+            } catch (e) {}
+        })();
         document.getElementById('sidebarOverlay')?.addEventListener('click', closeSidebar);
 
         // ── NAV TRANSPARENTE EN HERO ─────────────────────────────────

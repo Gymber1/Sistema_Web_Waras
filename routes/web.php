@@ -136,6 +136,33 @@ Route::middleware('auth')->group(function () {
             Route::delete('/firstlevels/{category}', [AdminBibliotecaController::class, 'destroyFirstlevel'])->name('firstlevels.destroy');
             Route::delete('/firstlevels', [AdminBibliotecaController::class, 'bulkDestroyFirstlevels'])->name('firstlevels.bulk-destroy');
 
+            // Categorías de Revistas (árbol independiente type='revista')
+            Route::get('/revista-categories', [AdminBibliotecaController::class, 'indexRevistaCategories'])->name('revista-categories');
+            Route::get('/revista-categories/create', [AdminBibliotecaController::class, 'createRevistaCategory'])->name('revista-categories.create');
+            Route::post('/revista-categories', [AdminBibliotecaController::class, 'storeRevistaCategory'])->name('revista-categories.store');
+            Route::get('/revista-categories/{category}/edit', [AdminBibliotecaController::class, 'editRevistaCategory'])->name('revista-categories.edit');
+            Route::put('/revista-categories/{category}', [AdminBibliotecaController::class, 'updateRevistaCategory'])->name('revista-categories.update');
+            Route::delete('/revista-categories/{category}', [AdminBibliotecaController::class, 'destroyRevistaCategory'])->name('revista-categories.destroy');
+            Route::delete('/revista-categories', [AdminBibliotecaController::class, 'bulkDestroyRevistaCategories'])->name('revista-categories.bulk-destroy');
+
+            // SubCategorías de Revistas
+            Route::get('/revista-subcategories', [AdminBibliotecaController::class, 'indexRevistaSubcategories'])->name('revista-subcategories');
+            Route::get('/revista-subcategories/create', [AdminBibliotecaController::class, 'createRevistaSubcategory'])->name('revista-subcategories.create');
+            Route::post('/revista-subcategories', [AdminBibliotecaController::class, 'storeRevistaSubcategory'])->name('revista-subcategories.store');
+            Route::get('/revista-subcategories/{category}/edit', [AdminBibliotecaController::class, 'editRevistaSubcategory'])->name('revista-subcategories.edit');
+            Route::put('/revista-subcategories/{category}', [AdminBibliotecaController::class, 'updateRevistaSubcategory'])->name('revista-subcategories.update');
+            Route::delete('/revista-subcategories/{category}', [AdminBibliotecaController::class, 'destroyRevistaSubcategory'])->name('revista-subcategories.destroy');
+            Route::delete('/revista-subcategories', [AdminBibliotecaController::class, 'bulkDestroyRevistaSubcategories'])->name('revista-subcategories.bulk-destroy');
+
+            // 1er Nivel de Revistas (depth 2)
+            Route::get('/revista-firstlevels', [AdminBibliotecaController::class, 'indexRevistaFirstlevels'])->name('revista-firstlevels');
+            Route::get('/revista-firstlevels/create', [AdminBibliotecaController::class, 'createRevistaFirstlevel'])->name('revista-firstlevels.create');
+            Route::post('/revista-firstlevels', [AdminBibliotecaController::class, 'storeRevistaFirstlevel'])->name('revista-firstlevels.store');
+            Route::get('/revista-firstlevels/{category}/edit', [AdminBibliotecaController::class, 'editRevistaFirstlevel'])->name('revista-firstlevels.edit');
+            Route::put('/revista-firstlevels/{category}', [AdminBibliotecaController::class, 'updateRevistaFirstlevel'])->name('revista-firstlevels.update');
+            Route::delete('/revista-firstlevels/{category}', [AdminBibliotecaController::class, 'destroyRevistaFirstlevel'])->name('revista-firstlevels.destroy');
+            Route::delete('/revista-firstlevels', [AdminBibliotecaController::class, 'bulkDestroyRevistaFirstlevels'])->name('revista-firstlevels.bulk-destroy');
+
             // Especiales (grupos/colecciones)
             Route::get('/specials', [AdminBibliotecaController::class, 'indexSpecials'])->name('specials');
             Route::get('/specials/create', [AdminBibliotecaController::class, 'createSpecial'])->name('specials.create');

@@ -58,6 +58,15 @@ class BibliotecaController extends Controller
                     ->limit(1),
                 $dir
             ),
+            // Ordenar por el nombre de la primera categoría asociada
+            'categories' => fn($qb, $dir) => $qb->orderBy(
+                Category::select('name')
+                    ->join('book_category', 'categories.id', '=', 'book_category.category_id')
+                    ->whereColumn('book_category.book_id', 'books.id')
+                    ->orderBy('name')
+                    ->limit(1),
+                $dir
+            ),
         ]);
         $books = $query->paginate(10)->withQueryString();
         $authors    = Author::orderBy('name')->get();
@@ -127,7 +136,7 @@ class BibliotecaController extends Controller
 
         $book = Book::create($data);
         $book->authors()->sync($this->withOrder($request->authors ?? []));
-        $book->descriptors()->sync($request->descriptors ?? []);
+        $book->descriptors()->sync($this->withOrder($request->descriptors ?? []));
         $catIds = array_filter([$request->category_id, $request->subcategory_id, $request->firstlevel_id]);
         $book->categories()->sync($catIds);
 
@@ -182,7 +191,7 @@ class BibliotecaController extends Controller
 
         $book->update($data);
         $book->authors()->sync($this->withOrder($request->authors ?? []));
-        $book->descriptors()->sync($request->descriptors ?? []);
+        $book->descriptors()->sync($this->withOrder($request->descriptors ?? []));
         $catIds = array_filter([$request->category_id, $request->subcategory_id, $request->firstlevel_id]);
         $book->categories()->sync($catIds);
 
@@ -542,6 +551,15 @@ class BibliotecaController extends Controller
                     ->limit(1),
                 $dir
             ),
+            // Ordenar por el nombre de la primera categoría asociada
+            'categories' => fn($qb, $dir) => $qb->orderBy(
+                Category::select('name')
+                    ->join('book_category', 'categories.id', '=', 'book_category.category_id')
+                    ->whereColumn('book_category.book_id', 'books.id')
+                    ->orderBy('name')
+                    ->limit(1),
+                $dir
+            ),
         ]);
         $magazines  = $query->paginate(10)->withQueryString();
         $authors    = Author::orderBy('name')->get();
@@ -556,7 +574,7 @@ class BibliotecaController extends Controller
     public function createMagazine()
     {
         $authors     = Author::orderBy('name')->get();
-        $categories  = Category::where('type', 'biblioteca')->whereNull('parent_id')
+        $categories  = Category::where('type', 'revista')->whereNull('parent_id')
                         ->with(['subcategories.subcategories'])->orderBy('name')->get();
         $descriptors = Descriptor::orderBy('name')->get();
         return view('admin.biblioteca.magazines.create', compact('authors', 'categories', 'descriptors'));
@@ -609,7 +627,7 @@ class BibliotecaController extends Controller
 
         $magazine = Book::create($data);
         $magazine->authors()->sync($this->withOrder($request->authors ?? []));
-        $magazine->descriptors()->sync($request->descriptors ?? []);
+        $magazine->descriptors()->sync($this->withOrder($request->descriptors ?? []));
         $catIds = array_filter([$request->category_id, $request->subcategory_id, $request->firstlevel_id]);
         $magazine->categories()->sync($catIds);
 
@@ -662,7 +680,7 @@ class BibliotecaController extends Controller
 
         $book->update($data);
         $book->authors()->sync($this->withOrder($request->authors ?? []));
-        $book->descriptors()->sync($request->descriptors ?? []);
+        $book->descriptors()->sync($this->withOrder($request->descriptors ?? []));
         $catIds = array_filter([$request->category_id, $request->subcategory_id, $request->firstlevel_id]);
         $book->categories()->sync($catIds);
 
@@ -673,7 +691,7 @@ class BibliotecaController extends Controller
     {
         $book->load(['authors', 'categories', 'descriptors']);
         $authors     = Author::orderBy('name')->get();
-        $categories  = Category::where('type', 'biblioteca')->whereNull('parent_id')
+        $categories  = Category::where('type', 'revista')->whereNull('parent_id')
                         ->with(['subcategories.subcategories'])->orderBy('name')->get();
         $descriptors = Descriptor::orderBy('name')->get();
         return view('admin.biblioteca.magazines.edit', compact('book', 'authors', 'categories', 'descriptors'));
@@ -833,6 +851,243 @@ class BibliotecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Category::whereIn('id', $ids)->where('type', 'biblioteca')->delete();
+        return back()->with('success', count($ids) . ' 1er nivel(es) eliminado(s).');
+    }
+
+    // ============= CATEGORÍAS DE REVISTAS =============
+
+    public function indexRevistaCategories(Request $request)
+    {
+        $q = $request->input('search');
+        $query = Category::where('type', 'revista')
+            ->whereNull('parent_id')
+            ->when($q, fn($query) => $query->where('name', 'like', "%{$q}%"));
+        $query = $this->applySort($query, $request, ['name'], 'name', 'asc');
+        $allCategories = $query->paginate(10)->withQueryString();
+        return view('admin.biblioteca.revista-categories.index', compact('allCategories', 'q'));
+    }
+
+    public function createRevistaCategory()
+    {
+        return view('admin.biblioteca.revista-categories.create');
+    }
+
+    public function storeRevistaCategory(Request $request)
+    {
+        $request->validate(['name' => 'required|string|max:255']);
+
+        Category::create([
+            'name'      => $request->name,
+            'slug'      => $this->uniqueSlug($request->name, Category::class),
+            'type'      => 'revista',
+            'parent_id' => null,
+        ]);
+
+        return redirect()->route('admin.biblioteca.revista-categories')->with('success', 'Categoría agregada correctamente.');
+    }
+
+    public function updateRevistaCategory(Request $request, Category $category)
+    {
+        $request->validate(['name' => 'required|string|max:255']);
+
+        $category->update(['name' => $request->name]);
+
+        return redirect()->route('admin.biblioteca.revista-categories')->with('success', 'Categoría actualizada correctamente.');
+    }
+
+    public function editRevistaCategory(Category $category)
+    {
+        return view('admin.biblioteca.revista-categories.edit', compact('category'));
+    }
+
+    public function destroyRevistaCategory(Category $category)
+    {
+        $category->delete();
+        return redirect()->route('admin.biblioteca.revista-categories')->with('success', 'Categoría eliminada.');
+    }
+
+    public function bulkDestroyRevistaCategories(Request $request)
+    {
+        $ids     = array_filter(explode(',', $request->input('ids', '')));
+        $cascade = $request->boolean('cascade');
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        foreach ($ids as $id) {
+            $cat = Category::where('type', 'revista')->whereNull('parent_id')->find($id);
+            if (!$cat) continue;
+            if ($cascade) {
+                // delete all subcategories (level 2) and their children (level 3)
+                foreach ($cat->subcategories as $sub) {
+                    Category::where('parent_id', $sub->id)->delete();
+                    $sub->delete();
+                }
+            }
+            $cat->delete();
+        }
+        return back()->with('success', count($ids) . ' categoría(s) eliminada(s).');
+    }
+
+    // ============= SUBCATEGORÍAS DE REVISTAS =============
+
+    public function indexRevistaSubcategories()
+    {
+        $subcategories = Category::where('type', 'revista')
+            ->whereNotNull('parent_id')
+            ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
+            ->with('parent')
+            ->orderBy('parent_id')
+            ->orderBy('name')
+            ->paginate(10);
+        return view('admin.biblioteca.revista-subcategories.index', compact('subcategories'));
+    }
+
+    public function createRevistaSubcategory()
+    {
+        $parentCategories = Category::where('type', 'revista')
+            ->whereNull('parent_id')
+            ->orderBy('name')
+            ->get();
+        return view('admin.biblioteca.revista-subcategories.create', compact('parentCategories'));
+    }
+
+    public function storeRevistaSubcategory(Request $request)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'parent_id' => 'required|exists:categories,id',
+        ]);
+
+        Category::create([
+            'name'      => $request->name,
+            'slug'      => $this->uniqueSlug($request->name, Category::class),
+            'type'      => 'revista',
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return redirect()->route('admin.biblioteca.revista-subcategories')->with('success', 'Subcategoría agregada correctamente.');
+    }
+
+    public function editRevistaSubcategory(Category $category)
+    {
+        $parentCategories = Category::where('type', 'revista')
+            ->whereNull('parent_id')
+            ->where('id', '!=', $category->id)
+            ->orderBy('name')
+            ->get();
+        return view('admin.biblioteca.revista-subcategories.edit', compact('category', 'parentCategories'));
+    }
+
+    public function updateRevistaSubcategory(Request $request, Category $category)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'parent_id' => 'required|exists:categories,id',
+        ]);
+
+        $category->update([
+            'name'      => $request->name,
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return redirect()->route('admin.biblioteca.revista-subcategories')->with('success', 'Subcategoría actualizada correctamente.');
+    }
+
+    public function destroyRevistaSubcategory(Category $category)
+    {
+        $category->delete();
+        return redirect()->route('admin.biblioteca.revista-subcategories')->with('success', 'Subcategoría eliminada.');
+    }
+
+    public function bulkDestroyRevistaSubcategories(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Category::whereIn('id', $ids)->where('type', 'revista')->whereNotNull('parent_id')->delete();
+        return back()->with('success', count($ids) . ' subcategoría(s) eliminada(s).');
+    }
+
+    // ============= 1ER NIVEL DE REVISTAS (depth 2) =============
+
+    public function indexRevistaFirstlevels(Request $request)
+    {
+        $q = $request->input('search');
+        $firstlevels = Category::where('type', 'revista')
+            ->whereNotNull('parent_id')
+            ->whereHas('parent', fn($q2) => $q2->whereNotNull('parent_id')
+                ->whereHas('parent', fn($q3) => $q3->whereNull('parent_id')))
+            ->when($q, fn($query) => $query->where('name', 'like', "%{$q}%"))
+            ->with(['parent', 'parent.parent'])
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
+        return view('admin.biblioteca.revista-firstlevels.index', compact('firstlevels'));
+    }
+
+    public function createRevistaFirstlevel()
+    {
+        $parentCategories = Category::where('type', 'revista')
+            ->whereNotNull('parent_id')
+            ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
+            ->with('parent')
+            ->orderBy('name')
+            ->get();
+        return view('admin.biblioteca.revista-firstlevels.create', compact('parentCategories'));
+    }
+
+    public function storeRevistaFirstlevel(Request $request)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'parent_id' => 'required|exists:categories,id',
+        ]);
+
+        Category::create([
+            'name'      => $request->name,
+            'slug'      => $this->uniqueSlug($request->name, Category::class),
+            'type'      => 'revista',
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return redirect()->route('admin.biblioteca.revista-firstlevels')->with('success', '1er Nivel agregado correctamente.');
+    }
+
+    public function editRevistaFirstlevel(Category $category)
+    {
+        $parentCategories = Category::where('type', 'revista')
+            ->whereNotNull('parent_id')
+            ->whereHas('parent', fn($q) => $q->whereNull('parent_id'))
+            ->where('id', '!=', $category->id)
+            ->with('parent')
+            ->orderBy('name')
+            ->get();
+        return view('admin.biblioteca.revista-firstlevels.edit', compact('category', 'parentCategories'));
+    }
+
+    public function updateRevistaFirstlevel(Request $request, Category $category)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'parent_id' => 'required|exists:categories,id',
+        ]);
+
+        $category->update([
+            'name'      => $request->name,
+            'parent_id' => $request->parent_id,
+        ]);
+
+        return redirect()->route('admin.biblioteca.revista-firstlevels')->with('success', '1er Nivel actualizado correctamente.');
+    }
+
+    public function destroyRevistaFirstlevel(Category $category)
+    {
+        $category->delete();
+        return redirect()->route('admin.biblioteca.revista-firstlevels')->with('success', '1er Nivel eliminado.');
+    }
+
+    public function bulkDestroyRevistaFirstlevels(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->input('ids', '')));
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
+        Category::whereIn('id', $ids)->where('type', 'revista')->delete();
         return back()->with('success', count($ids) . ' 1er nivel(es) eliminado(s).');
     }
 

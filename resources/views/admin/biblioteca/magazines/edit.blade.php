@@ -142,10 +142,11 @@
                 </div>
 
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Descriptores</label>
-                    <div id="chips-descriptors" class="flex flex-wrap gap-2 p-3 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg min-h-[48px]">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Descriptores <span class="font-normal text-slate-400 text-xs">(arrastra para ordenar)</span></label>
+                    <div id="chips-descriptors" data-sortable="1" class="flex flex-wrap gap-2 p-3 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg min-h-[48px]">
                         @foreach($book->descriptors as $descriptor)
-                        <span class="chip inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-300 text-xs font-semibold rounded-full border border-brand-100 dark:border-brand-500/20">
+                        <span class="chip inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-300 text-xs font-semibold rounded-full border border-brand-100 dark:border-brand-500/20" draggable="true">
+                            <i data-lucide="grip-vertical" class="w-3 h-3 opacity-40 cursor-grab drag-handle"></i>
                             {{ $descriptor->name }}
                             <button type="button" onclick="removeChip(this)" class="hover:text-red-500 font-bold text-sm leading-none">×</button>
                             <input type="hidden" name="descriptors[]" value="{{ $descriptor->id }}">
@@ -299,11 +300,49 @@ function addChip(btn, chipsId, field) {
     if (chips.querySelector(`input[value="${id}"]`)) return;
     const chip = document.createElement('span');
     chip.className = 'chip inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-300 text-xs font-semibold rounded-full border border-brand-100 dark:border-brand-500/20';
-    chip.innerHTML = `${name} <button type="button" onclick="removeChip(this)" class="hover:text-red-500 font-bold text-sm leading-none">×</button><input type="hidden" name="${field}[]" value="${id}">`;
+    const sortable = chips.dataset.sortable === '1';
+    const handle = sortable ? `<i data-lucide="grip-vertical" class="w-3 h-3 opacity-40 cursor-grab drag-handle"></i> ` : '';
+    if (sortable) chip.setAttribute('draggable', 'true');
+    chip.innerHTML = `${handle}${name} <button type="button" onclick="removeChip(this)" class="hover:text-red-500 font-bold text-sm leading-none">×</button><input type="hidden" name="${field}[]" value="${id}">`;
     chips.appendChild(chip);
+    if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
     const s = document.getElementById('search-' + field); if (s) s.value = '';
     document.getElementById('dropdown-' + field).classList.add('hidden');
 }
+
+// ── Drag & drop para ordenar chips en contenedores con data-sortable="1" ──
+(function () {
+    let dragEl = null;
+    function initSortable(container) {
+        container.addEventListener('dragstart', function (e) {
+            const chip = e.target.closest('.chip');
+            if (!chip || !container.contains(chip)) return;
+            dragEl = chip; chip.style.opacity = '0.4';
+        });
+        container.addEventListener('dragend', function () {
+            if (dragEl) dragEl.style.opacity = '';
+            dragEl = null;
+        });
+        container.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            if (!dragEl) return;
+            const after = getDragAfterElement(container, e.clientY);
+            if (after == null) container.appendChild(dragEl);
+            else container.insertBefore(dragEl, after);
+        });
+    }
+    function getDragAfterElement(container, y) {
+        const chips = [...container.querySelectorAll('.chip:not([style*="opacity: 0.4"])')];
+        return chips.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = (y - box.top - box.height / 2);
+            if (offset < 0 && offset > closest.offset) return { offset: offset, element: child };
+            return closest;
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+    document.querySelectorAll('[data-sortable="1"]').forEach(initSortable);
+})();
+
 function toggleSourceFields() {
     const val = document.getElementById('source_type').value;
     document.getElementById('field-external').style.display = val === 'external' ? '' : 'none';

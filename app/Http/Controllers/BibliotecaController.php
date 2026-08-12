@@ -48,6 +48,11 @@ class BibliotecaController extends Controller
             ->with('subcategories')
             ->get();
 
+        $allRevistaCategories = Category::where('type', 'revista')
+            ->whereNull('parent_id')
+            ->with('subcategories')
+            ->get();
+
         $buildTree = function ($categories) use (&$buildTree) {
             return $categories->map(fn($cat) => [
                 'id'       => $cat->id,
@@ -72,6 +77,7 @@ class BibliotecaController extends Controller
             'booksData'            => $booksData,
             'booksByCategory'      => Category::with('books')->get(),
             'categoriesForFilters' => $buildTree($allCategories),
+            'revistaCategoriesForFilters' => $buildTree($allRevistaCategories),
             'activeSection'        => $activeSection,
             'topDescriptors'       => $topDescriptors,
             'canEditPanel'         => auth()->check() && (auth()->user()->is_admin_global || auth()->user()->canAccessModule('biblioteca')),
@@ -101,13 +107,13 @@ class BibliotecaController extends Controller
 
     public function showBook(Book $book)
     {
-        $book->load(['authors', 'categories', 'descriptors' => fn($q) => $q->orderBy('name')]);
+        $book->load(['authors', 'categories', 'descriptors']);
         return view('biblioteca.libro', compact('book'));
     }
 
     public function showRevista(Book $book)
     {
-        $book->load(['authors', 'categories', 'descriptors' => fn($q) => $q->orderBy('name')]);
+        $book->load(['authors', 'categories', 'descriptors']);
         return view('biblioteca.revista', compact('book'));
     }
 

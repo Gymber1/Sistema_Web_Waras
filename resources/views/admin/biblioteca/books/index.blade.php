@@ -60,7 +60,7 @@
                         <th class="px-4 py-4 w-10"><input type="checkbox" class="row-check check-all"></th>
                         <x-sort-th column="title" label="Detalles del Libro" />
                         <x-sort-th column="authors" label="Autor(es)" />
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Categoría</th>
+                        <x-sort-th column="categories" label="Categoría" />
                         <x-sort-th column="publication_year" label="Año" align="center" />
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Acciones</th>
                     </tr>

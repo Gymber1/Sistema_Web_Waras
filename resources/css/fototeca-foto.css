@@ -113,7 +113,7 @@ html, body { font-family: 'Inter', sans-serif; background: var(--bg-page); color
 .g-mobile-link:hover { color: #fff; background: rgba(255,255,255,0.04); }
 .g-mobile-link.active { color: var(--gold) !important; }
 .g-mobile-admin { color: var(--gold); }
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .g-nav-links { display: none; }
     .g-nav-actions { display: none; }
     .g-hamburger { display: flex; }

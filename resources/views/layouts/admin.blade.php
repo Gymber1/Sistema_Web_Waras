@@ -77,7 +77,7 @@
 
         /* Accordion sidebar */
         .nav-submenu { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
-        .nav-submenu.open { max-height: 600px; }
+        .nav-submenu.open { max-height: 1200px; }
         .nav-chevron { transition: transform 0.25s ease; }
         .nav-chevron.open { transform: rotate(180deg); }
 
@@ -149,19 +149,85 @@
                                 class="w-4 h-4 text-slate-500 nav-chevron {{ request()->routeIs('admin.biblioteca.*') ? 'open' : '' }}"></i>
                         </button>
                         <ul id="submenu-bib" class="nav-submenu pl-12 pr-3 pt-1 space-y-1 {{ request()->routeIs('admin.biblioteca.*') ? 'open' : '' }}">
-                            @php $bibLinks = [
-                                ['route'=>'admin.biblioteca.index',        'pattern'=>'admin.biblioteca.index',         'label'=>'Detalles'],
-                                ['route'=>'admin.biblioteca.books',        'pattern'=>'admin.biblioteca.books*',        'label'=>'Libros'],
-                                ['route'=>'admin.biblioteca.authors',      'pattern'=>'admin.biblioteca.authors*',      'label'=>'Autores'],
-                                ['route'=>'admin.biblioteca.categories',   'pattern'=>'admin.biblioteca.categories*',   'label'=>'Categorías'],
-                                ['route'=>'admin.biblioteca.subcategories','pattern'=>'admin.biblioteca.subcategories*','label'=>'SubCategorías'],
-                                ['route'=>'admin.biblioteca.firstlevels',  'pattern'=>'admin.biblioteca.firstlevels*',  'label'=>'1er Nivel'],
-                                ['route'=>'admin.biblioteca.magazines',    'pattern'=>'admin.biblioteca.magazines*',    'label'=>'Revistas'],
-                                ['route'=>'admin.biblioteca.specials',            'pattern'=>'admin.biblioteca.specials',            'label'=>'Especiales'],
-                                ['route'=>'admin.biblioteca.specials.assign-books','pattern'=>'admin.biblioteca.specials.assign-books','label'=>'Agregar a Especiales'],
-                                ['route'=>'admin.biblioteca.descriptors',  'pattern'=>'admin.biblioteca.descriptors*', 'label'=>'Descriptores'],
-                            ]; @endphp
-                            @foreach($bibLinks as $l)
+                            @php
+                                $bibLinksTop = [
+                                    ['route'=>'admin.biblioteca.index',   'pattern'=>'admin.biblioteca.index',    'label'=>'Detalles'],
+                                    ['route'=>'admin.biblioteca.books',   'pattern'=>'admin.biblioteca.books*',   'label'=>'Libros'],
+                                    ['route'=>'admin.biblioteca.authors', 'pattern'=>'admin.biblioteca.authors*', 'label'=>'Autores'],
+                                    ['route'=>'admin.biblioteca.magazines','pattern'=>'admin.biblioteca.magazines*','label'=>'Revistas'],
+                                ];
+                                $catLibros = [
+                                    ['route'=>'admin.biblioteca.categories',    'pattern'=>'admin.biblioteca.categories*',    'label'=>'Categorías'],
+                                    ['route'=>'admin.biblioteca.subcategories', 'pattern'=>'admin.biblioteca.subcategories*', 'label'=>'SubCategorías'],
+                                    ['route'=>'admin.biblioteca.firstlevels',   'pattern'=>'admin.biblioteca.firstlevels*',   'label'=>'1er Nivel'],
+                                ];
+                                $catRevistas = [
+                                    ['route'=>'admin.biblioteca.revista-categories',    'pattern'=>'admin.biblioteca.revista-categories*',    'label'=>'Categorías'],
+                                    ['route'=>'admin.biblioteca.revista-subcategories', 'pattern'=>'admin.biblioteca.revista-subcategories*', 'label'=>'SubCategorías'],
+                                    ['route'=>'admin.biblioteca.revista-firstlevels',   'pattern'=>'admin.biblioteca.revista-firstlevels*',   'label'=>'1er Nivel'],
+                                ];
+                                $bibLinksBottom = [
+                                    ['route'=>'admin.biblioteca.specials',            'pattern'=>'admin.biblioteca.specials',            'label'=>'Especiales'],
+                                    ['route'=>'admin.biblioteca.specials.assign-books','pattern'=>'admin.biblioteca.specials.assign-books','label'=>'Agregar a Especiales'],
+                                    ['route'=>'admin.biblioteca.descriptors',  'pattern'=>'admin.biblioteca.descriptors*', 'label'=>'Descriptores'],
+                                ];
+                                $catLibrosActive   = request()->routeIs('admin.biblioteca.categories*') || request()->routeIs('admin.biblioteca.subcategories*') || request()->routeIs('admin.biblioteca.firstlevels*');
+                                $catRevistasActive = request()->routeIs('admin.biblioteca.revista-categories*') || request()->routeIs('admin.biblioteca.revista-subcategories*') || request()->routeIs('admin.biblioteca.revista-firstlevels*');
+                            @endphp
+
+                            @foreach($bibLinksTop as $l)
+                            <li>
+                                <a href="{{ route($l['route']) }}"
+                                    class="relative block px-3 py-2 rounded-md text-sm transition-colors
+                                    {{ request()->routeIs($l['pattern']) ? 'text-white font-semibold bg-[#1e293b]' : 'text-slate-400 hover:text-white hover:bg-[#1e293b]' }}">
+                                    <span class="absolute left-[-14px] top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full
+                                        {{ request()->routeIs($l['pattern']) ? 'bg-brand-500' : 'bg-slate-600' }}"></span>
+                                    {{ $l['label'] }}
+                                </a>
+                            </li>
+                            @endforeach
+
+                            {{-- Categoría Libros (colapsable) --}}
+                            <li>
+                                <button type="button" onclick="toggleNav('cat-libros')"
+                                    class="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors {{ $catLibrosActive ? 'text-white font-semibold bg-[#1e293b]' : 'text-slate-400 hover:text-white hover:bg-[#1e293b]' }}">
+                                    <span>Categoría Libros</span>
+                                    <i data-lucide="chevron-down" id="chevron-cat-libros" class="w-3.5 h-3.5 text-slate-500 nav-chevron {{ $catLibrosActive ? 'open' : '' }}"></i>
+                                </button>
+                                <ul id="submenu-cat-libros" class="nav-submenu pl-4 pt-1 space-y-1 {{ $catLibrosActive ? 'open' : '' }}">
+                                    @foreach($catLibros as $l)
+                                    <li>
+                                        <a href="{{ route($l['route']) }}"
+                                            class="relative block px-3 py-2 rounded-md text-sm transition-colors {{ request()->routeIs($l['pattern']) ? 'text-white font-semibold bg-[#1e293b]' : 'text-slate-400 hover:text-white hover:bg-[#1e293b]' }}">
+                                            <span class="absolute left-[-14px] top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full {{ request()->routeIs($l['pattern']) ? 'bg-brand-500' : 'bg-slate-600' }}"></span>
+                                            {{ $l['label'] }}
+                                        </a>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                            </li>
+
+                            {{-- Categoría Revistas (colapsable) --}}
+                            <li>
+                                <button type="button" onclick="toggleNav('cat-revistas')"
+                                    class="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors {{ $catRevistasActive ? 'text-white font-semibold bg-[#1e293b]' : 'text-slate-400 hover:text-white hover:bg-[#1e293b]' }}">
+                                    <span>Categoría Revistas</span>
+                                    <i data-lucide="chevron-down" id="chevron-cat-revistas" class="w-3.5 h-3.5 text-slate-500 nav-chevron {{ $catRevistasActive ? 'open' : '' }}"></i>
+                                </button>
+                                <ul id="submenu-cat-revistas" class="nav-submenu pl-4 pt-1 space-y-1 {{ $catRevistasActive ? 'open' : '' }}">
+                                    @foreach($catRevistas as $l)
+                                    <li>
+                                        <a href="{{ route($l['route']) }}"
+                                            class="relative block px-3 py-2 rounded-md text-sm transition-colors {{ request()->routeIs($l['pattern']) ? 'text-white font-semibold bg-[#1e293b]' : 'text-slate-400 hover:text-white hover:bg-[#1e293b]' }}">
+                                            <span class="absolute left-[-14px] top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full {{ request()->routeIs($l['pattern']) ? 'bg-brand-500' : 'bg-slate-600' }}"></span>
+                                            {{ $l['label'] }}
+                                        </a>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                            </li>
+
+                            @foreach($bibLinksBottom as $l)
                             <li>
                                 <a href="{{ route($l['route']) }}"
                                     class="relative block px-3 py-2 rounded-md text-sm transition-colors
@@ -575,6 +641,8 @@
         // Detect context from table id
         const isBibCategories    = tableId === 'table-bib-categories';
         const isBibSubcategories = tableId === 'table-sub';
+        const isRevistaCategories    = tableId === 'table-bib-revista-categories';
+        const isRevistaSubcategories = tableId === 'table-revista-sub';
         const isFotoCategories   = tableId === 'table-foto-categories';
         const isFotoSubcategories= tableId === 'table-foto-subcategories';
 
@@ -634,6 +702,46 @@
             lucide.createIcons({ node: body });
             confirmLbl.textContent = `Eliminar ${count} subcategoría(s)`;
             _bulkAction = () => submitBulk('{{ route("admin.biblioteca.subcategories.bulk-destroy") }}', ids, () => false);
+        }
+
+        // ── Categorías Revistas ──
+        else if (isRevistaCategories) {
+            const rowsWithChildren = checked.map(cb => ({ id: cb.value, name: cb.closest('tr')?.querySelector('td:nth-child(2)')?.textContent?.trim() ?? '' }));
+            title.textContent = `Eliminar ${count} categoría(s)`;
+            body.innerHTML = `
+                <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">Estás a punto de eliminar <strong>${count}</strong> categoría(s) de revistas. Las categorías pueden tener subcategorías conectadas.</p>
+                <div class="mb-4 max-h-36 overflow-y-auto space-y-1">
+                    ${rowsWithChildren.map(r => `<div class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 px-3 py-1.5 rounded-lg"><i data-lucide="folder" class="w-3.5 h-3.5 text-brand-400 shrink-0"></i>${r.name}</div>`).join('')}
+                </div>
+                <div class="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl p-4">
+                    <p class="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-3">¿Qué deseas hacer con las subcategorías conectadas?</p>
+                    <label class="flex items-start gap-2.5 cursor-pointer mb-2">
+                        <input type="radio" name="bulk-cascade" value="0" checked class="mt-0.5 accent-brand-500">
+                        <span class="text-sm text-slate-700 dark:text-slate-300">Eliminar <strong>solo la(s) categoría(s)</strong> seleccionada(s) (las subcategorías quedan huérfanas)</span>
+                    </label>
+                    <label class="flex items-start gap-2.5 cursor-pointer">
+                        <input type="radio" name="bulk-cascade" value="1" class="mt-0.5 accent-brand-500">
+                        <span class="text-sm text-slate-700 dark:text-slate-300">Eliminar la(s) categoría(s) <strong>y todas sus subcategorías conectadas</strong></span>
+                    </label>
+                </div>`;
+            lucide.createIcons({ node: body });
+            confirmLbl.textContent = `Eliminar ${count} categoría(s)`;
+            _bulkAction = () => submitBulk('{{ route("admin.biblioteca.revista-categories.bulk-destroy") }}', ids, () => document.querySelector('input[name="bulk-cascade"]:checked')?.value === '1');
+        }
+
+        // ── Subcategorías Revistas ──
+        else if (isRevistaSubcategories) {
+            const names = checked.map(cb => cb.closest('tr')?.querySelector('td:nth-child(2)')?.textContent?.trim() ?? '');
+            title.textContent = `Eliminar ${count} subcategoría(s)`;
+            body.innerHTML = `
+                <p class="text-sm text-slate-600 dark:text-slate-300 mb-3">¿Eliminar las siguientes <strong>${count}</strong> subcategoría(s)?</p>
+                <div class="max-h-48 overflow-y-auto space-y-1">
+                    ${names.map(n => `<div class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 px-3 py-1.5 rounded-lg"><i data-lucide="chevron-right" class="w-3.5 h-3.5 text-brand-400 shrink-0"></i>${n}</div>`).join('')}
+                </div>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">Esta acción no se puede deshacer.</p>`;
+            lucide.createIcons({ node: body });
+            confirmLbl.textContent = `Eliminar ${count} subcategoría(s)`;
+            _bulkAction = () => submitBulk('{{ route("admin.biblioteca.revista-subcategories.bulk-destroy") }}', ids, () => false);
         }
 
         // ── Categorías Fototeca ──
@@ -702,6 +810,7 @@
                 'table-thirdlevels':     '{{ route("admin.fototeca.thirdlevels.bulk-destroy") }}',
                 'table-foto-collections':'{{ route("admin.fototeca.collections.bulk-destroy") }}',
                 'table-descriptors':     '{{ route("admin.biblioteca.descriptors.bulk-destroy") }}',
+                'table-revista-first':   '{{ route("admin.biblioteca.revista-firstlevels.bulk-destroy") }}',
                 'table-tags':            '{{ route("admin.fototeca.tags.bulk-destroy") }}',
                 'table-users':           '{{ route("admin.usuarios.bulk-destroy") }}',
             };
@@ -711,7 +820,7 @@
                 'table-publishers': 'editorial(es)', 'table-specials': 'colección(es)',
                 'table-photos': 'fotografía(s)', 'table-photographers': 'fotógrafo(s)', 'table-donors': 'donador(es)',
                 'table-sublevels': 'subnivel(es)', 'table-secondlevels': '2do nivel(es)', 'table-thirdlevels': '3er nivel(es)',
-                'table-foto-collections': 'colección(es)', 'table-descriptors': 'descriptor(es)', 'table-tags': 'etiqueta(s)', 'table-users': 'usuario(s)',
+                'table-foto-collections': 'colección(es)', 'table-descriptors': 'descriptor(es)', 'table-revista-first': '1er nivel(es)', 'table-tags': 'etiqueta(s)', 'table-users': 'usuario(s)',
             };
             const item = labelMap[tableId] ?? 'elemento(s)';
             title.textContent = `Eliminar ${count} ${item}`;

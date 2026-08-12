@@ -187,20 +187,27 @@
 
 <script>
     (function() {
-        const backUrl   = sessionStorage.getItem('back_url');
-        const backLabel = sessionStorage.getItem('back_label');
+        const backUrl    = sessionStorage.getItem('back_url');
+        const backLabel  = sessionStorage.getItem('back_label');
+        const returnUrl  = sessionStorage.getItem('biblioteca_return_url'); // URL exacta del catálogo
         const tab  = sessionStorage.getItem('biblioteca_tab') || 'Revistas';
         const base = '{{ route('biblioteca.dashboard') }}';
+        const backBtn = document.getElementById('backBtn');
+        const bc      = document.getElementById('breadcrumbSection');
+
         if (backUrl) {
-            document.getElementById('backBtn').href = backUrl;
-            const bc = document.getElementById('breadcrumbSection');
+            backBtn.href = backUrl;
             bc.href = backUrl;
             bc.textContent = backLabel || 'Especiales';
             sessionStorage.removeItem('back_url');
             sessionStorage.removeItem('back_label');
+        } else if (returnUrl) {
+            backBtn.href = returnUrl;
+            bc.href = returnUrl;
+            bc.textContent = tab;
+            sessionStorage.removeItem('biblioteca_return_url');
         } else {
-            document.getElementById('backBtn').href = base + '#' + tab;
-            const bc = document.getElementById('breadcrumbSection');
+            backBtn.href = base + '#' + tab;
             bc.href = base + '#' + tab;
             bc.textContent = tab;
         }

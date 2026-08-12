@@ -9,7 +9,7 @@
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-MO_ZX6qJ.css",
+    "file": "assets/app-DFOELyau.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -45,7 +45,7 @@
     ]
   },
   "resources/css/biblioteca-libro.css": {
-    "file": "assets/biblioteca-libro-mb6BbcJB.css",
+    "file": "assets/biblioteca-libro-BykB2K4A.css",
     "src": "resources/css/biblioteca-libro.css",
     "isEntry": true,
     "name": "biblioteca-libro",
@@ -63,7 +63,7 @@
     ]
   },
   "resources/css/biblioteca.css": {
-    "file": "assets/biblioteca-4BGtf2Av.css",
+    "file": "assets/biblioteca-C_dA-7Jx.css",
     "src": "resources/css/biblioteca.css",
     "isEntry": true,
     "name": "biblioteca",
@@ -81,7 +81,7 @@
     ]
   },
   "resources/css/fototeca-donador.css": {
-    "file": "assets/fototeca-fotografo-acZPgioS.css",
+    "file": "assets/fototeca-fotografo-DWvDawc8.css",
     "src": "resources/css/fototeca-fotografo.css",
     "isEntry": true,
     "name": "fototeca-donador",
@@ -91,7 +91,7 @@
     ]
   },
   "resources/css/fototeca-especial.css": {
-    "file": "assets/fototeca-especial-DMYZS5tw.css",
+    "file": "assets/fototeca-especial-C0J_-R6Q.css",
     "src": "resources/css/fototeca-especial.css",
     "isEntry": true,
     "name": "fototeca-especial",
@@ -100,7 +100,7 @@
     ]
   },
   "resources/css/fototeca-foto.css": {
-    "file": "assets/fototeca-foto-B4aHEj8E.css",
+    "file": "assets/fototeca-foto-D0auu8ST.css",
     "src": "resources/css/fototeca-foto.css",
     "isEntry": true,
     "name": "fototeca-foto",
@@ -109,7 +109,7 @@
     ]
   },
   "resources/css/fototeca-fotografo.css": {
-    "file": "assets/fototeca-fotografo-acZPgioS.css",
+    "file": "assets/fototeca-fotografo-DWvDawc8.css",
     "src": "resources/css/fototeca-fotografo.css",
     "isEntry": true,
     "name": "fototeca-donador",
@@ -119,7 +119,7 @@
     ]
   },
   "resources/css/fototeca.css": {
-    "file": "assets/fototeca-xZgv-ng2.css",
+    "file": "assets/fototeca-YmbnqPKb.css",
     "src": "resources/css/fototeca.css",
     "isEntry": true,
     "name": "fototeca",
@@ -128,7 +128,7 @@
     ]
   },
   "resources/css/home.css": {
-    "file": "assets/home-SEymhEZc.css",
+    "file": "assets/home-CPoeRdyw.css",
     "src": "resources/css/home.css",
     "isEntry": true,
     "name": "home",

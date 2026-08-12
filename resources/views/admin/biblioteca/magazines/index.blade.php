@@ -53,7 +53,7 @@
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Portada</th>
                         <x-sort-th column="title" label="Título" />
                         <x-sort-th column="authors" label="Autores" />
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Categorías</th>
+                        <x-sort-th column="categories" label="Categorías" />
                         <x-sort-th column="publication_year" label="Año" align="center" />
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Acciones</th>
                     </tr>
