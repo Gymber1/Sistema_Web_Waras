@@ -47,7 +47,7 @@
                         <th class="px-4 py-4 w-10"><input type="checkbox" class="row-check check-all"></th>
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Portada</th>
                         <x-sort-th column="title" label="Nombre de la colección" />
-                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Autores</th>
+                        <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Descripción</th>
                         <x-sort-th column="type" label="Tipo" />
                         <x-sort-th column="books_count" label="Elementos" align="center" />
                         <th class="px-6 py-4 font-semibold text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Acciones</th>
@@ -56,7 +56,7 @@
                 <tbody class="divide-y divide-slate-100 dark:divide-dark-border">
                     @forelse($specials as $special)
                     @php
-                        $featuredAuthor = $special->description;
+                        $descripcion = trim($special->description ?? '');
                     @endphp
                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group">
                         <td class="px-4 py-4"><input type="checkbox" class="row-check" value="{{ $special->id }}"></td>
@@ -74,9 +74,9 @@
                         <td class="px-6 py-4">
                             <span class="font-semibold text-slate-800 dark:text-white">{{ $special->title }}</span>
                         </td>
-                        <td class="px-6 py-4">
-                            @if($featuredAuthor)
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300">{{ $featuredAuthor }}</span>
+                        <td class="px-6 py-4 max-w-md">
+                            @if($descripcion !== '')
+                                <span class="text-sm text-slate-600 dark:text-slate-300 line-clamp-2" title="{{ $descripcion }}">{{ Str::limit($descripcion, 140) }}</span>
                             @else
                                 <span class="text-slate-400 dark:text-slate-500 text-xs">—</span>
                             @endif

@@ -115,8 +115,8 @@
                 Colección {{ $special->type === 'revista' ? 'de Revistas' : 'de Libros' }}
             </span>
             <h1 class="special-title">{{ $special->title }}</h1>
-            @if($special->description)
-            <p style="font-size:.9rem;color:#4b5563;line-height:1.75;">{{ $special->description }}</p>
+            @if(trim($special->description ?? ''))
+            <p class="special-desc" style="font-size:.95rem;color:#4b5563;line-height:1.8;margin-bottom:1rem;white-space:pre-line;">{{ $special->description }}</p>
             @endif
             <div class="special-meta">
                 <span class="special-meta-item">

@@ -39,14 +39,11 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Autor destacado <span class="text-xs font-normal text-slate-400">(opcional)</span></label>
-                <x-searchable-select
-                    name="featured_author"
-                    label=""
-                    placeholder="— Sin autor destacado —"
-                    :selected="old('featured_author', '')"
-                    :options="$authors->map(fn($a) => ['value' => $a->name, 'text' => $a->name])" />
-                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1.5">Autor principal o representativo de esta colección.</p>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Descripción <span class="text-xs font-normal text-slate-400">(opcional)</span></label>
+                <textarea name="description" rows="4"
+                    placeholder="Breve descripción de la colección (aparecerá en la página pública de la colección)."
+                    class="w-full px-4 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all resize-y">{{ old('description') }}</textarea>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1.5">Se mostrará debajo del título en la página de la colección.</p>
             </div>
 
             <div>
@@ -65,9 +62,13 @@
 
             <div>
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Imagen de portada</label>
-                <input type="file" name="cover_image" accept="image/*"
+                <input type="file" name="cover_image" accept="image/*" id="coverInput"
                     class="w-full px-3 py-2.5 bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-lg text-xs text-slate-600 dark:text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-brand-50 file:text-brand-700 dark:file:bg-brand-500/10 dark:file:text-brand-400 file:font-semibold hover:file:bg-brand-100">
-                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1.5">Imagen representativa de la colección (ej. retrato del personaje).</p>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1.5">Imagen representativa de la colección (ej. retrato del personaje). Máx. 20 MB.</p>
+                <div id="coverPreviewWrap" class="mt-3 hidden">
+                    <img id="coverPreview" class="w-24 h-24 object-cover rounded-lg border border-slate-200 dark:border-slate-600" alt="Vista previa">
+                </div>
+                <p id="coverError" class="text-xs text-red-500 mt-1.5 hidden"></p>
             </div>
 
         </div>
@@ -80,4 +81,29 @@
         </div>
     </form>
 </div>
+@push('scripts')
+<script>
+(function () {
+    const input = document.getElementById('coverInput');
+    if (!input) return;
+    const wrap = document.getElementById('coverPreviewWrap');
+    const img  = document.getElementById('coverPreview');
+    const err  = document.getElementById('coverError');
+    const MAX  = 20 * 1024 * 1024; // 20 MB
+    input.addEventListener('change', function () {
+        err.classList.add('hidden'); err.textContent = '';
+        const f = input.files && input.files[0];
+        if (!f) { wrap.classList.add('hidden'); return; }
+        if (f.size > MAX) {
+            err.textContent = 'La imagen pesa ' + (f.size/1048576).toFixed(1) + ' MB. El máximo es 20 MB.';
+            err.classList.remove('hidden');
+            input.value = ''; wrap.classList.add('hidden');
+            return;
+        }
+        img.src = URL.createObjectURL(f);
+        wrap.classList.remove('hidden');
+    });
+})();
+</script>
+@endpush
 @endsection

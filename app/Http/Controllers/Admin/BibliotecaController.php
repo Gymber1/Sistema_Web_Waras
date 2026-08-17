@@ -1106,8 +1106,7 @@ class BibliotecaController extends Controller
 
     public function createSpecial()
     {
-        $authors = Author::orderBy('name')->get();
-        return view('admin.biblioteca.specials.create', compact('authors'));
+        return view('admin.biblioteca.specials.create');
     }
 
     public function storeSpecial(Request $request)
@@ -1116,14 +1115,14 @@ class BibliotecaController extends Controller
             'title'       => 'required|string|max:255',
             'type'        => 'required|in:libro,revista',
             'cover_image' => 'nullable|image|max:20480',
-            'featured_author' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:2000',
         ]);
 
         $data = [
             'title'       => $request->title,
             'slug'        => $this->uniqueSlug($request->title, Special::class),
             'type'        => $request->type,
-            'description' => $request->input('featured_author'),
+            'description' => $request->input('description'),
             'is_active'   => true,
             'module'      => 'biblioteca',
         ];
@@ -1137,8 +1136,7 @@ class BibliotecaController extends Controller
 
     public function editSpecial(Special $special)
     {
-        $authors = Author::orderBy('name')->get();
-        return view('admin.biblioteca.specials.edit', compact('special', 'authors'));
+        return view('admin.biblioteca.specials.edit', compact('special'));
     }
 
     public function updateSpecial(Request $request, Special $special)
@@ -1147,14 +1145,19 @@ class BibliotecaController extends Controller
             'title'       => 'required|string|max:255',
             'type'        => 'required|in:libro,revista',
             'cover_image' => 'nullable|image|max:20480',
+            'description' => 'nullable|string|max:2000',
         ]);
 
         $data = [
             'title'       => $request->title,
             'type'        => $request->type,
-            'description' => $request->input('featured_author'),
+            'description' => $request->input('description'),
         ];
         if ($request->hasFile('cover_image')) {
+            // Reemplazar la portada: borrar la anterior para no dejar archivos huérfanos
+            if ($special->cover_image_path) {
+                Storage::disk('public')->delete($special->cover_image_path);
+            }
             $data['cover_image_path'] = $request->file('cover_image')->store('specials', 'public');
         }
 
@@ -1190,15 +1193,9 @@ class BibliotecaController extends Controller
             ->orderBy('title')
             ->get(['id', 'title', 'publication_year', 'cover_image_path']);
 
-        // Libros sugeridos: del mismo autor destacado de la colección
-        $featuredAuthor = $special->description;
+        // Se eliminó el "autor destacado"; ya no hay libros sugeridos por autor.
+        $featuredAuthor = null;
         $suggested = collect();
-        if ($featuredAuthor) {
-            $suggested = $available->filter(function($book) use ($featuredAuthor) {
-                return $book->authors->contains(fn($a) => stripos($a->name, $featuredAuthor) !== false
-                    || stripos($featuredAuthor, $a->name) !== false);
-            });
-        }
 
         return view('admin.biblioteca.specials.manage', compact('special', 'available', 'suggested', 'featuredAuthor', 'isRevista'));
     }

@@ -667,6 +667,8 @@
         const serverActiveSection = @json($activeSection ?? 'Inicio');
 
         let activeDescriptorId = null;
+        let searchFilteredItems = null; // null = fuera del modo búsqueda. Declarada aquí (arriba)
+                                        // para evitar TDZ: initViewFromLocation() la usa al cargar.
         const ITEMS_PER_PAGE = 12;
 
         let state = {
@@ -1627,8 +1629,6 @@
             document.getElementById('contentSearchInput').value = '';
             renderBooks();
         });
-
-        let searchFilteredItems = null; // null = not in search mode
 
         document.getElementById('contentSearchInput').addEventListener('input', function() {
             closeMobileSidebar();
