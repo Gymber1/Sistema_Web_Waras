@@ -169,8 +169,9 @@
                     @if($book->cover_image_path)
                         <img src="{{ Storage::url($book->cover_image_path) }}" alt="{{ $book->title }}"
                             onerror="this.style.display='none'" loading="lazy">
+                    @else
+                        <span class="book-cover-icon">{{ $book->document_type === 'Revista' ? '📰' : '📚' }}</span>
                     @endif
-                    <span class="book-cover-icon">{{ $book->document_type === 'Revista' ? '📰' : '📚' }}</span>
                     <span class="book-type-badge"
                         style="background:{{ $book->document_type === 'Revista' ? 'rgba(37,99,235,.85)' : 'rgba(5,150,105,.85)' }};color:#fff;">
                         {{ $book->document_type }}

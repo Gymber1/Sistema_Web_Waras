@@ -19,6 +19,7 @@
 /storage/pail
 /vendor
 DEPLOY-WARAS.md
+/info
 Homestead.json
 Homestead.yaml
 Thumbs.db
