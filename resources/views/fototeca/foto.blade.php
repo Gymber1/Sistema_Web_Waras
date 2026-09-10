@@ -67,7 +67,44 @@
     </button>
 </nav>
 
-<div class="page-body">
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeFtcSidebar()"></div>
+
+<div class="detail-layout" id="detailLayout">
+    <button class="sidebar-show-btn" id="sidebarShowBtn" onclick="toggleFtcSidebar()" title="Mostrar panel de filtros">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Filtros
+    </button>
+
+    <!-- ═══ PANEL DE FILTROS ═══ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
+            <div>
+                <p class="sidebar-title-text">FOTOTECA</p>
+                <p class="sidebar-subtitle-text">Ancash Digital</p>
+            </div>
+            <button class="sidebar-collapse-btn" onclick="toggleFtcSidebar()" title="Ocultar panel" aria-label="Ocultar panel">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+            </button>
+            <button class="sidebar-close-btn" onclick="closeFtcSidebar()">&times;</button>
+        </div>
+
+        <div class="sidebar-section">
+            <h4 class="sidebar-section-label">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+                Distribucion Geografica
+            </h4>
+            <ul id="sidebarCategories" style="list-style:none;padding:0;margin:0;"></ul>
+        </div>
+    </aside>
+
+    <div class="page-body">
+    <button class="sidebar-toggle-btn" onclick="openFtcSidebar()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Filtrar
+    </button>
 
     {{-- Breadcrumb --}}
     <div class="breadcrumb">
@@ -195,6 +232,8 @@
 </div>
 
 <!-- ── SHARE MODAL ── -->
+</div><!-- /detail-layout -->
+
 <div id="shareModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:1rem;" onclick="if(event.target===this)closeShareModal()">
     <div style="background:#1c1c1c;border:1px solid #2e2e2e;border-radius:14px;width:100%;max-width:400px;padding:1.5rem;box-shadow:0 24px 64px rgba(0,0,0,0.7);">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">
@@ -439,5 +478,87 @@
 </script>
 <x-floating-buttons />
 <script>document.addEventListener('contextmenu', e => { if (e.target.tagName === 'IMG') e.preventDefault(); });</script>
+
+<script>
+    // ═══ PANEL DE FILTROS EN LA FICHA ═══
+    (function () {
+        const CATS    = @json($categoriesForFilters ?? []);
+        const GALLERY = '{{ route('fototeca.galeria.index') }}';
+        const open    = new Set();
+
+        function nodeHtml(node, depth) {
+            const kids = node.children && node.children.length;
+            const pad  = (1.1 + depth * 0.8) + 'rem';
+            if (kids) {
+                const isOpen = open.has(node.id);
+                return '<li>' +
+                    '<button class="accordion-btn" data-parent="' + node.id + '" style="padding-left:' + pad + ';">' +
+                        '<span>' + node.name + '</span>' +
+                        '<svg class="accordion-chevron' + (isOpen ? ' open' : '') + '" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>' +
+                    '</button>' +
+                    '<div class="accordion-body' + (isOpen ? ' open' : '') + '"><ul style="list-style:none;padding:0;margin:0;">' +
+                        node.children.map(c => nodeHtml(c, depth + 1)).join('') +
+                    '</ul></div></li>';
+            }
+            return '<li><button class="sidebar-leaf" data-cat="' + node.id + '" data-name="' + node.name.replace(/"/g, '&quot;') + '" style="padding-left:' + pad + ';">' +
+                   '<span>' + node.name + '</span></button></li>';
+        }
+
+        function render() {
+            const list = document.getElementById('sidebarCategories');
+            if (!list) return;
+            list.innerHTML =
+                '<li><button class="sidebar-leaf" data-cat="" data-name="Toda la Coleccion"><span>Toda la Coleccion</span></button></li>' +
+                CATS.map(n => nodeHtml(n, 0)).join('');
+
+            list.querySelectorAll('.accordion-btn').forEach(b => b.addEventListener('click', () => {
+                const id = parseInt(b.dataset.parent);
+                open.has(id) ? open.delete(id) : open.add(id);
+                render();
+            }));
+            // Al elegir una zona se vuelve a la galeria con ese filtro puesto
+            list.querySelectorAll('.sidebar-leaf').forEach(b => b.addEventListener('click', () => {
+                const id   = b.dataset.cat;
+                const name = b.dataset.name;
+                try {
+                    sessionStorage.setItem('fototeca_nav_ctx', JSON.stringify({
+                        restore: true, tab: 'Galeria', ids: [],
+                        categoryId: id ? parseInt(id) : null,
+                        filterName: name, page: 1,
+                        openAcc: Array.from(open), closedAcc: []
+                    }));
+                    sessionStorage.setItem('fototeca_tab', 'Galeria');
+                } catch (e) {}
+                window.location.href = GALLERY;
+            }));
+        }
+        render();
+    })();
+
+    // ── Ocultar / mostrar el panel ──
+    function toggleFtcSidebar() {
+        const l = document.getElementById('detailLayout');
+        if (!l) return;
+        const collapsed = l.classList.toggle('sidebar-collapsed');
+        try { localStorage.setItem('fototeca_sidebar_collapsed', collapsed ? '1' : '0'); } catch (e) {}
+    }
+    function openFtcSidebar() {
+        document.getElementById('sidebar')?.classList.add('open');
+        document.getElementById('sidebarOverlay')?.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeFtcSidebar() {
+        document.getElementById('sidebar')?.classList.remove('open');
+        document.getElementById('sidebarOverlay')?.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    (function () {
+        try {
+            if (localStorage.getItem('fototeca_sidebar_collapsed') === '1') {
+                document.getElementById('detailLayout')?.classList.add('sidebar-collapsed');
+            }
+        } catch (e) {}
+    })();
+</script>
 </body>
 </html>

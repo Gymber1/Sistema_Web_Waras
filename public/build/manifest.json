@@ -45,7 +45,7 @@
     ]
   },
   "resources/css/biblioteca-libro.css": {
-    "file": "assets/biblioteca-libro-BykB2K4A.css",
+    "file": "assets/biblioteca-libro-DRqdYGl6.css",
     "src": "resources/css/biblioteca-libro.css",
     "isEntry": true,
     "name": "biblioteca-libro",
@@ -54,7 +54,7 @@
     ]
   },
   "resources/css/biblioteca-revista.css": {
-    "file": "assets/biblioteca-revista-qxyPyACu.css",
+    "file": "assets/biblioteca-revista-Cjf9JqsH.css",
     "src": "resources/css/biblioteca-revista.css",
     "isEntry": true,
     "name": "biblioteca-revista",
@@ -100,7 +100,7 @@
     ]
   },
   "resources/css/fototeca-foto.css": {
-    "file": "assets/fototeca-foto-DRwxeR76.css",
+    "file": "assets/fototeca-foto-B5iq0iSu.css",
     "src": "resources/css/fototeca-foto.css",
     "isEntry": true,
     "name": "fototeca-foto",

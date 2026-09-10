@@ -115,13 +115,41 @@ class BibliotecaController extends Controller
     public function showBook(Book $book)
     {
         $book->load(['authors', 'categories', 'descriptors']);
-        return view('biblioteca.libro', compact('book'));
+        return view('biblioteca.libro', [
+            'book'                 => $book,
+            'categoriesForFilters' => $this->categoryTree('biblioteca'),
+        ]);
     }
 
     public function showRevista(Book $book)
     {
         $book->load(['authors', 'categories', 'descriptors']);
-        return view('biblioteca.revista', compact('book'));
+        return view('biblioteca.revista', [
+            'book'                 => $book,
+            'categoriesForFilters' => $this->categoryTree('revista'),
+        ]);
+    }
+
+    /**
+     * Arbol de categorias de un tipo, para el panel de filtros.
+     */
+    private function categoryTree(string $type): array
+    {
+        $roots = Category::where('type', $type)
+            ->whereNull('parent_id')
+            ->with('subcategories')
+            ->get();
+
+        $build = function ($categories) use (&$build) {
+            return $categories->map(fn($cat) => [
+                'id'       => $cat->id,
+                'name'     => $cat->name,
+                'slug'     => $cat->slug,
+                'children' => $build($cat->subcategories),
+            ])->toArray();
+        };
+
+        return $build($roots);
     }
 
     public function showEditorial(Publisher $publisher)

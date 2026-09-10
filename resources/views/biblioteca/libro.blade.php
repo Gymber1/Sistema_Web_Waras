@@ -86,7 +86,35 @@
     </div>
 </header>
 
-<div class="page-body">
+<!-- Overlay del panel en móvil -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+<div class="detail-layout" id="detailLayout">
+    <!-- Botón flotante para volver a mostrar el panel -->
+    <button class="sidebar-show-btn" id="sidebarShowBtn" onclick="toggleSidebarCollapse()" title="Mostrar panel de materias">
+        <i class="fas fa-filter"></i> Materias
+    </button>
+
+    <!-- ═══ PANEL DE FILTROS ═══ -->
+    <aside class="sidebar" id="mobileSidebar">
+        <div class="sidebar-header" style="justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:0.75rem">
+                <i class="fas fa-filter"></i>
+                <span class="sidebar-title">Explorar Catálogo</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.9rem">
+                <button onclick="toggleSidebarCollapse()" id="sidebarCollapseBtn" class="sidebar-collapse-btn" title="Ocultar panel"><i class="fas fa-angles-left"></i></button>
+                <button onclick="closeMobileSidebar()" id="sidebarCloseBtn" class="sidebar-close-btn"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div class="categories-section">
+            <div class="categories-label">Materias</div>
+            <ul class="categories-list" id="categoriesList"></ul>
+        </div>
+    </aside>
+
+    <div class="page-body">
+    <button class="sidebar-toggle-btn" onclick="openMobileSidebar()"><i class="fas fa-filter"></i>&nbsp; Filtrar por materia</button>
     <a id="backBtn" href="{{ route('biblioteca.dashboard') }}" class="back-btn">
         <i class="fas fa-arrow-left"></i> Atrás
     </a>
@@ -197,6 +225,8 @@
     </div>
 </div>
 
+</div><!-- /detail-layout -->
+
 <script>
     (function() {
         const backUrl    = sessionStorage.getItem('back_url');
@@ -257,5 +287,88 @@
     });
 </script>
     <x-floating-buttons />
+
+<script>
+    // ═══ PANEL DE FILTROS EN LA FICHA ═══
+    (function () {
+        const CATS      = @json($categoriesForFilters ?? []);
+        const CATALOG   = '{{ route('biblioteca.libros.index') }}';
+        const TAB       = 'Libros';
+        const open      = new Set();   // ramas abiertas
+
+        function nodeHtml(node, depth) {
+            const kids = node.children && node.children.length;
+            const pad  = (1.5 + depth * 0.875) + 'rem';
+            if (kids) {
+                const isOpen = open.has(node.id);
+                return '<li>' +
+                    '<button class="acc-parent-btn' + (isOpen ? ' open' : '') + '" data-parent="' + node.id + '" style="padding-left:' + pad + ';">' +
+                        '<span>' + node.name + '</span><i class="fas fa-chevron-right acc-chevron"></i>' +
+                    '</button>' +
+                    '<div class="acc-children' + (isOpen ? ' open' : '') + '"><ul style="list-style:none;padding:0;margin:0;">' +
+                        node.children.map(c => nodeHtml(c, depth + 1)).join('') +
+                    '</ul></div></li>';
+            }
+            const rootStyle = depth === 0 ? 'font-weight:700;color:#374151;' : '';
+            return '<li><button class="acc-child-btn" data-cat="' + node.id + '" data-name="' + node.name.replace(/"/g, '&quot;') + '" style="padding-left:' + pad + ';' + rootStyle + '">' +
+                   '<span>' + node.name + '</span><i class="fas fa-chevron-right category-icon" style="font-size:0.65rem;flex-shrink:0;"></i></button></li>';
+        }
+
+        function render() {
+            const list = document.getElementById('categoriesList');
+            if (!list) return;
+            list.innerHTML =
+                '<li><button class="category-btn" data-cat="" data-name="Todos"><span>Todos</span>' +
+                '<i class="fas fa-chevron-right category-icon"></i></button></li>' +
+                CATS.map(n => nodeHtml(n, 0)).join('');
+
+            list.querySelectorAll('.acc-parent-btn').forEach(b => b.addEventListener('click', () => {
+                const id = parseInt(b.dataset.parent);
+                open.has(id) ? open.delete(id) : open.add(id);
+                render();
+            }));
+            // Al elegir una materia se vuelve al catálogo con ese filtro puesto
+            list.querySelectorAll('.acc-child-btn, .category-btn').forEach(b => b.addEventListener('click', () => {
+                const id   = b.dataset.cat;
+                const name = b.dataset.name;
+                try {
+                    sessionStorage.setItem('biblioteca_filter_ctx', JSON.stringify({
+                        restore: true, tab: TAB,
+                        categoryId: id ? parseInt(id) : null,
+                        categoryName: name, page: 1, openAcc: Array.from(open), closedAcc: []
+                    }));
+                    sessionStorage.setItem('biblioteca_tab', TAB);
+                } catch (e) {}
+                window.location.href = CATALOG;
+            }));
+        }
+        render();
+    })();
+
+    // ── Ocultar / mostrar el panel (se recuerda la preferencia) ──
+    function toggleSidebarCollapse() {
+        const l = document.getElementById('detailLayout');
+        if (!l) return;
+        const collapsed = l.classList.toggle('sidebar-collapsed');
+        try { localStorage.setItem('biblioteca_sidebar_collapsed', collapsed ? '1' : '0'); } catch (e) {}
+    }
+    function openMobileSidebar() {
+        document.getElementById('mobileSidebar')?.classList.add('open');
+        document.getElementById('sidebarOverlay')?.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeMobileSidebar() {
+        document.getElementById('mobileSidebar')?.classList.remove('open');
+        document.getElementById('sidebarOverlay')?.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    (function () {
+        try {
+            if (localStorage.getItem('biblioteca_sidebar_collapsed') === '1') {
+                document.getElementById('detailLayout')?.classList.add('sidebar-collapsed');
+            }
+        } catch (e) {}
+    })();
+</script>
 </body>
 </html>

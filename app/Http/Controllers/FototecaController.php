@@ -151,7 +151,33 @@ class FototecaController extends Controller
             $related = $related->merge($extra);
         }
 
-        return view('fototeca.foto', compact('photo', 'related'));
+        return view('fototeca.foto', [
+            'photo'                => $photo,
+            'related'              => $related,
+            'categoriesForFilters' => $this->fototecaCategoryTree(),
+        ]);
+    }
+
+    /**
+     * Arbol de categorias de fototeca, para el panel de filtros.
+     */
+    private function fototecaCategoryTree(): array
+    {
+        $roots = Category::where('type', 'fototeca')
+            ->whereNull('parent_id')
+            ->with('subcategories')
+            ->get();
+
+        $build = function ($categories) use (&$build) {
+            return $categories->map(fn($cat) => [
+                'id'       => $cat->id,
+                'name'     => $cat->name,
+                'slug'     => $cat->slug,
+                'children' => $build($cat->subcategories),
+            ])->toArray();
+        };
+
+        return $build($roots);
     }
 
     public function showPhotographer(\App\Models\Photographer $photographer)

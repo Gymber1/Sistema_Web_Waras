@@ -555,3 +555,97 @@ img { -webkit-user-drag: none; user-drag: none; -webkit-user-select: none; user-
     border-radius: 3px;
 }
 .info-panel::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+/* ═══ PANEL DE FILTROS EN LA FICHA ═══════════════════════════ */
+.detail-layout { display: flex; align-items: flex-start; min-height: calc(100vh - var(--nav-h)); }
+.detail-layout .page-body { flex: 1; min-width: 0; }
+
+.detail-layout .sidebar {
+    position: sticky; top: var(--nav-h);
+    width: 260px; min-width: 260px; flex-shrink: 0;
+    height: calc(100vh - var(--nav-h)); overflow-y: auto;
+    display: flex; flex-direction: column;
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border-line);
+}
+
+.sidebar-header {
+    display: flex; align-items: center; gap: .75rem;
+    padding: 1.5rem 1.25rem 1rem;
+    border-bottom: 1px solid var(--border-line);
+}
+.sidebar-logo { color: var(--gold); line-height: 0; }
+.sidebar-title-text { margin: 0; font-size: .8rem; font-weight: 700; letter-spacing: .12em; color: var(--text-primary); }
+.sidebar-subtitle-text { margin: 0; font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; color: var(--text-muted); }
+.sidebar-collapse-btn {
+    margin-left: auto; background: none; border: none;
+    color: var(--gold); cursor: pointer; line-height: 0; padding: .25rem;
+}
+.sidebar-collapse-btn:hover { color: var(--gold-hover); }
+.sidebar-close-btn {
+    display: none; margin-left: auto; background: none; border: none;
+    color: var(--text-muted); font-size: 1.4rem; cursor: pointer; line-height: 1;
+}
+
+.sidebar-section { padding: 1.25rem 1rem; }
+.sidebar-section-label {
+    margin: 0 0 .75rem;
+    font-size: .6rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--text-muted);
+    display: flex; align-items: center; gap: .4rem;
+}
+
+.detail-layout .accordion-btn {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+    padding: .55rem .75rem; border: none; background: none;
+    color: #ccc; font-family: inherit; font-size: .78rem; text-align: left;
+    cursor: pointer; border-radius: 6px; transition: background .15s, color .15s;
+}
+.detail-layout .accordion-btn:hover { background: rgba(255,255,255,.04); color: var(--text-primary); }
+.accordion-chevron { transition: transform .2s; color: var(--text-muted); flex-shrink: 0; }
+.accordion-chevron.open { transform: rotate(90deg); color: var(--gold); }
+.accordion-body { display: none; }
+.accordion-body.open { display: block; }
+
+.detail-layout .sidebar-leaf {
+    width: 100%; display: flex; align-items: center; gap: .5rem;
+    padding: .45rem .75rem; border: none; background: none;
+    color: #999; font-family: inherit; font-size: .78rem; text-align: left;
+    cursor: pointer; border-radius: 6px; transition: background .15s, color .15s;
+}
+.detail-layout .sidebar-leaf:hover { background: rgba(197,166,109,.1); color: var(--gold); }
+
+/* Colapsado (escritorio) */
+.detail-layout.sidebar-collapsed .sidebar { display: none; }
+.sidebar-show-btn {
+    display: none; position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+    z-index: 90; align-items: center; gap: .4rem;
+    padding: .7rem .85rem; border: none; border-radius: 0 8px 8px 0;
+    background: var(--gold); color: #1a1a1a;
+    font-family: inherit; font-size: .75rem; font-weight: 700; cursor: pointer;
+    box-shadow: 2px 2px 12px rgba(0,0,0,.4);
+}
+.detail-layout.sidebar-collapsed .sidebar-show-btn { display: inline-flex; }
+
+/* Móvil */
+.sidebar-toggle-btn {
+    display: none; align-items: center; gap: .45rem;
+    margin-bottom: 1.25rem; padding: .6rem 1rem;
+    border: 1px solid var(--border-line); border-radius: 8px;
+    background: var(--bg-surface); color: var(--text-secondary);
+    font-family: inherit; font-size: .8rem; font-weight: 600; cursor: pointer;
+}
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; }
+.sidebar-overlay.open { display: block; }
+
+@media (max-width: 1024px) {
+    .detail-layout .sidebar {
+        position: fixed; top: 0; left: 0; z-index: 210;
+        height: 100vh; transform: translateX(-100%); transition: transform .25s ease;
+    }
+    .detail-layout .sidebar.open { transform: none; }
+    .sidebar-close-btn { display: block; }
+    .sidebar-collapse-btn { display: none; }
+    .sidebar-toggle-btn { display: inline-flex; }
+    .detail-layout.sidebar-collapsed .sidebar-show-btn { display: none; }
+}
