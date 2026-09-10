@@ -136,7 +136,7 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="hero" id="heroSection" style="background: linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)), url('{{ $heroBg ?? 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' }}') center/cover no-repeat; background-attachment: fixed;">
+    <section class="hero hidden" id="heroSection" style="background: linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)), url('{{ $heroBg ?? 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' }}') center/cover no-repeat; background-attachment: fixed;">
         <div class="hero-content">
             <h1 class="hero-title">{{ \App\Models\SiteSetting::get('hero_biblioteca_title', 'Biblioteca Digital Ancashina') }}</h1>
             <p class="hero-subtitle">{{ \App\Models\SiteSetting::get('hero_biblioteca_subtitle', '"Conocimiento e historia accesible para todos"') }}</p>
@@ -289,8 +289,24 @@
                 <div id="descriptorSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:200;background:#fff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);max-height:220px;overflow-y:auto;"></div>
             </div>
 
-            <!-- Descriptor chips (filtros rápidos) -->
-            <div id="descriptorChipsBar" style="display:none;margin:0.75rem 0 0.25rem;"></div>
+            <!-- Botones de filtro: Descriptores y Autores (abren ventana emergente) -->
+            <div id="descriptorChipsBar" style="display:none;margin:0.85rem 0 0.25rem;">
+                <div class="filter-btns-wrap">
+                    <button type="button" class="filter-open-btn" id="btnOpenDescriptores" onclick="openDescriptorModal()">
+                        <i class="fas fa-tags"></i>
+                        <span>Descriptores</span>
+                        <span class="filter-btn-badge" id="descriptorActiveBadge" hidden></span>
+                    </button>
+                    <button type="button" class="filter-open-btn" id="btnOpenAutores" onclick="openAuthorModal()">
+                        <i class="fas fa-user-pen"></i>
+                        <span>Autores</span>
+                        <span class="filter-btn-badge" id="authorActiveBadge" hidden></span>
+                    </button>
+                    <button type="button" class="filter-clear-btn" id="btnClearFilters" hidden onclick="clearQuickFilters()">
+                        <i class="fas fa-times"></i> Quitar filtros
+                    </button>
+                </div>
+            </div>
 
             <div class="section-header">
                 <h2 class="section-title" id="sectionTitle">Historia Y Geografía</h2>
@@ -549,6 +565,46 @@
     </div>
 
     <!-- Footer -->
+    <!-- ═══ MODAL: DESCRIPTORES ═══ -->
+    <div class="bib-modal-overlay" id="descriptorModal" hidden>
+        <div class="bib-modal" role="dialog" aria-modal="true" aria-labelledby="descriptorModalTitle">
+            <div class="bib-modal-head">
+                <h3 class="bib-modal-title" id="descriptorModalTitle">
+                    <i class="fas fa-tags"></i> Descriptores
+                </h3>
+                <button type="button" class="bib-modal-close" onclick="closeDescriptorModal()" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="bib-modal-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="descriptorModalSearch" placeholder="Buscar descriptor..." autocomplete="off">
+            </div>
+            <div class="bib-modal-body" id="descriptorModalList"></div>
+            <div class="bib-modal-foot">
+                <span class="bib-modal-hint" id="descriptorModalCount"></span>
+                <button type="button" class="bib-modal-btn-ghost" onclick="clearDescriptorFilter()">Quitar filtro</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ MODAL: AUTORES (filtro alfabético) ═══ -->
+    <div class="bib-modal-overlay" id="authorModal" hidden>
+        <div class="bib-modal" role="dialog" aria-modal="true" aria-labelledby="authorModalTitle">
+            <div class="bib-modal-head">
+                <h3 class="bib-modal-title" id="authorModalTitle">
+                    <i class="fas fa-user-pen"></i> Autores
+                </h3>
+                <button type="button" class="bib-modal-close" onclick="closeAuthorModal()" aria-label="Cerrar">&times;</button>
+            </div>
+            <p class="bib-modal-lead">Elige una letra para ver los libros cuyos autores empiezan con ella.</p>
+            <div class="bib-alpha-bar" id="authorAlphaBar"></div>
+            <div class="bib-modal-body" id="authorModalList"></div>
+            <div class="bib-modal-foot">
+                <span class="bib-modal-hint" id="authorModalCount"></span>
+                <button type="button" class="bib-modal-btn-ghost" onclick="clearAuthorFilter()">Quitar filtro</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="footer">
         <p class="footer-text">© 2024 WARAS - Asociación de Ciencia y Cultura Ancashina</p>
         <p class="footer-subtext">Preservando la memoria cultural de nuestra región</p>
@@ -594,6 +650,7 @@
         // ========== DATOS DINÁMICOS DESDE LARAVEL ==========
         const booksDataFromServer = @json($booksData ?? []);
         const topDescriptorsData  = @json($topDescriptors ?? []);
+        const allDescriptorsData  = @json($allDescriptors ?? []);
         
         // ========== DATOS POR SECCIÓN ==========
         const COVER_COLORS = ['#5c4033','#2d4a6e','#3a5a40','#6b3a2a','#1a3a5c','#4a3a6b'];
@@ -667,6 +724,10 @@
         const serverActiveSection = @json($activeSection ?? 'Inicio');
 
         let activeDescriptorId = null;
+        // Filtro por autor: inicial del abecedario o autor concreto.
+        // Declaradas aquí (arriba) para evitar TDZ: renderDescriptorChips() las usa al cargar.
+        let activeAuthorLetter = null;   // 'A'..'Z' | '#'
+        let activeAuthorName   = null;   // nombre exacto de un autor
         let searchFilteredItems = null; // null = fuera del modo búsqueda. Declarada aquí (arriba)
                                         // para evitar TDZ: initViewFromLocation() la usa al cargar.
         const ITEMS_PER_PAGE = 12;
@@ -1154,6 +1215,21 @@
                 // Guardar la URL exacta del catálogo actual (incluye ?descriptor= si aplica)
                 // para que el botón "Atrás" de la ficha regrese al mismo estado.
                 sessionStorage.setItem('biblioteca_return_url', window.location.href);
+                // Guardar el filtro activo (categoría, descriptor, búsqueda, orden, página)
+                // para restaurarlo al volver desde la ficha del libro.
+                try {
+                    sessionStorage.setItem('biblioteca_filter_ctx', JSON.stringify({
+                        tab:          state.activeTab,
+                        categoryId:   state.activeCategory ? state.activeCategory.id : null,
+                        categoryName: state.activeCategory ? state.activeCategory.name : null,
+                        descriptorId: activeDescriptorId,
+                        search:       document.getElementById('contentSearchInput')?.value || '',
+                        sort:         document.getElementById('sortSelect')?.value || '',
+                        page:         state.currentPage,
+                        openAcc:      Array.from(state.openAccordions || []),
+                        closedAcc:    Array.from(state.closedAccordions || [])
+                    }));
+                } catch (e) {}
                 window.location.href = item.detail_url;
                 return;
             }
@@ -1309,7 +1385,51 @@
             }
         }
 
-        initViewFromLocation();
+        // Restaurar el filtro activo al volver desde la ficha de un libro.
+        // Solo aplica si la ficha marcó el contexto como "para restaurar".
+        function restoreFilterContext() {
+            let ctx = null;
+            try { ctx = JSON.parse(sessionStorage.getItem('biblioteca_filter_ctx') || 'null'); } catch (e) {}
+            if (!ctx || !ctx.restore) return false;
+            sessionStorage.removeItem('biblioteca_filter_ctx');
+
+            const tab = validTabs.includes(ctx.tab) ? ctx.tab : 'Libros';
+            showSection(tab);
+
+            if (Array.isArray(ctx.openAcc))   state.openAccordions   = new Set(ctx.openAcc);
+            if (Array.isArray(ctx.closedAcc)) state.closedAccordions = new Set(ctx.closedAcc);
+            if (ctx.categoryId !== null && ctx.categoryId !== undefined) {
+                state.activeCategory = { id: ctx.categoryId, name: ctx.categoryName || 'Todos' };
+                const t = document.getElementById('sectionTitle');
+                const b = document.getElementById('breadcrumbCategory');
+                if (t && ctx.categoryName) t.textContent = ctx.categoryName;
+                if (b && ctx.categoryName) b.textContent = ctx.categoryName;
+            }
+            const ss = document.getElementById('sortSelect');
+            if (ss && ctx.sort) ss.value = ctx.sort;
+            if (ctx.page) state.currentPage = ctx.page;
+
+            renderCategories();
+
+            const si = document.getElementById('contentSearchInput');
+            if (ctx.descriptorId) {
+                const d = (topDescriptorsData || []).find(x => x.id === ctx.descriptorId);
+                if (d) { activeDescriptorId = d.id; if (si) si.value = d.name; filterByDescriptor(d.id); renderDescriptorChips(); }
+                else renderBooks();
+            } else if (ctx.search && si) {
+                si.value = ctx.search;
+                si.dispatchEvent(new Event('input'));
+            } else {
+                renderBooks();
+            }
+            return true;
+        }
+
+        if (!restoreFilterContext()) initViewFromLocation();
+
+        // Pintar el header según la sección activa desde el primer render
+        // (sin esperar a que el usuario haga scroll).
+        window.dispatchEvent(new Event('scroll'));
 
         // Al volver con la flecha del navegador desde una página restaurada de la caché
         // (bfcache), el DOM puede quedar en un estado inconsistente → reconstruir la vista.
@@ -1502,16 +1622,263 @@
 
         // ========== DESCRIPTOR CHIPS ==========
 
+        // Los botones sustituyen a los chips: sólo refrescan su estado visual.
         function renderDescriptorChips() {
-            const bar = document.getElementById('descriptorChipsBar');
-            const chips = topDescriptorsData.map(d => {
-                const isActive = activeDescriptorId === d.id;
-                return `<button class="descriptor-chip${isActive ? ' active' : ''}" data-id="${d.id}" data-name="${d.name}" onclick="toggleDescriptorChip(${d.id}, '${d.name.replace(/'/g,"\\'")}')">
-                    ${d.name} <span class="chip-count">${d.books_count}</span>
-                </button>`;
-            }).join('');
-            bar.innerHTML = `<div class="descriptor-chips-wrap">${chips}</div>`;
+            const dBadge = document.getElementById('descriptorActiveBadge');
+            const aBadge = document.getElementById('authorActiveBadge');
+            const clear  = document.getElementById('btnClearFilters');
+            const dBtn   = document.getElementById('btnOpenDescriptores');
+            const aBtn   = document.getElementById('btnOpenAutores');
+
+            const d = activeDescriptorId
+                ? descriptorSource().find(x => x.id === activeDescriptorId)
+                : null;
+            if (dBadge) {
+                if (d) { dBadge.textContent = d.name; dBadge.hidden = false; }
+                else   { dBadge.hidden = true; }
+            }
+            if (dBtn) dBtn.classList.toggle('is-active', !!d);
+
+            const authorLabel = activeAuthorName || (activeAuthorLetter ? 'Letra ' + activeAuthorLetter : null);
+            if (aBadge) {
+                if (authorLabel) { aBadge.textContent = authorLabel; aBadge.hidden = false; }
+                else             { aBadge.hidden = true; }
+            }
+            if (aBtn) aBtn.classList.toggle('is-active', !!authorLabel);
+
+            if (clear) clear.hidden = !(d || authorLabel);
         }
+
+        // ── Utilidades de autor ──
+        function authorInitial(name) {
+            const n = normalizeStr(name).trim();
+            if (!n) return '#';
+            const c = n.charAt(0).toUpperCase();
+            return (c >= 'A' && c <= 'Z') ? c : '#';
+        }
+
+        // Aplica los filtros rápidos (descriptor + autor) sobre la sección actual
+        function applyQuickFilters() {
+            const tab = state.activeTab;
+            let items = getDataForSection();
+
+            if (activeDescriptorId !== null) {
+                items = items.filter(it => (it.descriptorIds || []).includes(activeDescriptorId));
+            }
+            if (activeAuthorName) {
+                const target = normalizeStr(activeAuthorName);
+                items = items.filter(it => (it.authorNames || []).some(n => normalizeStr(n) === target));
+            } else if (activeAuthorLetter) {
+                items = items.filter(it => (it.authorNames || []).some(n => authorInitial(n) === activeAuthorLetter));
+            }
+
+            searchFilteredItems = items;
+            state.currentPage = 1;
+            renderDescriptorChips();
+
+            const label = activeAuthorName || (activeAuthorLetter ? 'Autores con «' + activeAuthorLetter + '»' : '');
+            renderSearchResults(getSortedItems(items), label, tab === 'Autores');
+        }
+
+        function clearQuickFilters() {
+            activeDescriptorId = null;
+            activeAuthorLetter = null;
+            activeAuthorName   = null;
+            searchFilteredItems = null;
+            const si = document.getElementById('contentSearchInput');
+            if (si) si.value = '';
+            state.currentPage = 1;
+            renderDescriptorChips();
+            renderBooks();
+        }
+        window.clearQuickFilters = clearQuickFilters;
+
+        // ═══════════ MODAL DESCRIPTORES ═══════════
+        function descriptorSource() {
+            const all = (typeof allDescriptorsData !== 'undefined' && allDescriptorsData && allDescriptorsData.length)
+                ? allDescriptorsData : topDescriptorsData;
+            return all || [];
+        }
+
+        function openDescriptorModal() {
+            const m = document.getElementById('descriptorModal');
+            if (!m) return;
+            m.hidden = false;
+            document.body.style.overflow = 'hidden';
+            const inp = document.getElementById('descriptorModalSearch');
+            if (inp) { inp.value = ''; setTimeout(() => inp.focus(), 40); }
+            renderDescriptorModalList('');
+        }
+        function closeDescriptorModal() {
+            const m = document.getElementById('descriptorModal');
+            if (m) m.hidden = true;
+            document.body.style.overflow = '';
+        }
+        window.openDescriptorModal  = openDescriptorModal;
+        window.closeDescriptorModal = closeDescriptorModal;
+
+        function renderDescriptorModalList(q) {
+            const list = document.getElementById('descriptorModalList');
+            const cnt  = document.getElementById('descriptorModalCount');
+            if (!list) return;
+            const nq = normalizeStr(q || '');
+            const items = descriptorSource().filter(d => !nq || normalizeStr(d.name).includes(nq));
+
+            if (cnt) cnt.textContent = items.length + (items.length === 1 ? ' descriptor' : ' descriptores');
+
+            if (!items.length) {
+                list.innerHTML = '<p class="bib-modal-empty">Sin resultados para «' + q + '»</p>';
+                return;
+            }
+            list.innerHTML = items.map(d =>
+                '<button type="button" class="bib-modal-item' + (activeDescriptorId === d.id ? ' is-active' : '') + '"' +
+                ' onclick="pickDescriptor(' + d.id + ')">' +
+                '<span class="bib-modal-item-name">' + d.name + '</span>' +
+                '<span class="bib-modal-item-count">' + d.books_count + '</span>' +
+                '</button>'
+            ).join('');
+        }
+
+        function pickDescriptor(id) {
+            activeDescriptorId = (activeDescriptorId === id) ? null : id;
+            const d = descriptorSource().find(x => x.id === activeDescriptorId);
+            const si = document.getElementById('contentSearchInput');
+            if (si) si.value = d ? d.name : '';
+            closeDescriptorModal();
+            if (activeDescriptorId === null && !activeAuthorLetter && !activeAuthorName) clearQuickFilters();
+            else applyQuickFilters();
+        }
+        window.pickDescriptor = pickDescriptor;
+
+        function clearDescriptorFilter() {
+            activeDescriptorId = null;
+            const si = document.getElementById('contentSearchInput');
+            if (si) si.value = '';
+            closeDescriptorModal();
+            if (!activeAuthorLetter && !activeAuthorName) clearQuickFilters();
+            else applyQuickFilters();
+        }
+        window.clearDescriptorFilter = clearDescriptorFilter;
+
+        // ═══════════ MODAL AUTORES (alfabético) ═══════════
+        function openAuthorModal() {
+            const m = document.getElementById('authorModal');
+            if (!m) return;
+            m.hidden = false;
+            document.body.style.overflow = 'hidden';
+            renderAuthorAlphaBar();
+            renderAuthorModalList('');
+        }
+        function closeAuthorModal() {
+            const m = document.getElementById('authorModal');
+            if (m) m.hidden = true;
+            document.body.style.overflow = '';
+        }
+        window.openAuthorModal  = openAuthorModal;
+        window.closeAuthorModal = closeAuthorModal;
+
+        // Autores presentes en la sección actual, con cuántos libros tiene cada uno
+        function authorsForCurrentTab() {
+            const base = dataBySectionAndCategory[state.activeTab]?.['default'] || [];
+            const map = new Map();
+            base.forEach(it => (it.authorNames || []).forEach(n => {
+                const key = (n || '').trim();
+                if (!key) return;
+                map.set(key, (map.get(key) || 0) + 1);
+            }));
+            return Array.from(map, ([name, count]) => ({ name, count, letter: authorInitial(name) }))
+                        .sort((a, b) => a.name.localeCompare(b.name, 'es'));
+        }
+
+        function renderAuthorAlphaBar() {
+            const bar = document.getElementById('authorAlphaBar');
+            if (!bar) return;
+            const authors = authorsForCurrentTab();
+            const present = new Set(authors.map(a => a.letter));
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').concat('#');
+
+            let html = '<button type="button" class="bib-alpha' + (activeAuthorLetter === null ? ' is-active' : '') +
+                       '" onclick="pickAuthorLetter(null)">Todas</button>';
+            html += letters.map(L => {
+                const has = present.has(L);
+                const cls = 'bib-alpha' + (activeAuthorLetter === L ? ' is-active' : '') + (has ? '' : ' is-empty');
+                return has
+                    ? '<button type="button" class="' + cls + '" onclick="pickAuthorLetter(\'' + L + '\')">' + L + '</button>'
+                    : '<button type="button" class="' + cls + '" disabled>' + L + '</button>';
+            }).join('');
+            bar.innerHTML = html;
+        }
+
+        function renderAuthorModalList(q) {
+            const list = document.getElementById('authorModalList');
+            const cnt  = document.getElementById('authorModalCount');
+            if (!list) return;
+            const nq = normalizeStr(q || '');
+            let items = authorsForCurrentTab();
+            if (activeAuthorLetter) items = items.filter(a => a.letter === activeAuthorLetter);
+            if (nq)                 items = items.filter(a => normalizeStr(a.name).includes(nq));
+
+            if (cnt) cnt.textContent = items.length + (items.length === 1 ? ' autor' : ' autores');
+
+            if (!items.length) {
+                list.innerHTML = '<p class="bib-modal-empty">No hay autores' +
+                    (activeAuthorLetter ? ' con «' + activeAuthorLetter + '»' : '') +
+                    (q ? ' para «' + q + '»' : '') + '.</p>';
+                return;
+            }
+            list.innerHTML = items.map(a =>
+                '<button type="button" class="bib-modal-item' + (activeAuthorName === a.name ? ' is-active' : '') + '"' +
+                ' data-author="' + a.name.replace(/"/g, '&quot;') + '">' +
+                '<span class="bib-modal-item-name">' + a.name + '</span>' +
+                '<span class="bib-modal-item-count">' + a.count + '</span>' +
+                '</button>'
+            ).join('');
+
+            list.querySelectorAll('.bib-modal-item[data-author]').forEach(btn => {
+                btn.addEventListener('click', () => pickAuthorName(btn.getAttribute('data-author')));
+            });
+        }
+
+        // Elegir una letra: filtra el catálogo por la inicial del autor
+        function pickAuthorLetter(L) {
+            activeAuthorLetter = L;
+            activeAuthorName   = null;
+            renderAuthorAlphaBar();
+            renderAuthorModalList('');
+            if (L === null && !activeDescriptorId) clearQuickFilters();
+            else applyQuickFilters();
+        }
+        window.pickAuthorLetter = pickAuthorLetter;
+
+        // Elegir un autor concreto de la lista
+        function pickAuthorName(name) {
+            activeAuthorName = (activeAuthorName === name) ? null : name;
+            closeAuthorModal();
+            if (!activeAuthorName && !activeAuthorLetter && !activeDescriptorId) clearQuickFilters();
+            else applyQuickFilters();
+        }
+        window.pickAuthorName = pickAuthorName;
+
+        function clearAuthorFilter() {
+            activeAuthorLetter = null;
+            activeAuthorName   = null;
+            closeAuthorModal();
+            if (!activeDescriptorId) clearQuickFilters();
+            else applyQuickFilters();
+        }
+        window.clearAuthorFilter = clearAuthorFilter;
+
+        // ── Enlaces de los modales ──
+        document.addEventListener('DOMContentLoaded', function () {
+            const ds = document.getElementById('descriptorModalSearch');
+            if (ds) ds.addEventListener('input', () => renderDescriptorModalList(ds.value.trim()));
+            document.querySelectorAll('.bib-modal-overlay').forEach(ov => {
+                ov.addEventListener('click', e => { if (e.target === ov) { closeDescriptorModal(); closeAuthorModal(); } });
+            });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') { closeDescriptorModal(); closeAuthorModal(); }
+            });
+        });
 
         function toggleDescriptorChip(id, name) {
             if (activeDescriptorId === id) {

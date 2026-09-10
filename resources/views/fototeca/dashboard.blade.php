@@ -192,7 +192,7 @@
     </nav>
 
     <!-- ── HERO ────────────────────────────────────────────────────── -->
-    <section class="hero-section" id="heroSection">
+    <section class="hero-section hidden" id="heroSection">
         <div class="hero-bg" style="background-image:url('{{ $heroBg ?? 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?auto=format&fit=crop&w=1920&q=80' }}');"></div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
@@ -676,6 +676,35 @@
             ).join('');
         }
 
+        // ── CONTEXTO DE NAVEGACIÓN (filtro activo) ───────────────────
+        // Al abrir una foto guardamos la lista COMPLETA de fotos del filtro actual
+        // (ya ordenada) para poder ir a la anterior/siguiente dentro de ese filtro,
+        // y el estado del panel de filtros para restaurarlo al volver.
+        function openPhotoFromGallery(photoId) {
+            try {
+                const ordered = getSortedPhotos(getCurrentPhotos());
+                const ctx = {
+                    ids:        ordered.map(p => p.id),
+                    filterName: state.activeCategory && state.activeCategory.id !== null
+                                    ? state.activeCategory.name
+                                    : (state.activeTagId !== null ? (document.querySelector('.tag-chip.active')?.textContent?.trim() || 'Galería') : 'Galería'),
+                    returnUrl:  window.location.href,
+                    tab:        state.activeTab,
+                    categoryId: state.activeCategory ? state.activeCategory.id : null,
+                    tagId:      state.activeTagId,
+                    page:       state.currentPage,
+                    openAcc:    Array.from(state.openAccordions || []),
+                    closedAcc:  Array.from(state.closedAccordions || []),
+                    search:     document.getElementById('contentSearchInput')?.value || '',
+                    sort:       document.getElementById('sortSelect')?.value || ''
+                };
+                sessionStorage.setItem('fototeca_nav_ctx', JSON.stringify(ctx));
+                sessionStorage.setItem('fototeca_tab', state.activeTab);
+            } catch (e) {}
+            window.location.href = '/fototeca/galeria/' + photoId;
+        }
+        window.openPhotoFromGallery = openPhotoFromGallery;
+
         // ── RENDER GRILLA ────────────────────────────────────────────
         function renderPhotos() {
             const grid = document.getElementById('photosGrid');
@@ -755,7 +784,7 @@
             }
 
             grid.innerHTML = items.map((photo, i) => `
-                <div class="photo-card" data-index="${i}" style="animation-delay:${i*0.05}s" onclick="(function(){sessionStorage.setItem('fototeca_tab','${state.activeTab}');window.location.href='${'/fototeca/galeria/'}${photo.id}'})()">
+                <div class="photo-card" data-index="${i}" style="animation-delay:${i*0.05}s" onclick="openPhotoFromGallery(${photo.id})">
                     <div class="photo-card-inner">
                         <div class="photo-card-img-wrap">
                             <div class="photo-corner photo-corner--tl"></div>
@@ -1357,6 +1386,39 @@
         } else {
             showSection(validTabs.includes(serverActiveSection) ? serverActiveSection : 'Inicio');
         }
+
+        // Al volver desde la ficha de una foto, restaurar el filtro que estaba activo
+        // (categoría, etiqueta, búsqueda, orden, página y acordeones abiertos).
+        (function restoreGalleryFilter() {
+            let ctx = null;
+            try { ctx = JSON.parse(sessionStorage.getItem('fototeca_nav_ctx') || 'null'); } catch (e) {}
+            if (!ctx || !ctx.restore) return;
+            sessionStorage.removeItem('fototeca_nav_ctx');
+
+            if (ctx.tab && validTabs.includes(ctx.tab) && ctx.tab !== state.activeTab) showSection(ctx.tab);
+
+            if (Array.isArray(ctx.openAcc))   { state.openAccordions   = new Set(ctx.openAcc); }
+            if (Array.isArray(ctx.closedAcc)) { state.closedAccordions = new Set(ctx.closedAcc); }
+            if (ctx.categoryId !== null && ctx.categoryId !== undefined) {
+                state.activeCategory = { id: ctx.categoryId, name: ctx.filterName || 'Galería' };
+            } else if (ctx.filterName && ctx.filterName !== 'Galería') {
+                state.activeCategory = { id: null, name: ctx.filterName };
+            }
+            if (ctx.tagId !== null && ctx.tagId !== undefined) state.activeTagId = ctx.tagId;
+
+            const si = document.getElementById('contentSearchInput');
+            if (si && ctx.search) si.value = ctx.search;
+            const ss = document.getElementById('sortSelect');
+            if (ss && ctx.sort) ss.value = ctx.sort;
+            if (ctx.page) state.currentPage = ctx.page;
+
+            const titleEl = document.getElementById('sectionTitle');
+            const bcEl    = document.getElementById('breadcrumbCurrent');
+            if (titleEl && ctx.filterName) titleEl.textContent = ctx.filterName;
+            if (bcEl && ctx.filterName)    bcEl.textContent    = ctx.filterName;
+
+            renderSidebar(); renderPhotos(); renderTagsBar(); renderSidebarTags();
+        })();
 
         // Filtro de fotógrafos — filtra datos y re-renderiza con paginación correcta
         function filterFotografosGrid(q) {

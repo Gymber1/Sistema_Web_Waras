@@ -225,6 +225,19 @@
     </div>
 </div>
 
+<!-- ── NAVEGACIÓN DENTRO DEL FILTRO ACTIVO ── -->
+<nav class="photo-nav" id="photoNav" hidden aria-label="Navegación entre fotos del filtro">
+    <a class="photo-nav-btn" id="photoNavPrev" href="#" rel="prev">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        <span>Anterior</span>
+    </a>
+    <span class="photo-nav-info" id="photoNavInfo"></span>
+    <a class="photo-nav-btn" id="photoNavNext" href="#" rel="next">
+        <span>Siguiente</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+</nav>
+
 <!-- ── LIGHTBOX MODAL ── -->
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Visor de imagen">
     <button class="lightbox-close" id="lightboxClose" title="Cerrar (Esc)">✕</button>
@@ -236,7 +249,7 @@
 <section class="related-section">
     <div class="related-header">
         <span class="related-line"></span>
-        <h2 class="related-title">Más del Archivo</h2>
+        <h2 class="related-title">Más Fotos</h2>
         <span class="related-line"></span>
     </div>
     <div class="related-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;">
@@ -270,10 +283,77 @@
     (function() {
         const tab  = sessionStorage.getItem('fototeca_tab') || 'Galería';
         const base = '{{ route('fototeca.dashboard') }}';
-        document.getElementById('breadcrumbBack').href  = base + '#' + tab;
+        const CURRENT_ID = {{ $photo->id }};
+
+        // Contexto del filtro desde el que se abrió esta foto (si lo hay)
+        let ctx = null;
+        try { ctx = JSON.parse(sessionStorage.getItem('fototeca_nav_ctx') || 'null'); } catch (e) {}
+        const ids = (ctx && Array.isArray(ctx.ids)) ? ctx.ids : [];
+        const idx = ids.indexOf(CURRENT_ID);
+
+        // ── Migas: volver al filtro activo, no a la galería genérica ──
+        const backHref = (ctx && ctx.returnUrl) ? ctx.returnUrl : (base + '#' + tab);
+        const label    = (ctx && ctx.filterName) ? ctx.filterName : tab;
+        document.getElementById('breadcrumbBack').href = base + '#' + tab;
         const bc = document.getElementById('breadcrumbSection');
-        bc.href = base + '#' + tab;
-        bc.textContent = tab;
+        bc.href = backHref;
+        bc.textContent = label;
+
+        // Marcar el contexto para que la galería restaure el filtro al volver
+        function markRestore() {
+            if (!ctx) return;
+            try {
+                ctx.restore = true;
+                sessionStorage.setItem('fototeca_nav_ctx', JSON.stringify(ctx));
+            } catch (e) {}
+        }
+        bc.addEventListener('click', markRestore);
+        const backBtn = document.getElementById('breadcrumbBack');
+        if (backBtn) backBtn.addEventListener('click', markRestore);
+        document.querySelectorAll('a.back-btn, .g-back-btn').forEach(a => {
+            a.addEventListener('click', markRestore);
+            if (ctx && ctx.returnUrl) a.href = ctx.returnUrl;
+        });
+
+        // ── Botones Anterior / Siguiente dentro del filtro activo ──
+        const nav = document.getElementById('photoNav');
+        if (nav && idx !== -1 && ids.length > 1) {
+            const prevEl = document.getElementById('photoNavPrev');
+            const nextEl = document.getElementById('photoNavNext');
+            const info   = document.getElementById('photoNavInfo');
+
+            const prevId = idx > 0 ? ids[idx - 1] : null;
+            const nextId = idx < ids.length - 1 ? ids[idx + 1] : null;
+
+            function wire(el, id) {
+                if (id === null) {
+                    el.classList.add('is-disabled');
+                    el.removeAttribute('href');
+                    el.setAttribute('aria-disabled', 'true');
+                } else {
+                    el.href = '/fototeca/galeria/' + id;
+                    el.addEventListener('click', function () {
+                        // Conservar el contexto para seguir navegando dentro del filtro
+                        try { sessionStorage.setItem('fototeca_nav_ctx', JSON.stringify(ctx)); } catch (e) {}
+                    });
+                }
+            }
+            wire(prevEl, prevId);
+            wire(nextEl, nextId);
+
+            if (info) {
+                info.textContent = (idx + 1) + ' de ' + ids.length +
+                    (ctx.filterName && ctx.filterName !== 'Galería' ? ' · ' + ctx.filterName : '');
+            }
+            nav.hidden = false;
+
+            // Navegación con teclado (flechas ← →)
+            document.addEventListener('keydown', function (e) {
+                if (document.getElementById('lightbox')?.classList.contains('open')) return;
+                if (e.key === 'ArrowLeft'  && prevId !== null) window.location.href = '/fototeca/galeria/' + prevId;
+                if (e.key === 'ArrowRight' && nextId !== null) window.location.href = '/fototeca/galeria/' + nextId;
+            });
+        }
     })();
 
     function openShareModal() {

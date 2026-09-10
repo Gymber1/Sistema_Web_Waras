@@ -207,6 +207,19 @@
         const backBtn = document.getElementById('backBtn');
         const bc      = document.getElementById('breadcrumbSection');
 
+        // Al volver al catálogo, pedirle que restaure el filtro que estaba activo
+        function markFilterRestore() {
+            try {
+                const raw = sessionStorage.getItem('biblioteca_filter_ctx');
+                if (!raw) return;
+                const c = JSON.parse(raw);
+                c.restore = true;
+                sessionStorage.setItem('biblioteca_filter_ctx', JSON.stringify(c));
+            } catch (e) {}
+        }
+        [backBtn, bc].forEach(el => el && el.addEventListener('click', markFilterRestore));
+
+
         if (backUrl) {
             // Contexto explícito (p. ej. desde una colección/especial)
             backBtn.href = backUrl;
@@ -214,7 +227,9 @@
             bc.textContent = backLabel || 'Especiales';
             sessionStorage.removeItem('back_url');
             sessionStorage.removeItem('back_label');
-        } else if (returnUrl) {
+        }
+
+        else if (returnUrl) {
             // Regresar exactamente al catálogo desde donde se abrió el libro
             // (conserva el filtro por descriptor u otra vista).
             backBtn.href = returnUrl;

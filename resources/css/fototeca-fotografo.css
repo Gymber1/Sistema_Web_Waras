@@ -408,3 +408,17 @@ body { display: flex; flex-direction: column; }
 
 /* ── PROTECCIÓN DE IMÁGENES ─────────────────────────────────── */
 img { -webkit-user-drag: none; user-drag: none; -webkit-user-select: none; user-select: none; }
+
+/* ── Barra de desplazamiento oscura (evita el scroll blanco del navegador) ── */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #3a3a3a transparent;
+}
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+    background: #3a3a3a;
+    border-radius: 3px;
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+*::-webkit-scrollbar-corner { background: transparent; }

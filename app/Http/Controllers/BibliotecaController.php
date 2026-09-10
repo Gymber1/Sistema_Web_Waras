@@ -68,6 +68,12 @@ class BibliotecaController extends Controller
             ->limit(20)
             ->get(['id', 'name', 'books_count']);
 
+        // Todos los descriptores con libros (para la ventana emergente de Descriptores)
+        $allDescriptors = Descriptor::withCount('books')
+            ->having('books_count', '>', 0)
+            ->orderBy('name')
+            ->get(['id', 'name', 'books_count']);
+
         return [
             'totalBooks'           => $totalBooks,
             'totalAuthors'         => $totalAuthors,
@@ -80,6 +86,7 @@ class BibliotecaController extends Controller
             'revistaCategoriesForFilters' => $buildTree($allRevistaCategories),
             'activeSection'        => $activeSection,
             'topDescriptors'       => $topDescriptors,
+            'allDescriptors'       => $allDescriptors,
             'canEditPanel'         => auth()->check() && (auth()->user()->is_admin_global || auth()->user()->canAccessModule('biblioteca')),
             'heroBg'               => ($p = SiteSetting::get('bg_biblioteca')) ? asset('storage/' . $p) : null,
         ];
