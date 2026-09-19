@@ -94,7 +94,7 @@
         <div class="sidebar-section">
             <h4 class="sidebar-section-label">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
-                Distribucion Geografica
+                Distribución Geográfica
             </h4>
             <ul id="sidebarCategories" style="list-style:none;padding:0;margin:0;"></ul>
         </div>
@@ -508,7 +508,7 @@
             const list = document.getElementById('sidebarCategories');
             if (!list) return;
             list.innerHTML =
-                '<li><button class="sidebar-leaf" data-cat="" data-name="Toda la Coleccion"><span>Toda la Coleccion</span></button></li>' +
+                '<li><button class="sidebar-leaf" data-cat="" data-name="Toda la Colección"><span>Toda la Colección</span></button></li>' +
                 CATS.map(n => nodeHtml(n, 0)).join('');
 
             list.querySelectorAll('.accordion-btn').forEach(b => b.addEventListener('click', () => {
@@ -522,12 +522,12 @@
                 const name = b.dataset.name;
                 try {
                     sessionStorage.setItem('fototeca_nav_ctx', JSON.stringify({
-                        restore: true, tab: 'Galeria', ids: [],
+                        restore: true, tab: 'Galería', ids: [],
                         categoryId: id ? parseInt(id) : null,
                         filterName: name, page: 1,
                         openAcc: Array.from(open), closedAcc: []
                     }));
-                    sessionStorage.setItem('fototeca_tab', 'Galeria');
+                    sessionStorage.setItem('fototeca_tab', 'Galería');
                 } catch (e) {}
                 window.location.href = GALLERY;
             }));
