@@ -28,7 +28,7 @@
             </div>
             <div class="mobile-menu-links">
                 <a href="{{ route('home') }}" class="mobile-nav-link" onclick="showView('inicio');closeMobileMenu();return false;">Inicio</a>
-                <button onclick="showView('inicio');closeMobileMenu();setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);" class="mobile-nav-link">Patrimonio Cultural</button>
+                <button onclick="showView('inicio');closeMobileMenu();setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);" class="mobile-nav-link">Patrimonio Bibliográfico y Documental</button>
                 <button onclick="showView('organizacion');closeMobileMenu();" class="mobile-nav-link">Organización</button>
                 <button onclick="showView('aportantes');closeMobileMenu();" class="mobile-nav-link">Aportantes</button>
                 <button onclick="closeMobileMenu(); openContactModal();" class="mobile-nav-link">Contacto</button>
@@ -57,7 +57,7 @@
             <nav class="desktop-nav">
                 <a href="{{ route('home') }}" class="nav-link" onclick="showView('inicio');return false;">Inicio</a>
                 <span class="nav-sep">|</span>
-                <a href="#colecciones" class="nav-link" onclick="showView('inicio');setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);return false;" style="white-space:nowrap;">Patrimonio Cultural</a>
+                <a href="#colecciones" class="nav-link nav-link-2l" onclick="showView('inicio');setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);return false;"><span>Patrimonio Bibliográfico</span><span>y Documental</span></a>
                 <span class="nav-sep">|</span>
                 <button onclick="showView('organizacion')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Organización</button>
                 <button onclick="showView('aportantes')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Aportantes</button>

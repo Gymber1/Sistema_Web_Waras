@@ -44,6 +44,17 @@ body { font-family: 'Poppins', sans-serif; color: #333; line-height: 1.6; backgr
     transition: color .3s;
 }
 .nav-link:hover { color: #cda274; }
+
+/* Enlace de dos niveles (dos líneas centradas) */
+.nav-link-2l {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.25;
+    text-align: center;
+    white-space: nowrap;
+}
 .nav-sep { color: rgba(255,255,255,.3); font-size: .85rem; user-select: none; }
 .btn-admin {
     background: #cda274; color: white;
@@ -96,6 +107,8 @@ body { font-family: 'Poppins', sans-serif; color: #333; line-height: 1.6; backgr
     color: rgba(255,255,255,.8); text-decoration: none;
     background: none; border: none; cursor: pointer; text-align: left;
     font-family: 'Poppins', sans-serif;
+    /* El texto largo debe partirse en varias líneas, no desbordarse */
+    white-space: normal; line-height: 1.35; width: 100%;
     border-left: 3px solid transparent; transition: all .2s;
 }
 .mobile-nav-link:hover, .mobile-nav-link.active {
@@ -891,3 +904,8 @@ body { font-family: 'Poppins', sans-serif; color: #333; line-height: 1.6; backgr
 }
 .form-submit:hover { background: #b88e62; }
 
+/* Pantallas intermedias: ajustar el enlace de dos niveles para que no apriete el menú */
+@media(max-width: 1200px) {
+    .desktop-nav { gap: 1.1rem; }
+    .nav-link-2l { font-size: .7rem; letter-spacing: .06em; }
+}
