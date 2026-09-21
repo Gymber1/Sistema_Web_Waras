@@ -545,7 +545,7 @@
                             <div style="position:relative;width:160px;height:160px;margin-bottom:1.5rem;">
                                 <div style="position:absolute;inset:0;border-radius:50%;border:4px solid #e2e8f0;"></div>
                                 <div style="position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--accent);opacity:.5;"></div>
-                                <img src="/giber.png" alt="Giber Garcia Alamo" style="width:100%;height:100%;object-fit:cover;border-radius:50%;padding:4px;">
+                                <img src="/giber.webp" alt="Giber Garcia Alamo" style="width:100%;height:100%;object-fit:cover;border-radius:50%;padding:4px;">
                             </div>
                             <!-- Datos -->
                             <h5 style="font-size:.9rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem;">Giber Garcia Alamo</h5>

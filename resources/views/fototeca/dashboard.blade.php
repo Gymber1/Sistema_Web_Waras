@@ -533,7 +533,7 @@
                 </div>
                 <div class="director-card">
                     <div class="director-avatar">
-                        <img src="{{ asset('giber.png') }}" alt="Giber Garcia Alamo">
+                        <img src="{{ asset('giber.webp') }}" alt="Giber Garcia Alamo">
                     </div>
                     <p class="director-name">Giber Garcia Alamo</p>
                     <p class="director-role">Bibliotecologo</p>

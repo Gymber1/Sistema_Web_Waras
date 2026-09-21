@@ -24,7 +24,7 @@ nav { display: flex; gap: 2.5rem; align-items: center; }
 
 /* ── Hero Banner ── */
 .page-hero {
-    background: linear-gradient(135deg, #0d4a4a 0%, #164e63 50%, #1e3a5f 100%), url('/Fondo.png') center/cover no-repeat;
+    background: linear-gradient(135deg, #0d4a4a 0%, #164e63 50%, #1e3a5f 100%), url('/Fondo.webp') center/cover no-repeat;
     background-blend-mode: multiply;
     padding: 8rem 2rem 5rem;
     text-align: center;
@@ -34,7 +34,7 @@ nav { display: flex; gap: 2.5rem; align-items: center; }
 .page-hero::before {
     content: '';
     position: absolute; inset: 0;
-    background: url('/Fondo.png') center/cover no-repeat;
+    background: url('/Fondo.webp') center/cover no-repeat;
     opacity: .06;
 }
 .page-hero-inner { position: relative; max-width: 720px; margin: 0 auto; }
