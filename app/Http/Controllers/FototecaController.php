@@ -64,12 +64,10 @@ class FototecaController extends Controller
                 'created_at'      => $photo->created_at?->toISOString() ?? '',
                 'year_sort'       => $photo->year ?? $photo->year_from ?? 0,
             ];
-            foreach ($photo->categories as $cat) {
-                $photosByCategory[$cat->name][] = $photoData;
-            }
-            if ($photo->categories->isEmpty()) {
-                $photosByCategory['Sin Categoría'][] = $photoData;
-            }
+            // Una sola vez por foto. Antes se guardaba una copia por cada
+            // categoría, de modo que una foto en 4 categorías viajaba 4 veces:
+            // eso hacía que el HTML pesara 338 KB solo en este bloque.
+            $photosByCategory[] = $photoData;
         }
 
         $photographersData = Photographer::withCount(['photos', 'collections'])->get()->map(fn($p) => [

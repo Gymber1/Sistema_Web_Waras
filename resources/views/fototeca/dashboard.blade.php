@@ -558,13 +558,8 @@
         const categoriesFromDB  = @json($categoriesForFilters ?? []);
         const tagsFromDB        = @json($tagsData ?? []);
 
-        const allPhotosFlat = (() => {
-            const seen = new Set(); const result = [];
-            Object.values(photosByCategory).flat().forEach(p => {
-                if (!seen.has(p.id)) { seen.add(p.id); result.push(p); }
-            });
-            return result;
-        })();
+        // El servidor ya envía una lista plana y sin repetidos.
+        const allPhotosFlat = photosByCategory;
 
         const serverActiveSection = @json($activeSection ?? 'Inicio');
 

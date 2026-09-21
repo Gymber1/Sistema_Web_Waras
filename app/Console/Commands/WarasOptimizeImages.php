@@ -49,7 +49,11 @@ class WarasOptimizeImages extends Command
      * de JSON, como los aportantes del inicio) y por eso hay que recorrerlas
      * por disco en vez de por base de datos.
      */
-    private const LOOSE_FOLDERS = ['aportantes', 'organizacion', 'contact-icons'];
+    private const LOOSE_FOLDERS = [
+        'aportantes', 'organizacion', 'contact-icons',
+        // Estas también se sirven directamente y pesaban varios MB cada una:
+        'backgrounds', 'logos', 'floating', 'contact',
+    ];
 
     public function handle(): int
     {

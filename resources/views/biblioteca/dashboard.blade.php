@@ -2235,9 +2235,11 @@
             const CARD_W_AUTHOR = 150 + 20;
             const VISIBLE       = Math.floor(window.innerWidth / CARD_W_BOOK) + 2;
 
-            const rawLibros   = @json($booksData['Libros'] ?? []);
-            const rawAutores  = @json($booksData['Autores'] ?? []);
-            const rawRevistas = @json($booksData['Revistas'] ?? []);
+            // Reutiliza los datos ya incrustados arriba en booksDataFromServer.
+            // Antes se volvían a imprimir enteros, duplicando ~180 KB de HTML.
+            const rawLibros   = booksDataFromServer['Libros']   || [];
+            const rawAutores  = booksDataFromServer['Autores']  || [];
+            const rawRevistas = booksDataFromServer['Revistas'] || [];
 
             const routes = {
                 libro:   '/biblioteca/libros/',
