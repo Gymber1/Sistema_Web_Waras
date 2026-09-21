@@ -62,7 +62,7 @@
                         <td class="px-4 py-4"><input type="checkbox" class="row-check" value="{{ $collection->id }}"></td>
                         <td class="px-6 py-4">
                             @if($collection->cover_image_path)
-                                <img src="{{ Storage::url($collection->cover_image_path) }}"
+                                <img src="{{ $collection->cover_thumb_url }}"
                                     class="w-10 h-10 object-cover rounded-lg border border-slate-200 dark:border-slate-700"
                                     onerror="this.style.display='none'">
                             @else

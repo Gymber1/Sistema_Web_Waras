@@ -131,7 +131,7 @@
             <div class="book-card">
                 <div class="book-cover" style="background:linear-gradient(135deg,{{ $colors[$i % count($colors)] }},{{ $colors[$i % count($colors)] }}cc)">
                     @if($book->cover_image_path)
-                        <img src="{{ Storage::url($book->cover_image_path) }}" alt="{{ $book->title }}" onerror="this.style.display='none'">
+                        <img src="{{ $book->cover_thumb_url }}" alt="{{ $book->title }}" onerror="this.style.display='none'">
                     @else
                         {{ $book->document_type === 'Revista' ? '📰' : '📚' }}
                     @endif

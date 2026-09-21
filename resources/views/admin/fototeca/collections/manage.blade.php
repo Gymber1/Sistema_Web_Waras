@@ -40,7 +40,7 @@
             @endif
         </div>
         @if($special->cover_image_path)
-        <img src="{{ Storage::url($special->cover_image_path) }}"
+        <img src="{{ $special->cover_thumb_url }}"
             class="w-12 h-12 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm flex-shrink-0"
             onerror="this.style.display='none'">
         @endif

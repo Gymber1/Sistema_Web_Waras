@@ -19,7 +19,8 @@ class WarasOptimizeImages extends Command
     protected $signature = 'waras:optimize-images
                             {--dry-run : Solo muestra lo que haría, sin tocar nada}
                             {--keep    : Conserva los originales en _originales (por defecto se borran)}
-                            {--only=   : Limitar a una carpeta (ej. photos)}';
+                            {--only=   : Limitar a una carpeta (ej. photos)}
+                            {--thumbs-only : Solo genera las miniaturas que falten, sin reconvertir}';
 
     protected $description = 'Convierte a WebP las imágenes ya subidas y actualiza la base de datos';
 
@@ -98,7 +99,35 @@ class WarasOptimizeImages extends Command
                 foreach ($rows as $row) {
                     $path = $row->$column;
 
-                    if (str_ends_with(strtolower($path), '.webp')) {
+                    $isWebp = str_ends_with(strtolower($path), '.webp');
+
+                    // Ya convertida: solo generar la miniatura si falta
+                    if ($isWebp) {
+                        // La carpeta real se toma de la ruta guardada: un mismo modelo
+                        // puede tener sus archivos en otra carpeta (p. ej. specials -> collections).
+                        $realFolder = dirname($path);
+                        $needsThumb = in_array($realFolder, self::THUMB_FOLDERS, true)
+                                      || in_array($folder, self::THUMB_FOLDERS, true);
+                        $thumbPath  = $realFolder . '/thumbs/' . basename($path);
+
+                        if ($needsThumb && ! $disk->exists($thumbPath)) {
+                            if ($dry) {
+                                $this->line("  miniatura pendiente: {$path}");
+                                $converted++;
+                            } elseif (ImageOptimizer::makeThumbFor($path)) {
+                                $this->line("  <fg=green>miniatura</fg=green> {$path}");
+                                $converted++;
+                            } else {
+                                $failed++;
+                            }
+                            continue;
+                        }
+
+                        $skipped++;
+                        continue;
+                    }
+
+                    if ($this->option('thumbs-only')) {
                         $skipped++;
                         continue;
                     }

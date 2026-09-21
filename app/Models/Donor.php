@@ -4,10 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Concerns\HasThumbnail;
 
 class Donor extends Model
 {
+    use HasThumbnail;
     protected $table = 'donors';
+
+
+    /** URL de la imagen reducida, para grillas y tablas. */
+    public function getPhotoThumbUrlAttribute(): ?string
+    {
+        return self::thumbUrl($this->photo_path);
+    }
 
     protected $fillable = [
         'full_name', 'slug', 'birth_place', 'birth_date',

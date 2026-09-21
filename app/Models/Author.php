@@ -5,12 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Concerns\HasThumbnail;
 
 class Author extends Model
 {
     use HasFactory;
+    use HasThumbnail;
 
     protected $table = 'authors';
+
+
+    /** URL de la imagen reducida, para grillas y tablas. */
+    public function getPhotoThumbUrlAttribute(): ?string
+    {
+        return self::thumbUrl($this->photo_path);
+    }
 
     protected $fillable = [
         'name',

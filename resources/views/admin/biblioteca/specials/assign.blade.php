@@ -45,7 +45,7 @@
 
             <div class="relative h-40 {{ $isRevista ? 'bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-500/10 dark:to-blue-500/5' : 'bg-gradient-to-br from-brand-50 to-brand-100 dark:from-brand-500/10 dark:to-brand-500/5' }} flex items-center justify-center overflow-hidden">
                 @if($special->cover_image_path)
-                <img src="{{ Storage::url($special->cover_image_path) }}"
+                <img src="{{ $special->cover_thumb_url }}"
                     class="w-full h-full object-cover"
                     onerror="this.style.display='none'">
                 @else

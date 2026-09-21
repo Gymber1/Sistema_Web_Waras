@@ -202,7 +202,7 @@
                                             : route('biblioteca.libros.show', $book),
                         'color'         => $colors[$i % count($colors)],
                         'type'          => $book->document_type ?? 'Libro',
-                        'cover'         => $book->cover_image_path ? Storage::url($book->cover_image_path) : null,
+                        'cover'         => $book->cover_image_path ? $book->cover_thumb_url : null,
                         'title'         => $book->title,
                         'year'          => $book->publication_year ?? ($book->publication_date ? \Carbon\Carbon::parse($book->publication_date)->format('Y') : 'S/F'),
                         'publisher'     => $book->editorial_name ?? null,

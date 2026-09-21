@@ -134,6 +134,35 @@ class ImageOptimizer
         return $newPath;
     }
 
+    /**
+     * Genera la miniatura de una imagen que ya está en el disco.
+     * Útil para archivos convertidos antes de que existieran las miniaturas.
+     */
+    public static function makeThumbFor(string $relativePath): bool
+    {
+        $disk = Storage::disk('public');
+        if (! $disk->exists($relativePath) || ! self::webpSupported()) {
+            return false;
+        }
+
+        $image = self::readImage($disk->path($relativePath));
+        if (! $image) {
+            return false;
+        }
+
+        $folder = dirname($relativePath);
+        $folder = $folder === '.' ? '' : $folder;
+        if (! $folder) {
+            imagedestroy($image);
+            return false;
+        }
+
+        self::makeThumb($image, $folder, basename($relativePath));
+        imagedestroy($image);
+
+        return $disk->exists($folder . '/thumbs/' . basename($relativePath));
+    }
+
     /** Genera la miniatura en <folder>/thumbs/<nombre>. */
     private static function makeThumb($image, string $folder, string $name): void
     {

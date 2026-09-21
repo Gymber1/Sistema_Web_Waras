@@ -54,7 +54,9 @@ class WarasCleanOrphanImages extends Command
             if (str_contains($file, '/thumbs/')) {
                 continue;
             }
-            if (isset($used[$file])) {
+            // Coincidencia por ruta completa o por nombre de archivo: algunas
+            // referencias vienen con prefijos distintos segun donde se guardaron.
+            if (isset($used[$file]) || isset($used[basename($file)])) {
                 continue;
             }
 
@@ -119,10 +121,6 @@ class WarasCleanOrphanImages extends Command
             }
 
             foreach ($columns as $column) {
-                if (! preg_match('/path|image|photo|logo|icon|cover|bg|file/i', $column)) {
-                    continue;
-                }
-
                 try {
                     $values = DB::table($table)
                         ->whereNotNull($column)
@@ -133,17 +131,44 @@ class WarasCleanOrphanImages extends Command
                 }
 
                 foreach ($values as $value) {
-                    if (! is_string($value) || $value === '') {
+                    if (! is_string($value) || $value === "") {
                         continue;
                     }
-                    $clean = ltrim(str_replace('\\', '/', $value), '/');
-                    $clean = preg_replace('#^storage/#', '', $clean);
-                    $used[$clean] = true;
+
+                    // Rastrear cualquier ruta de imagen que aparezca en el texto.
+                    // Hace falta porque algunas imagenes se guardan dentro de JSON
+                    // (p. ej. site_settings.aportantes_data) y de otro modo se
+                    // marcarian como huerfanas y se borrarian por error.
+                    if (preg_match_all("#[\\w/\\\\.-]+\\.(?:png|jpe?g|webp|bmp|gif|svg)#i", $value, $m)) {
+                        foreach ($m[0] as $hit) {
+                            $this->rememberPath($used, $hit);
+                        }
+                    }
                 }
             }
         }
 
         return $used;
+    }
+
+
+    /**
+     * Registra una ruta como "en uso", normalizando las variantes con que
+     * puede venir (barras escapadas, prefijo /storage/, etc.).
+     */
+    private function rememberPath(array &$used, string $value): void
+    {
+        $clean = str_replace(["\\\\/", "\\\\\\\\"], "/", $value);
+        $clean = ltrim($clean, "/");
+        $clean = preg_replace("#^storage/#", "", $clean);
+        $clean = ltrim($clean, "/");
+
+        if ($clean === "") {
+            return;
+        }
+
+        $used[$clean] = true;
+        $used[basename($clean)] = true;
     }
 
     private function human(int $bytes): string

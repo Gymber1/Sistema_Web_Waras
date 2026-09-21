@@ -75,7 +75,7 @@
                             <div class="flex items-center gap-4">
                                 <div class="w-10 h-14 bg-slate-200 dark:bg-slate-700 rounded shadow-sm overflow-hidden flex-shrink-0">
                                     @if($book->cover_image_path)
-                                        <img src="{{ Storage::url($book->cover_image_path) }}" alt="{{ $book->title }}"
+                                        <img src="{{ $book->cover_thumb_url }}" alt="{{ $book->title }}"
                                             class="w-full h-full object-cover cursor-zoom-in"
                                             onclick="openLightbox('{{ Storage::url($book->cover_image_path) }}', '{{ addslashes($book->title) }}')"
                                             onerror="this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center\'><i data-lucide=\'book\' class=\'w-4 h-4 text-slate-400\'></i></div>'; lucide.createIcons()">

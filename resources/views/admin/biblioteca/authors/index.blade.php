@@ -68,7 +68,7 @@
                         <td class="px-4 py-4"><input type="checkbox" class="row-check" value="{{ $author->id }}"></td>
                         <td class="px-6 py-4">
                             @if($author->photo_path)
-                                <img src="{{ Storage::url($author->photo_path) }}" alt="{{ $author->name }}"
+                                <img src="{{ $author->photo_thumb_url }}" alt="{{ $author->name }}"
                                     class="w-10 h-10 rounded-full object-cover cursor-zoom-in hover:opacity-80 transition-opacity ring-2 ring-slate-100 dark:ring-slate-700"
                                     onclick="openLightbox('{{ Storage::url($author->photo_path) }}', '{{ addslashes($author->name) }}')"
                                     onerror="this.style.display='none'">

@@ -65,7 +65,7 @@
                         <td class="px-6 py-4">
                             @if($mag->cover_image_path)
                                 <div class="w-10 h-14 rounded-lg shadow-sm overflow-hidden ring-1 ring-slate-200 dark:ring-slate-700">
-                                    <img src="{{ Storage::url($mag->cover_image_path) }}" alt="{{ $mag->title }}"
+                                    <img src="{{ $mag->cover_thumb_url }}" alt="{{ $mag->title }}"
                                         class="w-full h-full object-cover cursor-zoom-in hover:opacity-90 transition-opacity"
                                         onclick="openLightbox('{{ Storage::url($mag->cover_image_path) }}', '{{ addslashes($mag->title) }}')"
                                         onerror="this.style.display='none'">

@@ -131,7 +131,7 @@
            onclick="sessionStorage.setItem('back_url', window.location.href); sessionStorage.setItem('back_label', 'Colecciones')">
             <div class="collection-card-cover">
                 @if($col->cover_image_path)
-                    <img src="{{ Storage::url($col->cover_image_path) }}" alt="{{ $col->title }}" loading="lazy">
+                    <img src="{{ $col->cover_thumb_url }}" alt="{{ $col->title }}" loading="lazy">
                 @else
                     <div class="collection-card-placeholder">
                         <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>

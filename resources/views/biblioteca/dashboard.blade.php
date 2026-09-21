@@ -674,7 +674,10 @@
                 isbn:         book.isbn || 'N/A',
                 color:        COVER_COLORS[idx % COVER_COLORS.length],
                 icon:         ICONS[book.document_type] || '📚',
-                cover_url:    book.cover_image_path ? '/storage/' + book.cover_image_path : null,
+                // Usa la miniatura cuando existe (la genera el optimizador en thumbs/):
+                // en una grilla de decenas de libros, cargar la portada completa
+                // hace que la página tarde muchísimo.
+                cover_url:    book.cover_thumb_url || (book.cover_image_path ? '/storage/' + book.cover_image_path : null),
                 source_type:  book.source_type || 'none',
                 external_url: book.external_url || '',
                 pdf_path:     book.pdf_file_path || '',
@@ -704,7 +707,7 @@
                     id:          s.id,
                     title:       s.title,
                     type:        s.type,
-                    cover_url:   s.cover_image_path ? '/storage/' + s.cover_image_path : null,
+                    cover_url:   s.cover_thumb_url || (s.cover_image_path ? '/storage/' + s.cover_image_path : null),
                     books_count: s.books_count ?? (s.books ? s.books.length : 0),
                     slug:        s.slug || '',
                 }))

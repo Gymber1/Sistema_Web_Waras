@@ -167,7 +167,7 @@
                 onclick="sessionStorage.setItem('back_url','{{ url()->current() }}');sessionStorage.setItem('back_label','{{ addslashes($special->title) }}');window.location.href='{{ $detailRoute }}'">
                 <div class="book-cover" style="background:linear-gradient(135deg,{{ $color }},{{ $color }}cc)">
                     @if($book->cover_image_path)
-                        <img src="{{ Storage::url($book->cover_image_path) }}" alt="{{ $book->title }}"
+                        <img src="{{ $book->cover_thumb_url }}" alt="{{ $book->title }}"
                             onerror="this.style.display='none'" loading="lazy">
                     @else
                         <span class="book-cover-icon">{{ $book->document_type === 'Revista' ? '📰' : '📚' }}</span>

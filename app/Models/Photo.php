@@ -13,6 +13,9 @@ class Photo extends Model
 
     protected $table = 'photos';
 
+    /** Se incluye en el JSON para que las grillas usen la miniatura. */
+    protected $appends = ['thumbnail_url'];
+
     protected $fillable = [
         'title',
         'slug',
@@ -52,8 +55,22 @@ class Photo extends Model
         if ($this->source_type === 'external') {
             return $this->external_url ?: null;
         }
+
         $path = $this->thumbnail_path ?? $this->full_image_path;
-        return $path ? Storage::url($path) : null;
+        if (! $path) {
+            return null;
+        }
+
+        // Si existe la miniatura generada al optimizar (carpeta thumbs/), usarla:
+        // pesa una fracción de la imagen completa y es lo que hace ágil la galería.
+        // thumbnail_path suele apuntar al mismo archivo que full_image_path, así que
+        // sin esto la grilla descargaría las fotos a tamaño completo.
+        $thumb = dirname($path) . '/thumbs/' . basename($path);
+        if (Storage::disk('public')->exists($thumb)) {
+            return Storage::url($thumb);
+        }
+
+        return Storage::url($path);
     }
 
     public function photographers(): BelongsToMany

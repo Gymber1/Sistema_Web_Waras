@@ -135,12 +135,12 @@
                                  data-title="{{ addslashes($item->title) }}"
                                  data-author="{{ $item->authors->pluck('name')->join(', ') }}"
                                  data-year="{{ $item->publication_year }}"
-                                 data-cover="{{ $item->cover_image_path ? Storage::url($item->cover_image_path) : '' }}"
+                                 data-cover="{{ $item->cover_image_path ? $item->cover_thumb_url : '' }}"
                                  data-title-lower="{{ strtolower($item->title . ' ' . $item->authors->pluck('name')->join(' ')) }}"
-                                 onclick="addItem({{ $special->id }}, {{ $item->id }}, '{{ addslashes($item->title) }}', '{{ addslashes($item->authors->pluck('name')->join(', ')) }}', '{{ $item->publication_year }}', '{{ $item->cover_image_path ? Storage::url($item->cover_image_path) : '' }}', this)">
+                                 onclick="addItem({{ $special->id }}, {{ $item->id }}, '{{ addslashes($item->title) }}', '{{ addslashes($item->authors->pluck('name')->join(', ')) }}', '{{ $item->publication_year }}', '{{ $item->cover_image_path ? $item->cover_thumb_url : '' }}', this)">
                                 <div class="w-10 h-10 rounded-lg flex-shrink-0 overflow-hidden bg-brand-50 dark:bg-brand-500/10">
                                     @if($item->cover_image_path)
-                                        <img src="{{ Storage::url($item->cover_image_path) }}" alt="" class="w-full h-full object-cover">
+                                        <img src="{{ $item->cover_thumb_url }}" alt="" class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-xs font-bold text-brand-400">{{ $item->publication_year ? substr($item->publication_year, -2) : '?' }}</div>
                                     @endif
@@ -171,12 +171,12 @@
                                  data-title="{{ addslashes($item->title) }}"
                                  data-author="{{ $item->authors->pluck('name')->join(', ') }}"
                                  data-year="{{ $item->publication_year }}"
-                                 data-cover="{{ $item->cover_image_path ? Storage::url($item->cover_image_path) : '' }}"
+                                 data-cover="{{ $item->cover_image_path ? $item->cover_thumb_url : '' }}"
                                  data-title-lower="{{ strtolower($item->title . ' ' . $item->authors->pluck('name')->join(' ')) }}"
-                                 onclick="addItem({{ $special->id }}, {{ $item->id }}, '{{ addslashes($item->title) }}', '{{ addslashes($item->authors->pluck('name')->join(', ')) }}', '{{ $item->publication_year }}', '{{ $item->cover_image_path ? Storage::url($item->cover_image_path) : '' }}', this)">
+                                 onclick="addItem({{ $special->id }}, {{ $item->id }}, '{{ addslashes($item->title) }}', '{{ addslashes($item->authors->pluck('name')->join(', ')) }}', '{{ $item->publication_year }}', '{{ $item->cover_image_path ? $item->cover_thumb_url : '' }}', this)">
                                 <div class="w-10 h-10 rounded-lg flex-shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-700">
                                     @if($item->cover_image_path)
-                                        <img src="{{ Storage::url($item->cover_image_path) }}" alt="" class="w-full h-full object-cover">
+                                        <img src="{{ $item->cover_thumb_url }}" alt="" class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-xs font-bold text-slate-400">{{ $item->publication_year ? substr($item->publication_year, -2) : '?' }}</div>
                                     @endif

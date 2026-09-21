@@ -7,12 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\Book;
 use App\Models\Photographer;
+use App\Models\Concerns\HasThumbnail;
 
 class Special extends Model
 {
     use HasFactory;
+    use HasThumbnail;
 
     protected $table = 'specials';
+
+
+    /** URL de la imagen reducida, para grillas y tablas. */
+    public function getCoverThumbUrlAttribute(): ?string
+    {
+        return self::thumbUrl($this->cover_image_path);
+    }
+
+    /** Se incluye en el JSON para que las grillas usen la miniatura. */
+    protected $appends = ['cover_thumb_url'];
 
     protected $fillable = [
         'title',
