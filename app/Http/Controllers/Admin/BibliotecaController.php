@@ -128,7 +128,7 @@ class BibliotecaController extends Controller
         ];
 
         if ($request->hasFile('cover_image')) {
-            $data['cover_image_path'] = $request->file('cover_image')->store('covers', 'public');
+            $data['cover_image_path'] = \App\Services\ImageOptimizer::store($request->file('cover_image'), 'covers', true);
         }
         if ($request->hasFile('pdf_file') && $request->source_type === 'pdf') {
             $data['pdf_file_path'] = $request->file('pdf_file')->store('pdfs', 'public');
@@ -183,7 +183,7 @@ class BibliotecaController extends Controller
         ];
 
         if ($request->hasFile('cover_image')) {
-            $data['cover_image_path'] = $request->file('cover_image')->store('covers', 'public');
+            $data['cover_image_path'] = \App\Services\ImageOptimizer::store($request->file('cover_image'), 'covers', true);
         }
         if ($request->hasFile('pdf_file') && $request->source_type === 'pdf') {
             $data['pdf_file_path'] = $request->file('pdf_file')->store('pdfs', 'public');
@@ -269,7 +269,7 @@ class BibliotecaController extends Controller
             'death_date'       => $request->death_date,
         ];
         if ($request->hasFile('photo')) {
-            $data['photo_path'] = $request->file('photo')->store('authors', 'public');
+            $data['photo_path'] = \App\Services\ImageOptimizer::store($request->file('photo'), 'authors', false);
         }
 
         $author = Author::create($data);
@@ -310,7 +310,7 @@ class BibliotecaController extends Controller
             'death_date'       => $request->death_date,
         ];
         if ($request->hasFile('photo')) {
-            $data['photo_path'] = $request->file('photo')->store('authors', 'public');
+            $data['photo_path'] = \App\Services\ImageOptimizer::store($request->file('photo'), 'authors', false);
         }
 
         $author->update($data);
@@ -376,7 +376,7 @@ class BibliotecaController extends Controller
             'address'     => $request->address,
         ];
         if ($request->hasFile('logo')) {
-            $data['logo_path'] = $request->file('logo')->store('publishers', 'public');
+            $data['logo_path'] = \App\Services\ImageOptimizer::store($request->file('logo'), 'publishers', false);
         }
 
         Publisher::create($data);
@@ -404,7 +404,7 @@ class BibliotecaController extends Controller
             'address'     => $request->address,
         ];
         if ($request->hasFile('logo')) {
-            $data['logo_path'] = $request->file('logo')->store('publishers', 'public');
+            $data['logo_path'] = \App\Services\ImageOptimizer::store($request->file('logo'), 'publishers', false);
         }
 
         $publisher->update($data);
@@ -619,7 +619,7 @@ class BibliotecaController extends Controller
         ];
 
         if ($request->hasFile('cover_image')) {
-            $data['cover_image_path'] = $request->file('cover_image')->store('covers', 'public');
+            $data['cover_image_path'] = \App\Services\ImageOptimizer::store($request->file('cover_image'), 'covers', true);
         }
         if ($request->hasFile('pdf_file') && $request->source_type === 'pdf') {
             $data['pdf_file_path'] = $request->file('pdf_file')->store('pdfs', 'public');
@@ -672,7 +672,7 @@ class BibliotecaController extends Controller
         ];
 
         if ($request->hasFile('cover_image')) {
-            $data['cover_image_path'] = $request->file('cover_image')->store('covers', 'public');
+            $data['cover_image_path'] = \App\Services\ImageOptimizer::store($request->file('cover_image'), 'covers', true);
         }
         if ($request->hasFile('pdf_file') && $request->source_type === 'pdf') {
             $data['pdf_file_path'] = $request->file('pdf_file')->store('pdfs', 'public');
@@ -1127,7 +1127,7 @@ class BibliotecaController extends Controller
             'module'      => 'biblioteca',
         ];
         if ($request->hasFile('cover_image')) {
-            $data['cover_image_path'] = $request->file('cover_image')->store('specials', 'public');
+            $data['cover_image_path'] = \App\Services\ImageOptimizer::store($request->file('cover_image'), 'specials', false);
         }
 
         Special::create($data);
@@ -1158,7 +1158,7 @@ class BibliotecaController extends Controller
             if ($special->cover_image_path) {
                 Storage::disk('public')->delete($special->cover_image_path);
             }
-            $data['cover_image_path'] = $request->file('cover_image')->store('specials', 'public');
+            $data['cover_image_path'] = \App\Services\ImageOptimizer::store($request->file('cover_image'), 'specials', false);
         }
 
         $special->update($data);

@@ -216,7 +216,7 @@
                     <span class="btn btn-primary disabled"><i class="fas fa-book-open"></i> Sin acceso disponible</span>
                 @endif
 
-                <button id="btnShare" class="btn-icon" title="Copiar enlace">
+                <button id="btnShare" class="btn-icon" title="Compartir">
                     <i class="fas fa-share-alt"></i>
                 </button>
             </div>
@@ -273,7 +273,23 @@
         }
     })();
 
-    document.getElementById('btnShare').addEventListener('click', () => {
+    // ═══ COMPARTIR ═══
+    function openShareModal() {
+        const url  = encodeURIComponent(window.location.href);
+        const text = encodeURIComponent(@json($book->title) + ' · Biblioteca Digital Ancashina');
+        document.getElementById('share-facebook').href = 'https://www.facebook.com/sharer/sharer.php?u=' + url;
+        document.getElementById('share-twitter').href  = 'https://twitter.com/intent/tweet?url=' + url + '&text=' + text;
+        document.getElementById('share-whatsapp').href = 'https://wa.me/?text=' + text + '%20' + url;
+        const m = document.getElementById('shareModal');
+        m.hidden = false;
+        document.body.style.overflow = 'hidden';
+    }
+    function closeShareModal() {
+        const m = document.getElementById('shareModal');
+        if (m) m.hidden = true;
+        document.body.style.overflow = '';
+    }
+    function copyShareLink() {
         const url = window.location.href;
         const toast = document.getElementById('shareToast');
         navigator.clipboard.writeText(url).catch(() => {
@@ -281,11 +297,48 @@
             ta.value = url; document.body.appendChild(ta); ta.select();
             document.execCommand('copy'); document.body.removeChild(ta);
         }).finally(() => {
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 2500);
+            closeShareModal();
+            if (toast) {
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 2500);
+            }
         });
-    });
+    }
+    document.getElementById('btnShare').addEventListener('click', openShareModal);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeShareModal(); });
 </script>
+    
+<!-- ═══ MODAL COMPARTIR ═══ -->
+<div id="shareModal" class="bib-share-overlay" hidden onclick="if(event.target===this)closeShareModal()">
+    <div class="bib-share-box" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+        <div class="bib-share-head">
+            <span class="bib-share-title" id="shareModalTitle">Compartir libro</span>
+            <button onclick="closeShareModal()" class="bib-share-close" aria-label="Cerrar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <p class="bib-share-sub">{{ $book->title }}</p>
+        <div class="bib-share-grid">
+            <a id="share-facebook" href="#" target="_blank" rel="noopener" class="bib-share-btn bib-share-fb">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                Facebook
+            </a>
+            <a id="share-twitter" href="#" target="_blank" rel="noopener" class="bib-share-btn bib-share-x">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                X / Twitter
+            </a>
+            <a id="share-whatsapp" href="#" target="_blank" rel="noopener" class="bib-share-btn bib-share-wa">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.878-1.404A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10S17.522 2 12 2z"/></svg>
+                WhatsApp
+            </a>
+            <button onclick="copyShareLink()" class="bib-share-btn bib-share-copy">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copiar enlace
+            </button>
+        </div>
+    </div>
+</div>
+
     <x-floating-buttons />
 
 <script>

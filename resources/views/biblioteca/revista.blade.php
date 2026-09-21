@@ -257,15 +257,36 @@
             bc.textContent = tab;
         }
     })();
-    document.getElementById('btnShare').addEventListener('click', () => {
+    // ═══ COMPARTIR ═══
+    function openShareModal() {
+        const url  = encodeURIComponent(window.location.href);
+        const text = encodeURIComponent(@json($book->title) + ' · Biblioteca Digital Ancashina');
+        document.getElementById('share-facebook').href = 'https://www.facebook.com/sharer/sharer.php?u=' + url;
+        document.getElementById('share-twitter').href  = 'https://twitter.com/intent/tweet?url=' + url + '&text=' + text;
+        document.getElementById('share-whatsapp').href = 'https://wa.me/?text=' + text + '%20' + url;
+        const m = document.getElementById('shareModal');
+        m.hidden = false;
+        document.body.style.overflow = 'hidden';
+    }
+    function closeShareModal() {
+        const m = document.getElementById('shareModal');
+        if (m) m.hidden = true;
+        document.body.style.overflow = '';
+    }
+    function copyShareLink() {
         const url = window.location.href;
         const toast = document.getElementById('shareToast');
         navigator.clipboard.writeText(url).catch(() => {
             const ta = document.createElement('textarea');
             ta.value = url; document.body.appendChild(ta); ta.select();
             document.execCommand('copy'); document.body.removeChild(ta);
-        }).finally(() => { toast.style.display='block'; setTimeout(()=>{toast.style.display='none'},2500); });
-    });
+        }).finally(() => {
+            closeShareModal();
+            if (toast) { toast.style.display='block'; setTimeout(()=>{toast.style.display='none'},2500); }
+        });
+    }
+    document.getElementById('btnShare').addEventListener('click', openShareModal);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeShareModal(); });
 </script>
     <x-floating-buttons />
 

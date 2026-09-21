@@ -52,7 +52,7 @@ class WebConfigController extends Controller
             Storage::disk('public')->delete($old);
         }
 
-        $path = $request->file('image')->store('backgrounds', 'public');
+        $path = \App\Services\ImageOptimizer::store($request->file('image'), 'backgrounds', false);
         SiteSetting::set($key, $path);
 
         return back()->with('success', 'Fondo de ' . self::SITES[$key]['label'] . ' actualizado correctamente.');
@@ -137,8 +137,8 @@ class WebConfigController extends Controller
         if ($request->filled('new_nombre')) {
             $logoPath = null;
             $imgPath  = null;
-            if ($request->hasFile('new_logo'))   $logoPath = $request->file('new_logo')->store('floating', 'public');
-            if ($request->hasFile('new_imagen'))  $imgPath  = $request->file('new_imagen')->store('floating', 'public');
+            if ($request->hasFile('new_logo'))   $logoPath = \App\Services\ImageOptimizer::store($request->file('new_logo'), 'floating', false);
+            if ($request->hasFile('new_imagen'))  $imgPath  = \App\Services\ImageOptimizer::store($request->file('new_imagen'), 'floating', false);
             $maxOrden = FloatingButton::max('orden') ?? 0;
             FloatingButton::create([
                 'slug'        => 'extra_' . uniqid(),
@@ -202,14 +202,14 @@ class WebConfigController extends Controller
             if ($floatingButton->logo && Storage::disk('public')->exists($floatingButton->logo)) {
                 Storage::disk('public')->delete($floatingButton->logo);
             }
-            $floatingButton->logo = $request->file('logo')->store('floating', 'public');
+            $floatingButton->logo = \App\Services\ImageOptimizer::store($request->file('logo'), 'floating', false);
         }
 
         if ($request->hasFile('imagen')) {
             if ($floatingButton->imagen && Storage::disk('public')->exists($floatingButton->imagen)) {
                 Storage::disk('public')->delete($floatingButton->imagen);
             }
-            $floatingButton->imagen = $request->file('imagen')->store('floating', 'public');
+            $floatingButton->imagen = \App\Services\ImageOptimizer::store($request->file('imagen'), 'floating', false);
             if ($floatingButton->slug === 'yape')     SiteSetting::set('yape_qr',     $floatingButton->imagen);
             if ($floatingButton->slug === 'whatsapp') SiteSetting::set('whatsapp_qr', $floatingButton->imagen);
         }
@@ -332,7 +332,7 @@ class WebConfigController extends Controller
         ];
 
         if ($request->hasFile('director_foto')) {
-            $path = $request->file('director_foto')->store('aportantes', 'public');
+            $path = \App\Services\ImageOptimizer::store($request->file('director_foto'), 'aportantes', false);
             $data['director']['foto'] = '/storage/' . $path;
         }
 
@@ -476,7 +476,7 @@ class WebConfigController extends Controller
             Storage::disk('public')->delete($old);
         }
 
-        $path = $request->file('icono')->store('logos', 'public');
+        $path = \App\Services\ImageOptimizer::store($request->file('icono'), 'logos', false);
         SiteSetting::set($key, $path);
 
         return back()->with('success', 'Icono actualizado correctamente.');

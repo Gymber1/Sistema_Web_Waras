@@ -139,7 +139,7 @@ class FototecaController extends Controller
             $data['full_image_path'] = null;
             $data['thumbnail_path']  = null;
         } elseif ($request->hasFile('image_file')) {
-            $path = $request->file('image_file')->store('photos', 'public');
+            $path = \App\Services\ImageOptimizer::store($request->file('image_file'), 'photos', true);
             $data['full_image_path'] = $path;
             $data['thumbnail_path']  = $path;
         }
@@ -235,7 +235,7 @@ class FototecaController extends Controller
             $data['full_image_path'] = null;
             $data['thumbnail_path']  = null;
         } elseif ($request->hasFile('image_file')) {
-            $path = $request->file('image_file')->store('photos', 'public');
+            $path = \App\Services\ImageOptimizer::store($request->file('image_file'), 'photos', true);
             $data['full_image_path'] = $path;
             $data['thumbnail_path']  = $path;
         }
@@ -303,7 +303,7 @@ class FototecaController extends Controller
             'studies_critique' => $request->studies_critique,
         ];
         if ($request->hasFile('photo')) {
-            $data['photo_path'] = $request->file('photo')->store('photographers', 'public');
+            $data['photo_path'] = \App\Services\ImageOptimizer::store($request->file('photo'), 'photographers', false);
         }
 
         $p = Photographer::create($data);
@@ -342,7 +342,7 @@ class FototecaController extends Controller
             'studies_critique' => $request->studies_critique,
         ];
         if ($request->hasFile('photo')) {
-            $data['photo_path'] = $request->file('photo')->store('photographers', 'public');
+            $data['photo_path'] = \App\Services\ImageOptimizer::store($request->file('photo'), 'photographers', false);
         }
 
         $photographer->update($data);
@@ -405,7 +405,7 @@ class FototecaController extends Controller
             'studies_critique' => $request->studies_critique,
         ];
         if ($request->hasFile('photo')) {
-            $data['photo_path'] = $request->file('photo')->store('donors', 'public');
+            $data['photo_path'] = \App\Services\ImageOptimizer::store($request->file('photo'), 'donors', false);
         }
 
         $d = Donor::create($data);
@@ -444,7 +444,7 @@ class FototecaController extends Controller
             'studies_critique' => $request->studies_critique,
         ];
         if ($request->hasFile('photo')) {
-            $data['photo_path'] = $request->file('photo')->store('donors', 'public');
+            $data['photo_path'] = \App\Services\ImageOptimizer::store($request->file('photo'), 'donors', false);
         }
 
         $donor->update($data);
@@ -1089,7 +1089,7 @@ class FototecaController extends Controller
             'is_active'      => true,
         ];
         if ($request->hasFile('cover_image')) {
-            $data['cover_image_path'] = $request->file('cover_image')->store('collections', 'public');
+            $data['cover_image_path'] = \App\Services\ImageOptimizer::store($request->file('cover_image'), 'collections', true);
         }
 
         $collection = Special::create($data);
@@ -1122,7 +1122,7 @@ class FototecaController extends Controller
             'featured_donor' => $request->input('featured_donor'),
         ];
         if ($request->hasFile('cover_image')) {
-            $data['cover_image_path'] = $request->file('cover_image')->store('collections', 'public');
+            $data['cover_image_path'] = \App\Services\ImageOptimizer::store($request->file('cover_image'), 'collections', true);
         }
 
         $special->update($data);

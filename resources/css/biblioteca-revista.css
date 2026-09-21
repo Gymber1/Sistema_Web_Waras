@@ -173,3 +173,49 @@ html,body{font-family:'Poppins',sans-serif;color:#333;line-height:1.6;background
     .sidebar-toggle-btn { display: inline-flex; }
     .detail-layout.sidebar-collapsed .sidebar-show-btn { display: none; }
 }
+
+/* ═══ MODAL COMPARTIR ════════════════════════════════════════ */
+.bib-share-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    display: flex; align-items: center; justify-content: center; padding: 1rem;
+    background: rgba(15,23,42,.6); backdrop-filter: blur(4px);
+    animation: bibShareFade .18s ease;
+}
+.bib-share-overlay[hidden] { display: none !important; }
+@keyframes bibShareFade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes bibSharePop  { from { opacity: 0; transform: translateY(8px) scale(.98) } to { opacity: 1; transform: none } }
+
+.bib-share-box {
+    width: 100%; max-width: 420px; padding: 1.5rem;
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.28);
+    animation: bibSharePop .2s ease;
+}
+.bib-share-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .4rem; }
+.bib-share-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 600; color: var(--primary); }
+.bib-share-close {
+    background: none; border: none; color: #94a3b8; cursor: pointer;
+    padding: .3rem; border-radius: 6px; display: flex; align-items: center; transition: color .2s;
+}
+.bib-share-close:hover { color: var(--primary); }
+.bib-share-sub {
+    font-size: .78rem; color: #94a3b8; line-height: 1.45;
+    margin: 0 0 1.25rem; padding-bottom: .75rem; border-bottom: 1px solid #f1f5f9;
+}
+.bib-share-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; }
+.bib-share-btn {
+    display: flex; align-items: center; gap: .6rem;
+    padding: .7rem .9rem; border-radius: 8px;
+    font-family: inherit; font-size: .82rem; font-weight: 500;
+    text-decoration: none; cursor: pointer; border: none;
+    transition: opacity .2s, transform .15s;
+}
+.bib-share-btn:hover { opacity: .88; transform: translateY(-1px); }
+.bib-share-fb   { background: #1877f2; color: #fff; }
+.bib-share-x    { background: #0f0f0f; color: #fff; }
+.bib-share-wa   { background: #25d366; color: #fff; }
+.bib-share-copy { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; width: 100%; }
+
+@media (max-width: 420px) {
+    .bib-share-grid { grid-template-columns: 1fr; }
+}
