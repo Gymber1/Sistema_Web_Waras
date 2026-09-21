@@ -26,7 +26,18 @@ class FototecaController extends Controller
             ->get();
         $totalCategories    = Category::where('type', 'fototeca')->count();
 
-        $allPhotos = Photo::with(['photographers', 'categories', 'tag'])->get();
+        // La galería solo necesita estos campos: de las relaciones basta id y nombre.
+        $allPhotos = Photo::select([
+                'id', 'title', 'description', 'year', 'year_type', 'year_from', 'year_to',
+                'provider', 'location', 'thumbnail_path', 'full_image_path',
+                'source_type', 'external_url', 'tag_id', 'created_at',
+            ])
+            ->with([
+                'photographers:id,full_name',
+                'categories:id,name',
+                'tag:id,name',
+            ])
+            ->get();
 
         $photosByCategory = [];
         foreach ($allPhotos as $photo) {
@@ -40,7 +51,9 @@ class FototecaController extends Controller
                                     : ($photo->year ?? 'S/F'),
                 'source_type'  => $photo->source_type ?? 'local',
                 'image_url'    => $photo->thumbnail_url,
-                'description'  => $photo->description ?? '',
+                // Solo se usa para buscar texto en la galería; la descripción
+                // completa se muestra al abrir la foto, no hace falta aquí.
+                'description'  => mb_substr($photo->description ?? '', 0, 300),
                 'location'     => $photo->location ?? '',
                 'external_url' => $photo->external_url ?? '',
                 'detail_url'   => '/fototeca/galeria/' . $photo->id,

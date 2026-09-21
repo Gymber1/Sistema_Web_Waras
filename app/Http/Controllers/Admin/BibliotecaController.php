@@ -1156,7 +1156,7 @@ class BibliotecaController extends Controller
         if ($request->hasFile('cover_image')) {
             // Reemplazar la portada: borrar la anterior para no dejar archivos huérfanos
             if ($special->cover_image_path) {
-                Storage::disk('public')->delete($special->cover_image_path);
+                \App\Services\ImageOptimizer::delete($special->cover_image_path);
             }
             $data['cover_image_path'] = \App\Services\ImageOptimizer::store($request->file('cover_image'), 'specials', false);
         }
@@ -1233,7 +1233,7 @@ class BibliotecaController extends Controller
     public function destroySpecialCover(Special $special)
     {
         if ($special->cover_image_path) {
-            Storage::disk('public')->delete($special->cover_image_path);
+            \App\Services\ImageOptimizer::delete($special->cover_image_path);
             $special->update(['cover_image_path' => null]);
         }
         return redirect()->route('admin.biblioteca.specials.edit', $special)
@@ -1247,7 +1247,7 @@ class BibliotecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Book::whereIn('id', $ids)->where('document_type', '!=', 'Revista')->each(function($b) {
-            if ($b->cover_image_path) Storage::disk('public')->delete($b->cover_image_path);
+            if ($b->cover_image_path) \App\Services\ImageOptimizer::delete($b->cover_image_path);
             $b->delete();
         });
         return back()->with('success', count($ids) . ' libro(s) eliminado(s).');
@@ -1258,7 +1258,7 @@ class BibliotecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Book::whereIn('id', $ids)->where('document_type', 'Revista')->each(function($b) {
-            if ($b->cover_image_path) Storage::disk('public')->delete($b->cover_image_path);
+            if ($b->cover_image_path) \App\Services\ImageOptimizer::delete($b->cover_image_path);
             $b->delete();
         });
         return back()->with('success', count($ids) . ' revista(s) eliminada(s).');
@@ -1269,7 +1269,7 @@ class BibliotecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Author::whereIn('id', $ids)->each(function($a) {
-            if ($a->photo_path) Storage::disk('public')->delete($a->photo_path);
+            if ($a->photo_path) \App\Services\ImageOptimizer::delete($a->photo_path);
             $a->delete();
         });
         return back()->with('success', count($ids) . ' autor(es) eliminado(s).');
@@ -1280,7 +1280,7 @@ class BibliotecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Publisher::whereIn('id', $ids)->each(function($p) {
-            if ($p->logo_path) Storage::disk('public')->delete($p->logo_path);
+            if ($p->logo_path) \App\Services\ImageOptimizer::delete($p->logo_path);
             $p->delete();
         });
         return back()->with('success', count($ids) . ' editorial(es) eliminada(s).');
@@ -1319,7 +1319,7 @@ class BibliotecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Special::whereIn('id', $ids)->where('module', 'biblioteca')->each(function($s) {
-            if ($s->cover_image_path) Storage::disk('public')->delete($s->cover_image_path);
+            if ($s->cover_image_path) \App\Services\ImageOptimizer::delete($s->cover_image_path);
             $s->books()->detach();
             $s->delete();
         });

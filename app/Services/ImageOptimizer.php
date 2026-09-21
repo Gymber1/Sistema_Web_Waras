@@ -116,7 +116,16 @@ class ImageOptimizer
         $newPath = $folder ? $folder . '/' . $name : $name;
 
         $tmp = tempnam(sys_get_temp_dir(), 'webp');
-        if (! imagewebp($image, $tmp, self::QUALITY)) {
+
+        // Si GD no puede con esta imagen concreta, se devuelve null y el
+        // proceso sigue con las demas en vez de detenerse a medio camino.
+        try {
+            $ok = @imagewebp($image, $tmp, self::QUALITY);
+        } catch (\Throwable $e) {
+            $ok = false;
+        }
+
+        if (! $ok) {
             imagedestroy($image);
             @unlink($tmp);
             return null;
@@ -161,6 +170,27 @@ class ImageOptimizer
         imagedestroy($image);
 
         return $disk->exists($folder . '/thumbs/' . basename($relativePath));
+    }
+
+    /**
+     * Borra una imagen y su miniatura.
+     *
+     * Al reemplazar o eliminar contenido hay que quitar ambas: si solo se borra
+     * la original, la miniatura queda ocupando espacio sin que nadie la use.
+     */
+    public static function delete(?string $relativePath): void
+    {
+        if (! $relativePath) {
+            return;
+        }
+
+        $disk = Storage::disk('public');
+        $disk->delete($relativePath);
+
+        $thumb = dirname($relativePath) . '/thumbs/' . basename($relativePath);
+        if ($disk->exists($thumb)) {
+            $disk->delete($thumb);
+        }
     }
 
     /** Genera la miniatura en <folder>/thumbs/<nombre>. */
@@ -235,12 +265,33 @@ class ImageOptimizer
             default        => null,
         };
 
-        if ($image && $info[2] === IMAGETYPE_PNG) {
+        if (! $image) {
+            return null;
+        }
+
+        // WebP no admite imagenes con paleta de colores (PNG de 8 bits y
+        // similares): hay que pasarlas a color verdadero o imagewebp() falla
+        // con "Palette image not supported by webp".
+        if (! imageistruecolor($image)) {
+            if (function_exists('imagepalettetotruecolor')) {
+                imagepalettetotruecolor($image);
+            } else {
+                $w = imagesx($image);
+                $h = imagesy($image);
+                $true = imagecreatetruecolor($w, $h);
+                self::preserveTransparency($true);
+                imagecopy($true, $image, 0, 0, 0, 0, $w, $h);
+                imagedestroy($image);
+                $image = $true;
+            }
+        }
+
+        if ($info[2] === IMAGETYPE_PNG) {
             imagealphablending($image, true);
             imagesavealpha($image, true);
         }
 
-        return $image ?: null;
+        return $image;
     }
 
     private static function canConvert(UploadedFile $file): bool

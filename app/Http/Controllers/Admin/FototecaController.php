@@ -765,7 +765,7 @@ class FototecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Photographer::whereIn('id', $ids)->each(function($p) {
-            if ($p->photo_path) Storage::disk('public')->delete($p->photo_path);
+            if ($p->photo_path) \App\Services\ImageOptimizer::delete($p->photo_path);
             $p->delete();
         });
         return back()->with('success', count($ids) . ' fotógrafo(s) eliminado(s).');
@@ -776,7 +776,7 @@ class FototecaController extends Controller
         $ids = array_filter(explode(',', $request->input('ids', '')));
         if (empty($ids)) return back()->with('error', 'No se seleccionaron elementos.');
         Donor::whereIn('id', $ids)->each(function($d) {
-            if ($d->photo_path) Storage::disk('public')->delete($d->photo_path);
+            if ($d->photo_path) \App\Services\ImageOptimizer::delete($d->photo_path);
             $d->delete();
         });
         return back()->with('success', count($ids) . ' donador(es) eliminado(s).');

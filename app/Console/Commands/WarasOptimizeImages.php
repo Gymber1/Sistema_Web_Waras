@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use App\Services\ImageOptimizer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Throwable;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -41,6 +43,13 @@ class WarasOptimizeImages extends Command
 
     /** Carpetas cuyas imágenes se muestran en grillas: merecen miniatura. */
     private const THUMB_FOLDERS = ['photos', 'covers', 'collections'];
+
+    /**
+     * Carpetas cuyas imágenes no están en una columna propia (se guardan dentro
+     * de JSON, como los aportantes del inicio) y por eso hay que recorrerlas
+     * por disco en vez de por base de datos.
+     */
+    private const LOOSE_FOLDERS = ['aportantes', 'organizacion', 'contact-icons'];
 
     public function handle(): int
     {
@@ -156,7 +165,11 @@ class WarasOptimizeImages extends Command
                     }
 
                     $withThumb = in_array($folder, self::THUMB_FOLDERS, true);
-                    $newPath   = ImageOptimizer::convertExisting($path, $withThumb);
+                    try {
+                        $newPath = ImageOptimizer::convertExisting($path, $withThumb);
+                    } catch (\Throwable $e) {
+                        $newPath = null;
+                    }
 
                     if (! $newPath) {
                         $this->line("  <fg=red>falló</> {$path}");
@@ -206,6 +219,67 @@ class WarasOptimizeImages extends Command
             }
         }
 
+        // Carpetas sueltas (imágenes referenciadas desde JSON)
+        foreach (self::LOOSE_FOLDERS as $loose) {
+            if ($only && $only !== $loose) {
+                continue;
+            }
+            if (! $disk->exists($loose)) {
+                continue;
+            }
+
+            $files = array_filter(
+                $disk->files($loose),
+                fn($f) => preg_match('/\.(png|jpe?g|bmp)$/i', $f)
+            );
+
+            if (empty($files)) {
+                continue;
+            }
+
+            $this->line("
+<fg=cyan>{$loose}/</> (" . count($files) . " archivos sueltos)");
+
+            foreach ($files as $file) {
+                $sizeBefore = $disk->size($file);
+
+                if ($dry) {
+                    $this->line(sprintf('  %s  (%s)', $file, $this->human($sizeBefore)));
+                    $totalBefore += $sizeBefore;
+                    $converted++;
+                    continue;
+                }
+
+                try {
+                    $newPath = ImageOptimizer::convertExisting($file, false);
+                } catch (\Throwable $e) {
+                    $newPath = null;
+                }
+                if (! $newPath) {
+                    $this->line("  <fg=yellow>omitida</> {$file}");
+                    $failed++;
+                    continue;
+                }
+
+                $sizeAfter = $disk->size($newPath);
+
+                // Actualizar las referencias guardadas dentro de textos/JSON
+                $this->replaceInDatabase($file, $newPath);
+
+                if ($newPath !== $file && $disk->exists($newPath)) {
+                    $keep ? $disk->move($file, '_originales/' . $file) : $disk->delete($file);
+                }
+
+                $totalBefore += $sizeBefore;
+                $totalAfter  += $sizeAfter;
+                $converted++;
+
+                $pct = $sizeBefore > 0 ? round(100 - ($sizeAfter / $sizeBefore * 100)) : 0;
+                $this->line(sprintf('  <fg=green>ok</> %s → %s  (-%d%%)',
+                    $this->human($sizeBefore), $this->human($sizeAfter), $pct));
+            }
+        }
+
         $this->newLine();
 
         if ($dry) {
@@ -233,6 +307,51 @@ class WarasOptimizeImages extends Command
         }
 
         return self::SUCCESS;
+    }
+
+
+    /**
+     * Cambia una ruta por la nueva en cualquier texto de la base de datos.
+     *
+     * Las imagenes de secciones como "Aportantes" se guardan dentro de un JSON
+     * (site_settings.aportantes_data), asi que no basta con actualizar una
+     * columna: hay que reemplazar la ruta dentro del propio texto, en las dos
+     * formas en que puede aparecer (normal y con las barras escapadas del JSON).
+     */
+    private function replaceInDatabase(string $oldPath, string $newPath): void
+    {
+        // Basta con cambiar el NOMBRE del archivo: funciona igual si la ruta
+        // viene normal (/storage/x/foto.png) o escapada dentro de un JSON
+        // (\/storage\/x\/foto.png), sin tener que contemplar cada formato.
+        $variants = [
+            basename($oldPath) => basename($newPath),
+        ];
+
+        foreach (Schema::getTableListing() as $table) {
+            $table = str_contains($table, '.') ? substr($table, strrpos($table, '.') + 1) : $table;
+
+            try {
+                $columns = Schema::getColumnListing($table);
+            } catch (Throwable $e) {
+                continue;
+            }
+
+            foreach ($columns as $column) {
+                foreach ($variants as $from => $to) {
+                    try {
+                        DB::table($table)
+                            ->where($column, 'like', '%' . $from . '%')
+                            ->update([
+                                $column => DB::raw(
+                                    'REPLACE(`' . $column . '`, ' . DB::getPdo()->quote($from) . ', ' . DB::getPdo()->quote($to) . ')'
+                                ),
+                            ]);
+                    } catch (Throwable $e) {
+                        // columna no textual o sin permisos: se ignora
+                    }
+                }
+            }
+        }
     }
 
     private function human(int $bytes): string

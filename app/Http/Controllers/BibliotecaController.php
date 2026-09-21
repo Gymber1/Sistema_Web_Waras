@@ -28,18 +28,51 @@ class BibliotecaController extends Controller
         $totalAuthors    = Author::count();
         $totalPublishers = Publisher::count();
         $totalCategories = Category::count();
-        $allBooks        = Book::with(['authors', 'publisher', 'categories', 'descriptors'])->get();
+        // El catálogo se renderiza en el navegador con estos datos incrustados en
+        // la página, así que se piden SOLO las columnas que usa la grilla y, de
+        // cada relación, únicamente id y nombre. Traer el modelo completo con
+        // todas sus relaciones hacía que el HTML pesara más de 1 MB.
+        $allBooks = Book::select([
+                'id', 'title', 'summary', 'document_type', 'section',
+                'publication_year', 'publication_date', 'pages', 'language', 'isbn',
+                'cover_image_path', 'source_type', 'external_url', 'pdf_file_path',
+                'publisher_id', 'created_at',
+            ])
+            ->with([
+                'authors:id,name',
+                'publisher:id,name',
+                'categories:id,name',
+                'descriptors:id,name',
+            ])
+            ->get();
         $booksByType     = $allBooks->groupBy('document_type');
 
-        $specials = Special::where('module', 'biblioteca')->withCount('books')->with('books.authors')->orderBy('order')->orderBy('title')->get();
+        // Solo se muestran portada, título y cuántos elementos tiene cada colección:
+        // no hace falta traer los libros completos de cada una.
+        $specials = Special::where('module', 'biblioteca')
+            ->select('id', 'title', 'slug', 'type', 'cover_image_path', 'order')
+            ->withCount('books')
+            ->orderBy('order')->orderBy('title')
+            ->get();
+
+        // El catálogo solo usa la sinopsis para buscar texto; la ficha completa
+        // la carga aparte. Recortarla evita mandar miles de caracteres por libro.
+        $trimSummary = function (array $book) {
+            if (! empty($book['summary'])) {
+                $book['summary'] = mb_substr($book['summary'], 0, 300);
+            }
+            return $book;
+        };
 
         $booksData = [
-            'Libros'          => $allBooks->where('document_type', '!=', 'Revista')->values()->toArray(),
-            'Revistas'        => $booksByType->get('Revista', collect())->values()->toArray(),
-            'Editoriales'     => Publisher::with('books')->get()->toArray(),
+            'Libros'          => array_map($trimSummary, $allBooks->where('document_type', '!=', 'Revista')->values()->toArray()),
+            'Revistas'        => array_map($trimSummary, $booksByType->get('Revista', collect())->values()->toArray()),
+            // Solo el listado: cargar Publisher::with('books') duplicaba el
+            // catálogo entero dentro del HTML.
+            'Editoriales'     => Publisher::select('id', 'name')->withCount('books')->get()->toArray(),
             'Especiales'      => $specials->toArray(),
-            'Autores'         => Author::all()->toArray(),
-            'Waras Editorial' => $allBooks->where('section', 'Waras Editorial')->values()->toArray(),
+            'Autores'         => Author::select('id', 'name', 'biography', 'nationality', 'photo_path')->get()->toArray(),
+            'Waras Editorial' => array_map($trimSummary, $allBooks->where('section', 'Waras Editorial')->values()->toArray()),
             'Aportantes'      => [],
         ];
 
