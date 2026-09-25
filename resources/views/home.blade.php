@@ -30,6 +30,7 @@
             <div class="mobile-menu-links">
                 <a href="{{ route('home') }}" class="mobile-nav-link" onclick="showView('inicio');closeMobileMenu();return false;">Inicio</a>
                 <button onclick="showView('inicio');closeMobileMenu();setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);" class="mobile-nav-link">Patrimonio Bibliográfico y Documental</button>
+                <a href="{{ route('biblioteca.editorial.index') }}" class="mobile-nav-link">Waras Editorial</a>
                 <button onclick="showView('organizacion');closeMobileMenu();" class="mobile-nav-link">Organización</button>
                 <button onclick="showView('aportantes');closeMobileMenu();" class="mobile-nav-link">Aportantes</button>
                 <button onclick="closeMobileMenu(); openContactModal();" class="mobile-nav-link">Contacto</button>
@@ -46,7 +47,7 @@
     </div>
 
     <!-- Navbar -->
-    <header class="header" id="header">
+    <header class="header @if(auth()->check()) header-auth @endif" id="header">
         <div class="nav-wrapper">
             <a href="{{ route('home') }}" class="logo">
                 @php $navLogo = \App\Models\SiteSetting::get('nav_logo_portal'); @endphp
@@ -59,6 +60,8 @@
                 <a href="{{ route('home') }}" class="nav-link" onclick="showView('inicio');return false;">Inicio</a>
                 <span class="nav-sep">|</span>
                 <a href="#colecciones" class="nav-link nav-link-2l" onclick="showView('inicio');setTimeout(()=>{document.getElementById('colecciones')?.scrollIntoView({behavior:'smooth'})},50);return false;"><span>Patrimonio Bibliográfico</span><span>y Documental</span></a>
+                <span class="nav-sep">|</span>
+                <a href="{{ route('biblioteca.editorial.index') }}" class="nav-link">Waras Editorial</a>
                 <span class="nav-sep">|</span>
                 <button onclick="showView('organizacion')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Organización</button>
                 <button onclick="showView('aportantes')" class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;">Aportantes</button>
@@ -113,6 +116,7 @@
                 <div class="collections-carousel-container">
                     <div class="collections-carousel" id="collectionsCarousel">
                         <!-- Biblioteca -->
+                        @if(\App\Models\SiteSetting::carruselVisible('biblioteca'))
                         <div class="collection-card" data-url="{{ route('biblioteca.dashboard') }}">
                             <img class="collection-img" src="{{ $heroBgBiblioteca }}" alt="Biblioteca">
                             <div class="collection-gradient"></div>
@@ -122,7 +126,9 @@
                                 <p class="collection-type">Acceso Libre</p>
                             </div>
                         </div>
+                        @endif
                         <!-- Fototeca -->
+                        @if(\App\Models\SiteSetting::carruselVisible('fototeca'))
                         <div class="collection-card" data-url="{{ route('fototeca.inicio') }}">
                             <img class="collection-img" src="{{ $heroBgFototeca }}" alt="Fototeca">
                             <div class="collection-gradient"></div>
@@ -132,7 +138,9 @@
                                 <p class="collection-type">Acceso Libre</p>
                             </div>
                         </div>
+                        @endif
                         <!-- Efemérides -->
+                        @if(\App\Models\SiteSetting::carruselVisible('efemerides'))
                         <div class="collection-card">
                             <img class="collection-img" src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=900&q=80" alt="Efemérides">
                             <div class="collection-gradient"></div>
@@ -142,9 +150,11 @@
                                 <p class="collection-type">Próximamente</p>
                             </div>
                         </div>
+                        @endif
                         <!-- Catálogo KOHA -->
 
-                        <a class="collection-card" href="https://koha.waras.org.pe/" target="_blank">
+                        @if(\App\Models\SiteSetting::carruselVisible('koha'))
+                        <a class="collection-card" href="{{ \App\Models\SiteSetting::kohaUrl() }}" target="_blank" rel="noopener">
                             <img class="collection-img"
                                 src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=900&q=80"
                                 alt="Catálogo KOHA">
@@ -157,8 +167,10 @@
 
                             </div>
                         </a>
+                        @endif
 
                         <!-- Musicoteca -->
+                        @if(\App\Models\SiteSetting::carruselVisible('musicoteca'))
                         <div class="collection-card">
                             <img class="collection-img" src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=900&q=80" alt="Musicoteca">
                             <div class="collection-gradient"></div>
@@ -168,7 +180,9 @@
                                 <p class="collection-type">Próximamente</p>
                             </div>
                         </div>
+                        @endif
                         <!-- Pinacoteca -->
+                        @if(\App\Models\SiteSetting::carruselVisible('pinacoteca'))
                         <div class="collection-card">
                             <img class="collection-img" src="https://images.unsplash.com/photo-1578301978162-7aae4d755744?auto=format&fit=crop&w=900&q=80" alt="Pinacoteca">
                             <div class="collection-gradient"></div>
@@ -178,6 +192,7 @@
                                 <p class="collection-type">Próximamente</p>
                             </div>
                         </div>
+                        @endif
                     </div>
                 </div>
                 <div class="carousel-controls">
@@ -723,6 +738,16 @@
             let GAP = window.innerWidth < 768 ? 16 : 32;
             let SHIFT = CARD_W + GAP;
 
+            // Con una sola tarjeta el bucle infinito no tiene sentido: los clones
+            // se verian repetidos y el teletransporte quedaria en un solo punto.
+            // Se muestra centrada y se ocultan los controles.
+            if (n < 2) {
+                carousel.style.justifyContent = 'center';
+                document.querySelector('.carousel-controls')?.style.setProperty('display', 'none');
+                origCards.forEach(c => c.classList.add('active'));
+                return;
+            }
+
             // Triplicar para bucle infinito
             carousel.innerHTML = '';
             [...origCards, ...origCards, ...origCards].forEach(c => carousel.appendChild(c.cloneNode(true)));
@@ -826,20 +851,43 @@
                 startAuto();
             };
 
-            // Click en tarjeta activa → navegar; click en inactiva → centrar
+            // Click en tarjeta activa → navegar; click en inactiva → centrar.
+            // Las tarjetas que son <a> (KOHA) navegarian solas al hacer clic,
+            // saltandose el centrado, asi que se controla la navegacion aqui.
             carousel.addEventListener('click', function(e) {
                 const card = e.target.closest('.collection-card');
                 if (!card) return;
+
                 const idx = Array.from(allCards()).indexOf(card);
-                if (idx === current) {
-                    const url = card.dataset.url;
-                    if (url) window.location.href = url;
-                } else {
+                const url = card.dataset.url || card.getAttribute('href');
+
+                if (idx !== current) {
+                    e.preventDefault();
                     if (busy) return;
                     clearInterval(autoTimer);
                     go(idx);
                     startAuto();
+                    return;
                 }
+
+                if (!url) return;
+
+                // Un <a> con target="_blank" abre la pestaña por su cuenta.
+                if (card.tagName === 'A' && card.target === '_blank') return;
+
+                e.preventDefault();
+                window.location.href = url;
+            });
+
+            // Enter sobre la tarjeta-enlace la abriria sin centrarla antes.
+            carousel.addEventListener('keydown', function(e) {
+                if (e.key !== 'Enter') return;
+                const card = e.target.closest('.collection-card');
+                if (!card) return;
+                if (Array.from(allCards()).indexOf(card) === current) return;
+
+                e.preventDefault();
+                card.click();
             });
 
             initDots();

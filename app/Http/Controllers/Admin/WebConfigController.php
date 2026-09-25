@@ -546,6 +546,43 @@ class WebConfigController extends Controller
         return back()->with('success', $label . ' actualizado correctamente.');
     }
 
+    public function carrusel()
+    {
+        $items    = SiteSetting::CARRUSEL_ITEMS;
+        $ocultos  = SiteSetting::carruselOcultos();
+        $kohaUrl  = SiteSetting::kohaUrl();
+
+        return view('admin.web-config.carrusel', compact('items', 'ocultos', 'kohaUrl'));
+    }
+
+    public function carruselUpdate(Request $request)
+    {
+        $validos = array_keys(SiteSetting::CARRUSEL_ITEMS);
+
+        // Llegan las tarjetas marcadas como visibles; se guardan las demas.
+        // Asi una tarjeta nueva aparece visible por defecto sin migracion.
+        $visibles = array_intersect((array) $request->input('visibles', []), $validos);
+        $ocultos  = array_values(array_diff($validos, $visibles));
+
+        if (count($ocultos) === count($validos)) {
+            return back()->withErrors([
+                'visibles' => 'Debe quedar al menos una tarjeta visible en el carrusel.',
+            ]);
+        }
+
+        $request->validate([
+            'koha_url' => ['nullable', 'url', 'max:500'],
+        ], [
+            'koha_url.url' => 'El enlace del Catálogo KOHA debe ser una URL válida (incluye https://).',
+        ]);
+
+        SiteSetting::set('carrusel_hidden', json_encode($ocultos));
+        SiteSetting::set('carrusel_koha_url', trim((string) $request->input('koha_url')));
+
+        $n = count($validos) - count($ocultos);
+        return back()->with('success', "Carrusel actualizado: {$n} de " . count($validos) . ' tarjetas visibles.');
+    }
+
     private function defaultAportantes(): array
     {
         return [
@@ -553,7 +590,7 @@ class WebConfigController extends Controller
                 'nombre' => 'Giber Garcia Alamo',
                 'cargo'  => 'Bibliotecólogo',
                 'bio'    => 'Promotor inicial de la recopilación histórica. Asumió la dirección para rescatar, catalogar y promover la Identidad Ancashina a través de esta plataforma digital.',
-                'foto'   => '/giber.png',
+                'foto'   => '/giber.webp',
             ],
             'categorias' => [
                 [

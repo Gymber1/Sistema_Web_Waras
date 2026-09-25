@@ -110,6 +110,18 @@
             <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-sky-400 transition-colors flex-shrink-0 mt-1"></i>
         </a>
 
+        <a href="{{ route('admin.web-config.carrusel') }}"
+            class="group bg-white dark:bg-dark-surface rounded-xl shadow-premium dark:shadow-premium-dark border border-slate-200/50 dark:border-dark-border hover:border-indigo-200 dark:hover:border-indigo-500/30 p-6 flex items-start gap-4 transition-all hover:-translate-y-0.5">
+            <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 transition-colors">
+                <i data-lucide="gallery-horizontal-end" class="w-6 h-6 text-indigo-500"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Carrusel</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Activa o desactiva las tarjetas del carrusel de la página de inicio.</p>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-indigo-400 transition-colors flex-shrink-0 mt-1"></i>
+        </a>
+
     </div>
 </div>
 @endsection

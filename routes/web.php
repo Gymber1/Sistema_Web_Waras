@@ -301,6 +301,8 @@ Route::middleware('auth')->group(function () {
             Route::delete('/icono',           [WebConfigController::class, 'iconoDestroy'])->name('icono.destroy');
             Route::get('/hero-textos',        [WebConfigController::class, 'heroTextos'])->name('hero-textos');
             Route::post('/hero-textos',       [WebConfigController::class, 'updateHeroTextos'])->name('hero-textos.update');
+            Route::get('/carrusel',           [WebConfigController::class, 'carrusel'])->name('carrusel');
+            Route::post('/carrusel',          [WebConfigController::class, 'carruselUpdate'])->name('carrusel.update');
             Route::post('/{key}',   [WebConfigController::class, 'update'])->name('update');
             Route::delete('/{key}', [WebConfigController::class, 'destroy'])->name('destroy');
         });

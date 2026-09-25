@@ -21,6 +21,12 @@ body { font-family: 'Poppins', sans-serif; color: #333; line-height: 1.6; backgr
     max-width: 1300px; margin: 0 auto; padding: 0 2rem;
     height: 100%;
     display: flex; justify-content: space-between; align-items: center;
+    gap: 1rem;
+}
+/* Con sesion el header lleva 8 elementos (menu + Panel Admin + Cerrar Sesion).
+   En 1300px se solapaban con el logo, asi que se aprovecha el ancho real. */
+.header-auth .nav-wrapper {
+    max-width: 1560px;
 }
 .logo {
     font-family: 'Playfair Display', serif;
@@ -36,6 +42,10 @@ body { font-family: 'Poppins', sans-serif; color: #333; line-height: 1.6; backgr
 }
 .desktop-nav {
     display: flex; align-items: center; gap: 1.6rem;
+    /* Separacion minima del logo: sin esto el menu se le pega al comprimirse */
+    margin-left: 1.5rem;
+    flex: 0 1 auto; justify-content: flex-end;
+    min-width: 0;
 }
 .nav-link {
     color: white; text-decoration: none;
@@ -55,7 +65,7 @@ body { font-family: 'Poppins', sans-serif; color: #333; line-height: 1.6; backgr
     text-align: center;
     white-space: nowrap;
 }
-.nav-sep { color: rgba(255,255,255,.3); font-size: .85rem; user-select: none; }
+.nav-sep { color: rgba(255,255,255,.3); font-size: .85rem; user-select: none; flex-shrink: 0; }
 .btn-admin {
     background: #cda274; color: white;
     padding: .55rem 1.4rem;
@@ -64,6 +74,7 @@ body { font-family: 'Poppins', sans-serif; color: #333; line-height: 1.6; backgr
     text-decoration: none;
     transition: background .3s;
     border: none; cursor: pointer;
+    white-space: nowrap; flex-shrink: 0;
 }
 .btn-admin:hover { background: #b88e62; }
 .btn-login {
@@ -74,6 +85,7 @@ body { font-family: 'Poppins', sans-serif; color: #333; line-height: 1.6; backgr
     text-decoration: none;
     border: 1px solid rgba(255,255,255,.4);
     transition: all .3s;
+    white-space: nowrap; flex-shrink: 0;
 }
 .btn-login:hover { background: rgba(255,255,255,.1); border-color: white; }
 
@@ -133,6 +145,13 @@ body { font-family: 'Poppins', sans-serif; color: #333; line-height: 1.6; backgr
 @media(max-width: 1024px) {
     .desktop-nav { display: none; }
     .hamburger-btn { display: block; }
+}
+
+/* Con sesion iniciada el menu lleva dos botones mas (Panel Admin y Cerrar
+   Sesion). Se pasa antes al menu hamburguesa: apretarlos mas los deformaba. */
+@media(max-width: 1280px) {
+    .header-auth .desktop-nav { display: none; }
+    .header-auth .hamburger-btn { display: block; }
 }
 
 /* ── HERO SLIDER ── */
@@ -905,7 +924,16 @@ body { font-family: 'Poppins', sans-serif; color: #333; line-height: 1.6; backgr
 .form-submit:hover { background: #b88e62; }
 
 /* Pantallas intermedias: ajustar el enlace de dos niveles para que no apriete el menú */
-@media(max-width: 1200px) {
-    .desktop-nav { gap: 1.1rem; }
-    .nav-link-2l { font-size: .7rem; letter-spacing: .06em; }
+@media(max-width: 1400px) {
+    .desktop-nav { gap: 1.1rem; margin-left: 1rem; }
+    .nav-link, .nav-link-2l { font-size: .7rem; letter-spacing: .05em; }
+    .btn-admin, .btn-login { font-size: .68rem; padding: .5rem 1rem; letter-spacing: .05em; }
+}
+
+@media(max-width: 1240px) {
+    .desktop-nav { gap: .75rem; margin-left: .75rem; }
+    .nav-link, .nav-link-2l { font-size: .64rem; letter-spacing: .03em; }
+    .btn-admin, .btn-login { font-size: .62rem; padding: .45rem .8rem; letter-spacing: .03em; }
+    .logo { font-size: .85rem; }
+    .logo-icon { width: 28px; height: 28px; }
 }

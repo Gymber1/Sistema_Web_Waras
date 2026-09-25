@@ -87,7 +87,53 @@ class SiteSetting extends Model
             'director_label'  => 'Director del Proyecto',
             'director_name'   => 'Giber García Álamo',
             'director_bio'    => 'Promotor inicial de la recopilación histórica. Asumió la dirección para rescatar, catalogar y promover la Identidad Ancashina a través de esta plataforma digital.',
-            'director_img'    => '/giber.png',
+            'director_img'    => '/giber.webp',
         ];
+    }
+
+    /**
+     * Tarjetas del carrusel "Patrimonio Cultural" del portal.
+     *
+     * Estan aqui y no sueltas en la vista para que el panel pueda listarlas
+     * y ocultarlas sin tocar el blade. La clave identifica a la tarjeta en
+     * carrusel_hidden, asi que no debe cambiar una vez publicada.
+     */
+    public const CARRUSEL_ITEMS = [
+        'biblioteca'  => 'Biblioteca',
+        'fototeca'    => 'Fototeca',
+        'efemerides'  => 'Efemérides',
+        'koha'        => 'Catálogo KOHA',
+        'musicoteca'  => 'Musicoteca',
+        'pinacoteca'  => 'Pinacoteca',
+    ];
+
+    /** Claves de las tarjetas que el admin decidio ocultar. */
+    public static function carruselOcultos(): array
+    {
+        $raw   = static::get('carrusel_hidden');
+        $saved = $raw ? json_decode($raw, true) : [];
+
+        if (! is_array($saved)) {
+            return [];
+        }
+
+        // Descartar claves que ya no existen, por si se renombro una tarjeta.
+        return array_values(array_intersect($saved, array_keys(static::CARRUSEL_ITEMS)));
+    }
+
+    /** true si la tarjeta debe mostrarse en el portal. */
+    public static function carruselVisible(string $key): bool
+    {
+        return ! in_array($key, static::carruselOcultos(), true);
+    }
+
+    public const KOHA_URL_DEFAULT = 'https://koha.waras.org.pe/';
+
+    /** Destino de la tarjeta "Catálogo KOHA" del carrusel. */
+    public static function kohaUrl(): string
+    {
+        $url = trim((string) static::get('carrusel_koha_url'));
+
+        return $url !== '' ? $url : static::KOHA_URL_DEFAULT;
     }
 }

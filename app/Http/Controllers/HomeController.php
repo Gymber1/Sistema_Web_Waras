@@ -22,7 +22,7 @@ class HomeController extends Controller
                 'nombre' => 'Giber Garcia Alamo',
                 'cargo'  => 'Bibliotecólogo',
                 'bio'    => 'Promotor inicial de la recopilación histórica. Asumió la dirección para rescatar, catalogar y promover la Identidad Ancashina a través de esta plataforma digital.',
-                'foto'   => '/giber.png',
+                'foto'   => '/giber.webp',
             ],
             'categorias' => [
                 [
@@ -58,7 +58,7 @@ class HomeController extends Controller
                 auth()->user()->modules()->exists()
             ),
             'user'             => auth()->user(),
-            'heroBg'           => $bgPath      ? asset('storage/' . $bgPath)      : asset('Fondo.png'),
+            'heroBg'           => $bgPath      ? asset('storage/' . $bgPath)      : asset('Fondo.webp'),
             'heroBgBiblioteca' => $bgBiblioteca ? asset('storage/' . $bgBiblioteca) : 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=900&q=80',
             'heroBgFototeca'   => $bgFototeca   ? asset('storage/' . $bgFototeca)   : 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?auto=format&fit=crop&w=900&q=80',
             'aportantes'       => $aportantes,
